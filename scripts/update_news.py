@@ -798,6 +798,107 @@ def main() -> int:
     return 0
 
 
+# ── Auto-tagging ────────────────────────────────────────────────────────────────
+# Source → default region mapping
+SOURCE_REGION: dict[str, str] = {
+    "ndrc": "中国", "nea": "中国", "mee": "中国", "miit": "中国",
+    "chinaenergy": "中国", "tanpaifang": "中国", "bjx": "中国", "ideacarbon": "中国",
+    "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
+    "carbonbrief": "国际",
+    "reuters": "全球",
+}
+
+# Topic tag rules: (tag, [keywords])
+TOPIC_RULES: list[tuple[str, list[str]]] = [
+    ("碳市场", ["碳交易", "碳市场", "碳价", "碳配额", "碳关税", "CBAM", "CCER", "碳排放权", "碳排",
+                "carbon market", "carbon price", "carbon trading", "emissions trading", "ETS", "carbon border"]),
+    ("新能源", ["新能源", "光伏", "风电", "光热", "氢能", "核能", "生物质", "水电",
+                "solar", "wind power", "hydrogen", "nuclear", "renewable energy", "renewables"]),
+    ("储能", ["储能", "电池", "抽水蓄能", "battery", "energy storage"]),
+    ("电力", ["电力", "电网", "电价", "电力市场", "新型电力系统", "消纳", "用电", "发电",
+              "electricity", "power grid", "power market"]),
+    ("化石能源", ["煤炭", "石油", "天然气", "成品油", "LNG", "coal", "oil", "natural gas", "fossil fuel"]),
+    ("节能降碳", ["节能", "能效", "绿色制造", "绿色低碳", "零碳工厂", "减排", "降碳",
+                  "energy efficiency", "decarboni", "net zero", "net-zero", "zero carbon"]),
+    ("气候变化", ["气候", "COP", "NDC", "巴黎协定", "碳中和", "碳达峰", "双碳", "温室气体",
+                  "climate change", "climate policy", "paris agreement", "greenhouse"]),
+    ("绿色金融", ["ESG", "绿色金融", "碳金融", "碳资产", "green finance", "green bond"]),
+    ("环境保护", ["生态环境", "环境保护", "污染防治", "空气质量", "蓝天保卫战",
+                  "environment", "pollution", "air quality"]),
+    ("循环经济", ["循环经济", "资源循环", "废弃物", "circular economy"]),
+    ("电动车", ["电动车", "电动汽车", "EV", "充电桩", "electric vehicle"]),
+    ("政策法规", ["条例", "办法", "规定", "标准", "规范", "法律法规", "司法解释",
+                  "regulation", "legislation"]),
+]
+
+# Policy type tag rules
+POLICY_TYPE_RULES: list[tuple[str, list[str]]] = [
+    ("政策文件", ["通知", "意见", "办法", "条例", "规划", "方案", "公告", "印发", "关于印发"]),
+    ("政策解读", ["解读", "专家", "一图读懂"]),
+    ("新闻发布会", ["新闻发布会", "答问", "通报", "发布", "发布会"]),
+    ("数据报告", ["报告", "数据", "统计", "年报", "季报"]),
+]
+
+
+def auto_tag(title: str, site_id: str) -> list[str]:
+    """Generate tags for a news item based on title and source."""
+    import re as _tag_re
+    tags: list[str] = []
+    title_lower = title.lower()
+
+    # Topic tags
+    for tag, keywords in TOPIC_RULES:
+        for kw in keywords:
+            kw_lower = kw.lower()
+            # Word-boundary check for short abbreviations
+            if len(kw) <= 3 and kw.isascii() and kw.isalpha():
+                # Match only as whole word (e.g. "EV" not in "several")
+                pattern = r'\b' + _tag_re.escape(kw_lower) + r'\b'
+                if _tag_re.search(pattern, title_lower):
+                    tags.append(tag)
+                    break
+            elif kw_lower in title_lower:
+                tags.append(tag)
+                break  # one match per topic
+
+    # Region tag
+    region = SOURCE_REGION.get(site_id, "")
+    # For "全球" sources, try to detect region from title
+    if region == "全球":
+        if any(kw in title_lower for kw in ["eu", "european", "europe", "european union", "brussels"]):
+            region = "欧盟"
+        elif any(kw in title_lower for kw in ["us ", "u.s.", "america", "biden", "trump", "washington"]):
+            region = "美国"
+        elif any(kw in title_lower for kw in ["中国", "china", "beijing", "shanghai"]):
+            region = "中国"
+    if region:
+        tags.insert(0, region)  # region first
+
+    # Policy type tag
+    ptype = "行业动态"  # default
+    for tag, keywords in POLICY_TYPE_RULES:
+        for kw in keywords:
+            if kw.lower() in title_lower:
+                ptype = tag
+                break
+        if ptype != "行业动态":
+            break
+    tags.append(ptype)
+
+    # Fallback
+    if not any(t not in (region, ptype) for t in tags):
+        tags.append("行业动态")
+
+    # Dedup while preserving order
+    seen = set()
+    result = []
+    for t in tags:
+        if t not in seen:
+            seen.add(t)
+            result.append(t)
+    return result
+
+
 # ── Obsidian export ────────────────────────────────────────────────────────────
 def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> int:
     """Export news items as Obsidian markdown notes. Returns count of new notes."""
@@ -832,12 +933,14 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> i
 
         # Build markdown content
         date_val = pub_date[:10] if pub_date else now.strftime("%Y-%m-%d")
+        tags = auto_tag(title, item.get("site_id", ""))
+        tag_str = ", ".join(tags)
         lines = [
             "---",
             f'source: "{site_name}"',
             f"url: {url}",
             f"date: {date_val}",
-            "tags: [政策库]",
+            f"tags: [{tag_str}]",
             "---",
             "",
             f"# {title}",
