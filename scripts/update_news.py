@@ -935,12 +935,20 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> i
         date_val = pub_date[:10] if pub_date else now.strftime("%Y-%m-%d")
         tags = auto_tag(title, item.get("site_id", ""))
         tag_str = ", ".join(tags)
+        # Keywords from tags + title word segmentation
+        kw_set = set(tags)
+        for t in title.replace("：", " ").replace("，", " ").replace("、", " ").split():
+            t = t.strip().strip("\"'【】《》").strip()
+            if len(t) >= 2 and len(t) <= 12 and not t.startswith(("http", "www")):
+                kw_set.add(t)
+        kw_str = ", ".join(sorted(kw_set)[:15])
         lines = [
             "---",
             f'source: "{site_name}"',
             f"url: {url}",
             f"date: {date_val}",
             f"tags: [{tag_str}]",
+            f"keywords: [{kw_str}]",
             "---",
             "",
             f"# {title}",
@@ -958,6 +966,8 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> i
 
     # Update index page
     _update_obsidian_index(base, now)
+    # Update AI-readable index
+    _update_ai_index(base, now)
     return new_count
 
 
@@ -1042,6 +1052,83 @@ LIMIT 20
 ```
 """
     index_path.write_text(content, encoding="utf-8")
+
+
+def _update_ai_index(base: Path, now: datetime) -> None:
+    """Generate AI-readable plain-text index of all policy documents."""
+    index_path = base / "ai-index.md"
+    entries: list[dict] = []
+
+    for root, dirs, files in os.walk(str(base)):
+        for f in files:
+            if f.endswith(".md") and f not in ("政策库.md", "ai-index.md"):
+                fpath = Path(root) / f
+                rel = str(fpath.relative_to(base))
+                content = fpath.read_text(encoding="utf-8")
+                fm: dict[str, str] = {}
+                in_fm = False
+                for line in content.split("\n"):
+                    if line.strip() == "---":
+                        if not in_fm:
+                            in_fm = True
+                        else:
+                            break
+                    elif in_fm:
+                        if ":" in line:
+                            k, v = line.split(":", 1)
+                            fm[k.strip()] = v.strip().strip('"')
+                entries.append({
+                    "file": rel,
+                    "title": fm.get("title", f),
+                    "source": fm.get("source", ""),
+                    "date": fm.get("date", ""),
+                    "tags": fm.get("tags", ""),
+                    "keywords": fm.get("keywords", ""),
+                    "url": fm.get("url", ""),
+                })
+
+    entries.sort(key=lambda e: e["date"], reverse=True)
+
+    lines = [
+        "---",
+        f"updated: {now.strftime('%Y-%m-%d %H:%M')}",
+        "type: ai-index",
+        f"total: {len(entries)}",
+        "---",
+        "",
+        "# AI Policy Index",
+        "",
+        f"> Machine-readable catalog. {len(entries)} docs. grep-friendly.",
+        "",
+        "## By Date",
+        "",
+    ]
+
+    for e in entries:
+        lines.append(f"### {e['date']} | {e['source']} | {e['file']}")
+        lines.append(f"- Title: {e['title']}")
+        lines.append(f"- Tags: {e['tags']}")
+        lines.append(f"- Keywords: {e['keywords']}")
+        lines.append(f"- URL: {e['url']}")
+        lines.append("")
+
+    # Topic index
+    topic_index: dict[str, list[str]] = {}
+    for e in entries:
+        for tag in e["tags"].replace("[", "").replace("]", "").split(","):
+            tag = tag.strip()
+            if tag and tag not in ("MOC", "政策库", "wiki"):
+                topic_index.setdefault(tag, []).append(e["file"])
+
+    lines.append("## By Topic")
+    lines.append("")
+    for topic in sorted(topic_index.keys()):
+        lines.append(f"### {topic} ({len(topic_index[topic])} docs)")
+        for doc in topic_index[topic][:30]:
+            lines.append(f"- {doc}")
+        lines.append("")
+
+    index_path.write_text("\n".join(lines), encoding="utf-8")
 
 
 if __name__ == "__main__":
