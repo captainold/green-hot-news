@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-07T04:53:07.596709Z",
+  "generated_at": "2026-08-07T04:53:59.568829Z",
   "window_hours": 24,
-  "total_items": 79,
-  "total_raw": 241,
+  "total_items": 90,
+  "total_raw": 233,
   "site_count": 5,
   "site_stats": [
     {
@@ -11,14 +11,14 @@
       "count": 48
     },
     {
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "count": 20
+    },
+    {
       "site_id": "worldbank",
       "site_name": "World Bank Climate",
       "count": 15
-    },
-    {
-      "site_id": "iea",
-      "site_name": "IEA",
-      "count": 9
     },
     {
       "site_id": "chinaenergy",
@@ -40,487 +40,7 @@
       "title": "Q&A: What is in China’s new five-year plan for climate change?",
       "url": "https://www.carbonbrief.org/qa-what-is-in-chinas-new-five-year-plan-for-climate-change",
       "published_at": "2026-08-06T14:48:40Z",
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "af2e3455da1a463bfffffe0fe33af28655404dbc",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "生态环境部发布8月上半月全国空气质量预报会商结果",
-      "url": "https://www.mee.gov.cn/202607/t20260731_1163302.shtml",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "12b6a72e1175b19003857788317d9b1459be1104",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "生态环境部公布2026年第二季度和1—6月全国地表水环境质量状况",
-      "url": "https://www.mee.gov.cn/202607/t20260730_1163186.shtml",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "4a682610c7d6c5a4670b1baf421124181d3664e8",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "“扎实做好生态环境法典实施准备工作，为美丽中国建设提供法治保障”有关情况",
-      "url": "https://www.mee.gov.cn/202607/t20260728_1163005.shtml",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "63eb3beefe4c96f7d92ff7835d26803f69378e02",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "生态环境部公布2026年6月和1—6月全国环境空气质量状况",
-      "url": "https://www.mee.gov.cn/202607/t20260728_1162999.shtml",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "1ff642a96152a5ed411429d52f3e54c4dc824c5d",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "长江流域生态环境监督管理局",
-      "url": "http://cjjg.mee.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "409bcc2d8bbcbb5efcfaf1fb3f40f49113f35d40",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "黄河流域生态环境监督管理局",
-      "url": "http://huanghejg.mee.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "9871022f8c75ea79f898ed6e264045e9b9d5cc8a",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "淮河流域生态环境监督管理局",
-      "url": "http://huaihejg.mee.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "be259ae5e46d19a22ca457167695ac79c7fd3e79",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "海河流域北海海域生态环境监督管理局",
-      "url": "http://hhbhjg.mee.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "652260c7e8a4bcb5ecf2fd49035800563e352878",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "珠江流域南海海域生态环境监督管理局",
-      "url": "http://zjnhjg.mee.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "9aa740d62cbc4a5fbdb3279f0ac30f190a8e4814",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "松辽流域生态环境监督管理局",
-      "url": "http://sljg.mee.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "69ad52ddd04addcbececa75493b79c025d79cea3",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "太湖流域东海海域生态环境监督管理局",
-      "url": "http://thdhjg.mee.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "37e40eeba2af26f22b084521ba968b0f6529ca7e",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "国家应对气候变化战略研究和国际合作中心",
-      "url": "http://www.ncsc.org.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "9a7819a3d9e49d89bb1d33238d9cc12e08da04f9",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "土壤与农业农村生态环境监管技术中心",
-      "url": "http://www.tcare-mee.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "68036c124ce90ec94ebb49c96f7f62edc9005d79",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "北京市生态环境局",
-      "url": "http://sthjj.beijing.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "fc69377f5ce0d844b75ca99faf9c6f553d971bd4",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "天津市生态环境局",
-      "url": "http://sthj.tj.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "608792643aa18003e52d99cab45a78f300f5a835",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "河北省生态环境厅",
-      "url": "http://hbepb.hebei.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "7505ac19c3258235e758880d0f7c9c6a3b208d9e",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "山西省生态环境厅",
-      "url": "http://sthjt.shanxi.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "d276430db60cb25b397e459e03d4a4769ff015cf",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "内蒙古自治区生态环境厅",
-      "url": "http://sthjt.nmg.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "ed1cb5ed9dd441995339627711cfe63bc8d07908",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "辽宁省生态环境厅",
-      "url": "http://sthj.ln.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "4c9f0def1642f3dfc7e3b364a85f571a7cbd6f14",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "吉林省生态环境厅",
-      "url": "http://sthjt.jl.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "ca60342662b29d71c06b7597fe884e9f7f06a77b",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "黑龙江省生态环境厅",
-      "url": "http://sthj.hlj.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "bcff21913b7c6b36ad2c67b752ca4b102a8d66ed",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "上海市生态环境局",
-      "url": "http://sthj.sh.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "1e6573e80ce5a814125db526a0fba753a8547a81",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "江苏省生态环境厅",
-      "url": "http://sthjt.jiangsu.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "4c42ffac12653bffe257e03f3cfa28219cae459e",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "浙江省生态环境厅",
-      "url": "http://sthjt.zj.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "b04db73dc452dcea384f6c7cff5ab2d575b9b1c0",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "安徽省生态环境厅",
-      "url": "http://sthjt.ah.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "fa7ee0b286504002d4eb8895443c461f28586b83",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "福建省生态环境厅",
-      "url": "http://sthjt.fujian.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "91786740e2670d68c7655e62147fb8fbce0939a2",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "江西省生态环境厅",
-      "url": "http://sthjt.jiangxi.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "5087c709a5481a1c3c808c5aec19eca18ed32049",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "山东省生态环境厅",
-      "url": "http://www.sdein.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "cc76d0698f0d28dad07c3af28c20cea0b7225d88",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "河南省生态环境厅",
-      "url": "http://sthjt.henan.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "d939c4ed9b3183e34406409a4332d5997f9e9cc8",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "湖北省生态环境厅",
-      "url": "http://sthjt.hubei.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "e5ee87e3e5e43a2c3d5f35605e1578d4ed16511d",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "湖南省生态环境厅",
-      "url": "http://sthjt.hunan.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "5b47328094801e099c14fdab6a777276701765ff",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "广东省生态环境厅",
-      "url": "http://gdee.gd.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "25972f5731924135f0c71d7d85d895747aee8bdb",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "广西壮族自治区生态环境厅",
-      "url": "http://sthjt.gxzf.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "1fce6d35f9998328ab0ee3930cb8c9b385df714f",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "海南省生态环境厅",
-      "url": "http://hnsthb.hainan.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "8c42b21d94eea137b180a2b18a748e639dcd2121",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "重庆市生态环境局",
-      "url": "http://sthjj.cq.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "9971832f243127f553d99993fd07af8053c818ea",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "四川省生态环境厅",
-      "url": "http://sthjt.sc.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "e163f2cc07a465cc7edb3adcef48e670c30738a4",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "贵州省生态环境厅",
-      "url": "http://sthj.guizhou.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "d5b7b7c2f8d44b1905747e631b959e7f8dbb916c",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "云南省生态环境厅",
-      "url": "http://sthjt.yn.gov.cn/index.html",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "bce432109a9cf95ee7066a5ccf6dc278eedc7f1a",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "西藏自治区生态环境厅",
-      "url": "http://ee.xizang.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "4f0cf502aefe4874675a36797cf4047935d61e5b",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "陕西省生态环境厅",
-      "url": "http://sthjt.shaanxi.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "6ffd1646f976b6a051f1b8490acb7ea371327b52",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "甘肃省生态环境厅",
-      "url": "http://sthj.gansu.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "19765be1a9c27c147dcdad8a8c02e19cd76f28be",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "青海省生态环境厅",
-      "url": "http://sthjt.qinghai.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "67a2469105437fd9478854b5c9550933bfec26c2",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "宁夏回族自治区生态环境厅",
-      "url": "https://sthjt.nx.gov.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "909e2102ebd038db8d359be36ccd2bf8754ff9dd",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "新疆维吾尔自治区生态环境厅",
-      "url": "http://sthjt.xinjiang.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "855e5ea879a871c13137fe8f3ebac17fd9b6c548",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "新疆生产建设兵团生态环境局",
-      "url": "http://sthjj.xjbt.gov.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "53946348b74e618605ace3c6b0321108ccc5f0b7",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "《生物多样性公约》COP15东道国网站",
-      "url": "https://news.cop15-china.com.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "1af427a7c972b2bdc34ad6b944dd2372f457b667",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "国家生态环境科技成果转化综合服务平台",
-      "url": "https://www.ceett.org.cn/",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "f3f4d03e20f87b25a9f71b15c130da47b21fa251",
-      "site_id": "mee",
-      "site_name": "生态环境部",
-      "source": "生态环境部",
-      "title": "中国气候变化信息网",
-      "url": "http://www.ccchina.org.cn",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "8a16c6e80dd672e08ffcaaeddc2d81f90427a1a5",
@@ -530,7 +50,7 @@
       "title": "https://www.worldbank.org/ext/en/development-topics",
       "url": "https://www.worldbank.org/ext/en/development-topics",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "f37f91563d049551287690dcb220fe88f6cb0884",
@@ -540,7 +60,7 @@
       "title": "https://www.worldbank.org/ext/en/topic/climate-change",
       "url": "https://www.worldbank.org/ext/en/topic/climate-change",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "dc26f176d41caa5ca062af1c191ad52faeacf64c",
@@ -550,7 +70,7 @@
       "title": "https://blogs.worldbank.org/en/climatechange/smart-development--delivering-wins-for-jobs-and-climate",
       "url": "https://blogs.worldbank.org/en/climatechange/smart-development--delivering-wins-for-jobs-and-climate",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "e7d2cf04d655d368397d331c41d89e94d9bf54ca",
@@ -560,7 +80,7 @@
       "title": "https://www.worldbank.org/en/publication/rising-to-the-challenge-climate-adaptation-resilience/publication/adaptation-and-resilience-solutions-in-action",
       "url": "https://www.worldbank.org/en/publication/rising-to-the-challenge-climate-adaptation-resilience/publication/adaptation-and-resilience-solutions-in-action",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "414b94e425d0786d3ebf64e1a9dc84cabae70679",
@@ -570,7 +90,7 @@
       "title": "Climate Change Action Plan",
       "url": "https://www.worldbank.org/en/news/statement/2026/06/29/update-on-the-world-bank-group-climate-change-action-plan",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "e89ad7fdfb128f58a68e6da657c0bbbe02bc1990",
@@ -580,7 +100,7 @@
       "title": "Country Climate and Development Reports",
       "url": "https://www.worldbank.org/en/publication/country-climate-development-reports",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "fc10626f67da8bc2ecd57b41faa819eef292afa1",
@@ -590,7 +110,7 @@
       "title": "Climate Resilient Debt Clauses",
       "url": "https://www.worldbank.org/en/news/factsheet/2023/12/01/world-bank-extends-new-lifeline-for-countries-hit-by-natural-disasters",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "e04523a88aa685dd6fb74761f64f48f20f22b423",
@@ -600,7 +120,7 @@
       "title": "Global Methane Reduction Platform For Development",
       "url": "https://www.worldbank.org/en/news/factsheet/2023/12/04/world-bank-steps-up-efforts-to-address-methane-emissions",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "e39473a0fc3c7f8adaa24a555b27eb63c26d23c5",
@@ -610,7 +130,7 @@
       "title": "Climate Support Facility",
       "url": "https://www.climatesupportfacility.org/",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "7a34b62a5dd0fbd4affd20a3d0fac40bec7fad55",
@@ -620,7 +140,7 @@
       "title": "Scaling Climate Action by Lowering Emissions (SCALE)",
       "url": "https://www.worldbank.org/en/programs/scale/",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "3b812e8cfff213b70d5908873da03bdaa7fe1c2c",
@@ -630,7 +150,7 @@
       "title": "Canada-World Bank Clean Energy and Forests Climate Facility",
       "url": "https://www.worldbank.org/en/topic/climatechange/brief/canada-world-bank-clean-energy-and-forests-climate-facility",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "8ee722f25a4016dfdbe0bdba45aa1da38339b7ad",
@@ -640,7 +160,7 @@
       "title": "Forest Carbon Partnership Facility (FCPF)",
       "url": "https://www.forestcarbonpartnership.org/",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "8696c7652f3d464e23f08dd4b59bb3fa8aaab6fc",
@@ -650,7 +170,7 @@
       "title": "BioCarbon Fund Initiative for Sustainable Forest Landscapes (ISFL)",
       "url": "https://www.biocarbonfund-isfl.org/",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "6d74cec44b6857d4b089e185a0ba2104e01fd7e6",
@@ -660,7 +180,7 @@
       "title": "Transformative Carbon Asset Facility (TCAF)",
       "url": "https://www.tcafwb.org/",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "a8d92a99b9409fe868380d647799bac16008e078",
@@ -670,7 +190,687 @@
       "title": "Carbon Initiative for Development (Ci-Dev)",
       "url": "https://www.ci-dev.org/",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "139a5e6d10c56042e59a4f0c81c1e23df577255d",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "06 Aug 2026New Global Climate Action Agenda Work Programme and structure to operationalize five-year visionArticle",
+      "url": "https://unfccc.int/news/new-global-climate-action-agenda-work-programme-and-structure-to-operationalize-five-year-vision",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "74d00416e3a07ddf8a971c27e971d38093c92df5",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "UN Photo31 Jul 2026UN Secretary-General's remarks on climate change and extreme heatExternal Statement",
+      "url": "https://unfccc.int/news/un-secretary-general-s-remarks-on-climate-change-and-extreme-heat",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "2d0e70632d4dff99be6f179853acd05d5c6ba4c3",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "China's National Centre for Climate Change Strategy and International Cooperation31 Jul 2026UN Climate Change and China hold first joint workshop on transparency capacity-building under new partnershipArticle",
+      "url": "https://unfccc.int/news/un-climate-change-and-china-hold-first-joint-workshop-on-transparency-capacity-building-under-new",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "3f46ee9ceb5a0d153538849b2934a37993349f3d",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "30 Jul 2026UN carbon market expands to renewable power sectorUN Climate Press Release",
+      "url": "https://unfccc.int/news/un-carbon-market-expands-to-renewable-power-sector",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "ea9f28b2f96794b33476c1d143c6d5cfb7907ac2",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Matthias Fischer / Pixabay28 Jul 2026UN Climate Chief: \"The climate alarm is blaring, from every direction.\"UN Climate Statement",
+      "url": "https://unfccc.int/news/un-climate-chief-the-climate-alarm-is-blaring-from-every-direction",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "5c15233badde88c6252fd058531865dbe1b273f1",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Saranya Misra/OPGA24 Jul 2026UN Climate Chief: “Faster energy transitions are core to national security\"UN Climate Speech",
+      "url": "https://unfccc.int/news/un-climate-chief-faster-energy-transitions-are-core-to-national-security",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "c8ce64f88322816151113fa44abf6aeae54cdeea",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Carolina Mantsch | UNFCCC23 Jul 2026Paris Agreement Implementation and Compliance Committee: 2026 milestonesArticle",
+      "url": "https://unfccc.int/news/paris-agreement-implementation-and-compliance-committee-2026-milestones",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "d0f41f404ddfffce72013ccd944cb7001d4ce10f",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Renu Wahee | PlucTV22 Jul 2026India’s storytelling power emerges as key to connecting climate impacts & solutions to billions of daily lives, at inaugural industry conveningUN Climate Press Release",
+      "url": "https://unfccc.int/news/india-s-storytelling-power-emerges-as-key-to-connecting-climate-impacts-solutions-to-billions-of",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "4a6cf476245b2ae0f581eb14b9b121cd25b740f9",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Blassy Boben | UNIC21 Jul 2026UN Climate Chief in Delhi today: \"In the global clean energy race, India has powerful competitive advantages\"UN Climate Speech",
+      "url": "https://unfccc.int/news/un-climate-chief-in-delhi-today-in-the-global-clean-energy-race-india-has-powerful-competitive",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "1fe8ad4292b1d2efd4eb6b74d5679482aa4c5282",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Dennis Schroeder / NREL14 Jul 2026Renewable power generation records its fastest growth everExternal Press Release",
+      "url": "https://unfccc.int/news/renewable-power-generation-records-its-fastest-growth-ever",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "23c7ce0a720c3f4457c11406a022e3252530e49c",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Ranteen Dixon / Pexels07 Jul 2026Jamaica turns climate lessons into long-term climate actionArticle",
+      "url": "https://unfccc.int/news/jamaica-turns-climate-lessons-into-long-term-climate-action",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "0d5409af616365af01be02fa22912f672fad1235",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Samar Mourya / Pexels03 Jul 2026New UNFCCC study finds early climate action can help reduce risks from carbon border pricingArticle",
+      "url": "https://unfccc.int/news/new-unfccc-study-finds-early-climate-action-can-help-reduce-risks-from-carbon-border-pricing",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "94893fc7efc92434d9f41f369a5222f7d444acb1",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Constantine Sauer / UN Climate Change01 Jul 2026Record number of countries present climate progress through transparency reportsArticle",
+      "url": "https://unfccc.int/news/record-number-of-countries-present-climate-progress-through-transparency-reports",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "4a5a399334c6e6abfc685cf759146feb8c63e201",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Matteo del Piano | Unsplash26 Jun 2026Technology Mechanism showcases partnerships to deliver climate action at scaleArticle",
+      "url": "https://unfccc.int/news/technology-mechanism-showcases-partnerships-to-deliver-climate-action-at-scale",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "ce123f54c7152cf9f216336f819e63ae5609ae82",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Christian Julliard | Climate Visuals25 Jun 2026UN Climate Chief: \"Europe’s savage heatwave has the fingerprints of the climate crisis all over it\"UN Climate Statement",
+      "url": "https://unfccc.int/news/un-climate-chief-europe-s-savage-heatwave-has-the-fingerprints-of-the-climate-crisis-all-over-it",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "fe65d0c7dfe4e484e7b82de3a673694dd90c56d1",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Kiara Worth | UN Climate Change23 Jun 2026Secretary-General's special address at London Climate Action WeekExternal Speech",
+      "url": "https://unfccc.int/news/secretary-general-s-special-address-at-london-climate-action-week",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "a6edaf92a911190d1d6fc22c4dc0484bcf256f68",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Pixabay / Andreas23 Jun 2026UN Climate Chief: \"Clean energy is the fastest route to energy security, sovereignty and affordability for all\"UN Climate Speech",
+      "url": "https://unfccc.int/news/un-climate-chief-clean-energy-is-the-fastest-route-to-energy-security-sovereignty-and-affordability",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "ae8d5b742a1c4e69a332af313581682e3887a0d0",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Kiara Worth | IISD19 Jun 2026Transcript of remarks of Executive Secretary during Introduction to the High-Level Informal Consultative RoundtableUN Climate Speech",
+      "url": "https://unfccc.int/news/transcript-of-remarks-of-executive-secretary-during-introduction-to-the-high-level-informal",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "2494fd8719aad4980647264ffdb884e4ae85e983",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "Lara Murillo / UN Climate Change18 Jun 2026Written statement of UNFCCC Executive Secretary on closing of UN June Climate Meetings (SB64)UN Climate Statement",
+      "url": "https://unfccc.int/news/written-statement-of-unfccc-executive-secretary-on-closing-of-un-june-climate-meetings-sb64",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "7bb517bde7810737ffc38bfe690accd1cf2abc93",
+      "site_id": "unfccc",
+      "site_name": "UNFCCC",
+      "source": "UNFCCC",
+      "title": "IISD/ENB - Kiara Worth17 Jun 2026UN Climate Chief: \"Digital public infrastructure for climate action is a critical part of the solution\"UN Climate Speech",
+      "url": "https://unfccc.int/news/un-climate-chief-digital-public-infrastructure-for-climate-action-is-a-critical-part-of-the-solution",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "af2e3455da1a463bfffffe0fe33af28655404dbc",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "生态环境部发布8月上半月全国空气质量预报会商结果",
+      "url": "https://www.mee.gov.cn/202607/t20260731_1163302.shtml",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "12b6a72e1175b19003857788317d9b1459be1104",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "生态环境部公布2026年第二季度和1—6月全国地表水环境质量状况",
+      "url": "https://www.mee.gov.cn/202607/t20260730_1163186.shtml",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "4a682610c7d6c5a4670b1baf421124181d3664e8",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "“扎实做好生态环境法典实施准备工作，为美丽中国建设提供法治保障”有关情况",
+      "url": "https://www.mee.gov.cn/202607/t20260728_1163005.shtml",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "63eb3beefe4c96f7d92ff7835d26803f69378e02",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "生态环境部公布2026年6月和1—6月全国环境空气质量状况",
+      "url": "https://www.mee.gov.cn/202607/t20260728_1162999.shtml",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "1ff642a96152a5ed411429d52f3e54c4dc824c5d",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "长江流域生态环境监督管理局",
+      "url": "http://cjjg.mee.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "409bcc2d8bbcbb5efcfaf1fb3f40f49113f35d40",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "黄河流域生态环境监督管理局",
+      "url": "http://huanghejg.mee.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "9871022f8c75ea79f898ed6e264045e9b9d5cc8a",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "淮河流域生态环境监督管理局",
+      "url": "http://huaihejg.mee.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "be259ae5e46d19a22ca457167695ac79c7fd3e79",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "海河流域北海海域生态环境监督管理局",
+      "url": "http://hhbhjg.mee.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "652260c7e8a4bcb5ecf2fd49035800563e352878",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "珠江流域南海海域生态环境监督管理局",
+      "url": "http://zjnhjg.mee.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "9aa740d62cbc4a5fbdb3279f0ac30f190a8e4814",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "松辽流域生态环境监督管理局",
+      "url": "http://sljg.mee.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "69ad52ddd04addcbececa75493b79c025d79cea3",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "太湖流域东海海域生态环境监督管理局",
+      "url": "http://thdhjg.mee.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "37e40eeba2af26f22b084521ba968b0f6529ca7e",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "国家应对气候变化战略研究和国际合作中心",
+      "url": "http://www.ncsc.org.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "9a7819a3d9e49d89bb1d33238d9cc12e08da04f9",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "土壤与农业农村生态环境监管技术中心",
+      "url": "http://www.tcare-mee.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "68036c124ce90ec94ebb49c96f7f62edc9005d79",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "北京市生态环境局",
+      "url": "http://sthjj.beijing.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "fc69377f5ce0d844b75ca99faf9c6f553d971bd4",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "天津市生态环境局",
+      "url": "http://sthj.tj.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "608792643aa18003e52d99cab45a78f300f5a835",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "河北省生态环境厅",
+      "url": "http://hbepb.hebei.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "7505ac19c3258235e758880d0f7c9c6a3b208d9e",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "山西省生态环境厅",
+      "url": "http://sthjt.shanxi.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "d276430db60cb25b397e459e03d4a4769ff015cf",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "内蒙古自治区生态环境厅",
+      "url": "http://sthjt.nmg.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "ed1cb5ed9dd441995339627711cfe63bc8d07908",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "辽宁省生态环境厅",
+      "url": "http://sthj.ln.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "4c9f0def1642f3dfc7e3b364a85f571a7cbd6f14",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "吉林省生态环境厅",
+      "url": "http://sthjt.jl.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "ca60342662b29d71c06b7597fe884e9f7f06a77b",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "黑龙江省生态环境厅",
+      "url": "http://sthj.hlj.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "bcff21913b7c6b36ad2c67b752ca4b102a8d66ed",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "上海市生态环境局",
+      "url": "http://sthj.sh.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "1e6573e80ce5a814125db526a0fba753a8547a81",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "江苏省生态环境厅",
+      "url": "http://sthjt.jiangsu.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "4c42ffac12653bffe257e03f3cfa28219cae459e",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "浙江省生态环境厅",
+      "url": "http://sthjt.zj.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "b04db73dc452dcea384f6c7cff5ab2d575b9b1c0",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "安徽省生态环境厅",
+      "url": "http://sthjt.ah.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "fa7ee0b286504002d4eb8895443c461f28586b83",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "福建省生态环境厅",
+      "url": "http://sthjt.fujian.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "91786740e2670d68c7655e62147fb8fbce0939a2",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "江西省生态环境厅",
+      "url": "http://sthjt.jiangxi.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "5087c709a5481a1c3c808c5aec19eca18ed32049",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "山东省生态环境厅",
+      "url": "http://www.sdein.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "cc76d0698f0d28dad07c3af28c20cea0b7225d88",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "河南省生态环境厅",
+      "url": "http://sthjt.henan.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "d939c4ed9b3183e34406409a4332d5997f9e9cc8",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "湖北省生态环境厅",
+      "url": "http://sthjt.hubei.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "e5ee87e3e5e43a2c3d5f35605e1578d4ed16511d",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "湖南省生态环境厅",
+      "url": "http://sthjt.hunan.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "5b47328094801e099c14fdab6a777276701765ff",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "广东省生态环境厅",
+      "url": "http://gdee.gd.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "25972f5731924135f0c71d7d85d895747aee8bdb",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "广西壮族自治区生态环境厅",
+      "url": "http://sthjt.gxzf.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "1fce6d35f9998328ab0ee3930cb8c9b385df714f",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "海南省生态环境厅",
+      "url": "http://hnsthb.hainan.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "8c42b21d94eea137b180a2b18a748e639dcd2121",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "重庆市生态环境局",
+      "url": "http://sthjj.cq.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "9971832f243127f553d99993fd07af8053c818ea",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "四川省生态环境厅",
+      "url": "http://sthjt.sc.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "e163f2cc07a465cc7edb3adcef48e670c30738a4",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "贵州省生态环境厅",
+      "url": "http://sthj.guizhou.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "d5b7b7c2f8d44b1905747e631b959e7f8dbb916c",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "云南省生态环境厅",
+      "url": "http://sthjt.yn.gov.cn/index.html",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "bce432109a9cf95ee7066a5ccf6dc278eedc7f1a",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "西藏自治区生态环境厅",
+      "url": "http://ee.xizang.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "4f0cf502aefe4874675a36797cf4047935d61e5b",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "陕西省生态环境厅",
+      "url": "http://sthjt.shaanxi.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "6ffd1646f976b6a051f1b8490acb7ea371327b52",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "甘肃省生态环境厅",
+      "url": "http://sthj.gansu.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "19765be1a9c27c147dcdad8a8c02e19cd76f28be",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "青海省生态环境厅",
+      "url": "http://sthjt.qinghai.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "67a2469105437fd9478854b5c9550933bfec26c2",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "宁夏回族自治区生态环境厅",
+      "url": "https://sthjt.nx.gov.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "909e2102ebd038db8d359be36ccd2bf8754ff9dd",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "新疆维吾尔自治区生态环境厅",
+      "url": "http://sthjt.xinjiang.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "855e5ea879a871c13137fe8f3ebac17fd9b6c548",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "新疆生产建设兵团生态环境局",
+      "url": "http://sthjj.xjbt.gov.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "53946348b74e618605ace3c6b0321108ccc5f0b7",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "《生物多样性公约》COP15东道国网站",
+      "url": "https://news.cop15-china.com.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "1af427a7c972b2bdc34ad6b944dd2372f457b667",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "国家生态环境科技成果转化综合服务平台",
+      "url": "https://www.ceett.org.cn/",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
+    },
+    {
+      "id": "f3f4d03e20f87b25a9f71b15c130da47b21fa251",
+      "site_id": "mee",
+      "site_name": "生态环境部",
+      "source": "生态环境部",
+      "title": "中国气候变化信息网",
+      "url": "http://www.ccchina.org.cn",
+      "published_at": null,
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "719ab88bd66837c8ff335b17fcec6ab4844bd469",
@@ -680,7 +880,7 @@
       "title": "2030年我国新能源消纳将达28亿千瓦以上",
       "url": "https://www.cnenergynews.cn/article/4SgLJqZ7SKQ",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "4c7fd50fb4656940aee42aa42fab007a23f632dd",
@@ -690,7 +890,7 @@
       "title": "【三项光伏能耗能效强制性国标明年1月起正式实施】",
       "url": "https://www.cnenergynews.cn/article/4SfSsn2SgL3",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "e1d3b424a86c9112e3baca511d5dded0794b87c6",
@@ -700,7 +900,7 @@
       "title": "【利用率90%左右 新能源发展重心转向消纳】",
       "url": "https://www.cnenergynews.cn/article/4SegFCOt84P",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "084d40874b840f49571345903357967097cdfe33",
@@ -710,7 +910,7 @@
       "title": "【两部门印发《新型电力系统建设“十五五”规划》】",
       "url": "https://www.cnenergynews.cn/article/4Se84dbrO8X",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "3c0f650182db36f04901adfec1dd8b9d4bc24e49",
@@ -720,7 +920,7 @@
       "title": "新能源入市一年考，光伏投资何处去",
       "url": "https://www.cnenergynews.cn/article/4SdzPcoeNDq",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     },
     {
       "id": "293554c7832e42fcaf1acb9841f7a5b6cfedd601",
@@ -730,97 +930,7 @@
       "title": "海上风电再获关键技术突破 产业链公司深挖发展机遇",
       "url": "https://www.cnenergynews.cn/article/4ShAIrNJrqV",
       "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "0fff178e731559857316844ab1341372461e1c15",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar1 Dec 202626th Annual IEA-IETA-EPRI Workshop on Greenhouse Gas Emissions TradingWorkshop — Paris, France",
-      "url": "https://www.iea.org/events/26th-annual-iea-ieta-epri-workshop-on-greenhouse-gas-emissions-trading",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "48db7f63a84d57e4466a0f325d34a48ac67db562",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar9 Jul 2026 14:00—15:00High-level Virtual Event on Clean Cooking in AfricaWebinarWATCH",
-      "url": "https://www.iea.org/events/high-level-virtual-event-on-clean-cooking-in-africa",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "a4efa189fb509de2e928ed142f55cbeb985b73ad",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar18 Feb 2026IEA Energy Innovation Forum 2026Event — Paris, France",
-      "url": "https://www.iea.org/events/iea-energy-innovation-forum-2026",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "3c3e35363c59f28bef12e839b890b2d5179b94f3",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar6 - 21 Nov 2025IEA at COP30Conference — Belém, Brazil",
-      "url": "https://www.iea.org/events/iea-at-cop30",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "091db410ffa5a2bdfc7cdd596b7cb0df3f8b73bf",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar29 Oct 2025 14:00—23:00IEA Energy Innovation Forum 2025Event — Toronto, CanadaWATCH",
-      "url": "https://www.iea.org/events/iea-energy-innovation-forum-2025",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "07f5abb68a5475ffc04218746aa68b293a5d1f06",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar11 - 22 Nov 2024IEA at COP29Conference — Baku, AzerbaijanWATCH",
-      "url": "https://www.iea.org/events/iea-at-cop29",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "6874e6cdc00ae5cb7e96166e732649399a4c11e6",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar30 Jul 2026Global EV Outlook 2026 – Mid-Year UpdateReport launch",
-      "url": "https://www.iea.org/events/global-ev-outlook-2026-mid-year-update",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "4239fbef00079da06bef247c3019054377c95a94",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar29 Jul 2026 16:00—17:00Global Hydrogen Review 2026 Webinar (afternoon session)Webinar",
-      "url": "https://www.iea.org/events/global-hydrogen-review-2026-webinar-afternoon-session",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
-    },
-    {
-      "id": "bdb2bab5ebf073ea7d6508ff3ec3297234d91580",
-      "site_id": "iea",
-      "site_name": "IEA",
-      "source": "IEA",
-      "title": "Calendar29 Jul 2026 09:30—10:30Global Hydrogen Review 2026 Webinar (morning session)Webinar",
-      "url": "https://www.iea.org/events/global-hydrogen-review-2026-webinar-morning-session",
-      "published_at": null,
-      "first_seen_at": "2026-08-07T04:53:07.596709Z"
+      "first_seen_at": "2026-08-07T04:53:59.568829Z"
     }
   ]
 }
