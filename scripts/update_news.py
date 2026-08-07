@@ -468,12 +468,16 @@ def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
     """中国碳交易网."""
     items: list[RawItem] = []
     try:
+        from ftfy import fix_text
+    except ImportError:
+        fix_text = lambda x: x  # fallback
+    try:
         r = session.get("http://www.tanpaifang.com/", timeout=30)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
-            text = a.get_text(strip=True)
+            text = fix_text(a.get_text(strip=True))
             if not text or not href or len(text) < 8:
                 continue
             if not href.startswith("http"):
