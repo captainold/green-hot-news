@@ -647,6 +647,7 @@ def main() -> int:
     parser.add_argument("--output-dir", default="data", help="Output directory for JSON files")
     parser.add_argument("--window-hours", type=int, default=24, help="Time window in hours")
     parser.add_argument("--rss-opml", default=None, help="Optional OPML file for extra RSS feeds")
+    parser.add_argument("--obsidian-dir", default=None, help="Export news as Obsidian markdown notes to this dir")
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)
@@ -664,7 +665,6 @@ def main() -> int:
         for func, site_id, site_name in BUILTIN_SOURCES:
             futures[ex.submit(func, session, now)] = (site_id, site_name)
 
-        # Also fetch OPML if provided
         opml_future = None
         if args.rss_opml:
             opml_future = ex.submit(fetch_opml_rss, session, args.rss_opml, now)
@@ -698,8 +698,7 @@ def main() -> int:
                     "ok": False, "item_count": 0, "error": str(exc),
                 })
 
-    # ── Dedup + filter ─────────────────────────────────────────────────────
-    window_start = now - timedelta(hours=args.window_hours)
+    # ── Dedup (no time window) for Obsidian export ──────────────────────────
     seen_ids: set[str] = set()
     seen_items: set[tuple[str, str]] = set()
 
@@ -717,10 +716,6 @@ def main() -> int:
             continue
         seen_items.add(title_key)
 
-        # Time filter
-        if raw.published_at and raw.published_at < window_start:
-            continue
-
         record = {
             "id": tid,
             "site_id": raw.site_id,
@@ -736,16 +731,25 @@ def main() -> int:
         if is_policy_relevant(raw.title, raw.url, raw.site_id):
             green_items.append(record)
 
-    # Sort by time (newest first), items without time go last
+    # 24h window filter for web output
+    window_start = now - timedelta(hours=args.window_hours)
+    all_items_24h = [r for r in all_items if not r.get("published_at") or parse_iso(r["published_at"]) is None or parse_iso(r["published_at"]) >= window_start]
+    green_items_24h = [r for r in green_items if not r.get("published_at") or parse_iso(r["published_at"]) is None or parse_iso(r["published_at"]) >= window_start]
+
+    # Sort
     def sort_key(r: dict) -> str:
         return r.get("published_at") or "0000-00-00"
+    all_items_24h.sort(key=sort_key, reverse=True)
+    green_items_24h.sort(key=sort_key, reverse=True)
 
-    all_items.sort(key=sort_key, reverse=True)
-    green_items.sort(key=sort_key, reverse=True)
+    # ── Obsidian export ────────────────────────────────────────────────────
+    obsidian_new = 0
+    if args.obsidian_dir:
+        obsidian_new = export_to_obsidian(green_items, args.obsidian_dir, now)
 
     # ── Site stats ─────────────────────────────────────────────────────────
     site_stats: dict[str, dict[str, Any]] = {}
-    for item in green_items:
+    for item in green_items_24h:
         sid = item["site_id"]
         if sid not in site_stats:
             site_stats[sid] = {"site_id": sid, "site_name": item["site_name"], "count": 0}
@@ -755,18 +759,18 @@ def main() -> int:
     green_payload = {
         "generated_at": iso(now),
         "window_hours": args.window_hours,
-        "total_items": len(green_items),
-        "total_raw": len(all_items),
+        "total_items": len(green_items_24h),
+        "total_raw": len(all_items_24h),
         "site_count": len(site_stats),
         "site_stats": sorted(site_stats.values(), key=lambda x: x["count"], reverse=True),
-        "items": green_items,
+        "items": green_items_24h,
     }
 
     all_payload = {
         "generated_at": iso(now),
         "window_hours": args.window_hours,
-        "total_items": len(all_items),
-        "items": all_items,
+        "total_items": len(all_items_24h),
+        "items": all_items_24h,
     }
 
     status_payload = {
@@ -775,7 +779,7 @@ def main() -> int:
         "successful": sum(1 for s in source_statuses if s["ok"]),
         "failed": sum(1 for s in source_statuses if not s["ok"]),
         "total_raw_items": len(raw_items),
-        "total_green_items": len(green_items),
+        "total_green_items": len(green_items_24h),
     }
 
     (output_dir / "latest-24h.json").write_text(
@@ -786,10 +790,120 @@ def main() -> int:
         json.dumps(status_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"✅ Green Policy Radar done.")
-    print(f"   Green items: {len(green_items)}")
-    print(f"   All items:   {len(all_items)}")
+    print(f"   Green items: {len(green_items_24h)}")
+    print(f"   All items:   {len(all_items_24h)}")
     print(f"   Sources:     {len(source_statuses)} ({status_payload['successful']} ok / {status_payload['failed']} failed)")
+    if args.obsidian_dir:
+        print(f"   Obsidian:    {obsidian_new} new notes → {args.obsidian_dir}/Notes/政策库/")
     return 0
+
+
+# ── Obsidian export ────────────────────────────────────────────────────────────
+def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> int:
+    """Export news items as Obsidian markdown notes. Returns count of new notes."""
+    import re as _re
+    base = Path(base_dir_str) / "Notes" / "政策库"
+    base.mkdir(parents=True, exist_ok=True)
+
+    new_count = 0
+    for item in items:
+        site_name = item.get("site_name", item.get("site_id", "unknown"))
+        title = item.get("title", "untitled")
+        url = item.get("url", "")
+        pub_date = item.get("published_at", "")
+
+        # Sanitize directory name
+        safe_site = _re.sub(r'[<>:"/\\|?*]', '_', site_name).strip()
+        site_dir = base / safe_site
+        site_dir.mkdir(parents=True, exist_ok=True)
+
+        # Sanitize filename from title
+        safe_title = _re.sub(r'[<>:"/\\|?*]', '_', title)[:80].strip()
+        if pub_date:
+            date_prefix = pub_date[:10]  # YYYY-MM-DD
+            filename = f"{date_prefix} {safe_title}.md"
+        else:
+            filename = f"{safe_title}.md"
+        filepath = site_dir / filename
+
+        # Skip if already exists (dedup by filename)
+        if filepath.exists():
+            continue
+
+        # Build markdown content
+        date_val = pub_date[:10] if pub_date else now.strftime("%Y-%m-%d")
+        lines = [
+            "---",
+            f'source: "{site_name}"',
+            f"url: {url}",
+            f"date: {date_val}",
+            "tags: [政策库]",
+            "---",
+            "",
+            f"# {title}",
+            "",
+            f"[原文链接]({url})",
+            "",
+            f"> 来源: {site_name}",
+        ]
+        if pub_date:
+            lines.append(f"> 发布时间: {pub_date}")
+        lines.append(f"> 首次抓取: {now.strftime('%Y-%m-%d %H:%M')} UTC")
+
+        filepath.write_text("\n".join(lines), encoding="utf-8")
+        new_count += 1
+
+    # Update index page
+    _update_obsidian_index(base, now)
+    return new_count
+
+
+def _update_obsidian_index(base: Path, now: datetime) -> None:
+    """Create/update the 政策库 index page with dataview query."""
+    index_path = base / "政策库.md"
+    # Count existing notes
+    note_count = sum(1 for _ in base.rglob("*.md") if _.name != "政策库.md")
+    source_dirs = sorted(d.name for d in base.iterdir() if d.is_dir())
+
+    content = f"""---
+tags: [MOC, 政策库]
+updated: {now.strftime('%Y-%m-%d %H:%M')}
+---
+
+# 🌿 绿色政策库
+
+> 自动累积的国内外绿色低碳政策新闻库。每 30 分钟更新一次。
+> 总计: **{note_count}** 篇笔记 · **{len(source_dirs)}** 个信息源
+
+## 📡 信息源
+
+"""
+    for s in source_dirs:
+        count = sum(1 for _ in (base / s).glob("*.md"))
+        content += f"- [[{s}/|{s}]] ({count} 篇)\n"
+
+    content += f"""
+## 📋 最近更新
+
+```dataview
+TABLE source as "来源", date as "日期", file.cday as "收录时间"
+FROM "Notes/政策库"
+WHERE file.name != "政策库"
+SORT date DESC, file.cday DESC
+LIMIT 50
+```
+
+## 🔍 按来源浏览
+
+```dataview
+LIST
+FROM "Notes/政策库"
+WHERE file.name != "政策库"
+GROUP BY source
+SORT date DESC
+```
+"""
+    index_path.write_text(content, encoding="utf-8")
 
 
 if __name__ == "__main__":
