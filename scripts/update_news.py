@@ -158,10 +158,28 @@ def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_
 
 # ── Web scraping fetchers ─────────────────────────────────────────────────────
 def fetch_ndrc(session: requests.Session, now: datetime) -> list[RawItem]:
-    """国家发改委 — news feed."""
-    return fetch_rss_feed(session,
-        "https://www.ndrc.gov.cn/xwdt/xwfb/rss.xml",
-        "ndrc", "国家发改委", now)
+    """国家发改委 — HTML 新闻列表."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.ndrc.gov.cn/xwdt/xwfb/", timeout=30)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("li a[href]"):
+            href = (a.get("href") or "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or href == "./" or len(text) < 8:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.ndrc.gov.cn/xwdt/xwfb/", href)
+            items.append(RawItem(
+                site_id="ndrc", site_name="国家发改委",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:30]
 
 
 def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -175,7 +193,10 @@ def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
             text = a.get_text(strip=True)
-            if not text or not href or len(text) < 6:
+            # Filter out navigation links (short text, non-news URLs)
+            if not text or not href or len(text) < 8:
+                continue
+            if any(skip in href for skip in ["javascript", "mailto", "jg.mee.gov.cn"]):
                 continue
             if not href.startswith("http"):
                 href = urljoin("https://www.mee.gov.cn", href)
@@ -186,28 +207,39 @@ def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
             ))
     except Exception:
         pass
-    return items
+    return items[:60]
 
 
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
-    """国家能源局 — 新闻."""
+    """国家能源局 — CMS JSON API."""
     items: list[RawItem] = []
     try:
-        r = session.get("https://www.nea.gov.cn/xwzx/nyyw.htm", timeout=30)
+        r = session.get(
+            "https://www.nea.gov.cn/xwzx/ds_8839d76f7cb542ca8cbaab7122cc9b83.json",
+            timeout=30,
+            headers={"Referer": "https://www.nea.gov.cn/xwzx/nyyw.htm"},
+        )
         r.raise_for_status()
-        r.encoding = "utf-8"
-        soup = BeautifulSoup(r.text, "html.parser")
-        for a in soup.select("a[href]"):
-            href = a.get("href", "").strip()
-            text = a.get_text(strip=True)
-            if not text or not href or len(text) < 6:
+        data = r.json()
+        records = data.get("datasource", [])
+        for rec in records[:50]:
+            title = (rec.get("title") or rec.get("showTitle") or "").strip()
+            publish_url = (rec.get("publishUrl") or "").strip()
+            pub_time = (rec.get("publishTime") or "").strip()
+            if not title or not publish_url:
                 continue
-            if not href.startswith("http"):
-                href = urljoin("https://www.nea.gov.cn", href)
+            if not publish_url.startswith("http"):
+                publish_url = urljoin("https://www.nea.gov.cn/xwzx/nyyw/", publish_url)
+            published = None
+            try:
+                published = datetime.strptime(pub_time, "%Y-%m-%d %H:%M:%S").replace(tzinfo=SH_TZ)
+            except Exception:
+                pass
             items.append(RawItem(
                 site_id="nea", site_name="国家能源局",
-                title=text, url=href,
-                published_at=None,
+                source=rec.get("sourceText", "国家能源局"),
+                title=title, url=publish_url,
+                published_at=published,
             ))
     except Exception:
         pass
@@ -215,17 +247,17 @@ def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
 
 
 def fetch_miit(session: requests.Session, now: datetime) -> list[RawItem]:
-    """工信部 — 绿色制造."""
+    """工信部 — 节能与综合利用司."""
     items: list[RawItem] = []
     try:
-        r = session.get("https://www.miit.gov.cn/xwdt/gxdt/sjdt/index.html", timeout=30)
+        r = session.get("https://www.miit.gov.cn/jgsj/jns/", timeout=30)
         r.raise_for_status()
         r.encoding = "utf-8"
         soup = BeautifulSoup(r.text, "html.parser")
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
             text = a.get_text(strip=True)
-            if not text or not href or len(text) < 6:
+            if not text or not href or len(text) < 10:
                 continue
             if not href.startswith("http"):
                 href = urljoin("https://www.miit.gov.cn", href)
@@ -236,29 +268,72 @@ def fetch_miit(session: requests.Session, now: datetime) -> list[RawItem]:
             ))
     except Exception:
         pass
-    return items
+    return items[:30]
 
 
 def fetch_iea(session: requests.Session, now: datetime) -> list[RawItem]:
-    """IEA — news & commentary."""
+    """IEA — news page HTML scraping."""
     items: list[RawItem] = []
     try:
-        r = session.get("https://www.iea.org/news-and-events", timeout=30)
+        r = session.get(
+            "https://www.iea.org/news",
+            timeout=30,
+            headers={"Accept": "text/html", "Accept-Language": "en-US,en;q=0.9"},
+        )
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        for card in soup.select("article, .article-card, .news-item, .card"):
-            a = card.select_one("a[href]")
-            if not a:
-                continue
-            text = a.get_text(strip=True)
-            href = a.get("href", "").strip()
-            if not text or not href or len(text) < 10:
+        # IEA news page has article links with heading elements
+        for article in soup.select("article a[href]"):
+            href = (article.get("href") or "").strip()
+            # find the heading inside
+            heading = article.select_one("h4, h5, h6, [class*=heading], [class*=title]")
+            text = heading.get_text(strip=True) if heading else article.get_text(strip=True)
+            if not text or not href or len(text) < 15:
                 continue
             if not href.startswith("http"):
                 href = urljoin("https://www.iea.org", href)
+            # Get date if available
+            date_text = ""
+            date_el = article.select_one("time, [class*=date], [datetime]")
+            if date_el:
+                date_text = date_el.get_text(strip=True)
             items.append(RawItem(
                 site_id="iea", site_name="IEA",
                 title=text, url=href,
+                published_at=None,
+                meta={"date_text": date_text},
+            ))
+    except Exception:
+        pass
+    return items[:25]
+
+
+def fetch_irena(session: requests.Session, now: datetime) -> list[RawItem]:
+    """IRENA — news via Google News."""
+    import feedparser as fp
+    items: list[RawItem] = []
+    try:
+        r = session.get(
+            "https://news.google.com/rss/search",
+            params={"q": "IRENA renewable energy", "hl": "en-US", "gl": "US", "ceid": "US:en"},
+            timeout=30,
+        )
+        r.raise_for_status()
+        feed = fp.parse(r.content)
+        for entry in feed.entries[:20]:
+            title = (entry.get("title") or "").strip()
+            link = (entry.get("link") or "").strip()
+            if not title or not link:
+                continue
+            # Clean Google News redirect URLs
+            if "news.google.com" in link:
+                from urllib.parse import parse_qs, urlparse
+                qs = parse_qs(urlparse(link).query)
+                real_url = qs.get("url", [link])[0]
+                link = real_url
+            items.append(RawItem(
+                site_id="irena", site_name="IRENA",
+                title=title, url=link,
                 published_at=None,
             ))
     except Exception:
@@ -266,44 +341,68 @@ def fetch_iea(session: requests.Session, now: datetime) -> list[RawItem]:
     return items
 
 
-def fetch_irena(session: requests.Session, now: datetime) -> list[RawItem]:
-    """IRENA — news."""
-    return fetch_rss_feed(session,
-        "https://www.irena.org/newsroom/rss",
-        "irena", "IRENA", now)
-
-
 def fetch_carbonbrief(session: requests.Session, now: datetime) -> list[RawItem]:
-    """Carbon Brief — climate & energy news."""
+    """Carbon Brief — climate & energy RSS."""
     return fetch_rss_feed(session,
         "https://www.carbonbrief.org/feed/",
         "carbonbrief", "Carbon Brief", now)
 
 
-def fetch_unfccc(session: requests.Session, now: datetime) -> list[RawItem]:
-    """UNFCCC — news."""
+def fetch_reuters_energy(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Reuters — energy & climate news via Google News."""
+    import feedparser as fp
     items: list[RawItem] = []
     try:
-        r = session.get("https://unfccc.int/news", timeout=30)
+        r = session.get(
+            "https://news.google.com/rss/search",
+            params={"q": "reuters climate energy carbon policy", "hl": "en-US", "gl": "US", "ceid": "US:en"},
+            timeout=30,
+        )
         r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        for a in soup.select("a[href]"):
-            href = a.get("href", "").strip()
-            text = a.get_text(strip=True)
-            if not text or not href or len(text) < 10:
+        feed = fp.parse(r.content)
+        for entry in feed.entries[:20]:
+            title = (entry.get("title") or "").strip()
+            link = (entry.get("link") or "").strip()
+            if not title or not link:
                 continue
-            if "/news/" not in href:
+            # Only include Reuters articles (check title suffix)
+            if not title.lower().endswith(" - reuters"):
                 continue
-            if not href.startswith("http"):
-                href = urljoin("https://unfccc.int", href)
             items.append(RawItem(
-                site_id="unfccc", site_name="UNFCCC",
-                title=text, url=href,
+                site_id="reuters", site_name="Reuters",
+                title=title, url=link,
                 published_at=None,
             ))
     except Exception:
         pass
-    return items[:20]
+    return items
+
+
+def fetch_unfccc(session: requests.Session, now: datetime) -> list[RawItem]:
+    """UNFCCC — news via Google News (direct site blocked by Incapsula)."""
+    import feedparser as fp
+    items: list[RawItem] = []
+    try:
+        r = session.get(
+            "https://news.google.com/rss/search",
+            params={"q": "UNFCCC climate COP", "hl": "en-US", "gl": "US", "ceid": "US:en"},
+            timeout=30,
+        )
+        r.raise_for_status()
+        feed = fp.parse(r.content)
+        for entry in feed.entries[:20]:
+            title = (entry.get("title") or "").strip()
+            link = (entry.get("link") or "").strip()
+            if not title or not link:
+                continue
+            items.append(RawItem(
+                site_id="unfccc", site_name="UNFCCC",
+                title=title, url=link,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items
 
 
 def fetch_worldbank_climate(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -330,36 +429,31 @@ def fetch_worldbank_climate(session: requests.Session, now: datetime) -> list[Ra
     return items[:20]
 
 
-def fetch_reuters_energy(session: requests.Session, now: datetime) -> list[RawItem]:
-    """Reuters — energy & environment."""
-    return fetch_rss_feed(session,
-        "https://www.reuters.com/arc/outboundfeeds/v3/all/?outputType=xml&section=energy",
-        "reuters", "Reuters Energy", now)
-
-
 def fetch_bjx(session: requests.Session, now: datetime) -> list[RawItem]:
-    """北极星电力网 — 新闻."""
+    """北极星电力网 — via Google News (direct site blocked by Alibaba WAF)."""
+    import feedparser as fp
     items: list[RawItem] = []
     try:
-        r = session.get("https://news.bjx.com.cn/", timeout=30)
+        r = session.get(
+            "https://news.google.com/rss/search",
+            params={"q": "北极星电力网 新能源 电力 储能 光伏 风电", "hl": "zh-CN", "gl": "CN", "ceid": "CN:zh-Hans"},
+            timeout=30,
+        )
         r.raise_for_status()
-        r.encoding = "gbk"
-        soup = BeautifulSoup(r.text, "html.parser")
-        for a in soup.select("a[href]"):
-            href = a.get("href", "").strip()
-            text = a.get_text(strip=True)
-            if not text or not href or len(text) < 8:
+        feed = fp.parse(r.content)
+        for entry in feed.entries[:20]:
+            title = (entry.get("title") or "").strip()
+            link = (entry.get("link") or "").strip()
+            if not title or not link:
                 continue
-            if not href.startswith("http"):
-                href = urljoin("https://news.bjx.com.cn", href)
             items.append(RawItem(
                 site_id="bjx", site_name="北极星电力网",
-                title=text, url=href,
+                title=title, url=link,
                 published_at=None,
             ))
     except Exception:
         pass
-    return items[:50]
+    return items
 
 
 def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -372,7 +466,7 @@ def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
             text = a.get_text(strip=True)
-            if not text or not href or len(text) < 6:
+            if not text or not href or len(text) < 8:
                 continue
             if not href.startswith("http"):
                 href = urljoin("http://www.tanpaifang.com", href)
@@ -478,6 +572,7 @@ POLICY_KEYWORDS = [
     "能源转型", "电力市场", "新型电力系统",
     "生态环境", "污染防治", "蓝天保卫战",
     "CCUS", "碳捕集",
+    "发改", "能源", "电力", "成品油", "天然气", "煤炭",
     # English
     "carbon", "climate", "green", "renewable", "clean energy",
     "emission", "solar", "wind", "hydrogen", "battery",
@@ -487,11 +582,26 @@ POLICY_KEYWORDS = [
 ]
 
 
-def is_policy_relevant(title: str) -> bool:
-    """Check if a title is related to green/low-carbon policy."""
+# Sites where ALL content is inherently green policy
+GREEN_SITES = {
+    "tanpaifang", "ideacarbon", "ndrc", "nea", "mee",
+    "carbonbrief", "iea", "irena", "unfccc", "worldbank",
+    "chinaenergy", "bjx", "reuters", "miit",
+}
+
+
+def is_policy_relevant(title: str, url: str = "", site_id: str = "") -> bool:
+    """Check if a title/URL/site is related to green/low-carbon policy."""
+    # Auto-pass for known green sites
+    if site_id in GREEN_SITES:
+        return True
     title_lower = title.lower()
+    url_lower = url.lower()
     for kw in POLICY_KEYWORDS:
-        if kw.lower() in title_lower:
+        kw_lower = kw.lower()
+        if kw_lower in title_lower:
+            return True
+        if url_lower and kw_lower in url_lower:
             return True
     return False
 
@@ -611,7 +721,7 @@ def main() -> int:
         }
         all_items.append(record)
 
-        if is_policy_relevant(raw.title):
+        if is_policy_relevant(raw.title, raw.url, raw.site_id):
             green_items.append(record)
 
     # Sort by time (newest first), items without time go last
