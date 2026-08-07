@@ -962,11 +962,15 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> i
 
 
 def _update_obsidian_index(base: Path, now: datetime) -> None:
-    """Create/update the 政策库 index page with dataview query."""
+    """Create dataview-powered index page."""
     index_path = base / "政策库.md"
-    # Count existing notes
     note_count = sum(1 for _ in base.rglob("*.md") if _.name != "政策库.md")
     source_dirs = sorted(d.name for d in base.iterdir() if d.is_dir())
+
+    source_list = ""
+    for s in source_dirs:
+        count = sum(1 for _ in (base / s).glob("*.md"))
+        source_list += f"- [[{s}/|{s}]] ({count} 篇)\n"
 
     content = f"""---
 tags: [MOC, 政策库]
@@ -975,35 +979,66 @@ updated: {now.strftime('%Y-%m-%d %H:%M')}
 
 # 🌿 绿色政策库
 
-> 自动累积的国内外绿色低碳政策新闻库。每 30 分钟更新一次。
-> 总计: **{note_count}** 篇笔记 · **{len(source_dirs)}** 个信息源
+> 自动累积的国内外绿色低碳政策新闻库。总计 **{note_count}** 篇笔记 · **{len(source_dirs)}** 个信息源
 
-## 📡 信息源
+## 信息源
 
-"""
-    for s in source_dirs:
-        count = sum(1 for _ in (base / s).glob("*.md"))
-        content += f"- [[{s}/|{s}]] ({count} 篇)\n"
+{source_list}
 
-    content += f"""
-## 📋 最近更新
+## 最近更新
 
 ```dataview
-TABLE source as "来源", date as "日期", file.cday as "收录时间"
+TABLE source as "来源", date as "日期"
 FROM "Notes/政策库"
-WHERE file.name != "政策库"
-SORT date DESC, file.cday DESC
+SORT date DESC
 LIMIT 50
 ```
 
-## 🔍 按来源浏览
+## 按标签浏览
 
+### 碳市场
 ```dataview
-LIST
+TABLE date as "日期", source as "来源"
 FROM "Notes/政策库"
-WHERE file.name != "政策库"
-GROUP BY source
+WHERE contains(tags, "碳市场")
 SORT date DESC
+LIMIT 20
+```
+
+### 新能源
+```dataview
+TABLE date as "日期", source as "来源"
+FROM "Notes/政策库"
+WHERE contains(tags, "新能源")
+SORT date DESC
+LIMIT 20
+```
+
+### 电力
+```dataview
+TABLE date as "日期", source as "来源"
+FROM "Notes/政策库"
+WHERE contains(tags, "电力")
+SORT date DESC
+LIMIT 20
+```
+
+### 政策文件
+```dataview
+TABLE date as "日期", source as "来源"
+FROM "Notes/政策库"
+WHERE contains(tags, "政策文件")
+SORT date DESC
+LIMIT 20
+```
+
+### 气候变化
+```dataview
+TABLE date as "日期", source as "来源"
+FROM "Notes/政策库"
+WHERE contains(tags, "气候变化")
+SORT date DESC
+LIMIT 20
 ```
 """
     index_path.write_text(content, encoding="utf-8")
