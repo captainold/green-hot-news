@@ -1,0 +1,674 @@
+#!/usr/bin/env python3
+"""Green Policy News Radar — aggregate green/low-carbon policy updates from global sources."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+from urllib.parse import urljoin, urlparse
+
+import requests
+from bs4 import BeautifulSoup
+from dateutil import parser as dtparser
+
+try:
+    import feedparser
+except ModuleNotFoundError:
+    feedparser = None
+
+# ── constants ──────────────────────────────────────────────────────────────────
+UTC = timezone.utc
+BROWSER_UA = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+)
+SH_TZ = timezone(timedelta(hours=8))
+
+
+@dataclass
+class RawItem:
+    site_id: str
+    site_name: str
+    source: str = ""
+    title: str = ""
+    url: str = ""
+    published_at: datetime | None = None
+    meta: dict[str, Any] = field(default_factory=dict)
+
+
+# ── helpers ────────────────────────────────────────────────────────────────────
+def utc_now() -> datetime:
+    return datetime.now(tz=UTC)
+
+
+def iso(dt: datetime | None) -> str | None:
+    if not dt:
+        return None
+    return dt.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def parse_iso(dt_str: str | None) -> datetime | None:
+    if not dt_str:
+        return None
+    try:
+        dt = dtparser.parse(dt_str)
+    except Exception:
+        return None
+    if not dt.tzinfo:
+        dt = dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
+
+
+def normalize_url(raw_url: str) -> str:
+    try:
+        parsed = urlparse(raw_url.strip())
+        if not parsed.scheme:
+            return raw_url.strip()
+        return urljoin(raw_url.strip(), parsed.path).rstrip("/")
+    except Exception:
+        return raw_url.strip()
+
+
+def create_session() -> requests.Session:
+    session = requests.Session()
+    session.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"})
+    return session
+
+
+def make_item_id(site_id: str, title: str, url: str) -> str:
+    key = f"{site_id}||{title}||{normalize_url(url)}"
+    return hashlib.sha1(key.encode("utf-8")).hexdigest()
+
+
+# ── RSS helpers ────────────────────────────────────────────────────────────────
+def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_name: str, now: datetime) -> list[RawItem]:
+    """Fetch RSS/Atom feed and return RawItems."""
+    items: list[RawItem] = []
+    seen: set[tuple[str, str]] = set()
+    try:
+        r = session.get(feed_url, timeout=30)
+        r.raise_for_status()
+    except Exception:
+        return items
+
+    if feedparser:
+        feed = feedparser.parse(r.content)
+        for entry in feed.entries:
+            title = (entry.get("title") or "").strip()
+            link = (entry.get("link") or "").strip()
+            if not title or not link:
+                continue
+            key = (title, link)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            published = None
+            if hasattr(entry, "published_parsed") and entry.published_parsed:
+                try:
+                    published = datetime(*entry.published_parsed[:6], tzinfo=UTC)
+                except Exception:
+                    pass
+            if not published and hasattr(entry, "updated_parsed") and entry.updated_parsed:
+                try:
+                    published = datetime(*entry.updated_parsed[:6], tzinfo=UTC)
+                except Exception:
+                    pass
+
+            source = entry.get("author", "") or site_name
+            items.append(RawItem(
+                site_id=site_id, site_name=site_name,
+                source=source, title=title, url=link,
+                published_at=published,
+                meta={"feed_url": feed_url},
+            ))
+    else:
+        # Fallback: basic XML parsing
+        from xml.etree import ElementTree as ET
+        try:
+            root = ET.fromstring(r.content)
+        except Exception:
+            return items
+        for tag in ("item", "entry"):
+            for node in root.iter(tag):
+                title = (node.findtext("title") or "").strip()
+                link = (node.findtext("link") or "").strip()
+                if not title or not link:
+                    continue
+                key = (title, link)
+                if key in seen:
+                    continue
+                seen.add(key)
+                items.append(RawItem(
+                    site_id=site_id, site_name=site_name,
+                    source=site_name, title=title, url=link,
+                    meta={"feed_url": feed_url},
+                ))
+    return items
+
+
+# ── Web scraping fetchers ─────────────────────────────────────────────────────
+def fetch_ndrc(session: requests.Session, now: datetime) -> list[RawItem]:
+    """国家发改委 — news feed."""
+    return fetch_rss_feed(session,
+        "https://www.ndrc.gov.cn/xwdt/xwfb/rss.xml",
+        "ndrc", "国家发改委", now)
+
+
+def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
+    """生态环境部 — 新闻."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.mee.gov.cn/ywdt/xwfb/", timeout=30)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 6:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.mee.gov.cn", href)
+            items.append(RawItem(
+                site_id="mee", site_name="生态环境部",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items
+
+
+def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
+    """国家能源局 — 新闻."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.nea.gov.cn/xwzx/nyyw.htm", timeout=30)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 6:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.nea.gov.cn", href)
+            items.append(RawItem(
+                site_id="nea", site_name="国家能源局",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items
+
+
+def fetch_miit(session: requests.Session, now: datetime) -> list[RawItem]:
+    """工信部 — 绿色制造."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.miit.gov.cn/xwdt/gxdt/sjdt/index.html", timeout=30)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 6:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.miit.gov.cn", href)
+            items.append(RawItem(
+                site_id="miit", site_name="工信部",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items
+
+
+def fetch_iea(session: requests.Session, now: datetime) -> list[RawItem]:
+    """IEA — news & commentary."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.iea.org/news-and-events", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("article, .article-card, .news-item, .card"):
+            a = card.select_one("a[href]")
+            if not a:
+                continue
+            text = a.get_text(strip=True)
+            href = a.get("href", "").strip()
+            if not text or not href or len(text) < 10:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.iea.org", href)
+            items.append(RawItem(
+                site_id="iea", site_name="IEA",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items
+
+
+def fetch_irena(session: requests.Session, now: datetime) -> list[RawItem]:
+    """IRENA — news."""
+    return fetch_rss_feed(session,
+        "https://www.irena.org/newsroom/rss",
+        "irena", "IRENA", now)
+
+
+def fetch_carbonbrief(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Carbon Brief — climate & energy news."""
+    return fetch_rss_feed(session,
+        "https://www.carbonbrief.org/feed/",
+        "carbonbrief", "Carbon Brief", now)
+
+
+def fetch_unfccc(session: requests.Session, now: datetime) -> list[RawItem]:
+    """UNFCCC — news."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://unfccc.int/news", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 10:
+                continue
+            if "/news/" not in href:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://unfccc.int", href)
+            items.append(RawItem(
+                site_id="unfccc", site_name="UNFCCC",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:20]
+
+
+def fetch_worldbank_climate(session: requests.Session, now: datetime) -> list[RawItem]:
+    """World Bank — climate."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.worldbank.org/en/topic/climatechange", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 10:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.worldbank.org", href)
+            items.append(RawItem(
+                site_id="worldbank", site_name="World Bank Climate",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:20]
+
+
+def fetch_reuters_energy(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Reuters — energy & environment."""
+    return fetch_rss_feed(session,
+        "https://www.reuters.com/arc/outboundfeeds/v3/all/?outputType=xml&section=energy",
+        "reuters", "Reuters Energy", now)
+
+
+def fetch_bjx(session: requests.Session, now: datetime) -> list[RawItem]:
+    """北极星电力网 — 新闻."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://news.bjx.com.cn/", timeout=30)
+        r.raise_for_status()
+        r.encoding = "gbk"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 8:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://news.bjx.com.cn", href)
+            items.append(RawItem(
+                site_id="bjx", site_name="北极星电力网",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:50]
+
+
+def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中国碳交易网."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("http://www.tanpaifang.com/", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 6:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("http://www.tanpaifang.com", href)
+            items.append(RawItem(
+                site_id="tanpaifang", site_name="中国碳交易网",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:30]
+
+
+def fetch_tandao(session: requests.Session, now: datetime) -> list[RawItem]:
+    """碳道 — carbon news aggregator."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.ideacarbon.org/", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 6:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.ideacarbon.org", href)
+            items.append(RawItem(
+                site_id="ideacarbon", site_name="碳道",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:30]
+
+
+def fetch_china_energy_news(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中国能源报."""
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.cnenergynews.cn/", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 6:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.cnenergynews.cn", href)
+            items.append(RawItem(
+                site_id="chinaenergy", site_name="中国能源报",
+                title=text, url=href,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:30]
+
+
+# ── OPML RSS ──────────────────────────────────────────────────────────────────
+def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> list[RawItem]:
+    """Read an OPML file and fetch all RSS feeds listed in it."""
+    items: list[RawItem] = []
+    if not opml_path or not os.path.exists(opml_path):
+        return items
+
+    from xml.etree import ElementTree as ET
+    try:
+        tree = ET.parse(opml_path)
+        root = tree.getroot()
+    except Exception:
+        return items
+
+    outlines = root.findall(".//outline")
+    feed_urls: list[tuple[str, str]] = []
+    for ol in outlines:
+        xml_url = ol.get("xmlUrl") or ol.get("xml_url") or ""
+        title = ol.get("title") or ol.get("text") or os.path.basename(xml_url)
+        if xml_url and xml_url.startswith("http"):
+            feed_urls.append((title, xml_url))
+
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futures = {ex.submit(fetch_rss_feed, session, url, "opml", title, now): (title, url)
+                   for title, url in feed_urls}
+        for f in as_completed(futures):
+            try:
+                items.extend(f.result())
+            except Exception:
+                pass
+    return items
+
+
+# ── Policy relevance filter ──────────────────────────────────────────────────
+POLICY_KEYWORDS = [
+    # Chinese
+    "碳", "绿色", "低碳", "减排", "双碳", "新能源", "可再生能源",
+    "节能", "环保", "气候", "碳中和", "碳达峰", "清洁能源",
+    "光伏", "风电", "储能", "氢能", "核能", "生物质",
+    "碳交易", "碳市场", "碳关税", "碳足迹", "碳普惠",
+    "ESG", "可持续发展", "循环经济", "绿色制造", "绿色金融",
+    "能源转型", "电力市场", "新型电力系统",
+    "生态环境", "污染防治", "蓝天保卫战",
+    "CCUS", "碳捕集",
+    # English
+    "carbon", "climate", "green", "renewable", "clean energy",
+    "emission", "solar", "wind", "hydrogen", "battery",
+    "net zero", "net-zero", "decarboni", "sustainable",
+    "COP", "Paris Agreement", "NDC", "CBAM",
+    "energy transition", "EV", "electric vehicle",
+]
+
+
+def is_policy_relevant(title: str) -> bool:
+    """Check if a title is related to green/low-carbon policy."""
+    title_lower = title.lower()
+    for kw in POLICY_KEYWORDS:
+        if kw.lower() in title_lower:
+            return True
+    return False
+
+
+# ── Source registry ───────────────────────────────────────────────────────────
+# All built-in fetchers: (func, site_id, site_name)
+BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
+    # Chinese government
+    (fetch_ndrc, "ndrc", "国家发改委"),
+    (fetch_mee, "mee", "生态环境部"),
+    (fetch_nea, "nea", "国家能源局"),
+    (fetch_miit, "miit", "工信部"),
+    # International orgs
+    (fetch_iea, "iea", "IEA"),
+    (fetch_irena, "irena", "IRENA"),
+    (fetch_carbonbrief, "carbonbrief", "Carbon Brief"),
+    (fetch_unfccc, "unfccc", "UNFCCC"),
+    (fetch_worldbank_climate, "worldbank", "World Bank Climate"),
+    (fetch_reuters_energy, "reuters", "Reuters Energy"),
+    # Chinese industry
+    (fetch_bjx, "bjx", "北极星电力网"),
+    (fetch_tanpaifang, "tanpaifang", "中国碳交易网"),
+    (fetch_tandao, "ideacarbon", "碳道"),
+    (fetch_china_energy_news, "chinaenergy", "中国能源报"),
+]
+
+
+# ── Main pipeline ─────────────────────────────────────────────────────────────
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Green Policy News Radar")
+    parser.add_argument("--output-dir", default="data", help="Output directory for JSON files")
+    parser.add_argument("--window-hours", type=int, default=24, help="Time window in hours")
+    parser.add_argument("--rss-opml", default=None, help="Optional OPML file for extra RSS feeds")
+    args = parser.parse_args()
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    now = utc_now()
+    session = create_session()
+
+    # ── Fetch all sources ───────────────────────────────────────────────────
+    raw_items: list[RawItem] = []
+    source_statuses: list[dict[str, Any]] = []
+
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        futures: dict[Any, tuple[str, str]] = {}
+        for func, site_id, site_name in BUILTIN_SOURCES:
+            futures[ex.submit(func, session, now)] = (site_id, site_name)
+
+        # Also fetch OPML if provided
+        opml_future = None
+        if args.rss_opml:
+            opml_future = ex.submit(fetch_opml_rss, session, args.rss_opml, now)
+
+        for f in as_completed(futures):
+            site_id, site_name = futures[f]
+            try:
+                items = f.result()
+                raw_items.extend(items)
+                source_statuses.append({
+                    "site_id": site_id, "site_name": site_name,
+                    "ok": True, "item_count": len(items),
+                })
+            except Exception as exc:
+                source_statuses.append({
+                    "site_id": site_id, "site_name": site_name,
+                    "ok": False, "item_count": 0, "error": str(exc),
+                })
+
+        if opml_future:
+            try:
+                opml_items = opml_future.result()
+                raw_items.extend(opml_items)
+                source_statuses.append({
+                    "site_id": "opml", "site_name": "OPML订阅",
+                    "ok": True, "item_count": len(opml_items),
+                })
+            except Exception as exc:
+                source_statuses.append({
+                    "site_id": "opml", "site_name": "OPML订阅",
+                    "ok": False, "item_count": 0, "error": str(exc),
+                })
+
+    # ── Dedup + filter ─────────────────────────────────────────────────────
+    window_start = now - timedelta(hours=args.window_hours)
+    seen_ids: set[str] = set()
+    seen_items: set[tuple[str, str]] = set()
+
+    all_items: list[dict[str, Any]] = []
+    green_items: list[dict[str, Any]] = []
+
+    for raw in raw_items:
+        tid = make_item_id(raw.site_id, raw.title, raw.url)
+        if tid in seen_ids:
+            continue
+        seen_ids.add(tid)
+
+        title_key = (raw.title.strip().lower()[:80], normalize_url(raw.url))
+        if title_key in seen_items:
+            continue
+        seen_items.add(title_key)
+
+        # Time filter
+        if raw.published_at and raw.published_at < window_start:
+            continue
+
+        record = {
+            "id": tid,
+            "site_id": raw.site_id,
+            "site_name": raw.site_name,
+            "source": raw.source or raw.site_name,
+            "title": raw.title,
+            "url": raw.url,
+            "published_at": iso(raw.published_at),
+            "first_seen_at": iso(now),
+        }
+        all_items.append(record)
+
+        if is_policy_relevant(raw.title):
+            green_items.append(record)
+
+    # Sort by time (newest first), items without time go last
+    def sort_key(r: dict) -> str:
+        return r.get("published_at") or "0000-00-00"
+
+    all_items.sort(key=sort_key, reverse=True)
+    green_items.sort(key=sort_key, reverse=True)
+
+    # ── Site stats ─────────────────────────────────────────────────────────
+    site_stats: dict[str, dict[str, Any]] = {}
+    for item in green_items:
+        sid = item["site_id"]
+        if sid not in site_stats:
+            site_stats[sid] = {"site_id": sid, "site_name": item["site_name"], "count": 0}
+        site_stats[sid]["count"] += 1
+
+    # ── Write outputs ──────────────────────────────────────────────────────
+    green_payload = {
+        "generated_at": iso(now),
+        "window_hours": args.window_hours,
+        "total_items": len(green_items),
+        "total_raw": len(all_items),
+        "site_count": len(site_stats),
+        "site_stats": sorted(site_stats.values(), key=lambda x: x["count"], reverse=True),
+        "items": green_items,
+    }
+
+    all_payload = {
+        "generated_at": iso(now),
+        "window_hours": args.window_hours,
+        "total_items": len(all_items),
+        "items": all_items,
+    }
+
+    status_payload = {
+        "generated_at": iso(now),
+        "sites": source_statuses,
+        "successful": sum(1 for s in source_statuses if s["ok"]),
+        "failed": sum(1 for s in source_statuses if not s["ok"]),
+        "total_raw_items": len(raw_items),
+        "total_green_items": len(green_items),
+    }
+
+    (output_dir / "latest-24h.json").write_text(
+        json.dumps(green_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "latest-24h-all.json").write_text(
+        json.dumps(all_payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    (output_dir / "source-status.json").write_text(
+        json.dumps(status_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    print(f"✅ Green Policy Radar done.")
+    print(f"   Green items: {len(green_items)}")
+    print(f"   All items:   {len(all_items)}")
+    print(f"   Sources:     {len(source_statuses)} ({status_payload['successful']} ok / {status_payload['failed']} failed)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

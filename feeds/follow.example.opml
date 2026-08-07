@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Green Hot News OPML 模板
+  将本文件复制为 feeds/follow.opml 并填入你自己的 RSS 订阅源。
+  不要将 feeds/follow.opml 提交到仓库。
+-->
+<opml version="1.0">
+  <head>
+    <title>Green Policy Feeds</title>
+  </head>
+  <body>
+    <outline text="绿色政策 RSS 订阅" title="绿色政策 RSS 订阅">
+      <!-- 示例：添加你自己的 RSS 源 -->
+      <!--
+      <outline title="源名称" xmlUrl="https://example.com/feed.xml" type="rss"/>
+      -->
+    </outline>
+  </body>
+</opml>

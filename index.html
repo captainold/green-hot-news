@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Green Hot News · 绿色政策雷达</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌿</text></svg>" />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-main">
+          <div class="hero-headline">
+            <span class="hero-logo">🌿</span>
+            <div>
+              <p class="hero-tag">GREEN POLICY INTELLIGENCE</p>
+              <h1>绿色政策雷达</h1>
+            </div>
+          </div>
+          <p class="hero-sub">
+            国内外最新绿色低碳政策动态 · 24 小时自动更新
+          </p>
+        </div>
+        <div class="hero-meta">
+          <span class="updated-label">更新时间</span>
+          <span class="updated" id="updatedAt">加载中...</span>
+        </div>
+
+        <section class="stats" id="stats"></section>
+      </header>
+
+      <section class="primary-controls">
+        <input id="searchInput" type="search" placeholder="搜索政策信号 / 来源 / 关键词" />
+        <div class="mode-hint" id="modeHint">绿色政策</div>
+      </section>
+
+      <details class="advanced-panel">
+        <summary>
+          <span>高级筛选与源状态</span>
+          <span class="advanced-summary" id="advancedSummary">加载中...</span>
+        </summary>
+        <div class="advanced-content">
+          <div class="advanced-controls">
+            <label class="field">
+              <span>站点</span>
+              <select id="siteSelect">
+                <option value="">全部站点</option>
+              </select>
+            </label>
+            <div class="field">
+              <span>视图</span>
+              <div class="mode-switch">
+                <button id="modeGreenBtn" class="mode-btn active" type="button">绿色政策</button>
+                <button id="modeAllBtn" class="mode-btn" type="button">全量</button>
+              </div>
+            </div>
+          </div>
+          <div class="source-health" id="sourceHealth">源状态加载中...</div>
+          <section class="site-pills" id="sitePills"></section>
+        </div>
+      </details>
+
+      <section class="list-wrap">
+        <div class="list-head">
+          <h2 id="listTitle">绿色政策信号流</h2>
+          <span id="resultCount">0 条</span>
+        </div>
+        <div id="newsList" class="news-list"></div>
+      </section>
+    </main>
+
+    <template id="itemTpl">
+      <article class="news-card">
+        <div class="meta-row">
+          <span class="site"></span>
+          <span class="source"></span>
+          <time class="time"></time>
+        </div>
+        <a class="title" target="_blank" rel="noopener noreferrer"></a>
+      </article>
+    </template>
+
+    <script src="./assets/app.js" defer></script>
+  </body>
+</html>
