@@ -193,13 +193,21 @@ def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
             text = a.get_text(strip=True)
-            # Filter out navigation links (short text, non-news URLs)
+            # Filter: only news articles, not navigation/footer links
             if not text or not href or len(text) < 8:
                 continue
-            if any(skip in href for skip in ["javascript", "mailto", "jg.mee.gov.cn"]):
+            if any(skip in href for skip in ["javascript", "mailto"]):
                 continue
-            if not href.startswith("http"):
-                href = urljoin("https://www.mee.gov.cn", href)
+            # Only accept relative links (news) or absolute MEE links
+            if href.startswith("./"):
+                href = urljoin("https://www.mee.gov.cn/ywdt/xwfb/", href)
+            elif "mee.gov.cn" in href:
+                pass  # keep absolute MEE links
+            else:
+                continue  # skip external domains (nav/department links)
+            # Further filter: keep only news articles (URL contains date path)
+            if "/20" not in href and "/xwfb/" not in href:
+                continue
             items.append(RawItem(
                 site_id="mee", site_name="生态环境部",
                 title=text, url=href,
