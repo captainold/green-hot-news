@@ -28,12 +28,15 @@
   const itemTpl = $("#itemTpl");
 
   // ── Load data ──────────────────────────────────────────────────────────────
+  // Cache-buster: GitHub Pages serves data with max-age=600; a changing query
+  // param forces the browser (and CDN) to fetch fresh JSON every load.
+  const cb = `?t=${Date.now()}`;
   async function loadData() {
     try {
       const [greenResp, allResp, statusResp] = await Promise.all([
-        fetch("./data/latest-24h.json"),
-        fetch("./data/latest-24h-all.json"),
-        fetch("./data/source-status.json"),
+        fetch(`./data/latest-24h.json${cb}`),
+        fetch(`./data/latest-24h-all.json${cb}`),
+        fetch(`./data/source-status.json${cb}`),
       ]);
 
       const greenData = await greenResp.json();
