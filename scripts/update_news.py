@@ -501,23 +501,32 @@ def fetch_unfccc(session: requests.Session, now: datetime) -> list[RawItem]:
 
 
 def fetch_worldbank_climate(session: requests.Session, now: datetime) -> list[RawItem]:
-    """World Bank — climate."""
+    """World Bank — climate news via Google News.
+
+    The worldbank.org topic pages are JS-rendered: static HTML link texts are
+    the raw URLs themselves, so direct scraping yields garbage entries
+    (e.g. https://www.worldbank.org/ext/en/home). Google News gives real
+    headlines + publish time.
+    """
+    import feedparser as fp
     items: list[RawItem] = []
     try:
-        r = session.get("https://www.worldbank.org/en/topic/climatechange", timeout=30)
+        r = session.get(
+            "https://news.google.com/rss/search",
+            params={"q": '"World Bank" climate change', "hl": "en-US", "gl": "US", "ceid": "US:en"},
+            timeout=30,
+        )
         r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        for a in soup.select("a[href]"):
-            href = a.get("href", "").strip()
-            text = a.get_text(strip=True)
-            if not text or not href or len(text) < 10:
+        feed = fp.parse(r.content)
+        for entry in feed.entries[:20]:
+            title = (entry.get("title") or "").strip()
+            link = (entry.get("link") or "").strip()
+            if not title or not link:
                 continue
-            if not href.startswith("http"):
-                href = urljoin("https://www.worldbank.org", href)
             items.append(RawItem(
                 site_id="worldbank", site_name="World Bank Climate",
-                title=text, url=href,
-                published_at=None,
+                title=title, url=link,
+                published_at=_entry_published(entry),
             ))
     except Exception:
         pass
