@@ -64,6 +64,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The update job above may have committed fresh data AFTER this run was
+      # triggered; github.sha points at the trigger commit, so sync to the
+      # latest master before deploying.
+      - name: Sync to latest master
+        run: git pull --ff-only origin master
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
