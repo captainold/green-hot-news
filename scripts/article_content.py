@@ -117,7 +117,12 @@ _ISO_RE = re.compile(
 
 
 def _iso_to_beijing(m: "re.Match[str]") -> Optional[str]:
-    """Convert ISO match to Beijing-time 'YYYY-MM-DD HH:MM'."""
+    """Convert ISO match to 'YYYY-MM-DD HH:MM'.
+
+    Only timezone-annotated values (Z or ±HH:MM) are converted to Beijing;
+    naive datetimes (Chinese sites' visible meta rows) are returned as-is —
+    they are already Beijing wall-clock time.
+    """
     try:
         import datetime as dtm
         y, mo, d, h, mi = (int(m.group(i)) for i in range(1, 6))
@@ -128,7 +133,8 @@ def _iso_to_beijing(m: "re.Match[str]") -> Optional[str]:
             tz = dtm.timezone(sign * dtm.timedelta(
                 hours=int(m.group(9)), minutes=int(m.group(10) or 0)))
         else:
-            tz = dtm.timezone.utc  # no offset → assume UTC
+            # no offset → already wall-clock (Beijing for CN sites)
+            return f"{y:04d}-{mo:02d}-{d:02d} {int(h):02d}:{int(mi):02d}"
         dt = dtm.datetime(y, mo, d, h, mi, tzinfo=tz)
         bj = dt.astimezone(dtm.timezone(dtm.timedelta(hours=8)))
         return f"{bj:%Y-%m-%d %H:%M}"
@@ -166,10 +172,41 @@ def extract_published_at(soup: BeautifulSoup) -> Optional[str]:
     """Extract publish time from a detail page.
 
     Returns "YYYY-MM-DD HH:MM" (hour precision) when found, else
-    "YYYY-MM-DD" (date-only), else None. Tries, in order:
-    meta tags → <time datetime> → label+datetime text → raw regex.
+    "YYYY-MM-DD" (date-only), else None.
+
+    Layered: visible body text with HH:MM (Chinese sites' meta rows are
+    Beijing time) → <time>/meta ISO (some sites, e.g. 碳道, emit misleading
+    UTC metas, but gov sites like NDRC keep precise time only in meta) →
+    visible body date-only.
     """
-    # 1) meta tags
+    def short_texts():
+        for el in soup.find_all(["span", "div", "p", "li", "em", "td", "i"]):
+            txt = el.get_text(" ", strip=True)
+            if txt and len(txt) <= 60:
+                yield txt
+
+    def has_context(txt: str) -> bool:
+        """True if the element carries more than a bare datetime (author row,
+        label, ·-separated meta). Bare '2026-07-31 11:15' spans on gov sites
+        are hidden duplicates of the UTC meta — skip them."""
+        rest = re.sub(r"[\d\s\-/:：年月日.]", "", txt)
+        return len(rest) >= 1
+
+    # A) visible text with HH:MM + context (Chinese meta rows: Beijing-naive)
+    for txt in short_texts():
+        if not has_context(txt):
+            continue
+        m = _PUB_RE.search(txt) or _ISO_RE.search(txt)
+        if m:
+            hit = _pub_from_text(txt)
+            if hit and len(hit) > 10:
+                return hit
+    # B) <time datetime> / meta ISO (precise time, maybe UTC → Beijing)
+    for el in soup.find_all("time"):
+        dt = str(el.get("datetime") or el.get_text(strip=True))
+        hit = _pub_from_text(dt)
+        if hit and len(hit) > 10:
+            return hit
     for sel in (
         'meta[property="article:published_time"]',
         'meta[property="og:published_time"]',
@@ -182,29 +219,10 @@ def extract_published_at(soup: BeautifulSoup) -> Optional[str]:
         if el and el.get("content"):
             val = str(el.get("content")).strip()
             hit = _pub_from_text(val)
-            if hit:
+            if hit and len(hit) > 10:
                 return hit
-    # 2) <time datetime=...>
-    for el in soup.find_all("time"):
-        dt = str(el.get("datetime") or el.get_text(strip=True))
-        hit = _pub_from_text(dt)
-        if hit:
-            return hit
-    # 3) label + raw text scan (short elements only, keeps it fast)
-    for el in soup.find_all(["span", "div", "p", "li", "em", "td"]):
-        txt = el.get_text(" ", strip=True)
-        if not txt or len(txt) > 60:
-            continue  # too big to be a time label
-        hit = _pub_from_text(txt)
-        if hit:
-            return hit
-    # 4) raw regex over body text (look for 发布/时间 near a datetime)
-    for el in soup.find_all(["span", "div", "p", "li", "em", "td"]):
-        txt = el.get_text(" ", strip=True)
-        if not txt or len(txt) > 80:
-            continue
-        if "发布" not in txt and "时间" not in txt:
-            continue
+    # C) visible text, date-only
+    for txt in short_texts():
         hit = _pub_from_text(txt)
         if hit:
             return hit
@@ -357,6 +375,17 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
         summary = _cut_at_sentence(body, MAX_SUMMARY_CHARS)
         content = _cut_at_sentence(body, MAX_BODY_CHARS)
         published = extract_published_at(soup)
+        if published:
+            # Safety net: a publish time in the future is extraction garbage.
+            # Detail-page times are Beijing-naive; compare against UTC now.
+            try:
+                import datetime as dtm
+                bj_tz = dtm.timezone(dtm.timedelta(hours=8))
+                pub_dt = dtm.datetime.strptime(published, "%Y-%m-%d %H:%M").replace(tzinfo=bj_tz)
+                if pub_dt > dtm.datetime.now(dtm.timezone.utc) + dtm.timedelta(hours=1):
+                    published = None
+            except (TypeError, ValueError):
+                published = None
         return {"summary": summary, "content": content, "title": page_title,
                 "published": published}
     except Exception:
