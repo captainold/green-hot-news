@@ -874,6 +874,10 @@ def main() -> int:
         (output_dir / "published-index.json").write_text(
             json.dumps(archived_pub, ensure_ascii=False, indent=1), encoding="utf-8")
 
+    # Backfilled times change sort order — re-sort newest first
+    all_items_24h.sort(key=sort_key, reverse=True)
+    green_items_24h.sort(key=sort_key, reverse=True)
+
     # ── Site stats ─────────────────────────────────────────────────────────
     site_stats: dict[str, dict[str, Any]] = {}
     for item in green_items_24h:
