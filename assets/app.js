@@ -172,7 +172,13 @@
       const card = itemTpl.content.cloneNode(true);
       card.querySelector(".site").textContent = item.site_name || item.site_id;
       card.querySelector(".source").textContent = item.source || "";
-      card.querySelector(".time").textContent = formatTime(item.published_at);
+      const timeEl = card.querySelector(".time");
+      const timeTxt = formatTime(item.published_at);
+      // Scrape-time fallback (source site gives no publish time): mark it clearly
+      timeEl.textContent = item.time_source === "scraped" ? `收录 ${timeTxt}` : timeTxt;
+      timeEl.title = item.time_source === "scraped"
+        ? "源站未提供发布时间，此时间为收录（抓取）时间"
+        : "发布时间";
       const titleLink = card.querySelector(".title");
       titleLink.href = item.url;
       titleLink.textContent = item.title;

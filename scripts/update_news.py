@@ -854,12 +854,20 @@ def main() -> int:
             return pub.replace(" ", "T") + "+08:00"
         return pub + "T00:00:00+08:00"  # date-only → midnight Beijing
 
+    # NOTE: green_items shares the same dict objects as all_items, so this
+    # single pass covers both lists (do not loop green_items again — it would
+    # overwrite time_source).
     for rec in all_items:
-        if not rec.get("published_at") and rec.get("url") in archived_pub:
-            rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
-    for rec in green_items:
-        if not rec.get("published_at") and rec.get("url") in archived_pub:
-            rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
+        if not rec.get("published_at"):
+            if rec.get("url") in archived_pub:
+                rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
+                rec["time_source"] = "published"
+            elif rec.get("first_seen_at"):
+                # source site gives no publish time — record scrape time instead
+                rec["published_at"] = rec["first_seen_at"]
+                rec["time_source"] = "scraped"
+        else:
+            rec["time_source"] = "published"
 
     # Persist the url→published map so CI runs can reuse it
     if archived_pub:
