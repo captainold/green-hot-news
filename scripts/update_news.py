@@ -560,6 +560,45 @@ def fetch_bjx(session: requests.Session, now: datetime) -> list[RawItem]:
     return items
 
 
+# ── link filtering helpers ────────────────────────────────────────────────────
+_JUNK_TEXT = (
+    "注册", "登录", "协议", "条款", "关于", "联系我们", "备案", "版权",
+    "下载", "APP", "VIP", "会员", "沪ICP", "隐私", "帮助", "常见问题",
+    "手机版", "客户端", "订阅", "投稿", "广告", "合作", "招聘", "收藏本站",
+    "设为首页", "返回顶部", "邮箱快捷", "短信快捷", "使用协议", "用户协议",
+    "English", "简体", "繁體", "微博", "微信", "QQ群",
+)
+_JUNK_URL = (
+    "/user/", "/login", "/register", "/about", "/aboutus", "/terms",
+    "/privacy", "/protocol", "/copyright", "/disclaimer", "/faq", "/help",
+    "/jobs", "/advert", "/contact", "/member", "/vip", "/profile",
+    "/abouts", "/header_tab", "javascript:", "mailto:", "tel:", "#",
+    "/xiey", "/hezuo", "/guanggao",
+)
+
+
+def _is_junk_link(text: str, href: str) -> bool:
+    """True if a candidate link is nav/footer/auth junk, not content."""
+    if not text or not href:
+        return True
+    t = text.strip()
+    if len(t) < 6:
+        return True
+    for w in _JUNK_TEXT:
+        if w in t:
+            return True
+    hl = href.lower()
+    for u in _JUNK_URL:
+        if u in hl:
+            return True
+    return False
+
+
+def _allowed_path(href: str, patterns: tuple[str, ...]) -> bool:
+    """True if href matches one of the content URL patterns."""
+    return any(p in href for p in patterns)
+
+
 def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
     """中国碳交易网."""
     items: list[RawItem] = []
@@ -574,7 +613,7 @@ def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
             text = fix_text(a.get_text(strip=True))
-            if not text or not href or len(text) < 8:
+            if _is_junk_link(text, href):
                 continue
             if not href.startswith("http"):
                 href = urljoin("http://www.tanpaifang.com", href)
@@ -598,8 +637,10 @@ def fetch_tandao(session: requests.Session, now: datetime) -> list[RawItem]:
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
             text = a.get_text(strip=True)
-            if not text or not href or len(text) < 6:
+            if _is_junk_link(text, href):
                 continue
+            if not _allowed_path(href, ("news_free", "newspc")):
+                continue  # 碳道 news items live under /news_free/ or /newspc/
             if not href.startswith("http"):
                 href = urljoin("https://www.ideacarbon.org", href)
             items.append(RawItem(
@@ -622,8 +663,10 @@ def fetch_china_energy_news(session: requests.Session, now: datetime) -> list[Ra
         for a in soup.select("a[href]"):
             href = a.get("href", "").strip()
             text = a.get_text(strip=True)
-            if not text or not href or len(text) < 6:
+            if _is_junk_link(text, href):
                 continue
+            if not _allowed_path(href, ("/article/", "/topic/", "/energy/")):
+                continue  # 能源报 news items live under /article/
             if not href.startswith("http"):
                 href = urljoin("https://www.cnenergynews.cn", href)
             items.append(RawItem(
