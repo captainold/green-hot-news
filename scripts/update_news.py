@@ -197,6 +197,45 @@ def _list_item_date(li) -> Optional[str]:
     return None
 
 
+def _entry_published(entry) -> Optional[datetime]:
+    """Extract publish time from a feedparser entry (UTC)."""
+    published = None
+    if hasattr(entry, "published_parsed") and entry.published_parsed:
+        try:
+            published = datetime(*entry.published_parsed[:6], tzinfo=UTC)
+        except Exception:
+            pass
+    if not published and hasattr(entry, "updated_parsed") and entry.updated_parsed:
+        try:
+            published = datetime(*entry.updated_parsed[:6], tzinfo=UTC)
+        except Exception:
+            pass
+    return published
+
+
+_EN_MONTHS = {
+    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+    "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+}
+_EN_DATE_RE = re.compile(r"(\d{1,2})\s+([A-Za-z]+),?\s+(20\d{2})")
+
+
+def _parse_english_date(text: str) -> Optional[datetime]:
+    """Parse '07 August 2026' / '3 Aug 2026' into a UTC midnight datetime."""
+    if not text:
+        return None
+    m = _EN_DATE_RE.search(text)
+    if not m:
+        return None
+    mon = _EN_MONTHS.get(m.group(2).lower()[:3])
+    if not mon:
+        return None
+    try:
+        return datetime(int(m.group(3)), mon, int(m.group(1)), tzinfo=UTC)
+    except (TypeError, ValueError):
+        return None
+
+
 def fetch_ndrc(session: requests.Session, now: datetime) -> list[RawItem]:
     """国家发改委 — HTML 新闻列表."""
     items: list[RawItem] = []
@@ -250,10 +289,12 @@ def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
             # Further filter: keep only news articles (URL contains date path)
             if "/20" not in href and "/xwfb/" not in href:
                 continue
+            li = a.find_parent("li")
+            pub_date = _list_item_date(li) if li is not None else None
             items.append(RawItem(
                 site_id="mee", site_name="生态环境部",
                 title=text, url=href,
-                published_at=None,
+                published_at=parse_date_only(pub_date),
             ))
     except Exception:
         pass
@@ -311,10 +352,12 @@ def fetch_miit(session: requests.Session, now: datetime) -> list[RawItem]:
                 continue
             if not href.startswith("http"):
                 href = urljoin("https://www.miit.gov.cn", href)
+            li = a.find_parent("li")
+            pub_date = _list_item_date(li) if li is not None else None
             items.append(RawItem(
                 site_id="miit", site_name="工信部",
                 title=text, url=href,
-                published_at=None,
+                published_at=parse_date_only(pub_date),
             ))
     except Exception:
         pass
@@ -347,10 +390,12 @@ def fetch_iea(session: requests.Session, now: datetime) -> list[RawItem]:
             date_el = article.select_one("time, [class*=date], [datetime]")
             if date_el:
                 date_text = date_el.get_text(strip=True)
+            published = _parse_english_date(date_text) or _parse_english_date(
+                article.get_text(" ", strip=True))
             items.append(RawItem(
                 site_id="iea", site_name="IEA",
                 title=text, url=href,
-                published_at=None,
+                published_at=published,
                 meta={"date_text": date_text},
             ))
     except Exception:
@@ -384,7 +429,7 @@ def fetch_irena(session: requests.Session, now: datetime) -> list[RawItem]:
             items.append(RawItem(
                 site_id="irena", site_name="IRENA",
                 title=title, url=link,
-                published_at=None,
+                published_at=_entry_published(entry),
             ))
     except Exception:
         pass
@@ -421,7 +466,7 @@ def fetch_reuters_energy(session: requests.Session, now: datetime) -> list[RawIt
             items.append(RawItem(
                 site_id="reuters", site_name="Reuters",
                 title=title, url=link,
-                published_at=None,
+                published_at=_entry_published(entry),
             ))
     except Exception:
         pass
@@ -448,7 +493,7 @@ def fetch_unfccc(session: requests.Session, now: datetime) -> list[RawItem]:
             items.append(RawItem(
                 site_id="unfccc", site_name="UNFCCC",
                 title=title, url=link,
-                published_at=None,
+                published_at=_entry_published(entry),
             ))
     except Exception:
         pass
@@ -499,7 +544,7 @@ def fetch_bjx(session: requests.Session, now: datetime) -> list[RawItem]:
             items.append(RawItem(
                 site_id="bjx", site_name="北极星电力网",
                 title=title, url=link,
-                published_at=None,
+                published_at=_entry_published(entry),
             ))
     except Exception:
         pass
@@ -790,6 +835,37 @@ def main() -> int:
     if args.obsidian_dir:
         obsidian_new, obsidian_with_body = export_to_obsidian(green_items, args.obsidian_dir, now)
 
+    # Backfill publish times in JSON from the local archive (detail-page times,
+    # hour precision, Beijing). Newly exported notes are picked up immediately.
+    # In CI (no Notes/ dir) the mapping comes from the committed published-index.json.
+    archived_pub: dict[str, str] = {}
+    if args.obsidian_dir:
+        archived_pub = load_archived_published(args.obsidian_dir)
+    else:
+        pub_index_path = output_dir / "published-index.json"
+        if pub_index_path.exists():
+            try:
+                archived_pub = json.loads(pub_index_path.read_text(encoding="utf-8"))
+            except Exception:
+                archived_pub = {}
+
+    def _archived_to_iso(pub: str) -> str:
+        if " " in pub:
+            return pub.replace(" ", "T") + "+08:00"
+        return pub + "T00:00:00+08:00"  # date-only → midnight Beijing
+
+    for rec in all_items:
+        if not rec.get("published_at") and rec.get("url") in archived_pub:
+            rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
+    for rec in green_items:
+        if not rec.get("published_at") and rec.get("url") in archived_pub:
+            rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
+
+    # Persist the url→published map so CI runs can reuse it
+    if archived_pub:
+        (output_dir / "published-index.json").write_text(
+            json.dumps(archived_pub, ensure_ascii=False, indent=1), encoding="utf-8")
+
     # ── Site stats ─────────────────────────────────────────────────────────
     site_stats: dict[str, dict[str, Any]] = {}
     for item in green_items_24h:
@@ -949,6 +1025,35 @@ def format_published(iso_str: str) -> str:
     if not dt:
         return ""
     return dt.astimezone(SH_TZ).strftime("%Y-%m-%d %H:%M")
+
+
+def load_archived_published(base_dir_str: str) -> dict[str, str]:
+    """Map url -> published (Beijing 'YYYY-MM-DD HH:MM') from existing notes."""
+    mapping: dict[str, str] = {}
+    base = Path(base_dir_str) / "Notes" / "政策库"
+    if not base.exists():
+        return mapping
+    for p in base.rglob("*.md"):
+        if p.name in ("政策库.md", "ai-index.md"):
+            continue
+        try:
+            content = p.read_text(encoding="utf-8")
+            if not content.startswith("---"):
+                continue
+            fm: dict[str, str] = {}
+            for line in content.split("\n")[1:]:
+                if line.strip() == "---":
+                    break
+                if ":" in line:
+                    k, v = line.split(":", 1)
+                    fm[k.strip()] = v.strip().strip('"')
+            url = fm.get("url", "")
+            pub = fm.get("published", "")
+            if url and pub:
+                mapping[url] = pub
+        except Exception:
+            continue
+    return mapping
 
 
 def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> tuple[int, int]:

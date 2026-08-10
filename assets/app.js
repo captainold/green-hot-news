@@ -184,19 +184,28 @@
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
+  // Always show an absolute publish time (Beijing-local), hour precision,
+  // with 上午/下午 phrasing. Recent items get a relative hint appended.
+  function formatAbsolute(d) {
+    const h = d.getHours();
+    const ap = h < 12 ? "上午" : "下午";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    const min = String(d.getMinutes()).padStart(2, "0");
+    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${ap}${h12}:${min}`;
+  }
+
   function formatTime(isoStr) {
-    if (!isoStr) return "";
-    try {
-      const d = new Date(isoStr);
-      const now = new Date();
-      const diffMs = now - d;
-      const diffMin = Math.floor(diffMs / 60000);
-      const diffH = Math.floor(diffMs / 3600000);
-      if (diffMin < 1) return "刚刚";
-      if (diffMin < 60) return `${diffMin}分钟前`;
-      if (diffH < 24) return `${diffH}小时前`;
-      return d.toLocaleDateString("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-    } catch { return ""; }
+    if (!isoStr) return "时间未知";
+    let d;
+    try { d = new Date(isoStr); } catch { return "时间未知"; }
+    if (isNaN(d.getTime())) return "时间未知";
+
+    const abs = formatAbsolute(d);
+    const diffMin = (new Date() - d) / 60000;
+    if (diffMin < 0) return abs; // future-dated
+    if (diffMin < 60) return `${Math.floor(diffMin)}分钟前 · ${abs}`;
+    if (diffMin < 24 * 60) return `${Math.floor(diffMin / 60)}小时前 · ${abs}`;
+    return abs;
   }
 
   // ── Event listeners ────────────────────────────────────────────────────────
