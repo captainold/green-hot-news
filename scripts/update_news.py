@@ -13,12 +13,18 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 from dateutil import parser as dtparser
+
+try:
+    from . import article_content
+except ImportError:  # running as a plain script
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import article_content
 
 try:
     import feedparser
@@ -744,8 +750,9 @@ def main() -> int:
 
     # ── Obsidian export ────────────────────────────────────────────────────
     obsidian_new = 0
+    obsidian_with_body = 0
     if args.obsidian_dir:
-        obsidian_new = export_to_obsidian(green_items, args.obsidian_dir, now)
+        obsidian_new, obsidian_with_body = export_to_obsidian(green_items, args.obsidian_dir, now)
 
     # ── Site stats ─────────────────────────────────────────────────────────
     site_stats: dict[str, dict[str, Any]] = {}
@@ -794,7 +801,7 @@ def main() -> int:
     print(f"   All items:   {len(all_items_24h)}")
     print(f"   Sources:     {len(source_statuses)} ({status_payload['successful']} ok / {status_payload['failed']} failed)")
     if args.obsidian_dir:
-        print(f"   Obsidian:    {obsidian_new} new notes → {args.obsidian_dir}/Notes/政策库/")
+        print(f"   Obsidian:    {obsidian_new} new notes → {args.obsidian_dir}/Notes/政策库/ ({obsidian_with_body} with 正文)")
     return 0
 
 
@@ -900,25 +907,28 @@ def auto_tag(title: str, site_id: str) -> list[str]:
 
 
 # ── Obsidian export ────────────────────────────────────────────────────────────
-def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> int:
-    """Export news items as Obsidian markdown notes. Returns count of new notes."""
+def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> tuple[int, int]:
+    """Export news items as Obsidian markdown notes.
+
+    Returns (new_note_count, notes_with_body_count). Body/summary fetched
+    concurrently; fetch failures degrade gracefully to link-only cards.
+    """
     import re as _re
     base = Path(base_dir_str) / "Notes" / "政策库"
     base.mkdir(parents=True, exist_ok=True)
 
-    new_count = 0
+    # ── 1) plan new notes (dedup by filename) ────────────────────────────────
+    planned: list[tuple[Path, dict]] = []  # (filepath, item)
     for item in items:
         site_name = item.get("site_name", item.get("site_id", "unknown"))
         title = item.get("title", "untitled")
         url = item.get("url", "")
         pub_date = item.get("published_at", "")
 
-        # Sanitize directory name
         safe_site = _re.sub(r'[<>:"/\\|?*]', '_', site_name).strip()
         site_dir = base / safe_site
         site_dir.mkdir(parents=True, exist_ok=True)
 
-        # Sanitize filename from title
         safe_title = _re.sub(r'[<>:"/\\|?*]', '_', title)[:80].strip()
         if pub_date:
             date_prefix = pub_date[:10]  # YYYY-MM-DD
@@ -927,18 +937,43 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> i
             filename = f"{safe_title}.md"
         filepath = site_dir / filename
 
-        # Skip if already exists (dedup by filename)
         if filepath.exists():
             continue
+        planned.append((filepath, item))
 
-        # Build markdown content
+    # ── 2) fetch body + summary concurrently ─────────────────────────────────
+    bodies: dict[str, Optional[dict]] = {}
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        futures = {
+            ex.submit(article_content.fetch_article, it.get("url", "")):
+                (fp, it) for fp, it in planned
+        }
+        for fut in as_completed(futures):
+            fp, it = futures[fut]
+            try:
+                res = fut.result()
+            except Exception:
+                res = None
+            bodies[str(fp)] = res
+
+    # ── 3) write notes ───────────────────────────────────────────────────────
+    new_count = 0
+    body_count = 0
+    for fp, item in planned:
+        site_name = item.get("site_name", item.get("site_id", "unknown"))
+        title = item.get("title", "untitled")
+        url = item.get("url", "")
+        pub_date = item.get("published_at", "")
+        res = bodies.get(str(fp))
+        summary = (res or {}).get("summary") or ""
+        content = (res or {}).get("content") or ""
+
         date_val = pub_date[:10] if pub_date else now.strftime("%Y-%m-%d")
         tags = auto_tag(title, item.get("site_id", ""))
         tag_str = ", ".join(tags)
-        # Keywords from tags + title word segmentation
         kw_set = set(tags)
         for t in title.replace("：", " ").replace("，", " ").replace("、", " ").split():
-            t = t.strip().strip("\"'【】《》").strip()
+            t = _re.sub(r"[,，.。、:：;；!！?？'\"‘’“”()（）\[\]【】]", "", t).strip()
             if len(t) >= 2 and len(t) <= 12 and not t.startswith(("http", "www")):
                 kw_set.add(t)
         kw_str = ", ".join(sorted(kw_set)[:15])
@@ -949,6 +984,11 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> i
             f"date: {date_val}",
             f"tags: [{tag_str}]",
             f"keywords: [{kw_str}]",
+        ]
+        if summary:
+            safe_summary = summary.replace(chr(34), chr(39)).replace("\n", " ")
+            lines.append(f'summary: "{safe_summary}"')
+        lines += [
             "---",
             "",
             f"# {title}",
@@ -960,15 +1000,18 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> i
         if pub_date:
             lines.append(f"> 发布时间: {pub_date}")
         lines.append(f"> 首次抓取: {now.strftime('%Y-%m-%d %H:%M')} UTC")
+        if content:
+            lines += ["", "## 正文", "", content]
+            body_count += 1
 
-        filepath.write_text("\n".join(lines), encoding="utf-8")
+        fp.write_text("\n".join(lines), encoding="utf-8")
         new_count += 1
 
     # Update index page
     _update_obsidian_index(base, now)
     # Update AI-readable index
     _update_ai_index(base, now)
-    return new_count
+    return new_count, body_count
 
 
 def _update_obsidian_index(base: Path, now: datetime) -> None:
@@ -1084,6 +1127,7 @@ def _update_ai_index(base: Path, now: datetime) -> None:
                     "date": fm.get("date", ""),
                     "tags": fm.get("tags", ""),
                     "keywords": fm.get("keywords", ""),
+                    "summary": fm.get("summary", ""),
                     "url": fm.get("url", ""),
                 })
 
@@ -1109,6 +1153,8 @@ def _update_ai_index(base: Path, now: datetime) -> None:
         lines.append(f"- Title: {e['title']}")
         lines.append(f"- Tags: {e['tags']}")
         lines.append(f"- Keywords: {e['keywords']}")
+        summary = e.get("summary", "")
+        lines.append(f"- Summary: {summary[:150] if summary else '(none)'}")
         lines.append(f"- URL: {e['url']}")
         lines.append("")
 
