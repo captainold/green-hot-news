@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -72,6 +73,17 @@ def parse_iso(dt_str: str | None) -> datetime | None:
     if not dt.tzinfo:
         dt = dt.replace(tzinfo=UTC)
     return dt.astimezone(UTC)
+
+
+def parse_date_only(date_str: str | None) -> datetime | None:
+    """Parse 'YYYY-MM-DD' (or 'YYYY/MM/DD') into a UTC midnight datetime."""
+    if not date_str:
+        return None
+    try:
+        dt = dtparser.parse(date_str)
+    except Exception:
+        return None
+    return dt.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=UTC)
 
 
 def normalize_url(raw_url: str) -> str:
@@ -163,6 +175,28 @@ def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_
 
 
 # ── Web scraping fetchers ─────────────────────────────────────────────────────
+_LIST_DATE_RE = re.compile(r"(20\d{2})[/\-.](\d{1,2})[/\-.](\d{1,2})")
+
+
+def _list_item_date(li) -> Optional[str]:
+    """Extract a date (YYYY-MM-DD) from a list item on gov listing pages."""
+    for sp in li.find_all(["span", "em", "i", "time"]):
+        txt = sp.get_text(strip=True)
+        m = _LIST_DATE_RE.search(txt)
+        if m:
+            y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+            if 2000 <= y <= 2100 and 1 <= mo <= 12 and 1 <= d <= 31:
+                return f"{y:04d}-{mo:02d}-{d:02d}"
+    # fallback: any date-looking text in the li
+    txt = li.get_text(" ", strip=True)
+    m = _LIST_DATE_RE.search(txt)
+    if m:
+        y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if 2000 <= y <= 2100 and 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y:04d}-{mo:02d}-{d:02d}"
+    return None
+
+
 def fetch_ndrc(session: requests.Session, now: datetime) -> list[RawItem]:
     """国家发改委 — HTML 新闻列表."""
     items: list[RawItem] = []
@@ -178,10 +212,12 @@ def fetch_ndrc(session: requests.Session, now: datetime) -> list[RawItem]:
                 continue
             if not href.startswith("http"):
                 href = urljoin("https://www.ndrc.gov.cn/xwdt/xwfb/", href)
+            li = a.find_parent("li")
+            pub_date = _list_item_date(li) if li is not None else None
             items.append(RawItem(
                 site_id="ndrc", site_name="国家发改委",
                 title=text, url=href,
-                published_at=None,
+                published_at=parse_date_only(pub_date),
             ))
     except Exception:
         pass
@@ -907,6 +943,14 @@ def auto_tag(title: str, site_id: str) -> list[str]:
 
 
 # ── Obsidian export ────────────────────────────────────────────────────────────
+def format_published(iso_str: str) -> str:
+    """Convert RSS iso timestamp to Beijing-time 'YYYY-MM-DD HH:MM'."""
+    dt = parse_iso(iso_str)
+    if not dt:
+        return ""
+    return dt.astimezone(SH_TZ).strftime("%Y-%m-%d %H:%M")
+
+
 def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> tuple[int, int]:
     """Export news items as Obsidian markdown notes.
 
@@ -967,8 +1011,14 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         res = bodies.get(str(fp))
         summary = (res or {}).get("summary") or ""
         content = (res or {}).get("content") or ""
+        # Publish time: detail-page time (hour precision) wins, RSS time as fallback
+        published = (res or {}).get("published") or ""
+        if not published:
+            published = format_published(item.get("published_at", ""))
 
         date_val = pub_date[:10] if pub_date else now.strftime("%Y-%m-%d")
+        if not published:
+            published = date_val  # last resort: the date field itself
         tags = auto_tag(title, item.get("site_id", ""))
         tag_str = ", ".join(tags)
         kw_set = set(tags)
@@ -982,6 +1032,7 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             f'source: "{site_name}"',
             f"url: {url}",
             f"date: {date_val}",
+            f'published: "{published}"',
             f"tags: [{tag_str}]",
             f"keywords: [{kw_str}]",
         ]
@@ -996,10 +1047,9 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             f"[原文链接]({url})",
             "",
             f"> 来源: {site_name}",
+            f"> 发布时间: {published}",
+            f"> 首次抓取: {now.strftime('%Y-%m-%d %H:%M')} UTC",
         ]
-        if pub_date:
-            lines.append(f"> 发布时间: {pub_date}")
-        lines.append(f"> 首次抓取: {now.strftime('%Y-%m-%d %H:%M')} UTC")
         if content:
             lines += ["", "## 正文", "", content]
             body_count += 1
@@ -1125,6 +1175,7 @@ def _update_ai_index(base: Path, now: datetime) -> None:
                     "title": fm.get("title", f),
                     "source": fm.get("source", ""),
                     "date": fm.get("date", ""),
+                    "published": fm.get("published", ""),
                     "tags": fm.get("tags", ""),
                     "keywords": fm.get("keywords", ""),
                     "summary": fm.get("summary", ""),
@@ -1151,6 +1202,7 @@ def _update_ai_index(base: Path, now: datetime) -> None:
     for e in entries:
         lines.append(f"### {e['date']} | {e['source']} | {e['file']}")
         lines.append(f"- Title: {e['title']}")
+        lines.append(f"- Published: {e.get('published', '') or '(unknown)'}")
         lines.append(f"- Tags: {e['tags']}")
         lines.append(f"- Keywords: {e['keywords']}")
         summary = e.get("summary", "")

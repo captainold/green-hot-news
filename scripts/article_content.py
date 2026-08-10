@@ -80,6 +80,136 @@ MIN_SUMMARY_CHARS = 60
 
 _SENTENCE_END = re.compile(r"(?<=[。！？!?．\.])")
 
+# Published-time patterns found on Chinese gov/news detail pages
+# e.g. 发布时间：2026/07/31 15:30 | 时间: 2026-07-31 15:30:00 | 2026年7月31日 15:30
+_PUB_RE = re.compile(
+    r"(20\d{2})[年\-/.]\s*(\d{1,2})[月\-/.]\s*(\d{1,2})[日]?\s*"
+    r"(?:[　\s]|$|,|，)"
+    r"(\d{1,2})[:：](\d{2})"
+)
+_PUB_DATE_ONLY_RE = re.compile(
+    r"(20\d{2})[年\-/.]\s*(\d{1,2})[月\-/.]\s*(\d{1,2})[日]?"
+)
+# "发布时间"/"发布时间："/"时间："/"日期：" label immediately before a date
+_PUB_LABEL_RE = re.compile(
+    r"(?:发布\s*时间|时间|日期|发布时间|成文日期)[:：]?\s*"
+    r"(20\d{2})[年\-/.]\s*(\d{1,2})[月\-/.]\s*(\d{1,2})[日]?"
+)
+
+
+def _fmt_pub(year: str, month: str, day: str,
+             hm: Optional[str] = None) -> Optional[str]:
+    try:
+        y, mo, d = int(year), int(month), int(day)
+        if not (2000 <= y <= 2100 and 1 <= mo <= 12 and 1 <= d <= 31):
+            return None
+        date_part = f"{y:04d}-{mo:02d}-{d:02d}"
+        return f"{date_part} {hm}" if hm else date_part
+    except (TypeError, ValueError):
+        return None
+
+
+# ISO 8601, e.g. 2026-07-09T12:00:00+00:00 / 2026-07-09 12:00:00Z
+_ISO_RE = re.compile(
+    r"(20\d{2})-(\d{2})-(\d{2})[T ](\d{1,2}):(\d{2})(?::(\d{2}))?"
+    r"(?:(Z)|([+-])(\d{2}):?(\d{2}))?"
+)
+
+
+def _iso_to_beijing(m: "re.Match[str]") -> Optional[str]:
+    """Convert ISO match to Beijing-time 'YYYY-MM-DD HH:MM'."""
+    try:
+        import datetime as dtm
+        y, mo, d, h, mi = (int(m.group(i)) for i in range(1, 6))
+        if m.group(7) == "Z":
+            tz = dtm.timezone.utc
+        elif m.group(8):
+            sign = 1 if m.group(8) == "+" else -1
+            tz = dtm.timezone(sign * dtm.timedelta(
+                hours=int(m.group(9)), minutes=int(m.group(10) or 0)))
+        else:
+            tz = dtm.timezone.utc  # no offset → assume UTC
+        dt = dtm.datetime(y, mo, d, h, mi, tzinfo=tz)
+        bj = dt.astimezone(dtm.timezone(dtm.timedelta(hours=8)))
+        return f"{bj:%Y-%m-%d %H:%M}"
+    except (TypeError, ValueError):
+        return None
+
+
+def _pub_from_text(txt: str) -> Optional[str]:
+    """Return normalized publish time from a short text snippet."""
+    if not txt:
+        return None
+    m = _ISO_RE.search(txt)
+    if m:
+        hit = _iso_to_beijing(m)
+        if hit:
+            return hit
+    m = _PUB_LABEL_RE.search(txt)
+    if m:
+        y, mo, d = m.group(1), m.group(2), m.group(3)
+        hm = _PUB_RE.search(txt)
+        if hm and hm.start() >= m.start():
+            return _fmt_pub(y, mo, d, f"{int(hm.group(4)):02d}:{hm.group(5)}")
+        return _fmt_pub(y, mo, d, None)
+    m = _PUB_RE.search(txt)
+    if m:
+        return _fmt_pub(m.group(1), m.group(2), m.group(3),
+                        f"{int(m.group(4)):02d}:{m.group(5)}")
+    m = _PUB_DATE_ONLY_RE.search(txt)
+    if m:
+        return _fmt_pub(m.group(1), m.group(2), m.group(3), None)
+    return None
+
+
+def extract_published_at(soup: BeautifulSoup) -> Optional[str]:
+    """Extract publish time from a detail page.
+
+    Returns "YYYY-MM-DD HH:MM" (hour precision) when found, else
+    "YYYY-MM-DD" (date-only), else None. Tries, in order:
+    meta tags → <time datetime> → label+datetime text → raw regex.
+    """
+    # 1) meta tags
+    for sel in (
+        'meta[property="article:published_time"]',
+        'meta[property="og:published_time"]',
+        'meta[name="pubdate"]',
+        'meta[name="publishdate"]',
+        'meta[name="PubDate"]',
+        'meta[itemprop="datePublished"]',
+    ):
+        el = soup.select_one(sel)
+        if el and el.get("content"):
+            val = str(el.get("content")).strip()
+            hit = _pub_from_text(val)
+            if hit:
+                return hit
+    # 2) <time datetime=...>
+    for el in soup.find_all("time"):
+        dt = str(el.get("datetime") or el.get_text(strip=True))
+        hit = _pub_from_text(dt)
+        if hit:
+            return hit
+    # 3) label + raw text scan (short elements only, keeps it fast)
+    for el in soup.find_all(["span", "div", "p", "li", "em", "td"]):
+        txt = el.get_text(" ", strip=True)
+        if not txt or len(txt) > 60:
+            continue  # too big to be a time label
+        hit = _pub_from_text(txt)
+        if hit:
+            return hit
+    # 4) raw regex over body text (look for 发布/时间 near a datetime)
+    for el in soup.find_all(["span", "div", "p", "li", "em", "td"]):
+        txt = el.get_text(" ", strip=True)
+        if not txt or len(txt) > 80:
+            continue
+        if "发布" not in txt and "时间" not in txt:
+            continue
+        hit = _pub_from_text(txt)
+        if hit:
+            return hit
+    return None
+
 
 def _strip_html(src: str) -> str:
     """Remove tags/entities, collapse whitespace, keep CJK punctuation."""
@@ -114,9 +244,10 @@ def _cut_at_sentence(text: str, limit: int) -> str:
     return head
 
 
-def extract_readable(html: str) -> tuple[str, Optional[str]]:
+def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[str, Optional[str]]:
     """Return (body_text, page_title). body_text is '' when nothing found."""
-    soup = BeautifulSoup(html, "html.parser")
+    if soup is None:
+        soup = BeautifulSoup(html, "html.parser")
     title_el = soup.find("title")
     page_title = _clean_title(title_el.get_text() if title_el else None)
 
@@ -218,13 +349,16 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
             return None
         if resp.encoding is None or resp.encoding.lower() in ("iso-8859-1", "ascii"):
             resp.encoding = resp.apparent_encoding or "utf-8"
-        body, page_title = extract_readable(resp.text)
+        soup = BeautifulSoup(resp.text, "html.parser")
+        body, page_title = extract_readable(resp.text, soup)
         head = body[:120]
         if len(body) < MIN_PARAGRAPH_CHARS or any(m in head for m in ERROR_PAGE_MARKERS):
             return None
         summary = _cut_at_sentence(body, MAX_SUMMARY_CHARS)
         content = _cut_at_sentence(body, MAX_BODY_CHARS)
-        return {"summary": summary, "content": content, "title": page_title}
+        published = extract_published_at(soup)
+        return {"summary": summary, "content": content, "title": page_title,
+                "published": published}
     except Exception:
         return None
     finally:
