@@ -5,3 +5,6 @@ __pycache__/
 data/archive.json
 feeds/follow.opml
 Notes/
+
+# Obsidian local config
+.obsidian/
