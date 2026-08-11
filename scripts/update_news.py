@@ -338,8 +338,15 @@ def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
 
 
 def fetch_miit(session: requests.Session, now: datetime) -> list[RawItem]:
-    """工信部 — 节能与综合利用司."""
+    """工信部 — 节能与综合利用司.
+
+    首页把同一文件挂在多个栏目（gzdt 工作动态 / wjfb 文件发布 / nyjy 能源节约 /
+    zyjy 资源节约），标题相同 URL 不同 → 按标题去重，优先保留 gzdt（工作动态）。
+    """
     items: list[RawItem] = []
+    # 栏目优先级：gzdt(工作动态) 最权威，其次 wjfb(文件发布)，再其后按出现顺序
+    section_prio = {"gzdt": 0, "wjfb": 1}
+    by_title: dict[str, tuple[int, str, str]] = {}  # title -> (priority, href, pub_date)
     try:
         r = session.get("https://www.miit.gov.cn/jgsj/jns/", timeout=30)
         r.raise_for_status()
@@ -352,8 +359,14 @@ def fetch_miit(session: requests.Session, now: datetime) -> list[RawItem]:
                 continue
             if not href.startswith("http"):
                 href = urljoin("https://www.miit.gov.cn", href)
+            # 栏目去重：同标题只留一篇，优先级 gzdt > wjfb > 其他
+            prio = next((p for sec, p in section_prio.items() if f"/jns/{sec}/" in href), 2)
             li = a.find_parent("li")
             pub_date = _list_item_date(li) if li is not None else None
+            prev = by_title.get(text)
+            if prev is None or prio < prev[0]:
+                by_title[text] = (prio, href, pub_date)
+        for text, (_, href, pub_date) in by_title.items():
             items.append(RawItem(
                 site_id="miit", site_name="工信部",
                 title=text, url=href,

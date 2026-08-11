@@ -20,12 +20,13 @@ BASE = Path("Notes/政策库")
 
 
 def actual_files() -> dict[str, list[str]]:
-    """Map rel-name (without .md) -> absolute path for all 政策库 notes."""
+    """Map rel-name (without .md) -> absolute path for all notes (政策库+媒体库)."""
     out: dict[str, list[str]] = {}
-    for p in BASE.rglob("*.md"):
-        if p.name in ("政策库.md", "ai-index.md"):
-            continue
-        out.setdefault(p.name[:-3], []).append(str(p))
+    for root in (Path("Notes/政策库"), Path("Notes/媒体库")):
+        for p in root.rglob("*.md"):
+            if p.name in ("政策库.md", "媒体库.md", "ai-index.md"):
+                continue
+            out.setdefault(p.name[:-3], []).append(str(p))
     return out
 
 
@@ -45,7 +46,10 @@ def fuzzy_find(link_part: str, files: dict[str, list[str]]) -> str | None:
     prefix_matches = [n for n in files if n.startswith(base_name) and len(n) > len(base_name)]
     # also allow real name being a prefix of the link (extra chars in link)
     suffix_matches = [n for n in files if base_name.startswith(n)]
-    all_m = set(prefix_matches) | set(suffix_matches)
+    # date-prefixed rename: link uses the bare title, real file is "YYYY-MM-DD title"
+    # (dedup 2026-08-11 removed the bare-title duplicates)
+    dated_matches = [n for n in files if re.match(r"^\d{4}-\d{2}-\d{2} ", n) and n.endswith(base_name)]
+    all_m = set(prefix_matches) | set(suffix_matches) | set(dated_matches)
     if len(all_m) == 1:
         return files[next(iter(all_m))][0].replace(".md", "")
     return None
@@ -73,17 +77,24 @@ def main() -> int:
             t = p.parent / path_part
             if t.exists() or (t.parent / (t.name + ".md")).exists():
                 return whole  # already fine
-            # try ../../政策库/... relative form
+            # try ../../政策库/... or ../../媒体库/... relative form
             if path_part.startswith("../../政策库/"):
                 rel = path_part[len("../../政策库/"):]
+            elif path_part.startswith("../../媒体库/"):
+                rel = path_part[len("../../媒体库/"):]
             elif path_part.startswith("政策库/"):
                 rel = path_part[len("政策库/"):]
+            elif path_part.startswith("媒体库/"):
+                rel = path_part[len("媒体库/"):]
             else:
                 return whole
             real = fuzzy_find(rel, files)
             if real is None:
                 return whole
-            fixed = f"[[../../政策库/{real}{alias}]]"
+            # real 形如 "Notes/政策库/..." 或 "Notes/媒体库/..."，转成相对路径
+            lib_prefix = "../../" if real.startswith("Notes/") else "../"
+            rel_path = real[len("Notes/"):] if real.startswith("Notes/") else real
+            fixed = f"[[{lib_prefix}{rel_path}{alias}]]"
             changed = True
             return fixed
 
