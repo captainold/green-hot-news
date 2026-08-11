@@ -615,6 +615,11 @@ def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
             text = fix_text(a.get_text(strip=True))
             if _is_junk_link(text, href):
                 continue
+            # 碳交易网: keep only individual articles (URL has a /20xx/ date
+            # path and ends .html); bare category pages (/vers, /ccer, ...) are
+            # channels, not news items.
+            if not (re.search(r"/20\d{2}/", href) and href.split("?")[0].endswith(".html")):
+                continue
             if not href.startswith("http"):
                 href = urljoin("http://www.tanpaifang.com", href)
             items.append(RawItem(
