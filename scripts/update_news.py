@@ -600,14 +600,14 @@ def _allowed_path(href: str, patterns: tuple[str, ...]) -> bool:
 
 
 def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
-    """中国碳交易网."""
+    """中国碳交易网 — 碳顾问 (tanguwen) channel only."""
     items: list[RawItem] = []
     try:
         from ftfy import fix_text
     except ImportError:
         fix_text = lambda x: x  # fallback
     try:
-        r = session.get("http://www.tanpaifang.com/", timeout=30)
+        r = session.get("http://www.tanpaifang.com/tanguwen/", timeout=30)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         for a in soup.select("a[href]"):
@@ -615,10 +615,11 @@ def fetch_tanpaifang(session: requests.Session, now: datetime) -> list[RawItem]:
             text = fix_text(a.get_text(strip=True))
             if _is_junk_link(text, href):
                 continue
-            # 碳交易网: keep only individual articles (URL has a /20xx/ date
-            # path and ends .html); bare category pages (/vers, /ccer, ...) are
-            # channels, not news items.
-            if not (re.search(r"/20\d{2}/", href) and href.split("?")[0].endswith(".html")):
+            # 碳顾问 channel: keep only its individual articles (URL has a
+            # /tanguwen/ + /20xx/ date path and ends .html).
+            if not (href.split("?")[0].endswith(".html")
+                    and re.search(r"/20\d{2}/", href)
+                    and "/tanguwen/" in href):
                 continue
             if not href.startswith("http"):
                 href = urljoin("http://www.tanpaifang.com", href)
