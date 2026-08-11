@@ -785,6 +785,40 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_china_energy_news, "chinaenergy", "中国能源报"),
 ]
 
+# ── Library layout: site_id → (库类型, 政策库内分组) ─────────────────────────
+# 库类型: "policy" = 政策库（第一手权威原始出处）
+#        "media"  = 媒体库（第二手转述/解读）
+# 政策库分组: "中国"（部委） / "国际组织"
+SITE_LAYOUT: dict[str, tuple[str, str]] = {
+    # 政策库 · 中国部委
+    "ndrc":       ("policy", "中国"),
+    "mee":        ("policy", "中国"),
+    "nea":        ("policy", "中国"),
+    "miit":       ("policy", "中国"),
+    # 政策库 · 国际组织
+    "iea":        ("policy", "国际组织"),
+    "irena":      ("policy", "国际组织"),
+    "unfccc":     ("policy", "国际组织"),
+    "worldbank":  ("policy", "国际组织"),
+    # 媒体库
+    "carbonbrief": ("media", ""),
+    "reuters":     ("media", ""),
+    "bjx":         ("media", ""),
+    "tanpaifang":  ("media", ""),
+    "ideacarbon":  ("media", ""),
+    "chinaenergy": ("media", ""),
+}
+
+
+def site_library(site_id: str) -> str:
+    """policy (政策库/权威原文) or media (媒体库/二手转述)."""
+    return SITE_LAYOUT.get(site_id, ("policy", "其他"))[0]
+
+
+def site_policy_group(site_id: str) -> str:
+    """政策库内部分组（中国 / 国际组织）。媒体源无分组。"""
+    return SITE_LAYOUT.get(site_id, ("policy", "其他"))[1]
+
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 def main() -> int:
@@ -866,6 +900,7 @@ def main() -> int:
             "site_id": raw.site_id,
             "site_name": raw.site_name,
             "source": raw.source or raw.site_name,
+            "library": site_library(raw.site_id),  # policy | media
             "title": raw.title,
             "url": raw.url,
             "published_at": iso(raw.published_at),
@@ -1098,13 +1133,14 @@ def format_published(iso_str: str) -> str:
 
 
 def load_archived_published(base_dir_str: str) -> dict[str, str]:
-    """Map url -> published (Beijing 'YYYY-MM-DD HH:MM') from existing notes."""
+    """Map url -> published (Beijing 'YYYY-MM-DD HH:MM') from existing notes
+    (政策库 + 媒体库)."""
     mapping: dict[str, str] = {}
-    base = Path(base_dir_str) / "Notes" / "政策库"
-    if not base.exists():
+    notes_root = Path(base_dir_str) / "Notes"
+    if not notes_root.exists():
         return mapping
-    for p in base.rglob("*.md"):
-        if p.name in ("政策库.md", "ai-index.md"):
+    for p in notes_root.rglob("*.md"):
+        if p.name in ("政策库.md", "媒体库.md", "ai-index.md"):
             continue
         try:
             content = p.read_text(encoding="utf-8")
@@ -1133,19 +1169,25 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
     concurrently; fetch failures degrade gracefully to link-only cards.
     """
     import re as _re
-    base = Path(base_dir_str) / "Notes" / "政策库"
-    base.mkdir(parents=True, exist_ok=True)
+    notes_root = Path(base_dir_str) / "Notes"
+    notes_root.mkdir(parents=True, exist_ok=True)
 
     # ── 1) plan new notes (dedup by filename) ────────────────────────────────
     planned: list[tuple[Path, dict]] = []  # (filepath, item)
     for item in items:
-        site_name = item.get("site_name", item.get("site_id", "unknown"))
+        site_id = item.get("site_id", "unknown")
+        site_name = item.get("site_name", site_id)
         title = item.get("title", "untitled")
         url = item.get("url", "")
         pub_date = item.get("published_at", "")
 
         safe_site = _re.sub(r'[<>:"/\\|?*]', '_', site_name).strip()
-        site_dir = base / safe_site
+        # Library layout: 政策库/<分组>/<站点>/  or  媒体库/<站点>/
+        if site_library(site_id) == "media":
+            site_dir = notes_root / "媒体库" / safe_site
+        else:
+            group = site_policy_group(site_id) or "其他"
+            site_dir = notes_root / "政策库" / group / safe_site
         site_dir.mkdir(parents=True, exist_ok=True)
 
         safe_title = _re.sub(r'[<>:"/\\|?*]', '_', title)[:80].strip()
@@ -1232,23 +1274,28 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         fp.write_text("\n".join(lines), encoding="utf-8")
         new_count += 1
 
-    # Update index page
-    _update_obsidian_index(base, now)
-    # Update AI-readable index
-    _update_ai_index(base, now)
+    # Update index pages (政策库 + 媒体库)
+    _update_obsidian_index(notes_root / "政策库", now)
+    _update_media_index(notes_root / "媒体库", now)
+    # Update AI-readable index (政策库 + 媒体库)
+    _update_ai_index(notes_root / "政策库", now)
+    _update_ai_index(notes_root / "媒体库", now)
     return new_count, body_count
 
 
 def _update_obsidian_index(base: Path, now: datetime) -> None:
-    """Create dataview-powered index page."""
+    """Create dataview-powered index page for 政策库 (grouped: 中国/国际组织)."""
     index_path = base / "政策库.md"
     note_count = sum(1 for _ in base.rglob("*.md") if _.name != "政策库.md")
-    source_dirs = sorted(d.name for d in base.iterdir() if d.is_dir())
+    group_dirs = sorted(d.name for d in base.iterdir() if d.is_dir() and d.name != "ai-index.md")
 
     source_list = ""
-    for s in source_dirs:
-        count = sum(1 for _ in (base / s).glob("*.md"))
-        source_list += f"- [[{s}/|{s}]] ({count} 篇)\n"
+    for g in group_dirs:
+        source_list += f"### {g}\n"
+        for s in sorted(d.name for d in (base / g).iterdir() if d.is_dir()):
+            count = sum(1 for _ in (base / g / s).glob("*.md"))
+            source_list += f"- [[{g}/{s}/|{s}]] ({count} 篇)\n"
+        source_list += "\n"
 
     content = f"""---
 tags: [MOC, 政策库]
@@ -1257,7 +1304,7 @@ updated: {now.strftime('%Y-%m-%d %H:%M')}
 
 # 🌿 绿色政策库
 
-> 自动累积的国内外绿色低碳政策新闻库。总计 **{note_count}** 篇笔记 · **{len(source_dirs)}** 个信息源
+> 第一手权威原始出处：部委原文 / 国际组织报告。总计 **{note_count}** 篇笔记
 
 ## 信息源
 
@@ -1322,14 +1369,52 @@ LIMIT 20
     index_path.write_text(content, encoding="utf-8")
 
 
+def _update_media_index(base: Path, now: datetime) -> None:
+    """Create dataview-powered index page for 媒体库 (flat site dirs)."""
+    index_path = base / "媒体库.md"
+    note_count = sum(1 for _ in base.rglob("*.md") if _.name != "媒体库.md")
+    source_dirs = sorted(d.name for d in base.iterdir() if d.is_dir() and d.name != "ai-index.md")
+
+    source_list = ""
+    for s in source_dirs:
+        count = sum(1 for _ in (base / s).glob("*.md"))
+        source_list += f"- [[{s}/|{s}]] ({count} 篇)\n"
+
+    content = f"""---
+tags: [MOC, 媒体库]
+updated: {now.strftime('%Y-%m-%d %H:%M')}
+---
+
+# 📰 媒体库
+
+> 第二手转述/解读：行业媒体与通讯社（碳交易网、能源报、北极星、碳道、Carbon Brief、Reuters）。总计 **{note_count}** 篇笔记
+
+## 信息源
+
+{source_list}
+
+## 最近更新
+
+```dataview
+TABLE source as "来源", date as "日期"
+FROM "Notes/媒体库"
+SORT date DESC
+LIMIT 50
+```
+"""
+    index_path.write_text(content, encoding="utf-8")
+
+
 def _update_ai_index(base: Path, now: datetime) -> None:
     """Generate AI-readable plain-text index of all policy documents."""
     index_path = base / "ai-index.md"
     entries: list[dict] = []
+    lib_name = base.name  # 政策库 / 媒体库
+    index_files = {"政策库.md", "媒体库.md", "ai-index.md"}
 
     for root, dirs, files in os.walk(str(base)):
         for f in files:
-            if f.endswith(".md") and f not in ("政策库.md", "ai-index.md"):
+            if f.endswith(".md") and f not in index_files:
                 fpath = Path(root) / f
                 rel = str(fpath.relative_to(base))
                 content = fpath.read_text(encoding="utf-8")
@@ -1390,7 +1475,7 @@ def _update_ai_index(base: Path, now: datetime) -> None:
     for e in entries:
         for tag in e["tags"].replace("[", "").replace("]", "").split(","):
             tag = tag.strip()
-            if tag and tag not in ("MOC", "政策库", "wiki"):
+            if tag and tag not in ("MOC", "政策库", "媒体库", "wiki"):
                 topic_index.setdefault(tag, []).append(e["file"])
 
     lines.append("## By Topic")

@@ -18,7 +18,7 @@ from pathlib import Path
 LIST_LINE_RE = re.compile(r"^(\w+):\s*\[(.*)\]\s*$")
 SUMMARY_LINE_RE = re.compile(r'^(summary: )"(.*)"+$', re.S)
 # Only these keys are written by the exporter; anything else is residue
-ALLOWED_KEYS = {"source", "url", "date", "tags", "keywords", "summary"}
+ALLOWED_KEYS = {"source", "url", "date", "published", "tags", "keywords", "summary"}
 
 
 def _strip_quotes(tok: str) -> str:

@@ -9,6 +9,7 @@
   let searchQuery = "";
   let selectedSite = "";
   let currentMode = "green"; // "green" | "all"
+  let currentLib = "all"; // "all" | "policy" | "media"
 
   // ── Dom refs ───────────────────────────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
@@ -18,9 +19,12 @@
   const resultCount = $("#resultCount");
   const updatedAt = $("#updatedAt");
   const stats = $("#stats");
-  const modeGreenBtn = $("#modeGreenBtn");
-  const modeAllBtn = $("#modeAllBtn");
-  const modeHint = $("#modeHint");
+  const modeGreenBtn = $(" #modeGreenBtn ");
+  const modeAllBtn = $(" #modeAllBtn ");
+  const modeHint = $(" #modeHint ");
+  const libAllBtn = $(" #libAllBtn ");
+  const libPolicyBtn = $(" #libPolicyBtn ");
+  const libMediaBtn = $(" #libMediaBtn ");
   const listTitle = $("#listTitle");
   const advancedSummary = $("#advancedSummary");
   const sourceHealth = $("#sourceHealth");
@@ -142,6 +146,11 @@
       items = items.filter(i => i.site_id === selectedSite);
     }
 
+    // Filter by library (政策库/媒体库)
+    if (currentLib !== "all") {
+      items = items.filter(i => (i.library || "policy") === currentLib);
+    }
+
     resultCount.textContent = `${items.length} 条`;
     listTitle.textContent = currentMode === "green" ? "绿色政策信号流" : "全量信号流";
     modeHint.textContent = currentMode === "green" ? "绿色政策" : "全量";
@@ -245,6 +254,19 @@
     siteSelect.value = "";
     render();
   });
+
+  // ── Library switch (政策库/媒体库/全部) ───────────────────────────────────
+  function setLib(lib, btn) {
+    currentLib = lib;
+    [libAllBtn, libPolicyBtn, libMediaBtn].forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedSite = "";
+    siteSelect.value = "";
+    render();
+  }
+  libAllBtn.addEventListener("click", () => setLib("all", libAllBtn));
+  libPolicyBtn.addEventListener("click", () => setLib("policy", libPolicyBtn));
+  libMediaBtn.addEventListener("click", () => setLib("media", libMediaBtn));
 
   // ── Init ───────────────────────────────────────────────────────────────────
   loadData();
