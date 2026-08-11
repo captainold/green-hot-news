@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-11T01:37:55.107447Z",
+  "generated_at": "2026-08-11T01:41:12.244642Z",
   "window_hours": 96,
-  "total_items": 81,
-  "total_raw": 81,
+  "total_items": 65,
+  "total_raw": 65,
   "site_count": 7,
   "site_stats": [
     {
@@ -13,7 +13,7 @@
     {
       "site_id": "tanpaifang",
       "site_name": "中国碳交易网",
-      "count": 30
+      "count": 14
     },
     {
       "site_id": "ideacarbon",
@@ -43,14 +43,223 @@
   ],
   "items": [
     {
+      "id": "bea17cc5735bee9ce6f93ae16aec1b170d3d1de4",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "亚马逊得州数据中心项目或成全美最大碳排放源",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0809/120054.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "0663c59e017a41df729641edfe19d2f15ff7078c",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "科学碳目标倡议(SBTi)就修订版《森林、土地与农业(FLAG)标准》向东南亚企",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120051.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "75f749d1c7b4b76808de145c736e86588e278150",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "45国逾期18个月仍未提交气候计划,占《巴黎协定》缔约方约四分之一",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120047.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "5ccc43d6c73d93c4bb65fc206a0c17e35537033b",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "俄亥俄钢企拟把5亿美元气候拨款转投煤基项目,绿钢补贴的执行风险暴露",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120042.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "3a9cc8f560196b89b83e20bb02d2dfe494e89e8e",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "碳成本时代 钢企如何炼出绿色竞争力?",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120040.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "eaf1e807019fc436182e6f898094a805c376d94d",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "微软又找到一个\"意想不到\"的碳移除路径:废水处理过程中加碱性矿物,CO",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120024.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "ff8e53591eb30708347ff3a9721c29aeb834fb3c",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "美国国会两党议员再度提交《二氧化碳领导力法案》:联邦采购碳移除的制度化",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120020.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "d05206915988c886c89ce11e2f414ede8e211ec5",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "10个项目达标!深圳近零碳排放区试点项目2026年首批验收通过名单公布",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120017.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "6a8c41e9c5625ca27acddf85807f59e01adaa53e",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "10个项目达标!深圳近零碳排放区试点项",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120017.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "8d29fced12ecd27e087a12cd67447913cd1b24db",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "《碳减排系统工程概论》 数字教材正式出",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0721/119538.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "de8ea2f657f536daf34c59b789f2e115fd22f6e2",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "世界银行发布《2026年碳定价发展现状与未",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0716/119442.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "759f7de5023e42185fc84800d702b9227b651049",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "一图读懂《浙江省全国碳市场企业提质增",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0710/119317.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "42a2f37bb3aec3af86a73cd4e488795b1b524c62",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "广州高新区能源技术研究院荣获零碳园区",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0707/119191.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "3c7891cf0e2ce452aa9ed7cfb06a7c29dc61fa01",
+      "site_id": "tanpaifang",
+      "site_name": "中国碳交易网",
+      "source": "中国碳交易网",
+      "title": "\"碳源\"变\"碳汇\"?中国科学家发现冻",
+      "url": "http://www.tanpaifang.com/tanguwen/2026/0629/118984.html",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "d02f800e41196cb9d36a330db547e28898352b91",
+      "site_id": "ideacarbon",
+      "site_name": "碳道",
+      "source": "碳道",
+      "title": "能源领域甲烷减排亟需注入金融“活水”摘要：能源领域的甲烷减排项目普遍面临融资渠道有限、技术准入标准高、前期投入大以及收益机制不完善等共性问题，亟需通过金融创新打通资金进入通道，探索可复制、可推广的“技术落地+碳资产增值+金融赋能”闭环模式，让金融“活水”及时注入煤矿甲烷减排的实体项目。碳道小编\n                  \n            \n\t\t \n         \t53 分钟前",
+      "url": "https://www.ideacarbon.org/news_free/68423/?pc=pc",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "b7c22d8f09e9c260c2be42107633b41c693bdcc4",
+      "site_id": "ideacarbon",
+      "site_name": "碳道",
+      "source": "碳道",
+      "title": "绿电替代与核算认证要齐发力摘要：新能源装机规模持续扩大，绿电消费加快增长，我国可再生能源发展正步入“扩量提质、可靠替代”的新阶段。碳道小编\n                  \n            \n\t\t \n         \t55 分钟前",
+      "url": "https://www.ideacarbon.org/news_free/68422/?pc=pc",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "be74e0c331c2884fed92078abfe282fc6e35824d",
+      "site_id": "ideacarbon",
+      "site_name": "碳道",
+      "source": "碳道",
+      "title": "从融资到管“碳”： 信托公司竞逐碳减排新赛道摘要：当下，越来越多企业开始拥有碳排放配额这一特殊资产。如何让这些资产既满足履约要求，又能够实现规范管理、保值增值，成为市场关注的新课题。围绕这一需求，包括信托公司在内的金融机构也在深入探索。碳道小编\n                  \n            \n\t\t \n         \t56 分钟前",
+      "url": "https://www.ideacarbon.org/news_free/68421/?pc=pc",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "48aa8b5d4415b9ec4d00d16b29133f074bf4c158",
+      "site_id": "ideacarbon",
+      "site_name": "碳道",
+      "source": "碳道",
+      "title": "我国已建成绿色燃料产能约800万吨/年油当量摘要：我国已建成绿色燃料产能约800万吨/年油当量碳道小编\n                  \n            \n\t\t \n         \t58 分钟前",
+      "url": "https://www.ideacarbon.org/news_free/68420/?pc=pc",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
+      "id": "057cf32149d42688bf0d28af9d9dfb29a37fcc04",
+      "site_id": "ideacarbon",
+      "site_name": "碳道",
+      "source": "碳道",
+      "title": "Ideacarbon碳市场盘前资讯速递（20260810）摘要：碳道小编1分钟前",
+      "url": "https://www.ideacarbon.org/newspc/68419/?pc=pc",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
+      "time_source": "scraped"
+    },
+    {
       "id": "2bc165535c70bf8067220e5cd7c1e6c4b62bdb90",
       "site_id": "chinaenergy",
       "site_name": "中国能源报",
       "source": "中国能源报",
       "title": "【煤炭产业发展最新路线图：到2030年五大供应保障基地产量占全国比重超80%】",
       "url": "https://www.cnenergynews.cn/article/4SkOqMfzl2I",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -60,8 +269,8 @@
       "source": "中国能源报",
       "title": "【新标尺：提高智能化比例 收紧新建煤矿准入标准】",
       "url": "https://www.cnenergynews.cn/article/4SkOtDebCNw",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -71,8 +280,8 @@
       "source": "中国能源报",
       "title": "伊泰B股出资2.79亿元设产业基金 专项投资九岭锂业",
       "url": "https://www.cnenergynews.cn/article/4SkQwwL1xrV",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -82,8 +291,8 @@
       "source": "中国能源报",
       "title": "钶锐锶科创板IPO将于8月17日上会 应收账款高企等风险待考",
       "url": "https://www.cnenergynews.cn/article/4SkQSWuevrc",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -93,8 +302,8 @@
       "source": "中国能源报",
       "title": "锂价止跌企稳 碳酸锂紧平衡格局仍稳固",
       "url": "https://www.cnenergynews.cn/article/4SkPzldzomk",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -104,8 +313,8 @@
       "source": "中国能源报",
       "title": "《煤炭工业发展“十五五”规划》发布 如何影响煤炭板块？",
       "url": "https://www.cnenergynews.cn/article/4SkPwgC0CtN",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -115,8 +324,8 @@
       "source": "中国能源报",
       "title": "多路资金买入黄金 机构热议新“击球区”出现",
       "url": "https://www.cnenergynews.cn/article/4SkPz1iXwq0",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -126,8 +335,8 @@
       "source": "中国能源报",
       "title": "光伏上游“自杀式”价格战迎终局？多晶硅八巨头集体叫停亏损销售",
       "url": "https://www.cnenergynews.cn/article/4SkPvhpXC6E",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -137,8 +346,8 @@
       "source": "中国能源报",
       "title": "特朗普称美军已“100%控制”霍尔木兹海峡",
       "url": "https://www.cnenergynews.cn/article/4SkPxxv6oDj",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -148,8 +357,8 @@
       "source": "中国能源报",
       "title": "五大石油巨头Q2赚取480亿美元 巨额利润引发政治反弹",
       "url": "https://www.cnenergynews.cn/article/4SkOYr0Hbdt",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -159,8 +368,8 @@
       "source": "中国能源报",
       "title": "我国高能量密度一次电池功率获突破",
       "url": "https://www.cnenergynews.cn/article/4SkObNykoUS",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -170,8 +379,8 @@
       "source": "中国能源报",
       "title": "霍尔木兹海峡重启预期降温 美国战略石油储备创40多年新低 国际油价大涨4%",
       "url": "https://www.cnenergynews.cn/article/4SkOZZrkOf5",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -181,8 +390,8 @@
       "source": "中国能源报",
       "title": "局地特大暴雨！台风、暴雨、强对流天气，中央气象台三预警齐发",
       "url": "https://www.cnenergynews.cn/article/4SkOcbt9gbs",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -192,8 +401,8 @@
       "source": "中国能源报",
       "title": "金刚石散热材料迎来发展机遇 人工智能等催生新需求",
       "url": "https://www.cnenergynews.cn/article/4SkOhfNyNWJ",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -203,8 +412,8 @@
       "source": "中国能源报",
       "title": "民爆行业迎五年新蓝图 重量级重组蓄势待发",
       "url": "https://www.cnenergynews.cn/article/4SkOinAs1ES",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -214,8 +423,8 @@
       "source": "中国能源报",
       "title": "建设机械拟重大资产重组 涉足煤化工领域",
       "url": "https://www.cnenergynews.cn/article/4SkOneeQ3Vz",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -225,162 +434,8 @@
       "source": "中国能源报",
       "title": "新型能源基础设施“新”在哪？（新型能源体系长啥样？③）",
       "url": "https://www.cnenergynews.cn/article/4SkQovxosuR",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "852dfb86ee29e6bfdc11dadb7f01a98e29e71255",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "国管局节能司举办2026年第二期公共机构绿色低碳讲堂",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0803/119869.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "036f08af193aad991f48e8fe46d42feb87c0b6d2",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "四川召开2026年产品碳足迹工作机制联席会议",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0731/119803.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "7bc53b611bcf32de87ac7f16f85284c2794d14cf",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "广西壮族自治区工业和信息化厅召开零碳工厂建设部署培训会",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0730/119794.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "7d4c8e3ef334b094751bc61b458602e53dab1b65",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "大唐碳资产公司召开2026年年中工作会议",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0728/119710.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "74c6887c3c65ea5da0c9a1044320fd3e392a02fb",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "第五届碳捕集利用与封存技术大会召开",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0724/119615.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "eb82806052ce1c797cd763c629ee60e4f36f7649",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "提升\"双碳\"履职能力 筑牢绿色发展根基 ——北京朝阳区2026年",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0723/119577.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "a7460d9e0c88c8a448d9d60925f12ab90de11b73",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "吉林省零碳园区谋划建设算力设施工作推进会在白城市召开",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0721/119541.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "f7504de2d39948fae7c554a16f91bfb83775b197",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "天津市发展改革委举办零碳园区培育建设供需对接活动",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0721/119539.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "3b10f584e9ce8f3cee44ee4d519bb4b68bfe8d47",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "国家节能降碳中心举办数据中心绿色低碳转型交流会 共探算力基",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0715/119399.html",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "468911ea0e501a6910aadf0bbe818d5d0a120561",
-      "site_id": "ideacarbon",
-      "site_name": "碳道",
-      "source": "碳道",
-      "title": "能源领域甲烷减排亟需注入金融“活水”摘要：能源领域的甲烷减排项目普遍面临融资渠道有限、技术准入标准高、前期投入大以及收益机制不完善等共性问题，亟需通过金融创新打通资金进入通道，探索可复制、可推广的“技术落地+碳资产增值+金融赋能”闭环模式，让金融“活水”及时注入煤矿甲烷减排的实体项目。碳道小编\n                  \n            \n\t\t \n         \t49 分钟前",
-      "url": "https://www.ideacarbon.org/news_free/68423/?pc=pc",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "6df361fe918693d4c509b60dba223a5cb66b1587",
-      "site_id": "ideacarbon",
-      "site_name": "碳道",
-      "source": "碳道",
-      "title": "绿电替代与核算认证要齐发力摘要：新能源装机规模持续扩大，绿电消费加快增长，我国可再生能源发展正步入“扩量提质、可靠替代”的新阶段。碳道小编\n                  \n            \n\t\t \n         \t51 分钟前",
-      "url": "https://www.ideacarbon.org/news_free/68422/?pc=pc",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "a24e0436b8505eadd244e795d9de18c16e375b43",
-      "site_id": "ideacarbon",
-      "site_name": "碳道",
-      "source": "碳道",
-      "title": "从融资到管“碳”： 信托公司竞逐碳减排新赛道摘要：当下，越来越多企业开始拥有碳排放配额这一特殊资产。如何让这些资产既满足履约要求，又能够实现规范管理、保值增值，成为市场关注的新课题。围绕这一需求，包括信托公司在内的金融机构也在深入探索。碳道小编\n                  \n            \n\t\t \n         \t52 分钟前",
-      "url": "https://www.ideacarbon.org/news_free/68421/?pc=pc",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "ec551fe209f7e10bacd334706d42244f915bb211",
-      "site_id": "ideacarbon",
-      "site_name": "碳道",
-      "source": "碳道",
-      "title": "我国已建成绿色燃料产能约800万吨/年油当量摘要：我国已建成绿色燃料产能约800万吨/年油当量碳道小编\n                  \n            \n\t\t \n         \t54 分钟前",
-      "url": "https://www.ideacarbon.org/news_free/68420/?pc=pc",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "scraped"
-    },
-    {
-      "id": "665a9bf7c64240bfb19ee91e02cd215fc584c022",
-      "site_id": "ideacarbon",
-      "site_name": "碳道",
-      "source": "碳道",
-      "title": "Ideacarbon碳市场盘前资讯速递（20260810）摘要：碳道小编\n                  \n            \n\t\t \n         \t57 分钟前",
-      "url": "https://www.ideacarbon.org/newspc/68419/?pc=pc",
-      "published_at": "2026-08-11T01:37:55.107447Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "published_at": "2026-08-11T01:41:12.244642Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "scraped"
     },
     {
@@ -391,7 +446,7 @@
       "title": "二季度中国清洁能源建设景气指数处于较景气区间摘要：二季度中国清洁能源建设景气指数处于较景气区间碳道小编\n                  \n            \n\t\t \n            12 小时前",
       "url": "https://www.ideacarbon.org/news_free/68418/?pc=pc",
       "published_at": "2026-08-10T21:08+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -402,7 +457,7 @@
       "title": "《中国人民银行“十五五”改革发展规划》发布：提升金融支持绿色发展与低碳转型质效摘要：《中国人民银行“十五五”改革发展规划》发布碳道小编\n                  \n            \n\t\t \n            12 小时前",
       "url": "https://www.ideacarbon.org/news_free/68417/?pc=pc",
       "published_at": "2026-08-10T20:08+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -413,7 +468,7 @@
       "title": "国家发展改革委 国家能源局有关负责同志就《煤炭工业发展“十五五”规划》答记者问摘要：有关负责同志就《煤炭工业发展“十五五”规划》答记者问碳道小编\n                  \n            \n\t\t \n            12 小时前",
       "url": "https://www.ideacarbon.org/news_free/68415/?pc=pc",
       "published_at": "2026-08-10T20:08+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -424,7 +479,7 @@
       "title": "发改委、国家能源局发布《煤炭工业发展“十五五”规划》",
       "url": "https://www.cnenergynews.cn/article/4SjsdWdQjTm",
       "published_at": "2026-08-10T17:08+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -435,7 +490,7 @@
       "title": "国家发改委、国家能源局发布《煤炭工业发展“十五五”规划》",
       "url": "https://www.cnenergynews.cn/article/4SjsdWdQjTm",
       "published_at": "2026-08-10T17:08+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -446,7 +501,7 @@
       "title": "欧菲光紧急澄清不实举报：否认利益输送 已报案追责",
       "url": "https://www.cnenergynews.cn/article/4SjsW5EalgD",
       "published_at": "2026-08-10T17:05+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -457,7 +512,7 @@
       "title": "国家能源集团黑龙江电力有限公司党委委员、总会计师孙登伟接受纪律审查和监察调查",
       "url": "https://www.cnenergynews.cn/article/4Sjs7MLaQwf",
       "published_at": "2026-08-10T16:54+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -468,7 +523,7 @@
       "title": "紫金矿业巨额黄金并购案“临门叫停”的冷思考",
       "url": "https://www.cnenergynews.cn/article/4Sja7lbEjnU",
       "published_at": "2026-08-10T08:30+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -479,18 +534,18 @@
       "title": "【“六张网”等重大项目加快推进】",
       "url": "https://www.cnenergynews.cn/article/4SjZutwaVM5",
       "published_at": "2026-08-10T08:24+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
-      "id": "dec9b93bcfc23ddd8cc09c6d991eca46eb9a95ca",
+      "id": "1e2d42971baec01f679d78171f97c0d0a3b3016b",
       "site_id": "worldbank",
       "site_name": "World Bank Climate",
       "source": "World Bank Climate",
-      "title": "As World Bank steps back, India's climate finance strategy comes into spotlight - India Today",
+      "title": "As World Bank steps back, India's climate finance strategy comes into spotlight - indiatoday.in",
       "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNeXdqRlNORndtM09NM2JGYnM2VVZkYUQxR3BpN0k1NlJpQmNTNlU1SVNrcFFUR0dOZ0RkS3NXaHJOVWlSSFRJYk5iN25mN3o5TFczaTRkMHEzWkRhOFIzd0lWbFhfZ0xtanNKV2EtcklPQ1lCdk5hZlhnSmxwSXRlUjl4dVVnOHlSZG56OWtfNGFlZHpXcVVibUNEeGdaZ090cjhEelZhd1otM3hyOEhBcmJnZFFFSk1rNHdV0gHAAUFVX3lxTFBHWlQ2U3haSkZzRUxwRUlQMmt6ZEtYUm1FWGZzXzM1VXpCY1dxWVd0Vll2MkhkdDk2b3puNzJUa2kxNzBnSGRmZG15WTF4ZVI0MGhVWGhEUFJGT3VtZlBXNzFFd240VzZpV25oZ0owZ1UtQWVRX3Zlek1WMk8wWGZSamNEWkRQLXVKbXZiMDZWWWY2VlFkWlRyUXg1VUpKVFNtNDhwYkJNTGtIbXhCcHNQSTdlRG90TGVNN2VmZlA1eQ?oc=5",
       "published_at": "2026-08-10T06:09:10Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -501,7 +556,7 @@
       "title": "12份国家级“十五五”专项规划，提及能源电力！ - gdshe.org",
       "url": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE1zSmJqbmFoNW5sUVJHTE9Ba1lsZWNCV1QyX09iSE8yTzN1N1BSdGRPclhfbnlKY2ZoRE5nbVo1ZFcxd05yVkozX2dlbzY5Z1dKUmc?oc=5",
       "published_at": "2026-08-10T02:17:23Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -512,7 +567,7 @@
       "title": "工业和信息化部办公厅关于印发2026年度国家工业节能降碳诊断服务任务清单的通知",
       "url": "https://www.miit.gov.cn/jgsj/jns/gzdt/art/2026/art_eadc1c20c53a460ebb5af0558b85d0e9.html",
       "published_at": "2026-08-10T00:00:00Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -523,7 +578,7 @@
       "title": "工业和信息化部办公厅关于印发2026年度国家工业节能降碳诊断服务任务清单的通知",
       "url": "https://www.miit.gov.cn/jgsj/jns/wjfb/art/2026/art_88bb55bea1e642859ef6170df5b2a788.html",
       "published_at": "2026-08-10T00:00:00Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -534,18 +589,7 @@
       "title": "工业和信息化部办公厅关于印发2026年度国家工业节能降碳诊断服务任务清单的通知",
       "url": "https://www.miit.gov.cn/jgsj/jns/nyjy/art/2026/art_6172c931b1c843b1aa4d188594000da0.html",
       "published_at": "2026-08-10T00:00:00Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "cd821d70bb04d4feba5e28ca2c3ce1952c0fe9d8",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "二〇二六能源经济与碳达峰碳中和高质量发展论坛举行",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0807/120018.html",
-      "published_at": "2026-08-07T14:09+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -556,7 +600,7 @@
       "title": "新型储能按下“加速键” 赋能新型电力系统建设",
       "url": "https://www.nea.gov.cn/xwzx/20260807/6faf6245347147c5875171c3b973b46d/c.html",
       "published_at": "2026-08-07T06:29:55Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -567,7 +611,7 @@
       "title": "到2030年新型电力系统初步建成",
       "url": "https://www.nea.gov.cn/xwzx/20260807/34bfc6ca545f4627b2a1c1f00462c141/c.html",
       "published_at": "2026-08-07T06:29:12Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -578,7 +622,7 @@
       "title": "“三张牌”，筑牢能源安全底气",
       "url": "https://www.nea.gov.cn/xwzx/20260807/68d1faf2c679432a8b9a34551a93fdcc/c.html",
       "published_at": "2026-08-07T06:28:40Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -589,7 +633,7 @@
       "title": "构建立体化电力保供体系",
       "url": "https://www.nea.gov.cn/xwzx/20260807/6e8fdc33f16f4ea88bbee48be82c86a6/c.html",
       "published_at": "2026-08-07T06:27:59Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -600,7 +644,7 @@
       "title": "能源系统韧性充分彰显",
       "url": "https://www.nea.gov.cn/xwzx/20260807/f7407950b713408ea429aa6cbca066bd/c.html",
       "published_at": "2026-08-07T06:27:22Z",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -611,18 +655,7 @@
       "title": "郭局长被停职，一些疑问仍待解",
       "url": "https://www.cnenergynews.cn/article/4SfWbEudFlS",
       "published_at": "2026-08-05T10:38+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "7befe322c243298fc2a86e311cb50172289fca26",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "国家气候战略中心与中国移动通信集团北京有限公司开展座谈交",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0805/119979.html",
-      "published_at": "2026-08-05T10:33+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -633,7 +666,7 @@
       "title": "石油巨头为什么都在“甩资产”",
       "url": "https://www.cnenergynews.cn/article/4SfV96fgYEt",
       "published_at": "2026-08-05T10:30+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -644,18 +677,7 @@
       "title": "从“打价格战”转向“综合比拼”，能源出海如何应对新挑战",
       "url": "https://www.cnenergynews.cn/article/4SezaDIOj3S",
       "published_at": "2026-08-04T19:47+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "21abe7c2b78161714e4137a7cb37161a5d0ec015",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "青海省海西州格尔木市发展改革委举办国家核证自愿减排量(",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0804/119945.html",
-      "published_at": "2026-08-04T18:33+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -666,7 +688,7 @@
       "title": "汽车新势力淘汰赛愈演愈烈",
       "url": "https://www.cnenergynews.cn/article/4SevzopBYpJ",
       "published_at": "2026-08-04T18:06+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -677,7 +699,7 @@
       "title": "“空壳公司”，被蓝月亮告破产了",
       "url": "https://www.cnenergynews.cn/article/4Sehw9yoAyR",
       "published_at": "2026-08-04T11:33+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -688,18 +710,7 @@
       "title": "美国刮起史上最猛“抢铜潮”",
       "url": "https://www.cnenergynews.cn/article/4SehWxdTri0",
       "published_at": "2026-08-04T11:21+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "95786720cbc886b3cc560f2ccefd2b7f614593db",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "中碳登召开2026年半年工作会",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0803/119882.html",
-      "published_at": "2026-08-03T17:01+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -710,40 +721,7 @@
       "title": "新能源入市一年考，光伏投资何处去",
       "url": "https://www.cnenergynews.cn/article/4SdzPcoeNDq",
       "published_at": "2026-08-03T14:47+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "317964c4a6267c474ebc8bfea34cd5030a90375a",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "《全国碳排放权交易市场2025、2026年度发电行业以及2026年度钢铁、水泥",
-      "url": "http://www.tanpaifang.com/tanjiaoyi/2026/0727/119683.html",
-      "published_at": "2026-07-27T17:46+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "82681a717b3fac1c6b27a3108e948bcbd46cd1b2",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "碳交易改革分歧背后,欧盟有哪些困境",
-      "url": "http://www.tanpaifang.com/tanjiaoyi/2026/0721/119543.html",
-      "published_at": "2026-07-21T14:03+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "a63a1ebdb9a44c9372dc8d806c98846d0b093e1d",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "\"国际碳信用对话—聚力碳信用・共拓新空间\"",
-      "url": "http://www.tanpaifang.com/huiyi/2026/0701/119043.html",
-      "published_at": "2026-07-01T11:13+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -754,73 +732,7 @@
       "title": "工业园区节水环保技术交流活动在宁夏宁东成功举办",
       "url": "https://www.miit.gov.cn/jgsj/jns/gzdt/art/2026/art_f0e57546f4944be096160a1675f08840.html",
       "published_at": "2026-06-12T08:54+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "d072cf2c8fecec5e1c7fbdc426664e67cfedaf28",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "欧盟碳市场\"踩刹车\"",
-      "url": "http://www.tanpaifang.com/tanjiaoyi/2026/0508/117961.html",
-      "published_at": "2026-05-08T10:30+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "15d49f33133eaa500d333e840db7399df4cdd7ae",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "中共中央办公厅 国务院办公厅印发《碳达峰碳中和综合评价考核办法》",
-      "url": "http://www.tanpaifang.com/zhengcefagui/2026/0423117822.html",
-      "published_at": "2026-04-23T22:14+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "137376fb5079583de3f73caf269100e3d791e17c",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "国务院:推动金融机构参与碳市场交易 推广碳中和债券等创新产品!《",
-      "url": "http://www.tanpaifang.com/zhengcefagui/2026/0422117799.html",
-      "published_at": "2026-04-22T16:18+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "6a2ad9cd2d878922b5b3ddafa482d6c551ce88d5",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "事关\"双碳\"!中华人民共和国国民经济和社会发展第十五个五年规划",
-      "url": "http://www.tanpaifang.com/tanzhonghe/2026/0314/117294.html",
-      "published_at": "2026-03-14T17:27+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "bb87dee2b62844f8f71a36a38ff67a7423be5817",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "国家主席习近平签署第70号主席令 《中华人民共和国生态环境法典》正",
-      "url": "http://www.tanpaifang.com/zhengcefagui/2026/0313117287.html",
-      "published_at": "2026-03-13T09:23+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "16841b35d14e2176cbc755142644bf76251131aa",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "《中华人民共和国国民经济和社会发展第十五个五年规划纲要(草案)",
-      "url": "http://www.tanpaifang.com/tanguwen/2026/0305/117171.html",
-      "published_at": "2026-03-05T15:44+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -831,7 +743,7 @@
       "title": "节能司青年理论学习小组开展年终总结与新年展望专题学习活动",
       "url": "https://www.miit.gov.cn/jgsj/jns/gzdt/art/2025/art_3890179aeaec43a987314d1b3f95d41a.html",
       "published_at": "2025-12-31T15:17+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     },
     {
@@ -842,95 +754,7 @@
       "title": "2025年度“节能服务进企业”暨重点行业能效“领跑者”企业经验交流活动在山东青岛举办",
       "url": "https://www.miit.gov.cn/jgsj/jns/gzdt/art/2025/art_87757ee8cfa7460bbd83621ab16220ff.html",
       "published_at": "2025-12-29T18:18+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "cd3ea763b5b655d7e3ea4469fe37d6113a875859",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "习近平宣布中国新一轮国家自主贡献——",
-      "url": "http://www.tanpaifang.com/tanzhonghe/2025/0925/114558.html",
-      "published_at": "2025-09-25T10:35+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "9a01ab79362f0809d611ef3b7eecfdc72a25b1cd",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "【发改办环资〔2025〕248号】国家发展改革",
-      "url": "http://www.tanpaifang.com/zhengcefagui/2025/0321111146.html",
-      "published_at": "2025-03-21T23:30+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "00f54f5a82ebf3000e988f71c1fb1c64f5ede6db",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "2024年欧盟碳市场:价格承压,面临多重变",
-      "url": "http://www.tanpaifang.com/tanjiaoyi/2024/1207/109811.html",
-      "published_at": "2024-12-07T22:29+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "15ccb0ee7acb37fe34912638f9f1829b8b6c29da",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "碳配额收紧,发电企业如何经营管理碳资",
-      "url": "http://www.tanpaifang.com/tanzichanguanli/2024/1009/108706.html",
-      "published_at": "2024-10-09T09:07+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "d4ddb5437cd69d8db4b9fa09e80c2cd48395ea63",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "张希良|\"强制\"和\"自愿\"双轮驱动,",
-      "url": "http://www.tanpaifang.com/tanjiaoyi/2024/0708/107262.html",
-      "published_at": "2024-07-08T23:09+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "610932a3df70d6701cfef72d6444566a251339f0",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "国新办举行《碳排放权交易管理暂行条例",
-      "url": "http://www.tanpaifang.com/zhengcefagui/2024/0226104555.html",
-      "published_at": "2024-02-26T11:54+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "a66c9fb7ab00bcfac56d034573d4d1f69e093fa9",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "中国碳市场发展剖析与未来发展之我见",
-      "url": "http://www.tanpaifang.com/tanguwen/2023/1026/101587.html",
-      "published_at": "2023-10-26T09:24+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
-      "time_source": "published"
-    },
-    {
-      "id": "be22df97bf24fd8dce3a55f8c186767e156a4781",
-      "site_id": "tanpaifang",
-      "site_name": "中国碳交易网",
-      "source": "中国碳交易网",
-      "title": "欧盟碳价未来或将突破400欧元大关",
-      "url": "http://www.tanpaifang.com/tanjiaoyi/2023/1007/101017.html",
-      "published_at": "2023-10-07T11:04+08:00",
-      "first_seen_at": "2026-08-11T01:37:55.107447Z",
+      "first_seen_at": "2026-08-11T01:41:12.244642Z",
       "time_source": "published"
     }
   ]
