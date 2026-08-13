@@ -995,6 +995,12 @@ def main() -> int:
                 archived_pub = json.loads(pub_index_path.read_text(encoding="utf-8"))
             except Exception:
                 archived_pub = {}
+        title_index_path = output_dir / "title-index.json"
+        if title_index_path.exists():
+            try:
+                archived_titles = json.loads(title_index_path.read_text(encoding="utf-8"))
+            except Exception:
+                archived_titles = {}
 
     def _archived_to_iso(pub: str) -> str:
         if " " in pub:
@@ -1025,6 +1031,12 @@ def main() -> int:
     if archived_pub:
         (output_dir / "published-index.json").write_text(
             json.dumps(archived_pub, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    # Persist the url→full-title map so CI runs can backfill truncated titles
+    # (list pages truncate titles; full titles come from note headings)
+    if archived_titles:
+        (output_dir / "title-index.json").write_text(
+            json.dumps(archived_titles, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # Backfilled times change sort order — re-sort newest first
     all_items_24h.sort(key=sort_key, reverse=True)
