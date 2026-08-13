@@ -30,7 +30,8 @@ GARBAGE_SELECTORS = (
     ".advertisement,.ads,.ad,.banner,.share,.sharebox,.related,.recommend,"
     ".comment,.comments,.breadcrumb,.breadcrumbs,.pagination,.page-nav,"
     ".toc,.toolbar,.qrcode,.footer,.header,.nav,.menu,"
-    ".list,.listbox,.news_list,.news-list,.search,.searchbox"
+    ".list,.listbox,.news_list,.news-list,.search,.searchbox,"
+    ".tanlistbox_right,.list_r_b_x,.list_img_news,.about-read"  # 碳交易网推荐/相关阅读 (2026-08-11)
 )
 
 # Container hints: Chinese gov sites (TRS system), news portals, blogs
