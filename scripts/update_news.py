@@ -1241,6 +1241,7 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         res = bodies.get(str(fp))
         summary = (res or {}).get("summary") or ""
         content = (res or {}).get("content") or ""
+        source_org = (res or {}).get("source_org") or ""
         # Publish time: detail-page time (hour precision) wins, RSS time as fallback
         published = (res or {}).get("published") or ""
         if not published:
@@ -1266,6 +1267,9 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             f"tags: [{tag_str}]",
             f"keywords: [{kw_str}]",
         ]
+        if source_org:
+            safe_org = source_org.replace(chr(34), chr(39))
+            lines.append(f'author: "{safe_org}"')
         if summary:
             safe_summary = summary.replace(chr(34), chr(39)).replace("\n", " ")
             lines.append(f'summary: "{safe_summary}"')
@@ -1280,6 +1284,8 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             f"> 发布时间: {published}",
             f"> 首次抓取: {now.strftime('%Y-%m-%d %H:%M')} UTC",
         ]
+        if source_org:
+            lines.append(f"> 作者: {source_org}")
         if content:
             lines += ["", "## 正文", "", content]
             body_count += 1
@@ -1449,6 +1455,7 @@ def _update_ai_index(base: Path, now: datetime) -> None:
                     "source": fm.get("source", ""),
                     "date": fm.get("date", ""),
                     "published": fm.get("published", ""),
+                    "author": fm.get("author", ""),
                     "tags": fm.get("tags", ""),
                     "keywords": fm.get("keywords", ""),
                     "summary": fm.get("summary", ""),
@@ -1476,6 +1483,8 @@ def _update_ai_index(base: Path, now: datetime) -> None:
         lines.append(f"### {e['date']} | {e['source']} | {e['file']}")
         lines.append(f"- Title: {e['title']}")
         lines.append(f"- Published: {e.get('published', '') or '(unknown)'}")
+        if e.get("author"):
+            lines.append(f"- Author: {e['author']}")
         lines.append(f"- Tags: {e['tags']}")
         lines.append(f"- Keywords: {e['keywords']}")
         summary = e.get("summary", "")

@@ -330,6 +330,35 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
     return body, page_title
 
 
+def extract_source_org(soup: BeautifulSoup) -> Optional[str]:
+    """Extract 发文单位/文章来源 (作者属性) from detail page.
+
+    Patterns seen across sources (2026-08-11):
+      - 发改委:  <div class="ly laiyuantext">来源：产业司</div>
+      - 工信部:  <span>来源：节能与综合利用司</span>
+      - 生态环境部: <em>来源：生态环境部</em>
+      - 中国能源报: <span class="source">来源：中国证券报</span>
+      - 碳交易网: <span>文章来源:深圳晚报</span>
+    Returns cleaned org name or None.
+    """
+    if soup is None:
+        return None
+    # 1) known selectors first
+    for sel in (".ly.laiyuantext", ".laiyuan", ".source", ".article_source_web",
+                "[class*=source]", "[class*=laiyuan]", "[class*=origin]"):
+        for el in soup.select(sel):
+            txt = el.get_text(" ", strip=True)
+            m = re.search(r"来源[:：]\s*([^\s][^，。；;]{1,29})", txt)
+            if m:
+                return m.group(1).strip("：:，,。 ")
+    # 2) fallback: any element whose text starts with 来源/文章来源
+    for el in soup.find_all(string=lambda s: s and re.match(r"^(文章)?来源[:：]", s.strip())):
+        m = re.search(r"来源[:：]\s*([^\s][^，。；;]{1,29})", el.strip())
+        if m:
+            return m.group(1).strip("：:，,。 ")
+    return None
+
+
 def fetch_article(url: str, session: Optional[requests.Session] = None,
                   timeout: tuple[int, int] = (10, 20),
                   retries: int = 2) -> Optional[dict[str, Optional[str]]]:
@@ -376,6 +405,7 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
         summary = _cut_at_sentence(body, MAX_SUMMARY_CHARS)
         content = _cut_at_sentence(body, MAX_BODY_CHARS)
         published = extract_published_at(soup)
+        source_org = extract_source_org(soup)
         if published:
             # Safety net: a publish time in the future is extraction garbage.
             # Detail-page times are Beijing-naive; compare against UTC now.
@@ -388,7 +418,7 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
             except (TypeError, ValueError):
                 published = None
         return {"summary": summary, "content": content, "title": page_title,
-                "published": published}
+                "published": published, "source_org": source_org}
     except Exception:
         return None
     finally:
