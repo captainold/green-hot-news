@@ -737,6 +737,69 @@ def fetch_china_energy_news(session: requests.Session, now: datetime) -> list[Ra
     return items[:30]
 
 
+# ── allnet.hot 全网热点 ───────────────────────────────────────────────────────
+ALLNET_API_BASE = "https://api.allnet.hot/api/open/v1"
+# (board_id, board_name) — 主流综合热榜；最终入库内容由 is_policy_relevant 过滤
+ALLNET_BOARDS = [
+    (9, "微博热搜"),
+    (13, "知乎热榜"),
+    (140, "今日头条热榜"),
+    (108, "澎湃热榜"),
+    (139, "IT之家最新"),
+]
+
+
+def fetch_allnet(session: requests.Session, now: datetime) -> list[RawItem]:
+    """全网热点 (api.allnet.hot) — 抓取主流热榜条目。
+
+    需要 API Key：优先读环境变量 ALLNET_API_KEY，其次读项目根目录
+    .env 文件（key=ALLNET_API_KEY）。未配置时静默跳过，不影响其他源。
+    榜单无发布时间，published_at=None（回填为抓取时间）。入库内容由
+    is_policy_relevant 关键词过滤，只保留绿色/低碳/气候相关政策相关条目。
+    """
+    items: list[RawItem] = []
+    api_key = os.environ.get("ALLNET_API_KEY", "").strip()
+    if not api_key:
+        # 尝试从项目根目录 .env 读取
+        env_path = Path(__file__).resolve().parent.parent / ".env"
+        try:
+            for line in env_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line.startswith("ALLNET_API_KEY="):
+                    api_key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                    break
+        except Exception:
+            api_key = ""
+    if not api_key:
+        return items
+    for board_id, board_name in ALLNET_BOARDS:
+        try:
+            r = session.get(
+                f"{ALLNET_API_BASE}/sources/data",
+                params={"id": board_id, "page": 1},
+                headers={"X-API-Key": api_key},
+                timeout=20,
+            )
+            r.raise_for_status()
+            payload = r.json()
+            entries = (payload.get("data") or {}).get("list") or []
+            for entry in entries:
+                title = (entry.get("title") or "").strip()
+                url = (entry.get("jump_url") or "").strip()
+                if not title:
+                    continue
+                items.append(RawItem(
+                    site_id="allnet", site_name="全网热点",
+                    source=board_name,
+                    title=title, url=url,
+                    published_at=None,
+                    meta={"board": board_name},
+                ))
+        except Exception:
+            continue
+    return items[:60]
+
+
 # ── OPML RSS ──────────────────────────────────────────────────────────────────
 def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> list[RawItem]:
     """Read an OPML file and fetch all RSS feeds listed in it."""
@@ -835,6 +898,8 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_tanpaifang, "tanpaifang", "中国碳交易网"),
     (fetch_tandao, "ideacarbon", "碳道"),
     (fetch_china_energy_news, "chinaenergy", "中国能源报"),
+    # Aggregated hot boards (filtered by policy keywords)
+    (fetch_allnet, "allnet", "全网热点"),
 ]
 
 # ── Library layout: site_id → (库类型, 政策库内分组) ─────────────────────────
@@ -859,6 +924,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "tanpaifang":  ("media", ""),
     "ideacarbon":  ("media", ""),
     "chinaenergy": ("media", ""),
+    "allnet":      ("media", ""),
 }
 
 
