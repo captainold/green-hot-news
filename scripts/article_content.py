@@ -243,6 +243,15 @@ def _clean_title(raw: Optional[str]) -> Optional[str]:
         return None
     t = raw.strip()
     t = re.sub(r"\s+", " ", t)
+    # 去掉站点 SEO 后缀（"标题_站点名" 模式，如 碳排放交易网/国家发展和改革委员会）
+    for sep in ("_", "｜", "|", "——", "-"):
+        if sep in t:
+            head, tail = t.rsplit(sep, 1)
+            # 后缀是站点特征（含 网/委员会/官网/政府/部 等）或 tail 很短
+            if len(tail) <= 25 and re.search(
+                r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会)", tail):
+                t = head.strip()
+                break
     return t[:120] or None
 
 
@@ -267,8 +276,14 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
     """Return (body_text, page_title). body_text is '' when nothing found."""
     if soup is None:
         soup = BeautifulSoup(html, "html.parser")
+    # 优先 h1（干净标题），fallback <title>（可能带站点 SEO 后缀）
+    h1_el = soup.find("h1")
     title_el = soup.find("title")
-    page_title = _clean_title(title_el.get_text() if title_el else None)
+    page_title = None
+    if h1_el is not None:
+        page_title = _clean_title(h1_el.get_text())
+    if not page_title and title_el is not None:
+        page_title = _clean_title(title_el.get_text())
 
     for el in soup.select(GARBAGE_SELECTORS):
         el.decompose()

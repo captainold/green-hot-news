@@ -984,8 +984,10 @@ def main() -> int:
     # hour precision, Beijing). Newly exported notes are picked up immediately.
     # In CI (no Notes/ dir) the mapping comes from the committed published-index.json.
     archived_pub: dict[str, str] = {}
+    archived_titles: dict[str, str] = {}
     if args.obsidian_dir:
         archived_pub = load_archived_published(args.obsidian_dir)
+        archived_titles = load_archived_titles(args.obsidian_dir)
     else:
         pub_index_path = output_dir / "published-index.json"
         if pub_index_path.exists():
@@ -1003,6 +1005,11 @@ def main() -> int:
     # single pass covers both lists (do not loop green_items again — it would
     # overwrite time_source).
     for rec in all_items:
+        # 完整标题回填：笔记里的标题已用详情页标题修正，列表页截断标题
+        # （如碳交易网 "…现状与未"）会被覆盖为完整版（2026-08-11）
+        full_title = archived_titles.get(rec.get("url", ""))
+        if full_title and len(full_title) > len(rec.get("title", "")):
+            rec["title"] = full_title
         if not rec.get("published_at"):
             if rec.get("url") in archived_pub:
                 rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
@@ -1214,6 +1221,33 @@ def load_archived_published(base_dir_str: str) -> dict[str, str]:
     return mapping
 
 
+def load_archived_titles(base_dir_str: str) -> dict[str, str]:
+    """Map url -> full title from existing notes' # heading.
+
+    列表页标题常被源站截断（碳交易网等），笔记标题已用详情页标题回填过
+    （backfill_full_titles.py），这里把完整标题同步回 JSON。
+    """
+    mapping: dict[str, str] = {}
+    notes_root = Path(base_dir_str) / "Notes"
+    if not notes_root.exists():
+        return mapping
+    for p in notes_root.rglob("*.md"):
+        if p.name in ("政策库.md", "媒体库.md", "ai-index.md"):
+            continue
+        try:
+            content = p.read_text(encoding="utf-8")
+            m = re.search(r"^# (.+)$", content, re.M)
+            if not m:
+                continue
+            um = re.search(r"^url:\s*(\S+)", content, re.M)
+            if not um:
+                continue
+            mapping[um.group(1)] = m.group(1).strip()
+        except Exception:
+            continue
+    return mapping
+
+
 def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> tuple[int, int]:
     """Export news items as Obsidian markdown notes.
 
@@ -1224,8 +1258,20 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
     notes_root = Path(base_dir_str) / "Notes"
     notes_root.mkdir(parents=True, exist_ok=True)
 
-    # ── 1) plan new notes (dedup by filename) ────────────────────────────────
+    # ── 1) plan new notes (dedup by filename AND by url) ────────────────────
     planned: list[tuple[Path, dict]] = []  # (filepath, item)
+    # url → already exists in target dir? (文件名会因标题修正而变化，URL 稳定)
+    seen_urls: set[str] = set()
+    for existing in notes_root.rglob("*.md"):
+        if existing.name in ("政策库.md", "媒体库.md", "ai-index.md"):
+            continue
+        try:
+            _c = existing.read_text(encoding="utf-8")
+            _m = _re.search(r"^url:\s*(\S+)", _c, re.M)
+            if _m:
+                seen_urls.add(_m.group(1))
+        except Exception:
+            continue
     for item in items:
         site_id = item.get("site_id", "unknown")
         site_name = item.get("site_name", site_id)
@@ -1233,6 +1279,8 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         url = item.get("url", "")
         pub_date = item.get("published_at", "")
 
+        if url in seen_urls:
+            continue  # 该 URL 已有笔记（任意文件名）
         safe_site = _re.sub(r'[<>:"/\\|?*]', '_', site_name).strip()
         # Library layout: 政策库/<分组>/<站点>/  or  媒体库/<站点>/
         if site_library(site_id) == "media":
@@ -1278,6 +1326,12 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         url = item.get("url", "")
         pub_date = item.get("published_at", "")
         res = bodies.get(str(fp))
+        # 详情页标题优先：列表页标题常被源站截断（如碳交易网列表页
+        # "…现状与未"），详情页 <title>/<h1> 是完整的（2026-08-11）
+        page_title = (res or {}).get("title") or ""
+        if page_title and len(page_title) > len(title):
+            title = page_title.strip()
+            item["title"] = title  # record 共享引用 → JSON 同步
         summary = (res or {}).get("summary") or ""
         content = (res or {}).get("content") or ""
         source_org = (res or {}).get("source_org") or ""
