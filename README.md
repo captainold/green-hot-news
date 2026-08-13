@@ -7,6 +7,7 @@
 - 线上页面：`https://ywm.life`（新加坡服务器 Nginx 直出）
 - GitHub 镜像：`https://captainold.github.io/green-hot-news/`（仅代码归档，CI 已禁用）
 - Obsidian 笔记库：`C:\Users\wenyu\Documents\Obsidian_wen\green-hot-news\Notes\`
+- 服务器部署与运维文档：[docs/服务器部署与运维.md](docs/服务器部署与运维.md)
 
 ## 架构总览（2026-08 现状）
 
