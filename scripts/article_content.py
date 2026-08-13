@@ -273,18 +273,29 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
     for el in soup.select(GARBAGE_SELECTORS):
         el.decompose()
 
-    # 1) best container by text length
-    best: Any = None
-    best_len = 0
-    for sel in CONTAINER_SELECTORS:
-        for cand in soup.select(sel):
-            text = cand.get_text(" ", strip=True)
-            if len(text) > best_len:
-                best, best_len = cand, len(text)
-    if best is not None and best_len >= 200:
-        container = best
+    # 1) STRONG-PRIORITY containers: gov TRS systems mark the true article
+    #    body with TRS_Editor / Custom_UnionStyle — trust it even if another
+    #    candidate (e.g. a sidebar div) has more text.
+    for sel in ("[class*='TRS_Editor']", "[class*='Custom_UnionStyle']"):
+        cands = soup.select(sel)
+        if cands:
+            text = cands[0].get_text(" ", strip=True)
+            if len(text) >= 100:
+                container = cands[0]
+                break
     else:
-        container = soup.body or soup
+        # 1b) best container by text length
+        best: Any = None
+        best_len = 0
+        for sel in CONTAINER_SELECTORS:
+            for cand in soup.select(sel):
+                text = cand.get_text(" ", strip=True)
+                if len(text) > best_len:
+                    best, best_len = cand, len(text)
+        if best is not None and best_len >= 200:
+            container = best
+        else:
+            container = soup.body or soup
 
     # 2) rebuild clean text from block-level elements
     blocks: list[str] = []
@@ -308,9 +319,11 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
         if len(div_blocks) > len(blocks):
             blocks = div_blocks
 
-    if not blocks:
-        # fallback: whole container text
-        whole = container.get_text(" ", strip=True)
+    # 2c) fallback: whole container text when block extraction is too thin
+    #     (span/br layouts — TRS_Editor gov pages have paragraphs as bare
+    #     spans separated by <br/>, which find_all('div') misses entirely)
+    if len(blocks) < 2 or sum(len(b) for b in blocks) < 100:
+        whole = container.get_text("\n\n", strip=True)
         if len(whole) >= MIN_PARAGRAPH_CHARS:
             blocks = [whole]
 

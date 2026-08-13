@@ -237,30 +237,69 @@ def _parse_english_date(text: str) -> Optional[datetime]:
 
 
 def fetch_ndrc(session: requests.Session, now: datetime) -> list[RawItem]:
-    """国家发改委 — HTML 新闻列表."""
+    """国家发改委 — 新闻发布 + 通知公告全量.
+
+    两个栏目：
+      - xwfb 新闻发布（首页 30 条）
+      - tzgg 通知公告（全部分页，每页 ~20 条；2026-08 时约 20 页）
+    通知公告含规划/通知/公告/公示等最权威文件，必须一个不落。
+    """
     items: list[RawItem] = []
+
+    def _scrape_list(base_url: str, limit: int) -> None:
+        seen: set[tuple[str, str]] = set()
+        # 第 1 页: base_url/  第 n 页: base_url/index_{n-1}.html
+        for page in range(1, limit + 1):
+            if page == 1:
+                list_url = base_url
+            else:
+                list_url = f"{base_url}index_{page - 1}.html"
+            try:
+                r = session.get(list_url, timeout=30)
+                r.raise_for_status()
+                r.encoding = "utf-8"
+            except Exception:
+                break  # 页尾或网络问题，停止
+            soup = BeautifulSoup(r.text, "html.parser")
+            found = 0
+            for a in soup.select("li a[href]"):
+                href = (a.get("href") or "").strip()
+                text = a.get_text(strip=True)
+                if not text or not href or href in ("./", "#") or len(text) < 8:
+                    continue
+                if href.startswith("./"):
+                    href = urljoin(base_url, href)
+                elif not href.startswith("http"):
+                    continue
+                # 只要本栏目文章链接（日期路径格式 /2026xx/t2026xxxx.html）
+                if f"/{base_url.split('/')[-2]}/" not in href:
+                    continue
+                if href.endswith(("index_", ".html")) is False or "t20" not in href:
+                    continue
+                li = a.find_parent("li")
+                pub_date = _list_item_date(li) if li is not None else None
+                dedup_key = (text, href)
+                if dedup_key in seen:
+                    continue
+                seen.add(dedup_key)
+                items.append(RawItem(
+                    site_id="ndrc", site_name="国家发改委",
+                    title=text, url=href,
+                    published_at=parse_date_only(pub_date),
+                ))
+                found += 1
+            if found == 0:
+                break  # 空页：到末尾了
+            if found < 5:
+                break  # 页面异常，保守停止
+
     try:
-        r = session.get("https://www.ndrc.gov.cn/xwdt/xwfb/", timeout=30)
-        r.raise_for_status()
-        r.encoding = "utf-8"
-        soup = BeautifulSoup(r.text, "html.parser")
-        for a in soup.select("li a[href]"):
-            href = (a.get("href") or "").strip()
-            text = a.get_text(strip=True)
-            if not text or not href or href == "./" or len(text) < 8:
-                continue
-            if not href.startswith("http"):
-                href = urljoin("https://www.ndrc.gov.cn/xwdt/xwfb/", href)
-            li = a.find_parent("li")
-            pub_date = _list_item_date(li) if li is not None else None
-            items.append(RawItem(
-                site_id="ndrc", site_name="国家发改委",
-                title=text, url=href,
-                published_at=parse_date_only(pub_date),
-            ))
+        _scrape_list("https://www.ndrc.gov.cn/xwdt/xwfb/", 3)
+        _scrape_list("https://www.ndrc.gov.cn/xwdt/tzgg/", 25)
     except Exception:
         pass
-    return items[:30]
+    # 通知公告优先，去重后返回（tzgg 20 页 ≈ 400 条 + xwfb 首页）
+    return items[:500]
 
 
 def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
