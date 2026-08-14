@@ -108,8 +108,12 @@ def make_item_id(site_id: str, title: str, url: str) -> str:
 
 
 # ── RSS helpers ────────────────────────────────────────────────────────────────
-def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_name: str, now: datetime) -> list[RawItem]:
-    """Fetch RSS/Atom feed and return RawItems."""
+def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_name: str, now: datetime, limit: int = 60) -> list[RawItem]:
+    """Fetch RSS/Atom feed and return RawItems.
+
+    limit: 最多返回条数。OpenAI/arXiv 等 RSS 含全部历史文章（1100+ 条），
+    必须限量否则 export 阶段逐条抓详情页会卡死（2026-08-14 实测 timeout）。
+    """
     items: list[RawItem] = []
     seen: set[tuple[str, str]] = set()
     try:
@@ -171,7 +175,104 @@ def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_
                     source=site_name, title=title, url=link,
                     meta={"feed_url": feed_url},
                 ))
-    return items
+    return items[:limit]
+
+
+def fetch_jiqizhixin(session: requests.Session, now: datetime) -> list[RawItem]:
+    """机器之心 — 中文 AI 头部媒体（2026-08-14 扩充）。
+
+    PITFALL: jiqizhixin.com/rss 返回的是 HTML 壳（"机器之心·数据服务"）不是 RSS
+    → 用 Google News RSS 搜 site:jiqizhixin.com，取最新条目。
+    """
+    items: list[RawItem] = []
+    queries = [
+        '"jiqizhixin.com" 大模型 OR 模型 OR AI',
+        '"jiqizhixin.com" 芯片 OR 算力 OR 机器人',
+        '"jiqizhixin.com" 智能体 OR 自动驾驶 OR 融资',
+    ]
+    for q in queries:
+        try:
+            url = "https://news.google.com/rss/search"
+            params = {"q": q, "hl": "zh-CN", "gl": "CN", "ceid": "CN:zh-Hans"}
+            r = session.get(url, params=params, timeout=30)
+            r.raise_for_status()
+            feed = feedparser.parse(r.content) if feedparser else None
+            if not feed:
+                continue
+            for entry in feed.entries[:15]:
+                title = (entry.get("title") or "").strip()
+                link = (entry.get("link") or "").strip()
+                if not title or not link:
+                    continue
+                published = None
+                if hasattr(entry, "published_parsed") and entry.published_parsed:
+                    try:
+                        published = datetime(*entry.published_parsed[:6], tzinfo=UTC)
+                    except Exception:
+                        pass
+                items.append(RawItem(
+                    site_id="jiqizhixin", site_name="机器之心",
+                    title=title, url=link, published_at=published,
+                ))
+        except Exception:
+            continue
+    seen: set[tuple[str, str]] = set()
+    out: list[RawItem] = []
+    for it in items:
+        key = (it.title, it.url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(it)
+    return out[:20]
+
+
+def fetch_qbitai(session: requests.Session, now: datetime) -> list[RawItem]:
+    """量子位 — 中文 AI 产品/市场媒体（2026-08-14 扩充）。
+
+    PITFALL: qbitai.com/feed 返回 403（WAF 拦）→ Google News RSS 搜 site:qbitai.com。
+    """
+    items: list[RawItem] = []
+    queries = [
+        '"qbitai.com" AI OR 模型 OR 大模型',
+        '"qbitai.com" 机器人 OR 芯片 OR 融资',
+        '"qbitai.com" 智能体 OR 自动驾驶 OR 商业化',
+    ]
+    for q in queries:
+        try:
+            url = "https://news.google.com/rss/search"
+            params = {"q": q, "hl": "zh-CN", "gl": "CN", "ceid": "CN:zh-Hans"}
+            r = session.get(url, params=params, timeout=30)
+            r.raise_for_status()
+            feed = feedparser.parse(r.content) if feedparser else None
+            if not feed:
+                continue
+            for entry in feed.entries[:15]:
+                title = (entry.get("title") or "").strip()
+                link = (entry.get("link") or "").strip()
+                if not title or not link:
+                    continue
+                published = None
+                if hasattr(entry, "published_parsed") and entry.published_parsed:
+                    try:
+                        published = datetime(*entry.published_parsed[:6], tzinfo=UTC)
+                    except Exception:
+                        pass
+                items.append(RawItem(
+                    site_id="qbitai", site_name="量子位",
+                    title=title, url=link, published_at=published,
+                ))
+        except Exception:
+            continue
+    seen: set[tuple[str, str]] = set()
+    out: list[RawItem] = []
+    for it in items:
+        key = (it.title, it.url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(it)
+    return out[:20]
 
 
 # ── Web scraping fetchers ─────────────────────────────────────────────────────
@@ -1076,6 +1177,9 @@ SOURCE_SCORE: dict[str, int] = {
     "tanpaifang": 18, "ideacarbon": 18, "carbonbrief": 18, "ccai": 18,
     # 绿色科技媒体
     "stdaily": 16, "cleantechnica": 16,
+    # AI 领域全链条源（2026-08-14 扩充）
+    "jiqizhixin": 18, "qbitai": 18, "openai": 20,
+    "venturebeat": 16, "arxiv_ai": 18,
     # 行业媒体
     "chinaenergy": 13, "bjx": 13, "reuters": 13,
     # 全网热榜
@@ -1202,6 +1306,14 @@ AI_DIM_KW = [
     "能碳", "智算", "算法", "机器人", "无人机", "卫星", "自动驾驶",
     "artificial intelligence", "machine learning", "smart grid",
     "robot", "autonomous", "drone", "satellite",
+    # AI 领域全链条（2026-08-14 扩充：理论/模型/市场/商业）
+    "大语言模型", "多模态", "生成式", "深度学习", "神经网络", "transformer",
+    "llm", "gpt", "claude", "gemini", "deepseek", "qwen", "llama",
+    "agent", "智能体", "推理", "训练", "算力", "芯片", "gpu", "英伟达",
+    "openai", "anthropic", "google deepmind", "meta ai", "hugging face",
+    "ai芯片", "ai应用", "ai模型", "模型发布", "ai创业", "ai融资",
+    "机器学习模型", "计算机视觉", "自然语言处理", "强化学习", "aigc",
+    "大模型创业", "模型即服务", "ai agent", "mcp", "语义", "transformer架构",
 ]
 AI_TITLE_RE = r"\bai\b"  # 标题级英文 AI（词边界，防 "tail" "said" 误报）
 FINANCE_DIM_KW = [
@@ -1278,11 +1390,24 @@ GREEN_SITES = {
     "ccai", "stdaily",
 }
 
+# AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
+# 不加入 GREEN_SITES（那里是绿色政策源），单独一组放行
+AI_SITES = {
+    "jiqizhixin",   # 机器之心（中文 AI 头部媒体：模型/技术/商业）
+    "qbitai",       # 量子位（中文 AI 产品/市场）
+    "openai",       # OpenAI News（模型发布一手）
+    "venturebeat",  # VentureBeat AI（国际 AI 商业）
+    "arxiv_ai",     # arXiv cs.AI（理论前沿）
+}
+
 
 def is_policy_relevant(title: str, url: str = "", site_id: str = "") -> bool:
     """Check if a title/URL/site is related to green/low-carbon policy."""
     # Auto-pass for known green sites
     if site_id in GREEN_SITES:
+        return True
+    # AI 领域全链条源（2026-08-14）：理论/模型/市场/商业全通过
+    if site_id in AI_SITES:
         return True
     title_lower = title.lower()
     url_lower = url.lower()
@@ -1321,6 +1446,15 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_china_energy_news, "chinaenergy", "中国能源报"),
     # CleanTechnica RSS→Google News fallback（2026-08-14 新增；服务器直连被 WAF 拦）
     (fetch_cleantechnica, "cleantechnica", "CleanTechnica"),
+    # ── AI 领域全链条源（2026-08-14 扩充：理论/模型/市场/商业） ──
+    (fetch_jiqizhixin, "jiqizhixin", "机器之心"),
+    (fetch_qbitai, "qbitai", "量子位"),
+    (lambda s, n: fetch_rss_feed(s, "https://openai.com/news/rss.xml", "openai", "OpenAI", n, limit=30),
+     "openai", "OpenAI"),
+    (lambda s, n: fetch_rss_feed(s, "https://venturebeat.com/category/ai/feed/", "venturebeat", "VentureBeat AI", n, limit=30),
+     "venturebeat", "VentureBeat AI"),
+    (lambda s, n: fetch_rss_feed(s, "https://rss.arxiv.org/rss/cs.AI", "arxiv_ai", "arXiv·AI", n, limit=30),
+     "arxiv_ai", "arXiv·AI"),
     # Aggregated hot boards (filtered by policy keywords)
     (fetch_allnet, "allnet", "全网热点"),
 ]
@@ -1353,6 +1487,12 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "ccai":          ("media", ""),
     "stdaily":       ("media", ""),
     "cleantechnica": ("media", ""),
+    # AI 领域全链条源（2026-08-14 扩充：理论/模型/市场/商业）
+    "jiqizhixin":  ("media", ""),
+    "qbitai":      ("media", ""),
+    "openai":      ("media", ""),
+    "venturebeat": ("media", ""),
+    "arxiv_ai":    ("media", ""),
 }
 
 
@@ -1678,6 +1818,8 @@ SOURCE_REGION: dict[str, str] = {
     "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
     "carbonbrief": "国际",
     "cleantechnica": "国际", "ccai": "国际", "stdaily": "中国",
+    "jiqizhixin": "中国", "qbitai": "中国", "openai": "国际",
+    "venturebeat": "国际", "arxiv_ai": "国际",
     "reuters": "全球",
 }
 
@@ -2158,7 +2300,12 @@ def _update_ai_index(base: Path, now: datetime) -> None:
             if f.endswith(".md") and f not in index_files:
                 fpath = Path(root) / f
                 rel = str(fpath.relative_to(base))
-                content = fpath.read_text(encoding="utf-8")
+                # 容错（2026-08-14）：NTFS/WSL 下文件名偶有隐藏差异
+                # （Windows 自动去尾空格/点、8.3 短名等），os.walk 列出但 read 失败时跳过
+                try:
+                    content = fpath.read_text(encoding="utf-8")
+                except Exception:
+                    continue
                 fm: dict[str, str] = {}
                 in_fm = False
                 for line in content.split("\n"):
