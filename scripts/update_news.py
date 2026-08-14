@@ -837,6 +837,54 @@ def fetch_jp_anre(session: requests.Session, now: datetime) -> list[RawItem]:
 
 # ── 中国 P0 第二批（2026-08-14：人行/环交所/NCSC/CAEP/环境报/CNESA） ──
 
+def fetch_pbc(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中国人民银行 — 新闻发布 + 政策文件栏目（2026-08-14 接入）。
+
+    用户指定两个栏目：
+    - 新闻动态 = 新闻发布 /goutongjiaoliu/113456/113469/（公告/货币政策执行报告/金融统计）
+    - 政策文件 = 条法司 /tiaofasi/144941/3581332/（公告/办法/通知）
+    PITFALL: pbc.gov.cn 是 GBK 编码（apparent_encoding），链接是 14 位时间戳
+    /20\d{8,}/（不是 8 位）；标题过滤绿色关键词（人行内容以货币政策为主，
+    绿色金融相关才保留）。
+    """
+    items: list[RawItem] = []
+    urls = [
+        ("http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html", "新闻发布"),
+        ("http://www.pbc.gov.cn/tiaofasi/144941/3581332/index.html", "政策文件"),
+    ]
+    for u, col in urls:
+        try:
+            r = session.get(u, timeout=30)
+            r.encoding = r.apparent_encoding or "utf-8"
+            soup = BeautifulSoup(r.text, "html.parser")
+            for a in soup.find_all("a", href=True):
+                href = a.get("href", "")
+                txt = a.get_text(strip=True)
+                if not txt or len(txt) < 12:
+                    continue
+                if not re.search(r"/20\d{8,}/", href):
+                    continue
+                if not href.startswith("http"):
+                    href = urljoin("http://www.pbc.gov.cn", href)
+                items.append(RawItem(
+                    site_id="pbc", site_name="中国人民银行",
+                    title=txt, url=href, published_at=None,
+                    meta={"column": col},
+                ))
+        except Exception:
+            continue
+    # 去重
+    seen: set[tuple[str, str]] = set()
+    out: list[RawItem] = []
+    for it in items:
+        key = (it.title, it.url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(it)
+    return out[:30]
+
+
 def fetch_cneeex(session: requests.Session, now: datetime) -> list[RawItem]:
     """上海环交所 — 全国碳市场行情、配额公告（2026-08-14 接入）。
 
@@ -1493,7 +1541,7 @@ SOURCE_SCORE: dict[str, int] = {
     "us_noaa": 25, "us_eia": 25, "us_ferc": 25, "us_carb": 25,
     "jp_moe": 25, "jp_meti": 25, "jp_anre": 25,
     # 中国 P0 第二批（2026-08-14：官方机构档）
-"cneeex": 25, "ncsc": 25, "caep": 25,
+    "pbc": 25, "cneeex": 25, "ncsc": 25, "caep": 25,
     "cenews": 16, "cnesa": 16,
     # 官方解读（部委网站发布的专家解读）
     "mee_jiedu": 23,
@@ -1729,7 +1777,7 @@ GREEN_SITES = {
     # 美国/日本扩展官方源（2026-08-14 第二轮：联邦/部委官方直通）
     "us_noaa", "us_eia", "us_ferc", "us_carb", "jp_moe", "jp_meti", "jp_anre",
     # 中国 P0 第二批（2026-08-14：官方机构直通；环境报/CNESA 走关键词过滤）
-    "cneeex", "ncsc", "caep",
+    "pbc", "cneeex", "ncsc", "caep",
 }
 
 # 低频源宽窗口（2026-08-14）：国外官方源 + 中国智库型机构（NCSC/CAEP），
@@ -1815,6 +1863,7 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_jp_meti, "jp_meti", "日本经产省"),
     (fetch_jp_anre, "jp_anre", "日本资源能源厅"),
     # 中国 P0 第二批（2026-08-14）
+    (fetch_pbc, "pbc", "中国人民银行"),
     (fetch_cneeex, "cneeex", "上海环交所"),
     (fetch_ncsc, "ncsc", "NCSC国家气候中心"),
     (fetch_caep, "caep", "环境规划院CAEP"),
@@ -1880,6 +1929,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "jp_meti": ("policy", "国际组织"),
     "jp_anre": ("policy", "国际组织"),
     # 中国 P0 第二批（2026-08-14）
+    "pbc":    ("policy", "中国"),
     "cneeex": ("policy", "中国"),
     "ncsc":   ("policy", "中国"),
     "caep":   ("policy", "中国"),
@@ -2245,7 +2295,7 @@ SOURCE_REGION: dict[str, str] = {
     "us_noaa": "美国", "us_eia": "美国", "us_ferc": "美国", "us_carb": "美国",
     "jp_moe": "日本", "jp_meti": "日本", "jp_anre": "日本",
     # 中国 P0 第二批（2026-08-14）
-"cneeex": "中国", "ncsc": "中国", "caep": "中国",
+    "pbc": "中国", "cneeex": "中国", "ncsc": "中国", "caep": "中国",
     "cenews": "中国", "cnesa": "中国",
     "chinaenergy": "中国", "tanpaifang": "中国", "bjx": "中国", "ideacarbon": "中国",
     "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
