@@ -11,14 +11,27 @@ export PATH="/root/.local/bin:$PATH"
 # 1.5) 健康追踪（管理面板 admin/data/ 数据源）
 .venv/bin/python scripts/health_tracker.py || echo "health tracker failed"
 
-# 2) 素材层 git 提交（政策库 + 媒体库 + ai-index）
+# 2) 素材层 git 提交（服务器生成 + 本地 Obsidian 手工编辑双向同步）
 if [ -d /srv/git/green-policy-materials.git ]; then
+    # 2a) 提交服务器侧新生成/修改的笔记（无改动则跳过）
     git -C /opt/green-hot-news/Notes add -A
     if ! git -C /opt/green-hot-news/Notes diff --cached --quiet; then
         git -C /opt/green-hot-news/Notes -c user.name="green-policy-bot" \
             -c user.email="bot@ywm.life" \
             commit -m "sync: update materials $(date -u '+%Y-%m-%d %H:%M UTC')"
-        git -C /opt/green-hot-news/Notes push origin master --quiet
+    fi
+    # 2b) 双向同步竞态修复（2026-08-14 v2）：
+    #     -X theirs：索引文件（ai-index.md / 媒体库.md / 政策库.md）两端都会重写，
+    #     冲突必然发生 → 自动取远程（本地 Obsidian）版本，rebase 不中断；
+    #     服务器新笔记文件正常重放。素材层内容文件服务器只新增不修改，
+    #     非索引文件冲突概率≈0。万一仍失败（rename/delete 等）→ abort 保留下周期。
+    git -C /opt/green-hot-news/Notes pull --rebase -X theirs origin master --quiet || {
+        echo "⚠ notes rebase conflict — abort, retry next cycle"
+        git -C /opt/green-hot-news/Notes rebase --abort 2>/dev/null || true
+    }
+    # 2c) push；失败只提示（下个周期自动重试，不在此嵌套 pull 避免 rebase 卡住）
+    if ! git -C /opt/green-hot-news/Notes push origin master --quiet; then
+        echo "⚠ notes push deferred — retry next cycle"
     fi
 fi
 
