@@ -841,6 +841,8 @@ def fetch_cneeex(session: requests.Session, now: datetime) -> list[RawItem]:
     """上海环交所 — 全国碳市场行情、配额公告（2026-08-14 接入）。
 
     官网首页直抓：/c/YYYY-MM-DD/数字.shtml 日期路径，含政策转载+市场动态。
+    PITFALL(2026-08-14): 新加坡服务器直连 www.cneeex.com 失败（curl 异常，
+    疑似 IP 限制/SSL）→ 抓到 0 条时 fallback Google News 搜 site:cneeex.com。
     """
     items: list[RawItem] = []
     try:
@@ -862,6 +864,12 @@ def fetch_cneeex(session: requests.Session, now: datetime) -> list[RawItem]:
             ))
     except Exception:
         pass
+    if not items:
+        # fallback: Google News（服务器直连被拦时）
+        items = fetch_foreign_gov(session, now, "cneeex", "上海环交所", [
+            "site:cneeex.com (碳市场 OR 碳价 OR 配额 OR 碳交易) when:30d",
+            "site:cneeex.com (碳排放 OR 环交所 OR 碳金融) when:30d",
+        ], limit=15, locale="zh-CN")
     return items[:20]
 
 
