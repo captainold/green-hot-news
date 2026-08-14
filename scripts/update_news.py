@@ -464,6 +464,58 @@ def fetch_stdaily_green(session: requests.Session, now: datetime) -> list[RawIte
     return out[:25]
 
 
+def fetch_cleantechnica(session: requests.Session, now: datetime) -> list[RawItem]:
+    """CleanTechnica — 清洁技术第一站（2026-08-14 新增）。
+
+    PITFALL: cleantechnica.com/feed/ 直连被 Cloudflare WAF 拦（403 Just a moment，
+    本地通过可抓但服务器 IP 被拦）→ 用 Google News RSS 搜 site 内容。
+    走 is_policy_relevant 关键词过滤去车企商业噪音（Tesla 产量/Chevrolet 退出）。
+    """
+    items: list[RawItem] = []
+    queries = [
+        '"CleanTechnica" carbon OR climate OR energy',
+        '"CleanTechnica" solar OR wind OR battery OR hydrogen',
+        '"CleanTechnica" grid OR EV OR emission',
+    ]
+    for q in queries:
+        try:
+            url = "https://news.google.com/rss/search"
+            params = {"q": q, "hl": "en-US", "gl": "US", "ceid": "US:en"}
+            r = session.get(url, params=params, timeout=30)
+            r.raise_for_status()
+            feed = feedparser.parse(r.content) if feedparser else None
+            if not feed:
+                continue
+            for entry in feed.entries[:12]:
+                title = (entry.get("title") or "").strip()
+                link = (entry.get("link") or "").strip()
+                if not title or not link:
+                    continue
+                if not is_policy_relevant(title):
+                    continue
+                published = None
+                if hasattr(entry, "published_parsed") and entry.published_parsed:
+                    try:
+                        published = datetime(*entry.published_parsed[:6], tzinfo=UTC)
+                    except Exception:
+                        pass
+                items.append(RawItem(
+                    site_id="cleantechnica", site_name="CleanTechnica",
+                    title=title, url=link, published_at=published,
+                ))
+        except Exception:
+            continue
+    seen: set[tuple[str, str]] = set()
+    out: list[RawItem] = []
+    for it in items:
+        key = (it.title, it.url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(it)
+    return out[:20]
+
+
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
     """国家能源局 — CMS JSON API."""
     items: list[RawItem] = []
@@ -1166,9 +1218,8 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_tanpaifang, "tanpaifang", "中国碳交易网"),
     (fetch_tandao, "ideacarbon", "碳道"),
     (fetch_china_energy_news, "chinaenergy", "中国能源报"),
-    # CleanTechnica RSS（清洁技术第一站，2026-08-14 新增）
-    (lambda s, n: fetch_rss_feed(s, "https://cleantechnica.com/feed/", "cleantechnica", "CleanTechnica", n),
-     "cleantechnica", "CleanTechnica"),
+    # CleanTechnica RSS→Google News fallback（2026-08-14 新增；服务器直连被 WAF 拦）
+    (fetch_cleantechnica, "cleantechnica", "CleanTechnica"),
     # Aggregated hot boards (filtered by policy keywords)
     (fetch_allnet, "allnet", "全网热点"),
 ]
