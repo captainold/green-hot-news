@@ -379,6 +379,91 @@ def fetch_mee_jiedu(session: requests.Session, now: datetime) -> list[RawItem]:
     return items[:40]
 
 
+def fetch_ccai(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Climate Change AI — 博客列表页（AI×气候交叉领域，2026-08-14 新增）。
+
+    主题定位升级为「绿色低碳动态」后，AI/科技 是差异化增量维度。
+    CCAI 无 RSS，抓 blog 列表页 /blog/ 下文章链接。
+    PITFALL: 列表页按时间倒序但无日期元素（<time> 为 0），文章更新频率低
+    （月更）——只取前 12 条最新，避免 2021 年历史文章涌入。
+    """
+    items: list[RawItem] = []
+    list_url = "https://www.climatechange.ai/blog"
+    try:
+        r = session.get(list_url, timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = (a.get("href") or "").strip()
+            text = (a.get_text(strip=True) or "")
+            if not href.startswith("/blog/"):
+                continue
+            if not text or len(text) < 12:
+                continue
+            full = urljoin("https://www.climatechange.ai", href)
+            items.append(RawItem(
+                site_id="ccai", site_name="Climate Change AI",
+                title=text, url=full,
+                published_at=None,
+            ))
+    except Exception:
+        pass
+    # 去重（列表页常有重复链接）并只保留最新 12 条
+    seen: set[str] = set()
+    out: list[RawItem] = []
+    for it in items:
+        if it.url in seen:
+            continue
+        seen.add(it.url)
+        out.append(it)
+    return out[:12]
+
+
+def fetch_stdaily_green(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中国科技网（科技日报）— 绿色低碳/AI 动态。
+
+    2026-08-14 新增：科技日报是国家级科技媒体，AI+绿色技术报道密集。
+    PITFALL: Google News 搜 site:stdaily.com 返回的多是 1-3 月前旧文，
+    会被 96h 窗口过滤 → 改为抓首页实时列表 + is_policy_relevant 过滤。
+    """
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.stdaily.com/", timeout=30)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = (a.get("href") or "").strip()
+            text = (a.get_text(strip=True) or "")
+            if not text or not href or len(text) < 10:
+                continue
+            # 只要文章链接（/web/YYYY-MM/ 日期路径）
+            if "/web/20" not in href:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.stdaily.com", href)
+            if not is_policy_relevant(text):
+                continue
+            li = a.find_parent("li")
+            pub_date = _list_item_date(li) if li is not None else None
+            items.append(RawItem(
+                site_id="stdaily", site_name="中国科技网",
+                title=text, url=href,
+                published_at=parse_date_only(pub_date),
+            ))
+    except Exception:
+        pass
+    seen: set[tuple[str, str]] = set()
+    out: list[RawItem] = []
+    for it in items:
+        key = (it.title, it.url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(it)
+    return out[:25]
+
+
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
     """国家能源局 — CMS JSON API."""
     items: list[RawItem] = []
@@ -890,6 +975,8 @@ SOURCE_SCORE: dict[str, int] = {
     "tanpaifang": 20, "ideacarbon": 20, "carbonbrief": 20,
     # 行业媒体
     "chinaenergy": 15, "bjx": 15, "reuters": 15,
+    # 绿色科技/AI（2026-08-14 新增）
+    "ccai": 18, "stdaily": 16, "cleantechnica": 16,
     # 全网热榜
     "allnet": 10,
 }
@@ -912,6 +999,9 @@ IMPORTANT_TOPIC_KW = [  # 重要议题（18 分）
     "绿电", "零碳", "CCUS", "碳捕集", "绿色金融", "ESG", "循环经济",
     "电动车", "电动汽车", "renewable", "solar", "wind", "hydrogen",
     "battery", "energy storage", "electric vehicle",
+    # AI/科技（2026-08-14 主题升级）
+    "人工智能", "大模型", "智能电网", "数字孪生", "能碳", "AI",
+    "碳监测", "artificial intelligence", "machine learning", "smart grid",
 ]
 GENERAL_TOPIC_KW = [  # 一般议题（12 分）
     "节能", "环保", "气候", "绿色", "低碳", "减排", "污染防治",
@@ -1032,6 +1122,7 @@ GREEN_SITES = {
     "tanpaifang", "ideacarbon", "ndrc", "nea", "mee",
     "carbonbrief", "iea", "irena", "unfccc", "worldbank",
     "chinaenergy", "bjx", "reuters", "miit",
+    "ccai", "stdaily",
 }
 
 
@@ -1060,6 +1151,9 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_mee_jiedu, "mee_jiedu", "生态环境部·解读"),
     (fetch_nea, "nea", "国家能源局"),
     (fetch_miit, "miit", "工信部"),
+    # 绿色科技/AI（2026-08-14 主题定位升级新增）
+    (fetch_ccai, "ccai", "Climate Change AI"),
+    (fetch_stdaily_green, "stdaily", "中国科技网"),
     # International orgs
     (fetch_iea, "iea", "IEA"),
     (fetch_irena, "irena", "IRENA"),
@@ -1072,6 +1166,9 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_tanpaifang, "tanpaifang", "中国碳交易网"),
     (fetch_tandao, "ideacarbon", "碳道"),
     (fetch_china_energy_news, "chinaenergy", "中国能源报"),
+    # CleanTechnica RSS（清洁技术第一站，2026-08-14 新增）
+    (lambda s, n: fetch_rss_feed(s, "https://cleantechnica.com/feed/", "cleantechnica", "CleanTechnica", n),
+     "cleantechnica", "CleanTechnica"),
     # Aggregated hot boards (filtered by policy keywords)
     (fetch_allnet, "allnet", "全网热点"),
 ]
@@ -1100,6 +1197,10 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "ideacarbon":  ("media", ""),
     "chinaenergy": ("media", ""),
     "allnet":      ("media", ""),
+    # 绿色科技/AI（2026-08-14 新增）
+    "ccai":          ("media", ""),
+    "stdaily":       ("media", ""),
+    "cleantechnica": ("media", ""),
 }
 
 
@@ -1415,6 +1516,7 @@ SOURCE_REGION: dict[str, str] = {
     "chinaenergy": "中国", "tanpaifang": "中国", "bjx": "中国", "ideacarbon": "中国",
     "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
     "carbonbrief": "国际",
+    "cleantechnica": "国际", "ccai": "国际", "stdaily": "中国",
     "reuters": "全球",
 }
 
@@ -1439,6 +1541,9 @@ TOPIC_RULES: list[tuple[str, list[str]]] = [
     ("电动车", ["电动车", "电动汽车", "EV", "充电桩", "electric vehicle"]),
     ("政策法规", ["条例", "办法", "规定", "标准", "规范", "法律法规", "司法解释",
                   "regulation", "legislation"]),
+    ("AI科技", ["人工智能", "AI", "大模型", "机器学习", "智能电网", "数字孪生",
+                "碳监测", "能碳", "智算", "算法", "数字化", "数智化",
+                "artificial intelligence", "machine learning", "smart grid"]),
 ]
 
 # Policy type tag rules
