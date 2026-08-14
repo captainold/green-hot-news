@@ -14,6 +14,8 @@ Notes/
 admin/data/
 admin/.htpasswd.local
 admin/.admin-password.txt
+admin/.admin-token.txt
+admin/_green-policy.conf.prod
 
 # 本地运维脚本（每次操作覆盖，勿提交）
 _server_ops.bat

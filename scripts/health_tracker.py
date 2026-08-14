@@ -30,7 +30,7 @@ def run(cmd: list[str], timeout: int = 10) -> str | None:
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         out = (r.stdout or "").strip()
-        return out or (r.stderr or "").strip() or None
+        return out or None  # 失败/空输出 → None（stderr 丢弃，避免 fatal 报错进面板）
     except Exception:
         return None
 

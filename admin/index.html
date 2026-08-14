@@ -150,17 +150,46 @@
       const REFRESH_MS = 60000;
       const HOUR = 3600 * 1000;
 
+      // ── 访问密钥管理（数据 JSON 受 nginx token 保护）──────────────────
+      // key 来源：URL ?key= 优先，其次 localStorage；fetch 时自动附加。
+      const ADMIN_KEY = (() => {
+        const fromUrl = new URLSearchParams(location.search).get('key');
+        if (fromUrl) { try { localStorage.setItem('adminKey', fromUrl); } catch (e) {} return fromUrl; }
+        try { return localStorage.getItem('adminKey') || ''; } catch (e) { return ''; }
+      })();
+      function api(u) {
+        const sep = u.includes('?') ? '&' : '?';
+        return fetch(u + sep + 'key=' + encodeURIComponent(ADMIN_KEY), { cache: 'no-store' });
+      }
+
       function esc(s) {
         return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       }
+
+      function showKeyPrompt() {
+        const errBox = document.getElementById('loadErr');
+        errBox.style.display = 'block';
+        errBox.innerHTML =
+          '🔑 需要访问密钥：<input id="keyInput" type="password" placeholder="粘贴密钥" ' +
+          'style="padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--text);margin:0 8px;width:260px"/>' +
+          '<button onclick="submitKey()" style="padding:6px 14px;border-radius:6px;border:none;background:var(--green2);color:#06281d;font-weight:700;cursor:pointer">进入</button>';
+        document.getElementById('keyInput').focus();
+      }
+      window.submitKey = function () {
+        const k = document.getElementById('keyInput').value.trim();
+        if (!k) return;
+        try { localStorage.setItem('adminKey', k); } catch (e) {}
+        location.href = location.pathname;
+      };
 
       async function load() {
         const errBox = document.getElementById('loadErr');
         try {
           const [nowRes, histRes] = await Promise.all([
-            fetch('data/health-now.json?t=' + Date.now()),
-            fetch('data/health-history.json?t=' + Date.now()),
+            api('data/health-now.json'),
+            api('data/health-history.json'),
           ]);
+          if (nowRes.status === 401) { showKeyPrompt(); return; }
           if (!nowRes.ok) throw new Error('health-now.json ' + nowRes.status);
           const now = await nowRes.json();
           const hist = histRes.ok ? await histRes.json() : { entries: [] };
