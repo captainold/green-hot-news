@@ -677,19 +677,23 @@ def fetch_cleantechnica(session: requests.Session, now: datetime) -> list[RawIte
     return out[:20]
 
 
-def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, site_name: str, queries: list[str], limit: int = 20) -> list[RawItem]:
+def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, site_name: str, queries: list[str], limit: int = 20, locale: str = "en-US") -> list[RawItem]:
     """国外主要国家政策源 — Google News RSS 按站点搜索（2026-08-14 新增）。
 
     背景：美国/欧盟/日本/印度政府网站大多不提供 RSS（EPA/DOE/EU 等探测过，
     404 或 HTML 壳），白宫气候页 Google 未索引。用 Google News RSS 搜 site 是最
     成熟方案（与北极星/CleanTechnica 同款），加 when:7d 限近期。
     产出归政策库·国际（官方原文），SOURCE_SCORE 按部委档 25。
+    locale: "en-US"/"ja" 等，日本源用 ja（hl=ja/gl=JP），否则日语关键词搜不出。
     """
+    gl = "JP" if locale == "ja" else "US"
+    ceid = "JP:ja" if locale == "ja" else "US:en"
+    hl = locale
     items: list[RawItem] = []
     for q in queries:
         try:
             url = "https://news.google.com/rss/search"
-            params = {"q": q, "hl": "en-US", "gl": "US", "ceid": "US:en"}
+            params = {"q": q, "hl": hl, "gl": gl, "ceid": ceid}
             r = session.get(url, params=params, timeout=30)
             r.raise_for_status()
             feed = feedparser.parse(r.content) if feedparser else None
@@ -772,6 +776,63 @@ def fetch_india_pib(session: requests.Session, now: datetime) -> list[RawItem]:
         "site:pib.gov.in (climate OR renewable OR solar OR energy) when:7d",
         "site:pib.gov.in (green hydrogen OR emissions OR carbon OR sustainability) when:7d",
     ])
+
+
+# ── 美国/日本扩展官方源（2026-08-14 第二轮：NOAA/EIA/FERC/CARB/MOE/METI/ANRE） ──
+def fetch_us_noaa(session: requests.Session, now: datetime) -> list[RawItem]:
+    """美国国家海洋大气局 NOAA — 气候科学、温室气体监测、海洋与大气（2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "us_noaa", "美国NOAA", [
+        "site:noaa.gov (climate change OR greenhouse OR carbon dioxide) when:7d",
+        "site:noaa.gov (ocean warming OR sea level OR emissions) when:7d",
+    ])
+
+
+def fetch_us_eia(session: requests.Session, now: datetime) -> list[RawItem]:
+    """美国能源信息署 EIA — 能源统计与预测（天然气/电力/可再生，权威数据源，2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "us_eia", "美国EIA", [
+        "site:eia.gov (natural gas OR electricity OR renewables) when:7d",
+        "site:eia.gov (emissions OR energy outlook OR battery OR solar) when:7d",
+    ])
+
+
+def fetch_us_ferc(session: requests.Session, now: datetime) -> list[RawItem]:
+    """美国联邦能源监管委员会 FERC — 电网/输电/LNG/电力市场监管（2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "us_ferc", "美国FERC", [
+        "site:ferc.gov (grid OR transmission OR electricity OR LNG) when:14d",
+        "site:ferc.gov (reliability OR interconnection OR wholesale market) when:14d",
+    ])
+
+
+def fetch_us_carb(session: requests.Session, now: datetime) -> list[RawItem]:
+    """加州空气资源委员会 CARB — 零排放汽车、碳市场、气候政策（美国州级最权威，2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "us_carb", "加州CARB", [
+        "site:ww2.arb.ca.gov (climate OR zero emission OR cap and trade) when:30d",
+        "site:ww2.arb.ca.gov (trucks OR cars OR diesel OR regulations) when:30d",
+    ])
+
+
+def fetch_jp_moe(session: requests.Session, now: datetime) -> list[RawItem]:
+    """日本环境省 MOE — 气候政策、脱碳、碳市场（2026-08-14 新增，日语关键词）。"""
+    return fetch_foreign_gov(session, now, "jp_moe", "日本环境省", [
+        "site:env.go.jp (脱炭素 OR 気候変動対策 OR カーボンニュートラル) when:14d",
+        "site:env.go.jp (地球温暖化 OR 温室効果ガス OR 排出量取引) when:14d",
+    ], limit=15, locale="ja")
+
+
+def fetch_jp_meti(session: requests.Session, now: datetime) -> list[RawItem]:
+    """日本经济产业省 METI — 能源政策、GX、氢能（2026-08-14 新增，日语关键词）。"""
+    return fetch_foreign_gov(session, now, "jp_meti", "日本经产省", [
+        "site:meti.go.jp (エネルギー OR 脱炭素 OR 水素 OR GX) when:14d",
+        "site:meti.go.jp (再生可能エネルギー OR 電力 OR カーボン) when:14d",
+    ], limit=15, locale="ja")
+
+
+def fetch_jp_anre(session: requests.Session, now: datetime) -> list[RawItem]:
+    """日本资源能源厅 ANRE（经产省下属）— 电力/油气/可再生能源政策（2026-08-14 新增，日语关键词）。"""
+    return fetch_foreign_gov(session, now, "jp_anre", "日本资源能源厅", [
+        "site:enecho.meti.go.jp (再生可能 OR 水素 OR 脱炭素) when:14d",
+        "site:enecho.meti.go.jp (電力 OR エネルギー OR 石油 OR ガス) when:14d",
+    ], limit=15, locale="ja")
 
 
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1329,6 +1390,9 @@ SOURCE_SCORE: dict[str, int] = {
     # 国外主要国家政策源（2026-08-14 新增：官方部委档）
     "us_epa": 25, "us_doe": 25, "eu_commission": 25,
     "euractiv": 20, "india_pib": 25,
+    # 美国/日本扩展官方源（2026-08-14 第二轮：部委/联邦机构档）
+    "us_noaa": 25, "us_eia": 25, "us_ferc": 25, "us_carb": 25,
+    "jp_moe": 25, "jp_meti": 25, "jp_anre": 25,
     # 官方解读（部委网站发布的专家解读）
     "mee_jiedu": 23,
     # 国际组织
@@ -1560,6 +1624,8 @@ GREEN_SITES = {
     "ccai", "stdaily",
     # 国外主要国家政策源（2026-08-14 新增：官方部委直通；Euractiv 是综合媒体不走直通）
     "us_epa", "us_doe", "eu_commission", "india_pib",
+    # 美国/日本扩展官方源（2026-08-14 第二轮：联邦/部委官方直通）
+    "us_noaa", "us_eia", "us_ferc", "us_carb", "jp_moe", "jp_meti", "jp_anre",
 }
 
 # AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
@@ -1627,6 +1693,14 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_eu_commission, "eu_commission", "欧盟委员会"),
     (fetch_euractiv, "euractiv", "Euractiv·欧盟"),
     (fetch_india_pib, "india_pib", "印度PIB"),
+    # 美国/日本扩展官方源（2026-08-14 第二轮）
+    (fetch_us_noaa, "us_noaa", "美国NOAA"),
+    (fetch_us_eia, "us_eia", "美国EIA"),
+    (fetch_us_ferc, "us_ferc", "美国FERC"),
+    (fetch_us_carb, "us_carb", "加州CARB"),
+    (fetch_jp_moe, "jp_moe", "日本环境省"),
+    (fetch_jp_meti, "jp_meti", "日本经产省"),
+    (fetch_jp_anre, "jp_anre", "日本资源能源厅"),
     # 绿色科技/AI（2026-08-14 主题定位升级新增）
     (fetch_ccai, "ccai", "Climate Change AI"),
     (fetch_stdaily_green, "stdaily", "中国科技网"),
@@ -1678,6 +1752,14 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "eu_commission":("policy", "国际组织"),
     "euractiv":     ("policy", "国际组织"),
     "india_pib":    ("policy", "国际组织"),
+    # 美国/日本扩展官方源（2026-08-14 第二轮 → 政策库·国际）
+    "us_noaa": ("policy", "国际组织"),
+    "us_eia":  ("policy", "国际组织"),
+    "us_ferc": ("policy", "国际组织"),
+    "us_carb": ("policy", "国际组织"),
+    "jp_moe":  ("policy", "国际组织"),
+    "jp_meti": ("policy", "国际组织"),
+    "jp_anre": ("policy", "国际组织"),
     # 政策库 · 国际组织
     "iea":        ("policy", "国际组织"),
     "irena":      ("policy", "国际组织"),
@@ -2029,6 +2111,9 @@ SOURCE_REGION: dict[str, str] = {
     # 国外主要国家政策源（2026-08-14 新增）
     "us_epa": "美国", "us_doe": "美国", "eu_commission": "欧盟",
     "euractiv": "欧盟", "india_pib": "印度",
+    # 美国/日本扩展官方源（2026-08-14 第二轮）
+    "us_noaa": "美国", "us_eia": "美国", "us_ferc": "美国", "us_carb": "美国",
+    "jp_moe": "日本", "jp_meti": "日本", "jp_anre": "日本",
     "chinaenergy": "中国", "tanpaifang": "中国", "bjx": "中国", "ideacarbon": "中国",
     "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
     "carbonbrief": "国际",
