@@ -9,3 +9,11 @@ Notes/
 
 # Obsidian local config
 .obsidian/
+
+# 管理面板：本地生成的健康数据 + 凭据（服务器自动生成，勿提交）
+admin/data/
+admin/.htpasswd.local
+admin/.admin-password.txt
+
+# 本地运维脚本（每次操作覆盖，勿提交）
+_server_ops.bat

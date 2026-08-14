@@ -5,6 +5,7 @@
 ## 在线入口
 
 - 线上页面：`https://ywm.life`（新加坡服务器 Nginx 直出，双栏：官方新闻｜媒体新闻）
+- 管理面板：`https://ywm.life/admin/`（消息源健康监控，Basic Auth 保护，不公开；账号见 docs/服务器部署与运维.md）
 - GitHub 镜像：`https://captainold.github.io/green-hot-news/`（仅代码归档，CI 已禁用）
 - Obsidian 笔记库：`C:\Users\wenyu\Documents\Obsidian_wen\green-hot-news\Notes\`
 - 服务器部署与运维文档：[docs/服务器部署与运维.md](docs/服务器部署与运维.md)

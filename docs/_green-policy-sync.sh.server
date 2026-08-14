@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Green Policy Radar — 定时抓取 + 整理 + 提交素材层
+set -euo pipefail
+cd /opt/green-hot-news
+
+export PATH="/root/.local/bin:$PATH"
+
+# 1) 抓取新闻 + 导出 Obsidian 笔记 + 生成网站数据
+.venv/bin/python scripts/update_news.py --obsidian-dir . --window-hours 96
+
+# 1.5) 健康追踪（管理面板 admin/data/ 数据源）
+.venv/bin/python scripts/health_tracker.py || echo "health tracker failed"
+
+# 2) 素材层 git 提交（政策库 + 媒体库 + ai-index）
+if [ -d /srv/git/green-policy-materials.git ]; then
+    git -C /opt/green-hot-news/Notes add -A
+    if ! git -C /opt/green-hot-news/Notes diff --cached --quiet; then
+        git -C /opt/green-hot-news/Notes -c user.name="green-policy-bot" \
+            -c user.email="bot@ywm.life" \
+            commit -m "sync: update materials $(date -u '+%Y-%m-%d %H:%M UTC')"
+        git -C /opt/green-hot-news/Notes push origin master --quiet
+    fi
+fi
+
+# 3) 站点数据提交（供 nginx 直接服务 /opt/green-hot-news）
+if [ -d /opt/green-hot-news/.git ]; then
+    git -C /opt/green-hot-news add data/ admin/index.html index.html assets/ scripts/ 2>/dev/null || true
+    if ! git -C /opt/green-hot-news diff --cached --quiet; then
+        git -C /opt/green-hot-news -c user.name="green-policy-bot" \
+            -c user.email="bot@ywm.life" \
+            commit -m "sync: update site data $(date -u '+%Y-%m-%d %H:%M UTC')" || true
+    fi
+fi
+
+echo "✓ $(date '+%Y-%m-%d %H:%M:%S') sync done"

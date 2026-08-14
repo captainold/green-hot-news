@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>管理界面 · 消息源健康监控</title>
+    <style>
+      :root {
+        --bg: #0b1512;
+        --panel: #101f1a;
+        --panel2: #14261f;
+        --line: #1f3d31;
+        --text: #d7e8df;
+        --dim: #7fa393;
+        --green: #34d399;
+        --green2: #10b981;
+        --amber: #fbbf24;
+        --red: #f87171;
+        --blue: #60a5fa;
+        --mono: "SF Mono", "Cascadia Code", Consolas, monospace;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+        padding: 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      header.top {
+        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      header.top h1 { font-size: 20px; font-weight: 700; }
+      header.top .sub { color: var(--dim); font-size: 12px; }
+      #freshBadge {
+        margin-left: auto; padding: 5px 14px; border-radius: 999px;
+        font-size: 13px; font-weight: 600; border: 1px solid var(--line);
+      }
+      #freshBadge.ok { background: rgba(52,211,153,.12); color: var(--green); border-color: rgba(52,211,153,.4); }
+      #freshBadge.warn { background: rgba(251,191,36,.12); color: var(--amber); border-color: rgba(251,191,36,.4); }
+      #freshBadge.bad { background: rgba(248,113,113,.14); color: var(--red); border-color: rgba(248,113,113,.4); }
+
+      .kpi-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px; margin-bottom: 14px;
+      }
+      .kpi {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+        padding: 12px 14px;
+      }
+      .kpi .label { font-size: 11px; color: var(--dim); margin-bottom: 4px; }
+      .kpi .value { font-size: 26px; font-weight: 800; font-family: var(--mono); }
+      .kpi .value.green { color: var(--green); }
+      .kpi .value.red { color: var(--red); }
+      .kpi .value.amber { color: var(--amber); }
+      .kpi .hint { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+      .panel {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+        padding: 14px 16px; margin-bottom: 14px;
+      }
+      .panel h2 { font-size: 14px; margin-bottom: 10px; color: var(--green2); }
+      .panel h2 .count { color: var(--dim); font-weight: 400; font-size: 12px; }
+
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+      th { color: var(--dim); font-weight: 500; font-size: 12px; }
+      tr:last-child td { border-bottom: none; }
+      td.num { font-family: var(--mono); }
+      .badge {
+        display: inline-block; padding: 2px 10px; border-radius: 999px;
+        font-size: 12px; font-weight: 600;
+      }
+      .badge.ok { background: rgba(52,211,153,.14); color: var(--green); }
+      .badge.bad { background: rgba(248,113,113,.14); color: var(--red); }
+      .warn-tag { color: var(--red); font-size: 12px; }
+
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+
+      pre.log {
+        background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+        padding: 10px 12px; font-family: var(--mono); font-size: 11.5px;
+        line-height: 1.55; overflow-x: auto; color: #b8d4c6; white-space: pre-wrap;
+        word-break: break-all; max-height: 260px; overflow-y: auto;
+      }
+      .kv { display: grid; grid-template-columns: 130px 1fr; gap: 6px 10px; font-size: 13px; }
+      .kv .k { color: var(--dim); }
+      .kv .v { font-family: var(--mono); font-size: 12.5px; word-break: break-all; }
+
+      svg { width: 100%; height: 140px; display: block; }
+      .legend { display: flex; gap: 16px; font-size: 12px; color: var(--dim); margin-top: 6px; }
+      .legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; }
+
+      #loadErr {
+        color: var(--amber); font-size: 13px; padding: 20px; text-align: center;
+        border: 1px dashed var(--line); border-radius: 10px; margin-bottom: 14px;
+      }
+      .foot { color: var(--dim); font-size: 11px; text-align: center; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <h1>🌿 管理界面 · 消息源健康监控</h1>
+      <span class="sub" id="lastUpdate">加载中...</span>
+      <span id="freshBadge">—</span>
+    </header>
+
+    <div id="loadErr" style="display:none"></div>
+
+    <section class="kpi-grid" id="kpis"></section>
+
+    <section class="panel">
+      <h2>📈 源健康趋势 <span class="count" id="trendRange"></span></h2>
+      <svg id="trend" viewBox="0 0 1000 140" preserveAspectRatio="none"></svg>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--green)"></span>正常源数</span>
+        <span><span class="dot" style="background:var(--red)"></span>异常源数</span>
+        <span><span class="dot" style="background:var(--blue)"></span>绿色条目(×10)</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>🔌 源状态 <span class="count" id="siteCount"></span></h2>
+      <table>
+        <thead>
+          <tr><th>来源</th><th>状态</th><th>当前条数</th><th>连续失败</th><th>最后正常</th></tr>
+        </thead>
+        <tbody id="siteRows"></tbody>
+      </table>
+    </section>
+
+    <div class="grid2">
+      <section class="panel">
+        <h2>🖥️ 服务器状态</h2>
+        <div class="kv" id="serverInfo"></div>
+      </section>
+      <section class="panel">
+        <h2>📋 最近运行日志</h2>
+        <pre class="log" id="logBox">加载中...</pre>
+      </section>
+    </div>
+
+    <div class="foot">管理面板仅授权访问 · 数据由 health_tracker.py 每 30 分钟生成 · 自动刷新 60s</div>
+
+    <script>
+      const REFRESH_MS = 60000;
+      const HOUR = 3600 * 1000;
+
+      function esc(s) {
+        return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      }
+
+      async function load() {
+        const errBox = document.getElementById('loadErr');
+        try {
+          const [nowRes, histRes] = await Promise.all([
+            fetch('data/health-now.json?t=' + Date.now()),
+            fetch('data/health-history.json?t=' + Date.now()),
+          ]);
+          if (!nowRes.ok) throw new Error('health-now.json ' + nowRes.status);
+          const now = await nowRes.json();
+          const hist = histRes.ok ? await histRes.json() : { entries: [] };
+          errBox.style.display = 'none';
+          render(now, hist);
+        } catch (e) {
+          errBox.style.display = 'block';
+          errBox.textContent = '⚠ 数据加载失败：' + e.message + ' —— 等待定时任务首次生成（正常约 30 分钟内出现）';
+          document.getElementById('freshBadge').className = 'bad';
+          document.getElementById('freshBadge').textContent = '无数据';
+        }
+      }
+
+      function render(now, hist) {
+        const status = now.status || {};
+        const sites = status.sites || [];
+        const server = now.server || {};
+        const entries = (hist.entries || []).slice(-96);
+
+        // ── freshness ────────────────────────────────────────────────
+        const genAt = status.generated_at ? Date.parse(status.generated_at) : NaN;
+        const age = isNaN(genAt) ? NaN : Date.now() - genAt;
+        const badge = document.getElementById('freshBadge');
+        let freshClass = 'bad', freshText = '数据过期';
+        if (!isNaN(age)) {
+          if (age < 2 * HOUR) { freshClass = 'ok'; freshText = '新鲜 · ' + fmtAge(age); }
+          else if (age < 6 * HOUR) { freshClass = 'warn'; freshText = '延迟 · ' + fmtAge(age); }
+          else { freshClass = 'bad'; freshText = '故障 · ' + fmtAge(age); }
+        }
+        badge.className = freshClass;
+        badge.textContent = freshText;
+        document.getElementById('lastUpdate').textContent =
+          '抓取时间 ' + (status.generated_at ? esc(status.generated_at.replace('T',' ').slice(0,19)) : '—') +
+          ' · 本机 ' + now.generated_at;
+
+        // ── health score ─────────────────────────────────────────────
+        const fail = status.failed ?? sites.filter(s => !s.ok).length;
+        const ok = status.successful ?? sites.filter(s => s.ok).length;
+        let score = 50;
+        if (fail === 0) score += 30; else score = Math.max(0, score - fail * 5);
+        if (!isNaN(age) && age < 2 * HOUR) score += 20;
+        if ((status.total_green_items ?? 0) > 0) score += 0;
+        if (fail === 0 && !isNaN(age) && age < 2 * HOUR) score += 20; // 全绿+新鲜额外加分
+        score = Math.min(100, Math.max(0, score));
+        const scoreColor = score >= 80 ? 'green' : score >= 50 ? 'amber' : 'red';
+
+        // ── KPI ──────────────────────────────────────────────────────
+        const kpi = (label, value, cls, hint) =>
+          `<div class="kpi"><div class="label">${label}</div><div class="value ${cls}">${value}</div>` +
+          (hint ? `<div class="hint">${hint}</div>` : '') + '</div>';
+        document.getElementById('kpis').innerHTML =
+          kpi('健康度', score, scoreColor, fail === 0 ? '全部源正常' : fail + ' 个源异常') +
+          kpi('消息源', sites.length, '', `${ok} 正常 / ${fail} 异常`) +
+          kpi('24h 原始条数', status.total_raw_items ?? '—', '', '抓取未过滤总量') +
+          kpi('24h 绿色条数', status.total_green_items ?? '—', 'green', '过滤后入库');
+
+        // ── trend chart ──────────────────────────────────────────────
+        drawTrend(entries, sites.length);
+
+        // ── per-site table ───────────────────────────────────────────
+        document.getElementById('siteCount').textContent = `共 ${sites.length} 个`;
+        const rows = sites.map(s => {
+          let consec = 0, lastOk = '—';
+          for (let i = entries.length - 1; i >= 0; i--) {
+            const st = entries[i].sites ? entries[i].sites[s.site_id] : undefined;
+            if (!st) break;
+            if (st[0]) { lastOk = entries[i].ts.slice(5, 16); break; }
+            consec++;
+          }
+          return { s, consec, lastOk };
+        }).sort((a, b) => (a.s.ok ? 1 : 0) - (b.s.ok ? 1 : 0) || b.consec - a.consec);
+
+        document.getElementById('siteRows').innerHTML = rows.map(r => `
+          <tr>
+            <td>${esc(r.s.site_name)} <span style="color:var(--dim);font-size:11px">${esc(r.s.site_id)}</span></td>
+            <td><span class="badge ${r.s.ok ? 'ok' : 'bad'}">${r.s.ok ? '正常' : '异常'}</span></td>
+            <td class="num">${r.s.item_count ?? '—'}</td>
+            <td class="num">${r.consec > 0 ? `<span class="warn-tag">${r.consec} 次</span>` : '—'}</td>
+            <td class="num" style="color:var(--dim)">${r.lastOk}</td>
+          </tr>`).join('');
+
+        // ── server info ──────────────────────────────────────────────
+        const kv = (k, v) => `<div class="k">${k}</div><div class="v">${esc(v ?? '—')}</div>`;
+        document.getElementById('serverInfo').innerHTML =
+          kv('timer', server.timer_active) +
+          kv('磁盘 /opt', (server.disk || '').split('\n').slice(-1)[0] || '—') +
+          kv('素材库最近提交', server.notes_commit) +
+          kv('站点最近提交', server.site_commit);
+
+        // ── log ──────────────────────────────────────────────────────
+        document.getElementById('logBox').textContent = server.last_log || '（无日志，可能未通过 systemd 运行）';
+      }
+
+      function drawTrend(entries, siteCount) {
+        const svg = document.getElementById('trend');
+        const W = 1000, H = 140, PAD = 8;
+        const n = entries.length;
+        const maxY = Math.max(siteCount, 1);
+        const x = i => n <= 1 ? PAD : PAD + (W - 2 * PAD) * i / (n - 1);
+        const y = v => H - PAD - (H - 2 * PAD) * Math.min(v, maxY) / maxY;
+
+        let grid = '';
+        for (let g = 0; g <= 4; g++) {
+          const gy = PAD + (H - 2 * PAD) * g / 4;
+          grid += `<line x1="${PAD}" y1="${gy}" x2="${W - PAD}" y2="${gy}" stroke="var(--line)" stroke-width="1"/>`;
+        }
+        if (n === 0) {
+          svg.innerHTML = grid;
+          return;
+        }
+        const line = (vals, color) => {
+          const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+          return `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>`;
+        };
+        const okVals = entries.map(e => e.ok ?? 0);
+        const failVals = entries.map(e => e.fail ?? 0);
+        const greenVals = entries.map(e => Math.min((e.green ?? 0) / 10, maxY));
+        svg.innerHTML = grid + line(okVals, 'var(--green)') + line(failVals, 'var(--red)') + line(greenVals, 'var(--blue)');
+
+        const firstTs = entries[0].ts, lastTs = entries[n - 1].ts;
+        document.getElementById('trendRange').textContent =
+          `${firstTs.slice(5, 16)} → ${lastTs.slice(5, 16)} · ${n} 次采样`;
+      }
+
+      function fmtAge(ms) {
+        const m = Math.floor(ms / 60000);
+        if (m < 60) return m + ' 分钟前';
+        const h = Math.floor(m / 60), mm = m % 60;
+        return h + ' 小时 ' + mm + ' 分前';
+      }
+
+      load();
+      setInterval(load, REFRESH_MS);
+    </script>
+  </body>
+</html>
