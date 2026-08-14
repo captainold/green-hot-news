@@ -684,10 +684,10 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
     404 或 HTML 壳），白宫气候页 Google 未索引。用 Google News RSS 搜 site 是最
     成熟方案（与北极星/CleanTechnica 同款），加 when:7d 限近期。
     产出归政策库·国际（官方原文），SOURCE_SCORE 按部委档 25。
-    locale: "en-US"/"ja" 等，日本源用 ja（hl=ja/gl=JP），否则日语关键词搜不出。
+    locale: "en-US"/"ja"/"zh-CN" 等；日本源用 ja（hl=ja/gl=JP），中文源用 zh-CN（hl=zh-CN/gl=CN），否则关键词搜不出。
     """
-    gl = "JP" if locale == "ja" else "US"
-    ceid = "JP:ja" if locale == "ja" else "US:en"
+    gl = "JP" if locale == "ja" else ("CN" if locale == "zh-CN" else "US")
+    ceid = "JP:ja" if locale == "ja" else ("CN:zh-Hans" if locale == "zh-CN" else "US:en")
     hl = locale
     items: list[RawItem] = []
     for q in queries:
@@ -833,6 +833,97 @@ def fetch_jp_anre(session: requests.Session, now: datetime) -> list[RawItem]:
         "site:enecho.meti.go.jp (再生可能 OR 水素 OR 脱炭素) when:14d",
         "site:enecho.meti.go.jp (電力 OR エネルギー OR 石油 OR ガス) when:14d",
     ], limit=15, locale="ja")
+
+
+# ── 中国 P0 第二批（2026-08-14：人行/环交所/NCSC/CAEP/环境报/CNESA） ──
+
+def fetch_cneeex(session: requests.Session, now: datetime) -> list[RawItem]:
+    """上海环交所 — 全国碳市场行情、配额公告（2026-08-14 接入）。
+
+    官网首页直抓：/c/YYYY-MM-DD/数字.shtml 日期路径，含政策转载+市场动态。
+    """
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.cneeex.com/", timeout=30)
+        r.encoding = r.apparent_encoding or "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.find_all("a", href=True):
+            href = a.get("href", "")
+            txt = a.get_text(strip=True)
+            if not txt or len(txt) < 12:
+                continue
+            if not re.search(r"/c/20\d{2}-\d{2}-\d{2}/", href):
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://www.cneeex.com", href)
+            items.append(RawItem(
+                site_id="cneeex", site_name="上海环交所",
+                title=txt, url=href, published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:20]
+
+
+def fetch_ncsc(session: requests.Session, now: datetime) -> list[RawItem]:
+    """国家应对气候变化战略研究和国际合作中心 NCSC — 气候战略/碳市场研究（2026-08-14 接入）。"""
+    return fetch_foreign_gov(session, now, "ncsc", "NCSC国家气候中心", [
+        "site:ncsc.org.cn (气候 OR 碳市场 OR 碳中和 OR 碳达峰) when:30d",
+        "site:ncsc.org.cn (温室气体 OR 减排 OR 政策) when:30d",
+    ], limit=10, locale="zh-CN")
+
+
+def fetch_caep(session: requests.Session, now: datetime) -> list[RawItem]:
+    """生态环境部环境规划院 CAEP — 环境规划/双碳路径（2026-08-14 接入）。"""
+    return fetch_foreign_gov(session, now, "caep", "环境规划院CAEP", [
+        "site:caep.org.cn (环境 OR 双碳 OR 规划 OR 美丽中国) when:30d",
+        "site:caep.org.cn (碳 OR 气候 OR 减污降碳) when:30d",
+    ], limit=10, locale="zh-CN")
+
+
+def fetch_cenews(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中国环境报 — 生态环境部机关报（2026-08-14 接入，媒体库）。"""
+    return fetch_foreign_gov(session, now, "cenews", "中国环境报", [
+        "site:cenews.com.cn (生态 OR 环境 OR 双碳) when:14d",
+        "site:cenews.com.cn (碳市场 OR 绿色 OR 污染防治) when:14d",
+    ], limit=15, locale="zh-CN")
+
+
+def fetch_cnesa(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中关村储能产业技术联盟 CNESA — 储能装机数据/白皮书（2026-08-14 接入，媒体库·数据）。
+
+    官网 /information/detail/?column_id=58（产业数据）直抓，储能数据极权威
+    （15.77GWh 并网、2h 储能价格等）。
+    """
+    items: list[RawItem] = []
+    try:
+        r = session.get("http://www.cnesa.org/", timeout=30)
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.find_all("a", href=True):
+            href = a.get("href", "")
+            txt = a.get_text(strip=True)
+            if not txt or len(txt) < 12:
+                continue
+            if "/information/detail/" not in href:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("http://www.cnesa.org", href)
+            items.append(RawItem(
+                site_id="cnesa", site_name="CNESA储能联盟",
+                title=txt, url=href, published_at=None,
+            ))
+    except Exception:
+        pass
+    seen: set[tuple[str, str]] = set()
+    out: list[RawItem] = []
+    for it in items:
+        key = (it.title, it.url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(it)
+    return out[:15]
 
 
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1393,6 +1484,9 @@ SOURCE_SCORE: dict[str, int] = {
     # 美国/日本扩展官方源（2026-08-14 第二轮：部委/联邦机构档）
     "us_noaa": 25, "us_eia": 25, "us_ferc": 25, "us_carb": 25,
     "jp_moe": 25, "jp_meti": 25, "jp_anre": 25,
+    # 中国 P0 第二批（2026-08-14：官方机构档）
+"cneeex": 25, "ncsc": 25, "caep": 25,
+    "cenews": 16, "cnesa": 16,
     # 官方解读（部委网站发布的专家解读）
     "mee_jiedu": 23,
     # 国际组织
@@ -1626,13 +1720,17 @@ GREEN_SITES = {
     "us_epa", "us_doe", "eu_commission", "india_pib",
     # 美国/日本扩展官方源（2026-08-14 第二轮：联邦/部委官方直通）
     "us_noaa", "us_eia", "us_ferc", "us_carb", "jp_moe", "jp_meti", "jp_anre",
+    # 中国 P0 第二批（2026-08-14：官方机构直通；环境报/CNESA 走关键词过滤）
+    "cneeex", "ncsc", "caep",
 }
 
-# 国外官方政策源（2026-08-14）：更新频率低（周级），网站数据用 7 天宽窗口过滤
+# 低频源宽窗口（2026-08-14）：国外官方源 + 中国智库型机构（NCSC/CAEP），
+# 更新频率低（周级/月级），网站数据用 7 天宽窗口过滤，其余源保持 96h
 FOREIGN_GOV_SITES = {
     "us_epa", "us_doe", "us_noaa", "us_eia", "us_ferc", "us_carb",
     "eu_commission", "euractiv", "india_pib",
     "jp_moe", "jp_meti", "jp_anre",
+    "ncsc", "caep",
 }
 
 # AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
@@ -1708,6 +1806,12 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_jp_moe, "jp_moe", "日本环境省"),
     (fetch_jp_meti, "jp_meti", "日本经产省"),
     (fetch_jp_anre, "jp_anre", "日本资源能源厅"),
+    # 中国 P0 第二批（2026-08-14）
+    (fetch_cneeex, "cneeex", "上海环交所"),
+    (fetch_ncsc, "ncsc", "NCSC国家气候中心"),
+    (fetch_caep, "caep", "环境规划院CAEP"),
+    (fetch_cenews, "cenews", "中国环境报"),
+    (fetch_cnesa, "cnesa", "CNESA储能联盟"),
     # 绿色科技/AI（2026-08-14 主题定位升级新增）
     (fetch_ccai, "ccai", "Climate Change AI"),
     (fetch_stdaily_green, "stdaily", "中国科技网"),
@@ -1767,6 +1871,12 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "jp_moe":  ("policy", "国际组织"),
     "jp_meti": ("policy", "国际组织"),
     "jp_anre": ("policy", "国际组织"),
+    # 中国 P0 第二批（2026-08-14）
+    "cneeex": ("policy", "中国"),
+    "ncsc":   ("policy", "中国"),
+    "caep":   ("policy", "中国"),
+    "cenews": ("media", "中国"),
+    "cnesa":  ("media", "中国"),
     # 政策库 · 国际组织
     "iea":        ("policy", "国际组织"),
     "irena":      ("policy", "国际组织"),
@@ -2126,6 +2236,9 @@ SOURCE_REGION: dict[str, str] = {
     # 美国/日本扩展官方源（2026-08-14 第二轮）
     "us_noaa": "美国", "us_eia": "美国", "us_ferc": "美国", "us_carb": "美国",
     "jp_moe": "日本", "jp_meti": "日本", "jp_anre": "日本",
+    # 中国 P0 第二批（2026-08-14）
+"cneeex": "中国", "ncsc": "中国", "caep": "中国",
+    "cenews": "中国", "cnesa": "中国",
     "chinaenergy": "中国", "tanpaifang": "中国", "bjx": "中国", "ideacarbon": "中国",
     "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
     "carbonbrief": "国际",
