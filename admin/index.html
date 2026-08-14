@@ -70,6 +70,13 @@
       th { color: var(--dim); font-weight: 500; font-size: 12px; }
       tr:last-child td { border-bottom: none; }
       td.num { font-family: var(--mono); }
+      /* 分类分组行 */
+      tr.cat-row td {
+        background: var(--panel2); color: var(--green2); font-weight: 700;
+        font-size: 12.5px; padding: 9px 8px 7px; letter-spacing: .5px;
+        border-bottom: 1px solid var(--line);
+      }
+      tr.cat-row td .cat-count { color: var(--dim); font-weight: 400; font-size: 11px; margin-left: 8px; }
       .badge {
         display: inline-block; padding: 2px 10px; border-radius: 999px;
         font-size: 12px; font-weight: 600;
@@ -249,9 +256,32 @@
         // ── trend chart ──────────────────────────────────────────────
         drawTrend(entries, sites.length);
 
-        // ── per-site table ───────────────────────────────────────────
-        document.getElementById('siteCount').textContent = `共 ${sites.length} 个`;
-        const rows = sites.map(s => {
+        // ── per-site table（按类型分组：政府/国际组织/媒体/KOL/热榜）────
+        // 新增源时在此登记 site_id → 分类；未登记自动归入「其他」
+        const SITE_CAT = {
+          // 🏛️ 政府官方（部委）
+          'ndrc': 'gov', 'mee': 'gov', 'mee_jiedu': 'gov', 'nea': 'gov', 'miit': 'gov',
+          // 🌐 国际组织（政府间机构）
+          'iea': 'intl', 'irena': 'intl', 'unfccc': 'intl', 'worldbank': 'intl',
+          // 📰 媒体（行业/综合/专业媒体）
+          'reuters': 'media', 'bjx': 'media', 'chinaenergy': 'media', 'carbonbrief': 'media',
+          'stdaily': 'media', 'cleantechnica': 'media', 'tanpaifang': 'media', 'ideacarbon': 'media',
+          // 🧑‍🔬 KOL/研究（个人专家/研究社区/智库）
+          'ccai': 'kol',
+          // 🔥 全网热榜（榜单聚合）
+          'allnet': 'hot',
+        };
+        const CATS = [
+          { id: 'gov',   label: '🏛️ 政府官方' },
+          { id: 'intl',  label: '🌐 国际组织' },
+          { id: 'media', label: '📰 媒体' },
+          { id: 'kol',   label: '🧑‍🔬 KOL / 研究' },
+          { id: 'hot',   label: '🔥 全网热榜' },
+          { id: 'other', label: '📦 其他' },
+        ];
+
+        document.getElementById('siteCount').textContent = `共 ${sites.length} 个 · ${CATS.filter(c => sites.some(s => (SITE_CAT[s.site_id] || 'other') === c.id)).length} 类`;
+        const enriched = sites.map(s => {
           let consec = 0, lastOk = '—';
           for (let i = entries.length - 1; i >= 0; i--) {
             const st = entries[i].sites ? entries[i].sites[s.site_id] : undefined;
@@ -259,17 +289,27 @@
             if (st[0]) { lastOk = entries[i].ts.slice(5, 16); break; }
             consec++;
           }
-          return { s, consec, lastOk };
-        }).sort((a, b) => (a.s.ok ? 1 : 0) - (b.s.ok ? 1 : 0) || b.consec - a.consec);
+          return { s, consec, lastOk, cat: SITE_CAT[s.site_id] || 'other' };
+        });
 
-        document.getElementById('siteRows').innerHTML = rows.map(r => `
+        const rowHtml = r => `
           <tr>
             <td>${esc(r.s.site_name)} <span style="color:var(--dim);font-size:11px">${esc(r.s.site_id)}</span></td>
             <td><span class="badge ${r.s.ok ? 'ok' : 'bad'}">${r.s.ok ? '正常' : '异常'}</span></td>
             <td class="num">${r.s.item_count ?? '—'}</td>
             <td class="num">${r.consec > 0 ? `<span class="warn-tag">${r.consec} 次</span>` : '—'}</td>
             <td class="num" style="color:var(--dim)">${r.lastOk}</td>
-          </tr>`).join('');
+          </tr>`;
+
+        document.getElementById('siteRows').innerHTML = CATS.map(cat => {
+          const group = enriched
+            .filter(r => r.cat === cat.id)
+            .sort((a, b) => (a.s.ok ? 1 : 0) - (b.s.ok ? 1 : 0) || b.consec - a.consec);
+          if (!group.length) return '';
+          const okN = group.filter(g => g.s.ok).length;
+          return `<tr class="cat-row"><td colspan="5">${cat.label}<span class="cat-count">${okN}/${group.length} 正常</span></td></tr>` +
+                 group.map(rowHtml).join('');
+        }).join('');
 
         // ── server info ──────────────────────────────────────────────
         const kv = (k, v) => `<div class="k">${k}</div><div class="v">${esc(v ?? '—')}</div>`;
