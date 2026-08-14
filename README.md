@@ -1,6 +1,6 @@
 # Green Hot News · 绿色低碳动态雷达
 
-国内外最新绿色低碳动态聚合站：**政策 + 技术 + 金融 + AI科技** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、全网热榜的绿色低碳动态（24 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.0**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100），前端**综合榜 + 四维榜**展示 + 分数徽章（S/A/B/C/D 等级）。
+国内外最新绿色低碳动态聚合站：**政策 + 技术 + 金融 + AI科技** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（26 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.0**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100），前端**综合榜 + 四维榜**展示 + 分数徽章（S/A/B/C/D 等级）。
 
 ## 在线入口
 
@@ -31,7 +31,7 @@
       └─ 每30分钟 auto-push → 服务器 bare 仓库
 ```
 
-## 覆盖范围（25 个源，2026-08-14 服务器为准）
+## 覆盖范围（26 个源，2026-08-14 服务器为准）
 
 ### 国内政策源（政策库 · 中国）
 - 国家发改委、生态环境部、生态环境部·解读、国家能源局、工信部
@@ -52,6 +52,10 @@
 - **机器之心 / 量子位**（中文 AI 头部媒体，Google News fallback）
 - **VentureBeat AI**（国际 AI 商业，RSS 限量 30）
 - **AIHOT**（`aihot.virxact.com`，AI 行业动态聚合：X/公众号/RSS 几十源，精选 RSS 每 30 分钟抓取，带热度与 AI 评分；2026-08-14 接入）
+
+### 技术趋势（媒体库 · 2026-08-14 新增）
+> GitHub 开源项目热度追踪，TECH_SITES 白名单直通 + DIM_SITE_OVERRIDE 站点级维度强制 → 技术维度
+- **RadarAI·GitHub趋势**（`radarai.top/trends`）：聚合 GitHub Trending 开源项目（中文摘要+star），抓 `/api/trends` JSON 取前 40 条，归「技术」维度（AIHOT 等源里的 deepseek/ollama 类项目不会抢到 AI科技榜）；无发布时间走收录时间兜底
 
 ### 全网热点（媒体库 · 2026-08-13 新增）
 - **allnet.hot**（`https://api.allnet.hot/api/open/v1`）：抓取微博热搜、知乎热榜、今日头条热榜、澎湃热榜、IT之家最新 5 个榜单
@@ -79,7 +83,7 @@ python3.11 scripts/update_news.py --output-dir data --window-hours 24
 | 维度 | 定位 | 信源 |
 |------|------|------|
 | 🏛️ 政策 | 制度锚点 | 4部委 + 官方解读 + 4国际组织 |
-| 🔋 技术 | 产业脉搏 | 中国能源报、北极星、CleanTechnica |
+| 🔋 技术 | 产业脉搏 | 中国能源报、北极星、CleanTechnica、RadarAI·GitHub趋势 |
 | 💰 金融 | 市场温度计 | 碳交易网、碳道、Carbon Brief |
 | 🤖 AI科技 | 新视野（理论→模型→市场→商业 + 交叉） | OpenAI、arXiv·AI、机器之心、量子位、VentureBeat AI、Climate Change AI、中国科技网 |
 
@@ -87,7 +91,7 @@ python3.11 scripts/update_news.py --output-dir data --window-hours 24
 
 - `data/latest-24h.json` — 24小时绿色动态信号（过滤后，含 `score`/`score_level`/`score_breakdown`/`dimension` 字段）
 - `data/latest-24h-all.json` — 24小时全量数据
-- `data/source-status.json` — 24 个源健康状态
+- `data/source-status.json` — 26 个源健康状态
 - `data/published-index.json` — 发布时间索引
 - `data/title-index.json` — 完整标题索引
 - `data/summary-index.json` — 摘要索引（前端可展开摘要，News Minimalist 风格）

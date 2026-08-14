@@ -13,6 +13,7 @@
 	- [x] 主题升级：绿色低碳动态雷达（2026-08-14）——政策+技术+金融+AI科技四维，新增 Climate Change AI / 中国科技网 / CleanTechnica（共19源）
 	- [x] 首页四维排行榜（2026-08-14）——顶部综合榜 + 政策/技术/金融/AI科技 四维榜
 	- [x] AI 维度全链条扩充（2026-08-14）——AI科技维度 = 理论→模型→市场→商业 + AI×能碳交叉；新增 OpenAI/arXiv·AI/机器之心/量子位/VentureBeat AI（共24源）；wiki 新增 AI进展 板块
+	- [x] 技术维度扩充（2026-08-14）——RadarAI·GitHub趋势 接入（radarai.top/trends，GitHub 开源项目热度追踪）；/api/trends JSON 取前 40 条，TECH_SITES 直通 + DIM_SITE_OVERRIDE 站点级维度强制→技术（共26源）；record 补 summary 通道参与打分/前端摘要
 
 
 - [x] 添加这个：全网热点聚合：6ef1d8f4-8745-437c-a1e4-8c525ed8e971   https://api.allnet.hot/api/open/v1
@@ -54,7 +55,7 @@
 信源: 4部委 + 官方解读 + 4国际组织 + 国际主要国家政策发布
 ────────────────────────────────────────
 维度: 🔋 技术
-信源: 中国能源报、北极星、CleanTechnica
+信源: 中国能源报、北极星、CleanTechnica、RadarAI·GitHub趋势（2026-08-14）
 ────────────────────────────────────────
 维度: 💰 金融
 信源: 碳交易网、碳道、Carbon Brief
