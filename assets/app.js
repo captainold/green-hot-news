@@ -1,6 +1,6 @@
-// ── Green Hot News · 绿色政策雷达 — App ──────────────────────────────────────
-// 双栏布局（2026-08-14）：官方新闻（policy 库）｜媒体新闻（media 库）
-// 学 News Minimalist：来源徽章 + 相对时间 + 可展开摘要
+// ── Green Hot News · 绿色低碳动态雷达 — App ──────────────────────────────────
+// 布局（2026-08-14）：顶部综合评分排行榜 + 下面四维排行榜（政策/技术/金融/AI科技）
+// 学 News Minimalist：分数徽章 + 相对时间 + 可展开摘要
 (function () {
   "use strict";
 
@@ -11,17 +11,22 @@
   let searchQuery = "";
   let selectedSite = "";
   let currentMode = "green"; // "green" | "all"
-  let currentLevel = ""; // "" | S | A | B | C | D
   let currentSort = "score"; // "score" | "time"
+
+  const DIMS = [
+    { key: "政策", id: "policyList", countId: "policyCount", limit: 8 },
+    { key: "技术", id: "techList", countId: "techCount", limit: 8 },
+    { key: "金融", id: "finList", countId: "finCount", limit: 8 },
+    { key: "AI科技", id: "aiList", countId: "aiCount", limit: 8 },
+  ];
+  const OVERALL_LIMIT = 10;
 
   // ── Dom refs ───────────────────────────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
-  const policyList = $("#policyList");
-  const mediaList = $("#mediaList");
+  const overallList = $("#overallList");
+  const overallCount = $("#overallCount");
   const searchInput = $("#searchInput");
   const siteSelect = $("#siteSelect");
-  const policyCount = $("#policyCount");
-  const mediaCount = $("#mediaCount");
   const updatedAt = $("#updatedAt");
   const stats = $("#stats");
   const modeGreenBtn = $("#modeGreenBtn");
@@ -29,7 +34,6 @@
   const modeHint = $("#modeHint");
   const sortScoreBtn = $("#sortScoreBtn");
   const sortTimeBtn = $("#sortTimeBtn");
-  const levelSwitch = $("#levelSwitch");
   const advancedSummary = $("#advancedSummary");
   const sourceHealth = $("#sourceHealth");
   const sitePills = $("#sitePills");
@@ -66,7 +70,7 @@
       render();
     } catch (err) {
       console.error("Failed to load data:", err);
-      policyList.innerHTML = '<p style="color:var(--text-dim);padding:2rem;">数据加载中，请稍候...</p>';
+      overallList.innerHTML = '<p style="color:var(--text-dim);padding:2rem;">数据加载中，请稍候...</p>';
     }
   }
 
@@ -79,7 +83,7 @@
 
     stats.innerHTML = [
       `<span class="stat-item">📡 <strong>${siteCount}</strong> 个源</span>`,
-      `<span class="stat-item">🟢 <strong>${totalGreen}</strong> 条政策信号</span>`,
+      `<span class="stat-item">🟢 <strong>${totalGreen}</strong> 条动态</span>`,
       `<span class="stat-item">✅ ${success} 正常</span>`,
       failed > 0 ? `<span class="stat-item" style="color:#f87171">⚠️ ${failed} 异常</span>` : "",
     ].join("");
@@ -140,9 +144,6 @@
     if (selectedSite) {
       items = items.filter(i => i.site_id === selectedSite);
     }
-    if (currentLevel) {
-      items = items.filter(i => (i.score_level || "") === currentLevel);
-    }
     // Sort: by score (desc) or by time (desc)
     items.sort((a, b) => {
       if (currentSort === "score") {
@@ -159,14 +160,9 @@
     const source = currentMode === "green" ? greenItems : allItems;
     const filtered = filterItems(source);
 
-    const policyItems = filtered.filter(i => (i.library || "policy") === "policy");
-    const mediaItems = filtered.filter(i => (i.library || "policy") === "media");
-
-    policyCount.textContent = `${policyItems.length} 条`;
-    mediaCount.textContent = `${mediaItems.length} 条`;
-    modeHint.textContent = currentMode === "green" ? "绿色政策" : "全量";
+    modeHint.textContent = currentMode === "green" ? "绿色动态" : "全量";
     advancedSummary.textContent = currentMode === "green"
-      ? `绿色政策 ${greenItems.length} 条 / 全量 ${allItems.length} 条`
+      ? `绿色动态 ${greenItems.length} 条 / 全量 ${allItems.length} 条`
       : `全量 ${allItems.length} 条`;
 
     // Populate site select
@@ -182,8 +178,16 @@
       `<option value="${id}" ${selectedSite === id ? "selected" : ""}>${name}</option>`
     ).join("");
 
-    renderList(policyList, policyItems, "暂无官方政策信号");
-    renderList(mediaList, mediaItems, "暂无媒体新闻");
+    // 综合榜：Top N
+    overallCount.textContent = `${filtered.length} 条`;
+    renderList(overallList, filtered.slice(0, OVERALL_LIMIT), "暂无动态");
+
+    // 四维榜
+    DIMS.forEach(dim => {
+      const dimItems = filtered.filter(i => (i.dimension || "政策") === dim.key);
+      document.getElementById(dim.countId).textContent = `${dimItems.length} 条`;
+      renderList(document.getElementById(dim.id), dimItems.slice(0, dim.limit), "暂无动态");
+    });
   }
 
   function renderList(container, items, emptyText) {
@@ -207,6 +211,13 @@
       badge.title = score
         ? `综合 ${score} 分（${level}级）\n来源权威 ${bd.source} + 政策类型 ${bd.type} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
         : "暂无评分";
+
+      // 四维标签
+      const dimTag = card.querySelector(".dim-tag");
+      const dim = item.dimension || "政策";
+      dimTag.textContent = dim;
+      dimTag.classList.add(`dim-${dim}`);
+
       card.querySelector(".site").textContent = item.site_name || item.site_id;
       const timeEl = card.querySelector(".time");
       const timeTxt = formatTime(item.published_at);
@@ -239,17 +250,6 @@
 
     container.appendChild(frag);
   }
-
-  // ── Collapse columns ───────────────────────────────────────────────────────
-  document.querySelectorAll(".col-toggle").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const body = document.getElementById(btn.dataset.target);
-      const expanded = body.style.display !== "none";
-      body.style.display = expanded ? "none" : "";
-      btn.textContent = expanded ? "展开" : "收起";
-      btn.setAttribute("aria-expanded", String(!expanded));
-    });
-  });
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   function formatAbsolute(d) {
@@ -296,7 +296,7 @@
   modeGreenBtn.addEventListener("click", () => setMode("green", modeGreenBtn, modeAllBtn));
   modeAllBtn.addEventListener("click", () => setMode("all", modeAllBtn, modeGreenBtn));
 
-  // ── Score sorting & level filter ──────────────────────────────────────────
+  // ── Sort ───────────────────────────────────────────────────────────────────
   function setSort(sort, activeBtn, otherBtn) {
     currentSort = sort;
     activeBtn.classList.add("active");
@@ -305,15 +305,6 @@
   }
   sortScoreBtn.addEventListener("click", () => setSort("score", sortScoreBtn, sortTimeBtn));
   sortTimeBtn.addEventListener("click", () => setSort("time", sortTimeBtn, sortScoreBtn));
-
-  levelSwitch.querySelectorAll(".level-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      currentLevel = btn.dataset.level || "";
-      levelSwitch.querySelectorAll(".level-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      render();
-    });
-  });
 
   // ── Init ───────────────────────────────────────────────────────────────────
   loadData();

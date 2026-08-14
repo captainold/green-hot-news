@@ -166,6 +166,56 @@ body {
 .score-badge.lv-D { background: #374151; color: #9ca3af; }      /* 暗灰：低 */
 .score-badge.lv-none { background: var(--bg-surface); color: var(--text-dim); }
 
+/* ── Boards (2026-08-14 综合榜+四维榜布局) ─────────────── */
+.board {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  min-width: 0;
+}
+.board-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.board-title { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.board-icon { font-size: 1.05rem; }
+.board-title h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
+.board-sub { font-size: .68rem; color: var(--text-dim); }
+.board-count { font-size: .75rem; color: var(--green-400); font-weight: 600; }
+.board-body { padding: .5rem; }
+
+/* 综合榜：全宽，稍强调 */
+.board-overall { border-color: var(--green-800); }
+.board-overall .board-head { border-left: 3px solid #f59e0b; }
+
+/* 四维榜：2×2 grid */
+.dim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+.dim-board .board-head { border-left: 3px solid var(--green-600); }
+.dim-board[data-dim="技术"] .board-head { border-left-color: #3b82f6; }
+.dim-board[data-dim="金融"] .board-head { border-left-color: #f59e0b; }
+.dim-board[data-dim="AI科技"] .board-head { border-left-color: #a855f7; }
+
+/* 四维标签 */
+.dim-tag {
+  flex-shrink: 0; font-size: .65rem; font-weight: 600;
+  padding: .05rem .4rem; border-radius: 4px;
+  background: var(--bg-surface); color: var(--text-muted);
+  border: 1px solid var(--border-light);
+}
+.dim-tag.dim-政策 { color: #86efac; border-color: var(--green-700); }
+.dim-tag.dim-技术 { color: #93c5fd; border-color: #1d4ed8; }
+.dim-tag.dim-金融 { color: #fcd34d; border-color: #b45309; }
+.dim-tag.dim-AI科技 { color: #d8b4fe; border-color: #7e22ce; }
+
 /* ── News list ────────────────────────────────────────── */
 /* 双栏布局（2026-08-14）：官方新闻 ｜ 媒体新闻 */
 .dual-list {
@@ -275,6 +325,6 @@ body {
   .shell { padding: 1rem; }
   .primary-controls { flex-direction: column; }
   .advanced-controls { flex-direction: column; align-items: flex-start; }
-  /* 移动端双栏堆叠 */
-  .dual-list { grid-template-columns: 1fr; }
+  /* 移动端四维榜堆叠 */
+  .dim-grid { grid-template-columns: 1fr; }
 }

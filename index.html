@@ -19,7 +19,7 @@
             </div>
           </div>
           <p class="hero-sub">
-            国内外最新绿色低碳政策动态 · 官方新闻与媒体评论双栏展示
+            政策 · 技术 · 金融 · AI科技 四维覆盖 · 评分排行榜
           </p>
         </div>
         <div class="hero-meta">
@@ -31,29 +31,72 @@
       </header>
 
       <section class="primary-controls">
-        <input id="searchInput" type="search" placeholder="搜索政策信号 / 来源 / 关键词" />
-        <div class="mode-hint" id="modeHint">绿色政策</div>
+        <input id="searchInput" type="search" placeholder="搜索动态 / 来源 / 关键词" />
+        <div class="mode-hint" id="modeHint">绿色动态</div>
       </section>
 
-      <section class="score-bar" id="scoreBar">
-        <div class="score-bar-left">
-          <span class="score-bar-label">分数徽章</span>
-          <div class="level-switch" id="levelSwitch">
-            <button class="level-btn active" data-level="" type="button">全部</button>
-            <button class="level-btn" data-level="S" type="button">S</button>
-            <button class="level-btn" data-level="A" type="button">A</button>
-            <button class="level-btn" data-level="B" type="button">B</button>
-            <button class="level-btn" data-level="C" type="button">C</button>
-            <button class="level-btn" data-level="D" type="button">D</button>
+      <!-- 综合评分排行榜 -->
+      <section class="board board-overall">
+        <div class="board-head">
+          <div class="board-title">
+            <span class="board-icon">🏆</span>
+            <h2>综合评分排行榜</h2>
+            <span class="board-sub" id="overallSub">全维度 · 按综合分</span>
           </div>
+          <span class="board-count" id="overallCount">0 条</span>
         </div>
-        <div class="score-bar-right">
-          <span class="score-bar-label">排序</span>
-          <div class="mode-switch">
-            <button id="sortScoreBtn" class="mode-btn active" type="button">按分数</button>
-            <button id="sortTimeBtn" class="mode-btn" type="button">按时间</button>
+        <div class="board-body" id="overallList"></div>
+      </section>
+
+      <!-- 四维排行榜 -->
+      <section class="dim-grid">
+        <section class="board dim-board" data-dim="政策">
+          <div class="board-head">
+            <div class="board-title">
+              <span class="board-icon">🏛️</span>
+              <h2>政策榜</h2>
+              <span class="board-sub">部委 · 国际组织 · 官方解读</span>
+            </div>
+            <span class="board-count" id="policyCount">0 条</span>
           </div>
-        </div>
+          <div class="board-body" id="policyList"></div>
+        </section>
+
+        <section class="board dim-board" data-dim="技术">
+          <div class="board-head">
+            <div class="board-title">
+              <span class="board-icon">🔋</span>
+              <h2>技术榜</h2>
+              <span class="board-sub">储能 · 氢能 · 光伏 · CCUS</span>
+            </div>
+            <span class="board-count" id="techCount">0 条</span>
+          </div>
+          <div class="board-body" id="techList"></div>
+        </section>
+
+        <section class="board dim-board" data-dim="金融">
+          <div class="board-head">
+            <div class="board-title">
+              <span class="board-icon">💰</span>
+              <h2>金融榜</h2>
+              <span class="board-sub">碳市场 · 碳价 · 绿色金融</span>
+            </div>
+            <span class="board-count" id="finCount">0 条</span>
+          </div>
+          <div class="board-body" id="finList"></div>
+        </section>
+
+        <section class="board dim-board" data-dim="AI科技">
+          <div class="board-head">
+            <div class="board-title">
+              <span class="board-icon">🤖</span>
+              <h2>AI科技榜</h2>
+              <span class="board-sub">AI×能碳 · 智能电网 · 数智化</span>
+            </div>
+            <span class="board-count" id="aiCount">0 条</span>
+          </div>
+          <div class="board-body" id="aiList"></div>
+        </section>
       </section>
 
       <details class="advanced-panel">
@@ -72,8 +115,15 @@
             <div class="field">
               <span>视图</span>
               <div class="mode-switch">
-                <button id="modeGreenBtn" class="mode-btn active" type="button">绿色政策</button>
+                <button id="modeGreenBtn" class="mode-btn active" type="button">绿色动态</button>
                 <button id="modeAllBtn" class="mode-btn" type="button">全量</button>
+              </div>
+            </div>
+            <div class="field">
+              <span>排序</span>
+              <div class="mode-switch">
+                <button id="sortScoreBtn" class="mode-btn active" type="button">按分数</button>
+                <button id="sortTimeBtn" class="mode-btn" type="button">按时间</button>
               </div>
             </div>
           </div>
@@ -81,45 +131,13 @@
           <section class="site-pills" id="sitePills"></section>
         </div>
       </details>
-
-      <!-- 双栏：官方新闻（政策库）｜媒体新闻（媒体库） -->
-      <section class="dual-list">
-        <section class="col col-policy">
-          <div class="col-head">
-            <div class="col-title">
-              <span class="col-icon">🏛️</span>
-              <h2>官方新闻</h2>
-              <span class="col-sub">政府 · 国际组织 · 官方解读</span>
-            </div>
-            <div class="col-meta">
-              <span class="col-count" id="policyCount">0 条</span>
-              <button class="col-toggle" type="button" data-target="policyList" aria-expanded="true">收起</button>
-            </div>
-          </div>
-          <div class="col-body" id="policyList"></div>
-        </section>
-
-        <section class="col col-media">
-          <div class="col-head">
-            <div class="col-title">
-              <span class="col-icon">📰</span>
-              <h2>媒体新闻</h2>
-              <span class="col-sub">报刊 · 公众号 · 全网热点</span>
-            </div>
-            <div class="col-meta">
-              <span class="col-count" id="mediaCount">0 条</span>
-              <button class="col-toggle" type="button" data-target="mediaList" aria-expanded="true">收起</button>
-            </div>
-          </div>
-          <div class="col-body" id="mediaList"></div>
-        </section>
-      </section>
     </main>
 
     <template id="itemTpl">
       <article class="news-card">
         <div class="card-top">
           <span class="score-badge" title=""></span>
+          <span class="dim-tag" title="四维分类"></span>
           <div class="meta-row">
             <span class="site"></span>
             <time class="time"></time>

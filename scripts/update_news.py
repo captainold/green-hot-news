@@ -1148,6 +1148,62 @@ def score_item(site_id: str, title: str, summary: str, people: list[str],
     }
 
 
+# ── 四维分类（2026-08-14 主题定位：政策/技术/金融/AI科技） ─────────────────────
+# 优先级：AI科技 > 金融 > 技术 > 政策。
+# PITFALL: AI 判定只用标题（摘要常含反爬水印 "t a np ai fan g.com" 的 "ai "，
+# 2026-08-14 实测误判"走进零碳园区"为 AI科技）且用词边界正则。
+AI_DIM_KW = [
+    "人工智能", "大模型", "机器学习", "智能电网", "数字孪生", "碳监测",
+    "能碳", "智算", "算法", "机器人", "无人机", "卫星", "自动驾驶",
+    "artificial intelligence", "machine learning", "smart grid",
+    "robot", "autonomous", "drone", "satellite",
+]
+AI_TITLE_RE = r"\bai\b"  # 标题级英文 AI（词边界，防 "tail" "said" 误报）
+FINANCE_DIM_KW = [
+    "碳市场", "碳交易", "碳价", "碳配额", "碳关税", "CBAM", "CCER",
+    "ESG", "绿色金融", "碳金融", "债券", "融资", "投资", "基金", "期货",
+    "收购", "并购", "IPO", "股价", "碳资产", "绿色债券", "成交",
+    "carbon market", "carbon price", "carbon trading", "ETS",
+    "green bond", "finance", "investment", "fund",
+]
+TECH_DIM_KW = [
+    "储能", "氢能", "光伏", "风电", "电池", "CCUS", "碳捕集", "技术",
+    "研发", "突破", "材料", "工艺", "装备", "光热", "绿氢", "甲醇",
+    "甲烷", "负排放", "DAC", "BECCS", "生物炭", "核能", "生物质",
+    "solar", "wind", "battery", "hydrogen", "storage", "technology",
+    "carbon capture", "renewable", "nuclear",
+]
+POLICY_DIM_KW = [
+    "印发", "通知", "意见", "规划", "方案", "条例", "办法", "公告",
+    "发布会", "答记者问", "解读", "一图读懂", "政策", "文件", "国务院",
+    "十五五", "碳达峰", "碳中和", "双碳", "目标", "标准", "规范",
+    "法规", "实施", "行动方案", "指导意见", "政策文件", "政策解读",
+]
+
+
+def categorize_dimension(site_id: str, title: str, summary: str, library: str) -> str:
+    """四维分类：AI科技 > 金融 > 技术 > 政策。"""
+    import re as _dim_re
+    title_l = (title or "").lower()
+    text = f"{title or ''} {summary or ''}".lower()
+    # AI 判定：标题关键词 + 标题级英文 AI 词边界
+    if any(kw.lower() in title_l for kw in AI_DIM_KW) or _dim_re.search(AI_TITLE_RE, title_l):
+        return "AI科技"
+    for kw in FINANCE_DIM_KW:
+        if kw.lower() in text:
+            return "金融"
+    for kw in TECH_DIM_KW:
+        if kw.lower() in text:
+            return "技术"
+    # 政策库（官方原文）默认政策；媒体库看关键词
+    if library == "policy":
+        return "政策"
+    for kw in POLICY_DIM_KW:
+        if kw.lower() in text:
+            return "政策"
+    return "技术"  # 兜底：媒体库行业动态归技术
+
+
 # ── Policy relevance filter ──────────────────────────────────────────────────
 POLICY_KEYWORDS = [
     # Chinese
@@ -1445,6 +1501,13 @@ def main() -> int:
         rec.update(scoring)
         if people:
             rec["people"] = people
+        # 四维分类（2026-08-14）：政策/技术/金融/AI科技
+        rec["dimension"] = categorize_dimension(
+            rec.get("site_id", ""),
+            rec.get("title", ""),
+            rec.get("summary", ""),
+            rec.get("library", "media"),
+        )
 
     # Persist the url→published map so CI runs can reuse it
     if archived_pub:
