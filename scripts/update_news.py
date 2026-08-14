@@ -1628,6 +1628,13 @@ GREEN_SITES = {
     "us_noaa", "us_eia", "us_ferc", "us_carb", "jp_moe", "jp_meti", "jp_anre",
 }
 
+# 国外官方政策源（2026-08-14）：更新频率低（周级），网站数据用 7 天宽窗口过滤
+FOREIGN_GOV_SITES = {
+    "us_epa", "us_doe", "us_noaa", "us_eia", "us_ferc", "us_carb",
+    "eu_commission", "euractiv", "india_pib",
+    "jp_moe", "jp_meti", "jp_anre",
+}
+
 # AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
 # 不加入 GREEN_SITES（那里是绿色政策源），单独一组放行
 AI_SITES = {
@@ -1892,9 +1899,14 @@ def main() -> int:
             green_items.append(record)
 
     # 24h window filter for web output
+    # 国外官方源更新频率低（周级）→ 用 7 天宽窗口，否则 96h 窗口常滤空
+    # （2026-08-14：CARB 最新 08-07 / 环境省 08-07 / 资源能源厅 08-10 曾被 96h 滤掉）
     window_start = now - timedelta(hours=args.window_hours)
+    foreign_win = now - timedelta(hours=7 * 24)
     all_items_24h = [r for r in all_items if not r.get("published_at") or parse_iso(r["published_at"]) is None or parse_iso(r["published_at"]) >= window_start]
-    green_items_24h = [r for r in green_items if not r.get("published_at") or parse_iso(r["published_at"]) is None or parse_iso(r["published_at"]) >= window_start]
+    green_items_24h = [r for r in green_items
+                       if not r.get("published_at") or parse_iso(r["published_at"]) is None
+                       or parse_iso(r["published_at"]) >= (foreign_win if r.get("site_id") in FOREIGN_GOV_SITES else window_start)]
 
     # Sort
     def sort_key(r: dict) -> str:
