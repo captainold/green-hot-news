@@ -209,7 +209,7 @@
       badge.classList.add(`lv-${level || "none"}`);
       const bd = item.score_breakdown || {};
       badge.title = score
-        ? `综合 ${score} 分（${level}级）\n来源权威 ${bd.source} + 政策类型 ${bd.type} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
+        ? `综合 ${score} 分（${level}级）\n来源权威 ${bd.source} + 内容强度 ${bd.strength} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
         : "暂无评分";
 
       // 四维标签

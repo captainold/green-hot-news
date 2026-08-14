@@ -1009,35 +1009,79 @@ def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> 
     return items
 
 
-# ── Scoring system (2026-08-14) ───────────────────────────────────────────────
-# 打分体系 v1.0：五维加权，0-100 分，代表"老温品味"——官方权威优先、政策文件优先、
-# 核心议题优先、关键人物加分、新鲜度加分。
-#   来源权威 30 + 政策类型 25 + 主题相关 25 + 人物 10 + 时效 10
+# ── Scoring system v2.0 (2026-08-14 四维定位重设计) ──────────────────────────
+# 打分体系 v2.0：四维自适应，0-100 分。
+# 与 v1.0 的关键差异：
+#   v1.0 的"政策类型"只认政策文件（技术/AI/金融内容全卡行业动态 8 分，被压分）
+#   v2.0 改为"内容强度"，按 政策/技术/金融/AI科技 各自的关键词档位计分
+#   来源权威上限 30→25（防止政策源碾压，四维公平竞争）
+# 权重：内容强度 30 + 来源权威 25 + 主题相关 25 + 人物 10 + 时效 10
 # 等级: S(85+) / A(70+) / B(55+) / C(40+) / D(<40)
 
-# 1) 来源权威分（site_id → 0-30）
+# 1) 内容强度分（按维度自适应，0-30）——每维度按关键词从高到低取第一档
+#    结构: {dimension: [(score, [keywords]), ...]}，末尾 () 为默认档
+CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
+    "政策": [
+        (30, ["印发", "通知", "意见", "条例", "办法", "规划", "方案", "公告",
+              "答记者问", "政策文件", "发布", "国务院"]),
+        (25, ["解读", "一图读懂", "新闻发布会", "吹风会"]),
+        (20, ["报告", "数据", "统计", "年报", "季报"]),
+        (10, []),
+    ],
+    "技术": [
+        (30, ["突破", "首次", "首发", "成功", "世界首个", "全球首个", "里程碑",
+              "实现", "投产", "并网", "交付", "建成"]),
+        (20, ["进展", "研发", "上线", "落地", "试点", "示范", "应用", "试验",
+              "回收", "产量", "扩产", "测试", "验证", "升级", "改造", "效率",
+              "recycle", "yield", "output", "test", "upgrade", "efficiency"]),
+        (10, []),
+    ],
+    "金融": [
+        (30, ["扩围", "大涨", "突破", "新高", "首次", "创纪录", "启动", "成交",
+              "破", "亿元", "覆盖"]),
+        (20, ["价格", "指数", "报告", "数据", "融资", "投资", "交易", "配额"]),
+        (8, []),
+    ],
+    "AI科技": [
+        (30, ["落地", "应用", "发布", "大模型", "智能体", "突破", "首发",
+              "平台", "上线", "部署", "启用"]),
+        (20, ["研究", "方法", "评估", "预测", "优化", "监测", "算法", "模型",
+              "adaptation", "response", "pathway", "framework", "system",
+              "tool", "dataset", "workshop", "grant"]),
+        (8, []),
+    ],
+}
+DEFAULT_STRENGTH = 8
+
+
+def score_content_strength(dimension: str, title: str, summary: str) -> int:
+    """内容强度分：按维度关键词档位，从高到低取第一命中档。"""
+    text = f"{title or ''} {summary or ''}"
+    rules = CONTENT_STRENGTH_RULES.get(dimension, CONTENT_STRENGTH_RULES["政策"])
+    for score, kws in rules:
+        if any(kw in text for kw in kws):
+            return score
+    return DEFAULT_STRENGTH
+
+
+# 2) 来源权威分（site_id → 0-25，v2.0 上限从 30 压缩）
 SOURCE_SCORE: dict[str, int] = {
     # 部委官方
-    "ndrc": 30, "mee": 30, "nea": 30, "miit": 30,
+    "ndrc": 25, "mee": 25, "nea": 25, "miit": 25,
     # 官方解读（部委网站发布的专家解读）
-    "mee_jiedu": 28,
+    "mee_jiedu": 23,
     # 国际组织
-    "iea": 28, "irena": 28, "unfccc": 28, "worldbank": 28,
-    # 专业政策媒体
-    "tanpaifang": 20, "ideacarbon": 20, "carbonbrief": 20,
+    "iea": 22, "irena": 22, "unfccc": 22, "worldbank": 22,
+    # 专业政策/碳媒体 + AI×气候专业
+    "tanpaifang": 18, "ideacarbon": 18, "carbonbrief": 18, "ccai": 18,
+    # 绿色科技媒体
+    "stdaily": 16, "cleantechnica": 16,
     # 行业媒体
-    "chinaenergy": 15, "bjx": 15, "reuters": 15,
-    # 绿色科技/AI（2026-08-14 新增）
-    "ccai": 18, "stdaily": 16, "cleantechnica": 16,
+    "chinaenergy": 13, "bjx": 13, "reuters": 13,
     # 全网热榜
-    "allnet": 10,
+    "allnet": 8,
 }
-DEFAULT_SOURCE_SCORE = 12
-
-# 2) 政策类型分（auto_tag 的 POLICY_TYPE_RULES 结果 → 0-25）
-TYPE_SCORE: dict[str, int] = {
-    "政策文件": 25, "政策解读": 20, "新闻发布会": 15, "数据报告": 15, "行业动态": 8,
-}
+DEFAULT_SOURCE_SCORE = 10
 
 # 3) 主题相关分：标题+摘要命中关键词，分级取最高档
 CORE_TOPIC_KW = [  # 核心议题（25 分）
@@ -1117,13 +1161,14 @@ def score_freshness(published_at: str, now: datetime) -> int:
 
 
 def score_item(site_id: str, title: str, summary: str, people: list[str],
-               published_at: str, now: datetime) -> dict[str, Any]:
-    """五维打分 → {'score': 0-100, 'score_level': S/A/B/C/D, 'type_score': int, ...}"""
+               published_at: str, now: datetime, dimension: str = "政策") -> dict[str, Any]:
+    """五维打分（v2.0）→ {'score': 0-100, 'score_level': S/A/B/C/D, 'strength': int, ...}
+
+    内容强度按 dimension 自适应（政策/技术/金融/AI科技 各自关键词档位），
+    替代 v1.0 只认政策文件的"政策类型"分。
+    """
     src = SOURCE_SCORE.get(site_id, DEFAULT_SOURCE_SCORE)
-    tags = auto_tag(title, site_id)
-    # 政策类型：取 auto_tag 输出的最后一个（POLICY_TYPE_RULES 追加在末尾）
-    ptype = tags[-1] if tags else "行业动态"
-    tscore = TYPE_SCORE.get(ptype, 8)
+    tscore = score_content_strength(dimension, title, summary)
     top = score_topic(title, summary)
     pscore = score_people(people)
     fscore = score_freshness(published_at, now)
@@ -1142,7 +1187,7 @@ def score_item(site_id: str, title: str, summary: str, people: list[str],
         "score": total,
         "score_level": level,
         "score_breakdown": {
-            "source": src, "type": tscore, "topic": top,
+            "source": src, "strength": tscore, "topic": top,
             "people": pscore, "freshness": fscore,
         },
     }
@@ -1488,7 +1533,15 @@ def main() -> int:
                 rec["time_source"] = "scraped"
         else:
             rec["time_source"] = "published"
-        # 打分体系（2026-08-14）：五维加权，写入 score / score_level / score_breakdown
+        # 四维分类（2026-08-14）：政策/技术/金融/AI科技
+        dimension = categorize_dimension(
+            rec.get("site_id", ""),
+            rec.get("title", ""),
+            rec.get("summary", ""),
+            rec.get("library", "media"),
+        )
+        rec["dimension"] = dimension
+        # 打分体系 v2.0（2026-08-14）：内容强度按维度自适应
         people = extract_people(rec.get("title", ""), rec.get("summary", ""), "")
         scoring = score_item(
             rec.get("site_id", ""),
@@ -1497,17 +1550,11 @@ def main() -> int:
             people,
             rec.get("published_at", ""),
             now,
+            dimension,
         )
         rec.update(scoring)
         if people:
             rec["people"] = people
-        # 四维分类（2026-08-14）：政策/技术/金融/AI科技
-        rec["dimension"] = categorize_dimension(
-            rec.get("site_id", ""),
-            rec.get("title", ""),
-            rec.get("summary", ""),
-            rec.get("library", "media"),
-        )
 
     # Persist the url→published map so CI runs can reuse it
     if archived_pub:
