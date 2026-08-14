@@ -11,6 +11,8 @@
   let searchQuery = "";
   let selectedSite = "";
   let currentMode = "green"; // "green" | "all"
+  let currentLevel = ""; // "" | S | A | B | C | D
+  let currentSort = "score"; // "score" | "time"
 
   // ── Dom refs ───────────────────────────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
@@ -25,6 +27,9 @@
   const modeGreenBtn = $("#modeGreenBtn");
   const modeAllBtn = $("#modeAllBtn");
   const modeHint = $("#modeHint");
+  const sortScoreBtn = $("#sortScoreBtn");
+  const sortTimeBtn = $("#sortTimeBtn");
+  const levelSwitch = $("#levelSwitch");
   const advancedSummary = $("#advancedSummary");
   const sourceHealth = $("#sourceHealth");
   const sitePills = $("#sitePills");
@@ -135,6 +140,17 @@
     if (selectedSite) {
       items = items.filter(i => i.site_id === selectedSite);
     }
+    if (currentLevel) {
+      items = items.filter(i => (i.score_level || "") === currentLevel);
+    }
+    // Sort: by score (desc) or by time (desc)
+    items.sort((a, b) => {
+      if (currentSort === "score") {
+        const sa = a.score || 0, sb = b.score || 0;
+        if (sa !== sb) return sb - sa;
+      }
+      return String(b.published_at || "").localeCompare(String(a.published_at || ""));
+    });
     return items;
   }
 
@@ -181,6 +197,16 @@
 
     items.forEach(item => {
       const card = itemTpl.content.cloneNode(true);
+      // 分数徽章（News Minimalist 风格）
+      const badge = card.querySelector(".score-badge");
+      const score = item.score || 0;
+      const level = item.score_level || "";
+      badge.textContent = score ? `${level}${score}` : "—";
+      badge.classList.add(`lv-${level || "none"}`);
+      const bd = item.score_breakdown || {};
+      badge.title = score
+        ? `综合 ${score} 分（${level}级）\n来源权威 ${bd.source} + 政策类型 ${bd.type} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
+        : "暂无评分";
       card.querySelector(".site").textContent = item.site_name || item.site_id;
       const timeEl = card.querySelector(".time");
       const timeTxt = formatTime(item.published_at);
@@ -269,6 +295,25 @@
   }
   modeGreenBtn.addEventListener("click", () => setMode("green", modeGreenBtn, modeAllBtn));
   modeAllBtn.addEventListener("click", () => setMode("all", modeAllBtn, modeGreenBtn));
+
+  // ── Score sorting & level filter ──────────────────────────────────────────
+  function setSort(sort, activeBtn, otherBtn) {
+    currentSort = sort;
+    activeBtn.classList.add("active");
+    otherBtn.classList.remove("active");
+    render();
+  }
+  sortScoreBtn.addEventListener("click", () => setSort("score", sortScoreBtn, sortTimeBtn));
+  sortTimeBtn.addEventListener("click", () => setSort("time", sortTimeBtn, sortScoreBtn));
+
+  levelSwitch.querySelectorAll(".level-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentLevel = btn.dataset.level || "";
+      levelSwitch.querySelectorAll(".level-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      render();
+    });
+  });
 
   // ── Init ───────────────────────────────────────────────────────────────────
   loadData();

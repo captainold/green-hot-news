@@ -35,6 +35,27 @@
         <div class="mode-hint" id="modeHint">绿色政策</div>
       </section>
 
+      <section class="score-bar" id="scoreBar">
+        <div class="score-bar-left">
+          <span class="score-bar-label">分数徽章</span>
+          <div class="level-switch" id="levelSwitch">
+            <button class="level-btn active" data-level="" type="button">全部</button>
+            <button class="level-btn" data-level="S" type="button">S</button>
+            <button class="level-btn" data-level="A" type="button">A</button>
+            <button class="level-btn" data-level="B" type="button">B</button>
+            <button class="level-btn" data-level="C" type="button">C</button>
+            <button class="level-btn" data-level="D" type="button">D</button>
+          </div>
+        </div>
+        <div class="score-bar-right">
+          <span class="score-bar-label">排序</span>
+          <div class="mode-switch">
+            <button id="sortScoreBtn" class="mode-btn active" type="button">按分数</button>
+            <button id="sortTimeBtn" class="mode-btn" type="button">按时间</button>
+          </div>
+        </div>
+      </section>
+
       <details class="advanced-panel">
         <summary>
           <span>高级筛选与源状态</span>
@@ -97,9 +118,12 @@
 
     <template id="itemTpl">
       <article class="news-card">
-        <div class="meta-row">
-          <span class="site"></span>
-          <time class="time"></time>
+        <div class="card-top">
+          <span class="score-badge" title=""></span>
+          <div class="meta-row">
+            <span class="site"></span>
+            <time class="time"></time>
+          </div>
         </div>
         <a class="title" target="_blank" rel="noopener noreferrer"></a>
         <button class="summary-toggle" type="button" hidden>摘要</button>

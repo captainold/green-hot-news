@@ -872,6 +872,140 @@ def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> 
     return items
 
 
+# ── Scoring system (2026-08-14) ───────────────────────────────────────────────
+# 打分体系 v1.0：五维加权，0-100 分，代表"老温品味"——官方权威优先、政策文件优先、
+# 核心议题优先、关键人物加分、新鲜度加分。
+#   来源权威 30 + 政策类型 25 + 主题相关 25 + 人物 10 + 时效 10
+# 等级: S(85+) / A(70+) / B(55+) / C(40+) / D(<40)
+
+# 1) 来源权威分（site_id → 0-30）
+SOURCE_SCORE: dict[str, int] = {
+    # 部委官方
+    "ndrc": 30, "mee": 30, "nea": 30, "miit": 30,
+    # 官方解读（部委网站发布的专家解读）
+    "mee_jiedu": 28,
+    # 国际组织
+    "iea": 28, "irena": 28, "unfccc": 28, "worldbank": 28,
+    # 专业政策媒体
+    "tanpaifang": 20, "ideacarbon": 20, "carbonbrief": 20,
+    # 行业媒体
+    "chinaenergy": 15, "bjx": 15, "reuters": 15,
+    # 全网热榜
+    "allnet": 10,
+}
+DEFAULT_SOURCE_SCORE = 12
+
+# 2) 政策类型分（auto_tag 的 POLICY_TYPE_RULES 结果 → 0-25）
+TYPE_SCORE: dict[str, int] = {
+    "政策文件": 25, "政策解读": 20, "新闻发布会": 15, "数据报告": 15, "行业动态": 8,
+}
+
+# 3) 主题相关分：标题+摘要命中关键词，分级取最高档
+CORE_TOPIC_KW = [  # 核心议题（25 分）
+    "碳市场", "碳交易", "CCER", "CBAM", "碳关税", "碳价", "碳排放权",
+    "双碳", "碳中和", "碳达峰", "碳足迹", "碳普惠", "碳配额",
+    "carbon market", "carbon price", "carbon border", "emissions trading",
+    "net zero", "net-zero", "ETS",
+]
+IMPORTANT_TOPIC_KW = [  # 重要议题（18 分）
+    "新能源", "储能", "氢能", "光伏", "风电", "新型电力系统", "电力市场",
+    "绿电", "零碳", "CCUS", "碳捕集", "绿色金融", "ESG", "循环经济",
+    "电动车", "电动汽车", "renewable", "solar", "wind", "hydrogen",
+    "battery", "energy storage", "electric vehicle",
+]
+GENERAL_TOPIC_KW = [  # 一般议题（12 分）
+    "节能", "环保", "气候", "绿色", "低碳", "减排", "污染防治",
+    "生态环境", "能源转型", "电力", "煤炭", "天然气", "成品油",
+    "climate", "green", "emission", "decarbon", "sustainable",
+    "environment", "energy transition", "coal",
+]
+
+
+def score_topic(title: str, summary: str = "") -> int:
+    """主题相关分：命中最高档关键词即得该档分。"""
+    text = f"{title or ''} {summary or ''}".lower()
+    for kw in CORE_TOPIC_KW:
+        if kw.lower() in text:
+            return 25
+    for kw in IMPORTANT_TOPIC_KW:
+        if kw.lower() in text:
+            return 18
+    for kw in GENERAL_TOPIC_KW:
+        if kw.lower() in text:
+            return 12
+    return 6
+
+
+# 4) 人物分（PERSON_RULES 职务级别 → 0-10，取最高分人物）
+def score_people(people: list[str]) -> int:
+    """人物分：部长/主任级 10，副主任级 7，专家 5，分析师 3。"""
+    if not people:
+        return 0
+    best = 0
+    for name in people:
+        role = person_role(name)
+        if any(k in role for k in ["部长", "主任", "党组书记", "局长"]):
+            best = max(best, 10)
+        elif any(k in role for k in ["副主任", "副部长", "副局长"]):
+            best = max(best, 7)
+        elif any(k in role for k in ["院长", "教授", "理事长", "所长"]):
+            best = max(best, 5)
+        elif any(k in role for k in ["分析师", "首席"]):
+            best = max(best, 3)
+    return best
+
+
+def score_freshness(published_at: str, now: datetime) -> int:
+    """时效分：24h 内 10，48h 8，72h 6，96h 4，更久 2。无时间 0。"""
+    dt = parse_iso(published_at)
+    if not dt:
+        return 0
+    hours = (now - dt).total_seconds() / 3600
+    if hours < 0:
+        return 10  # 未来时间按最新算
+    if hours < 24:
+        return 10
+    if hours < 48:
+        return 8
+    if hours < 72:
+        return 6
+    if hours < 96:
+        return 4
+    return 2
+
+
+def score_item(site_id: str, title: str, summary: str, people: list[str],
+               published_at: str, now: datetime) -> dict[str, Any]:
+    """五维打分 → {'score': 0-100, 'score_level': S/A/B/C/D, 'type_score': int, ...}"""
+    src = SOURCE_SCORE.get(site_id, DEFAULT_SOURCE_SCORE)
+    tags = auto_tag(title, site_id)
+    # 政策类型：取 auto_tag 输出的最后一个（POLICY_TYPE_RULES 追加在末尾）
+    ptype = tags[-1] if tags else "行业动态"
+    tscore = TYPE_SCORE.get(ptype, 8)
+    top = score_topic(title, summary)
+    pscore = score_people(people)
+    fscore = score_freshness(published_at, now)
+    total = min(100, src + tscore + top + pscore + fscore)
+    if total >= 85:
+        level = "S"
+    elif total >= 70:
+        level = "A"
+    elif total >= 55:
+        level = "B"
+    elif total >= 40:
+        level = "C"
+    else:
+        level = "D"
+    return {
+        "score": total,
+        "score_level": level,
+        "score_breakdown": {
+            "source": src, "type": tscore, "topic": top,
+            "people": pscore, "freshness": fscore,
+        },
+    }
+
+
 # ── Policy relevance filter ──────────────────────────────────────────────────
 POLICY_KEYWORDS = [
     # Chinese
@@ -1146,6 +1280,19 @@ def main() -> int:
                 rec["time_source"] = "scraped"
         else:
             rec["time_source"] = "published"
+        # 打分体系（2026-08-14）：五维加权，写入 score / score_level / score_breakdown
+        people = extract_people(rec.get("title", ""), rec.get("summary", ""), "")
+        scoring = score_item(
+            rec.get("site_id", ""),
+            rec.get("title", ""),
+            rec.get("summary", ""),
+            people,
+            rec.get("published_at", ""),
+            now,
+        )
+        rec.update(scoring)
+        if people:
+            rec["people"] = people
 
     # Persist the url→published map so CI runs can reuse it
     if archived_pub:
