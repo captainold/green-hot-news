@@ -108,16 +108,17 @@ def make_item_id(site_id: str, title: str, url: str) -> str:
 
 
 # ── RSS helpers ────────────────────────────────────────────────────────────────
-def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_name: str, now: datetime, limit: int = 60) -> list[RawItem]:
+def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_name: str, now: datetime, limit: int = 60, headers: dict | None = None) -> list[RawItem]:
     """Fetch RSS/Atom feed and return RawItems.
 
     limit: 最多返回条数。OpenAI/arXiv 等 RSS 含全部历史文章（1100+ 条），
     必须限量否则 export 阶段逐条抓详情页会卡死（2026-08-14 实测 timeout）。
+    headers: 可选请求头（如 aihot 需带 aihot-api UA）。
     """
     items: list[RawItem] = []
     seen: set[tuple[str, str]] = set()
     try:
-        r = session.get(feed_url, timeout=30)
+        r = session.get(feed_url, timeout=30, headers=headers)
         r.raise_for_status()
     except Exception:
         return items
@@ -176,6 +177,25 @@ def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_
                     meta={"feed_url": feed_url},
                 ))
     return items[:limit]
+
+
+def fetch_aihot(session: requests.Session, now: datetime) -> list[RawItem]:
+    """AIHOT — AI 行业动态聚合（2026-08-14 接入）。
+
+    aihot.virxact.com 聚合 X/公众号/RSS 几十个 AI 信源，每条带热度与 AI 评分。
+    页面有 JS 反爬（__tst_status cookie 挑战），但 RSS 端点匿名可访问（文档明确
+    curl 是正式支持路径），ttl=30 恰好匹配本雷达 30 分钟抓取节奏。
+    actor 是匿名标识（非密钥，清浏览器数据会更换），按服务条款个人使用免费。
+    精选摘要 feed：最新 50 条，link 指向站内阅读页（items/xxx），正文由
+    article_content 抓站内页；站内页若被 JS 挑战挡，RSS description 摘要兜底。
+    """
+    actor = "7077622b-91da-4e53-9bbb-48f5dc5e079f"
+    return fetch_rss_feed(
+        session,
+        f"https://aihot.virxact.com/feed.xml?aihot_actor={actor}",
+        "aihot", "AIHOT", now, limit=50,
+        headers={"User-Agent": f"aihot-api/1.0 aihot-actor/{actor}"},
+    )
 
 
 def fetch_jiqizhixin(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1179,7 +1199,7 @@ SOURCE_SCORE: dict[str, int] = {
     "stdaily": 16, "cleantechnica": 16,
     # AI 领域全链条源（2026-08-14 扩充）
     "jiqizhixin": 18, "qbitai": 18, "openai": 20,
-    "venturebeat": 16, "arxiv_ai": 18,
+    "venturebeat": 16, "arxiv_ai": 18, "aihot": 18,
     # 行业媒体
     "chinaenergy": 13, "bjx": 13, "reuters": 13,
     # 全网热榜
@@ -1343,7 +1363,10 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     import re as _dim_re
     title_l = (title or "").lower()
     text = f"{title or ''} {summary or ''}".lower()
-    # AI 判定：标题关键词 + 标题级英文 AI 词边界
+    # AI 判定：AI_SITES 源全链条直通（AIHOT/机器之心等标题未必含 AI 关键词）
+    # + 标题关键词 + 标题级英文 AI 词边界
+    if site_id in AI_SITES:
+        return "AI科技"
     if any(kw.lower() in title_l for kw in AI_DIM_KW) or _dim_re.search(AI_TITLE_RE, title_l):
         return "AI科技"
     for kw in FINANCE_DIM_KW:
@@ -1398,6 +1421,7 @@ AI_SITES = {
     "openai",       # OpenAI News（模型发布一手）
     "venturebeat",  # VentureBeat AI（国际 AI 商业）
     "arxiv_ai",     # arXiv cs.AI（理论前沿）
+    "aihot",        # AIHOT（AI 行业动态聚合：模型/产品/行业/论文，带 AI 评分）
 }
 
 
@@ -1455,6 +1479,8 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
      "venturebeat", "VentureBeat AI"),
     (lambda s, n: fetch_rss_feed(s, "https://rss.arxiv.org/rss/cs.AI", "arxiv_ai", "arXiv·AI", n, limit=30),
      "arxiv_ai", "arXiv·AI"),
+    # AIHOT — AI 行业动态聚合（2026-08-14 接入；页面有 JS 反爬，RSS 端点匿名可访问）
+    (fetch_aihot, "aihot", "AIHOT"),
     # Aggregated hot boards (filtered by policy keywords)
     (fetch_allnet, "allnet", "全网热点"),
 ]
@@ -1493,6 +1519,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "openai":      ("media", ""),
     "venturebeat": ("media", ""),
     "arxiv_ai":    ("media", ""),
+    "aihot":       ("media", ""),
 }
 
 
@@ -1819,7 +1846,7 @@ SOURCE_REGION: dict[str, str] = {
     "carbonbrief": "国际",
     "cleantechnica": "国际", "ccai": "国际", "stdaily": "中国",
     "jiqizhixin": "中国", "qbitai": "中国", "openai": "国际",
-    "venturebeat": "国际", "arxiv_ai": "国际",
+    "venturebeat": "国际", "arxiv_ai": "国际", "aihot": "中国",
     "reuters": "全球",
 }
 
