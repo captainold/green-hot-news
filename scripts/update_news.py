@@ -198,6 +198,46 @@ def fetch_aihot(session: requests.Session, now: datetime) -> list[RawItem]:
     )
 
 
+def fetch_radarai(session: requests.Session, now: datetime) -> list[RawItem]:
+    """RadarAI·GitHub趋势 — 开源项目热度追踪（radarai.top/trends）。
+
+    radarai.top 聚合 GitHub Trending 开源项目（中文摘要 + star 数），
+    /api/trends 返回干净 JSON（count=1052，无分页参数生效 → 代码内取前 40 条，
+    即 GitHub 日榜 stars 排序的头部项目，作为技术风向标）。
+    热榜条目无发布时间 → published_at=None 走收录时间兜底（同 allnet）。
+    summary 塞 meta 备用（前端摘要回填通道未接 meta.summary，仅存档）。
+    """
+    url = "https://radarai.top/api/trends"
+    limit = 40
+    try:
+        r = session.get(url, timeout=(10, 20))
+        r.raise_for_status()
+        data = r.json()
+    except Exception:
+        return []
+    items: list[RawItem] = []
+    for proj in (data.get("data") or [])[:limit]:
+        title = (proj.get("title") or "").strip()
+        link = (proj.get("link") or "").strip()
+        if not title or not link:
+            continue
+        summary = (proj.get("summary") or proj.get("description_zh") or "").strip()
+        items.append(RawItem(
+            site_id="radarai",
+            site_name="RadarAI·GitHub趋势",
+            source="RadarAI·GitHub趋势",
+            title=title,
+            url=link,
+            meta={
+                "summary": summary,
+                "stars_total": proj.get("stars_total"),
+                "language": proj.get("language"),
+                "period": proj.get("period"),
+            },
+        ))
+    return items
+
+
 def fetch_jiqizhixin(session: requests.Session, now: datetime) -> list[RawItem]:
     """机器之心 — 中文 AI 头部媒体（2026-08-14 扩充）。
 
@@ -635,6 +675,103 @@ def fetch_cleantechnica(session: requests.Session, now: datetime) -> list[RawIte
         seen.add(key)
         out.append(it)
     return out[:20]
+
+
+def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, site_name: str, queries: list[str], limit: int = 20) -> list[RawItem]:
+    """国外主要国家政策源 — Google News RSS 按站点搜索（2026-08-14 新增）。
+
+    背景：美国/欧盟/日本/印度政府网站大多不提供 RSS（EPA/DOE/EU 等探测过，
+    404 或 HTML 壳），白宫气候页 Google 未索引。用 Google News RSS 搜 site 是最
+    成熟方案（与北极星/CleanTechnica 同款），加 when:7d 限近期。
+    产出归政策库·国际（官方原文），SOURCE_SCORE 按部委档 25。
+    """
+    items: list[RawItem] = []
+    for q in queries:
+        try:
+            url = "https://news.google.com/rss/search"
+            params = {"q": q, "hl": "en-US", "gl": "US", "ceid": "US:en"}
+            r = session.get(url, params=params, timeout=30)
+            r.raise_for_status()
+            feed = feedparser.parse(r.content) if feedparser else None
+            if not feed:
+                continue
+            for entry in feed.entries[:15]:
+                title = (entry.get("title") or "").strip()
+                link = (entry.get("link") or "").strip()
+                if not title or not link:
+                    continue
+                if len(title) < 8:
+                    continue  # 跳过站内导航类碎片（"News - EPA" 等）
+                if title.startswith("-") or title.count(" ") < 2:
+                    continue  # 跳过 "- 机构名" 导航碎片、无描述性标题
+                # 去掉尾部 " - EPA (.gov)" 类来源标记再判导航碎片
+                title_clean = title.rsplit(" - ", 1)[0].strip()
+                if len(title_clean) < 8:
+                    continue
+                published = None
+                if hasattr(entry, "published_parsed") and entry.published_parsed:
+                    try:
+                        published = datetime(*entry.published_parsed[:6], tzinfo=UTC)
+                    except Exception:
+                        pass
+                items.append(RawItem(
+                    site_id=site_id, site_name=site_name,
+                    title=title, url=link, published_at=published,
+                ))
+        except Exception:
+            continue
+    seen: set[tuple[str, str]] = set()
+    out: list[RawItem] = []
+    for it in items:
+        key = (it.title, it.url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(it)
+    return out[:limit]
+
+
+def fetch_us_epa(session: requests.Session, now: datetime) -> list[RawItem]:
+    """美国环保署 EPA — 温室气体法规、发电厂排放标准（2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "us_epa", "美国EPA", [
+        "site:epa.gov (climate OR emissions OR greenhouse) when:7d",
+        "site:epa.gov (power plant OR methane OR carbon pollution) when:7d",
+    ])
+
+
+def fetch_us_doe(session: requests.Session, now: datetime) -> list[RawItem]:
+    """美国能源部 DOE — 清洁能源计划、关键矿产、贷款项目（2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "us_doe", "美国DOE", [
+        "site:energy.gov (clean energy OR solar OR grid OR battery OR hydrogen) when:7d",
+        "site:energy.gov (loan program OR critical minerals OR nuclear OR wind) when:7d",
+    ])
+
+
+def fetch_eu_commission(session: requests.Session, now: datetime) -> list[RawItem]:
+    """欧盟委员会 — 气候行动总司/能源总司：Fit for 55、CBAM、EU ETS（2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "eu_commission", "欧盟委员会", [
+        "site:ec.europa.eu (climate OR emissions OR CBAM OR carbon) when:7d",
+        "site:ec.europa.eu (energy OR renewables OR hydrogen OR grid) when:7d",
+    ])
+
+
+def fetch_euractiv(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Euractiv（布鲁塞尔）— 欧盟政策专业媒体（2026-08-14 新增）。
+
+    归政策库·国际（欧盟政策一手报道），媒体属性但政策浓度高。
+    """
+    return fetch_foreign_gov(session, now, "euractiv", "Euractiv·欧盟", [
+        "site:euractiv.com (climate OR energy OR emissions OR carbon) when:7d",
+        "site:euractiv.com (CBAM OR ETS OR renewables OR green deal) when:7d",
+    ])
+
+
+def fetch_india_pib(session: requests.Session, now: datetime) -> list[RawItem]:
+    """印度新闻信息局 PIB — 绿氢使命、气候政策、可再生能源（2026-08-14 新增）。"""
+    return fetch_foreign_gov(session, now, "india_pib", "印度PIB", [
+        "site:pib.gov.in (climate OR renewable OR solar OR energy) when:7d",
+        "site:pib.gov.in (green hydrogen OR emissions OR carbon OR sustainability) when:7d",
+    ])
 
 
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1189,6 +1326,9 @@ def score_content_strength(dimension: str, title: str, summary: str) -> int:
 SOURCE_SCORE: dict[str, int] = {
     # 部委官方
     "ndrc": 25, "mee": 25, "nea": 25, "miit": 25,
+    # 国外主要国家政策源（2026-08-14 新增：官方部委档）
+    "us_epa": 25, "us_doe": 25, "eu_commission": 25,
+    "euractiv": 20, "india_pib": 25,
     # 官方解读（部委网站发布的专家解读）
     "mee_jiedu": 23,
     # 国际组织
@@ -1200,6 +1340,8 @@ SOURCE_SCORE: dict[str, int] = {
     # AI 领域全链条源（2026-08-14 扩充）
     "jiqizhixin": 18, "qbitai": 18, "openai": 20,
     "venturebeat": 16, "arxiv_ai": 18, "aihot": 18,
+    # 技术聚合（GitHub 开源项目趋势：无编辑自动榜单，略低于行业媒体）
+    "radarai": 12,
     # 行业媒体
     "chinaenergy": 13, "bjx": 13, "reuters": 13,
     # 全网热榜
@@ -1363,6 +1505,11 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     import re as _dim_re
     title_l = (title or "").lower()
     text = f"{title or ''} {summary or ''}".lower()
+    # 站点级维度强制（2026-08-14）：radarai = GitHub 开源项目趋势 → 技术。
+    # 比 AI_SITES 判定优先——GitHub 项目含大量 AI 关键词（deepseek/ollama…），
+    # 用户明确要求该源归「技术」维度，不能让 AI_DIM_KW 抢走。
+    if site_id in DIM_SITE_OVERRIDE:
+        return DIM_SITE_OVERRIDE[site_id]
     # AI 判定：AI_SITES 源全链条直通（AIHOT/机器之心等标题未必含 AI 关键词）
     # + 标题关键词 + 标题级英文 AI 词边界
     if site_id in AI_SITES:
@@ -1411,6 +1558,8 @@ GREEN_SITES = {
     "carbonbrief", "iea", "irena", "unfccc", "worldbank",
     "chinaenergy", "bjx", "reuters", "miit",
     "ccai", "stdaily",
+    # 国外主要国家政策源（2026-08-14 新增：官方部委直通；Euractiv 是综合媒体不走直通）
+    "us_epa", "us_doe", "eu_commission", "india_pib",
 }
 
 # AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
@@ -1424,6 +1573,19 @@ AI_SITES = {
     "aihot",        # AIHOT（AI 行业动态聚合：模型/产品/行业/论文，带 AI 评分）
 }
 
+# 技术全链条源（2026-08-14）：GitHub 开源项目趋势，全量直通（同 AI_SITES 逻辑），
+# 维度在 DIM_SITE_OVERRIDE 强制为「技术」（项目未必含 AI 关键词，且用户要求归技术类）
+TECH_SITES = {
+    "radarai",      # RadarAI·GitHub趋势（开源项目热度追踪）
+}
+
+# 站点级维度强制（2026-08-14）：categorize_dimension 最先检查，优先于 AI_SITES 直通。
+# radarai = GitHub 开源项目趋势，用户明确归「技术」维度（项目标题含大量 AI 关键词，
+# 若不强制会被 AI_DIM_KW 抢到 AI科技）。
+DIM_SITE_OVERRIDE: dict[str, str] = {
+    "radarai": "技术",
+}
+
 
 def is_policy_relevant(title: str, url: str = "", site_id: str = "") -> bool:
     """Check if a title/URL/site is related to green/low-carbon policy."""
@@ -1433,13 +1595,19 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "") -> bool:
     # AI 领域全链条源（2026-08-14）：理论/模型/市场/商业全通过
     if site_id in AI_SITES:
         return True
+    # 技术全链条源（2026-08-14）：GitHub 开源项目趋势全通过
+    if site_id in TECH_SITES:
+        return True
     title_lower = title.lower()
     url_lower = url.lower()
     for kw in POLICY_KEYWORDS:
         kw_lower = kw.lower()
         if kw_lower in title_lower:
             return True
-        if url_lower and kw_lower in url_lower:
+        # PITFALL(2026-08-14): Google News 的 base64 URL（news.google.com/rss/articles/...）
+        # 常"碰巧包含"短英文关键词（coal/wind/gas 等），导致无关条目被误放行
+        # （如 Euractiv 的德国法院逮捕令新闻因 base64 含关键词而进政策库）
+        if url_lower and "news.google.com" not in url_lower and kw_lower in url_lower:
             return True
     return False
 
@@ -1453,6 +1621,12 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_mee_jiedu, "mee_jiedu", "生态环境部·解读"),
     (fetch_nea, "nea", "国家能源局"),
     (fetch_miit, "miit", "工信部"),
+    # ── 国外主要国家政策源（2026-08-14 新增：Google News 搜 site） ──
+    (fetch_us_epa, "us_epa", "美国EPA"),
+    (fetch_us_doe, "us_doe", "美国DOE"),
+    (fetch_eu_commission, "eu_commission", "欧盟委员会"),
+    (fetch_euractiv, "euractiv", "Euractiv·欧盟"),
+    (fetch_india_pib, "india_pib", "印度PIB"),
     # 绿色科技/AI（2026-08-14 主题定位升级新增）
     (fetch_ccai, "ccai", "Climate Change AI"),
     (fetch_stdaily_green, "stdaily", "中国科技网"),
@@ -1481,6 +1655,8 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
      "arxiv_ai", "arXiv·AI"),
     # AIHOT — AI 行业动态聚合（2026-08-14 接入；页面有 JS 反爬，RSS 端点匿名可访问）
     (fetch_aihot, "aihot", "AIHOT"),
+    # RadarAI — GitHub 开源项目趋势（2026-08-14 接入；/api/trends 干净 JSON）
+    (fetch_radarai, "radarai", "RadarAI·GitHub趋势"),
     # Aggregated hot boards (filtered by policy keywords)
     (fetch_allnet, "allnet", "全网热点"),
 ]
@@ -1496,6 +1672,12 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "mee_jiedu":  ("policy", "中国"),
     "nea":        ("policy", "中国"),
     "miit":       ("policy", "中国"),
+    # 国外主要国家政策源（2026-08-14 新增 → 政策库·国际）
+    "us_epa":       ("policy", "国际组织"),
+    "us_doe":       ("policy", "国际组织"),
+    "eu_commission":("policy", "国际组织"),
+    "euractiv":     ("policy", "国际组织"),
+    "india_pib":    ("policy", "国际组织"),
     # 政策库 · 国际组织
     "iea":        ("policy", "国际组织"),
     "irena":      ("policy", "国际组织"),
@@ -1520,6 +1702,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "venturebeat": ("media", ""),
     "arxiv_ai":    ("media", ""),
     "aihot":       ("media", ""),
+    "radarai":     ("media", ""),
 }
 
 
@@ -1618,6 +1801,8 @@ def main() -> int:
             "url": raw.url,
             "published_at": iso(raw.published_at),
             "first_seen_at": iso(now),
+            # 抓取器自带摘要（radarai 的 GitHub 项目中文描述等）→ 参与打分 + 前端摘要
+            "summary": raw.meta.get("summary", ""),
         }
         all_items.append(record)
 
@@ -1841,6 +2026,9 @@ def person_role(name: str) -> str:
 # Source → default region mapping
 SOURCE_REGION: dict[str, str] = {
     "ndrc": "中国", "nea": "中国", "mee": "中国", "mee_jiedu": "中国", "miit": "中国",
+    # 国外主要国家政策源（2026-08-14 新增）
+    "us_epa": "美国", "us_doe": "美国", "eu_commission": "欧盟",
+    "euractiv": "欧盟", "india_pib": "印度",
     "chinaenergy": "中国", "tanpaifang": "中国", "bjx": "中国", "ideacarbon": "中国",
     "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
     "carbonbrief": "国际",
