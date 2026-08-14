@@ -340,6 +340,45 @@ def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
     return items[:60]
 
 
+def fetch_mee_jiedu(session: requests.Session, now: datetime) -> list[RawItem]:
+    """生态环境部 — 政策解读栏目 (zcwj/zcjd/)，官方专家解读。
+
+    2026-08-14 新增：部委网站发布的专家解读纳入政策库。
+    栏目含「一图读懂」「司负责人答记者问」「解读XXX规划」等官方解读文章。
+    """
+    items: list[RawItem] = []
+    list_url = "https://www.mee.gov.cn/zcwj/zcjd/"
+    try:
+        r = session.get(list_url, timeout=30)
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = (a.get("href") or "").strip()
+            text = (a.get_text(strip=True) or "")
+            if not text or not href or len(text) < 8:
+                continue
+            if any(skip in href for skip in ["javascript", "mailto"]):
+                continue
+            if href.startswith("./"):
+                href = urljoin(list_url, href)
+            elif "mee.gov.cn" not in href:
+                continue
+            # 只要解读文章（日期路径 t20xxxx）
+            if "t20" not in href:
+                continue
+            li = a.find_parent("li")
+            pub_date = _list_item_date(li) if li is not None else None
+            items.append(RawItem(
+                site_id="mee_jiedu", site_name="生态环境部·解读",
+                title=text, url=href,
+                published_at=parse_date_only(pub_date),
+            ))
+    except Exception:
+        pass
+    return items[:40]
+
+
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
     """国家能源局 — CMS JSON API."""
     items: list[RawItem] = []
@@ -884,6 +923,7 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     # Chinese government
     (fetch_ndrc, "ndrc", "国家发改委"),
     (fetch_mee, "mee", "生态环境部"),
+    (fetch_mee_jiedu, "mee_jiedu", "生态环境部·解读"),
     (fetch_nea, "nea", "国家能源局"),
     (fetch_miit, "miit", "工信部"),
     # International orgs
@@ -910,6 +950,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     # 政策库 · 中国部委
     "ndrc":       ("policy", "中国"),
     "mee":        ("policy", "中国"),
+    "mee_jiedu":  ("policy", "中国"),
     "nea":        ("policy", "中国"),
     "miit":       ("policy", "中国"),
     # 政策库 · 国际组织
@@ -1159,10 +1200,53 @@ def main() -> int:
     return 0
 
 
+# ── 人物识别（人名标签，2026-08-14 新增） ─────────────────────────────────────
+# 白名单：绿色政策领域关键人物（官员/专家/分析师）。
+# name → (职务, [匹配关键词])。匹配范围 = 标题 + summary + 正文前 2000 字。
+# 只收录独特姓名（三字名/极独特两字名），避免常见名误报。
+PERSON_RULES: dict[str, tuple[str, list[str]]] = {
+    # 部委官员
+    "郑栅洁": ("国家发改委主任", ["郑栅洁"]),
+    "周海兵": ("国家发改委副主任", ["周海兵"]),
+    "沈竹林": ("国家发改委副主任", ["沈竹林"]),
+    "李春临": ("国家发改委副主任", ["李春临"]),
+    "黄润秋": ("生态环境部部长", ["黄润秋"]),
+    "孙金龙": ("生态环境部党组书记", ["孙金龙"]),
+    "赵英民": ("生态环境部副部长", ["赵英民"]),
+    "万劲松": ("国家能源局副局长", ["万劲松"]),
+    "李乐成": ("工信部部长", ["李乐成"]),
+    # 学界专家
+    "林伯强": ("厦门大学中国能源政策研究院院长", ["林伯强"]),
+    "魏一鸣": ("北京理工大学能源与环境政策研究中心教授", ["魏一鸣"]),
+    "杨昆": ("中电联党委书记、常务副理事长", ["杨昆"]),
+    # 行业分析师
+    "卢书剑": ("西南证券电新行业联席首席分析师", ["卢书剑"]),
+    "张维鑫": ("中信建投期货分析师", ["张维鑫"]),
+    "郑小霞": ("华安证券研究所联席所长、首席经济学家", ["郑小霞"]),
+    "傅强": ("罗兰贝格副合伙人、能源行业首席专家", ["傅强"]),
+    "张玉昕": ("弘则研究分析师", ["张玉昕"]),
+}
+
+
+def extract_people(title: str, summary: str = "", content: str = "") -> list[str]:
+    """从标题/摘要/正文前 2000 字识别白名单人物，按出现顺序去重返回。"""
+    text = " ".join([title or "", summary or "", (content or "")[:2000]])
+    found: list[str] = []
+    for name, (_role, keywords) in PERSON_RULES.items():
+        if any(kw in text for kw in keywords):
+            found.append(name)
+    return found
+
+
+def person_role(name: str) -> str:
+    """返回人物职务（用于 wiki 展示），未知返回空串。"""
+    return PERSON_RULES.get(name, ("", [""]))[0]
+
+
 # ── Auto-tagging ────────────────────────────────────────────────────────────────
 # Source → default region mapping
 SOURCE_REGION: dict[str, str] = {
-    "ndrc": "中国", "nea": "中国", "mee": "中国", "miit": "中国",
+    "ndrc": "中国", "nea": "中国", "mee": "中国", "mee_jiedu": "中国", "miit": "中国",
     "chinaenergy": "中国", "tanpaifang": "中国", "bjx": "中国", "ideacarbon": "中国",
     "iea": "国际", "irena": "国际", "unfccc": "国际", "worldbank": "国际",
     "carbonbrief": "国际",
@@ -1193,9 +1277,11 @@ TOPIC_RULES: list[tuple[str, list[str]]] = [
 ]
 
 # Policy type tag rules
+# 顺序即优先级：解读类放最前（"一图读懂/解读/专家" 优先于 "规划/通知" 等文件词，
+# 否则官方解读文章会因标题含"规划"被标成 政策文件 — 2026-08-14 调整）
 POLICY_TYPE_RULES: list[tuple[str, list[str]]] = [
+    ("政策解读", ["解读", "专家", "一图读懂", "答记者问"]),
     ("政策文件", ["通知", "意见", "办法", "条例", "规划", "方案", "公告", "印发", "关于印发"]),
-    ("政策解读", ["解读", "专家", "一图读懂"]),
     ("新闻发布会", ["新闻发布会", "答问", "通报", "发布", "发布会"]),
     ("数据报告", ["报告", "数据", "统计", "年报", "季报"]),
 ]
@@ -1444,6 +1530,10 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         if summary:
             safe_summary = summary.replace(chr(34), chr(39)).replace("\n", " ")
             lines.append(f'summary: "{safe_summary}"')
+        # 人物标签（2026-08-14）：标题+摘要+正文识别白名单人物
+        people = extract_people(title, summary, content)
+        if people:
+            lines.append(f"people: [{', '.join(people)}]")
         lines += [
             "---",
             "",
@@ -1457,6 +1547,9 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         ]
         if source_org:
             lines.append(f"> 作者: {source_org}")
+        if people:
+            people_links = "、".join(f"[[人物/{p}|{p}]]" for p in people)
+            lines.append(f"> 人物: {people_links}")
         if content:
             lines += ["", "## 正文", "", content]
             body_count += 1
@@ -1628,6 +1721,7 @@ def _update_ai_index(base: Path, now: datetime) -> None:
                     "published": fm.get("published", ""),
                     "author": fm.get("author", ""),
                     "tags": fm.get("tags", ""),
+                    "people": fm.get("people", ""),
                     "keywords": fm.get("keywords", ""),
                     "summary": fm.get("summary", ""),
                     "url": fm.get("url", ""),
@@ -1656,6 +1750,8 @@ def _update_ai_index(base: Path, now: datetime) -> None:
         lines.append(f"- Published: {e.get('published', '') or '(unknown)'}")
         if e.get("author"):
             lines.append(f"- Author: {e['author']}")
+        if e.get("people"):
+            lines.append(f"- People: {e['people']}")
         lines.append(f"- Tags: {e['tags']}")
         lines.append(f"- Keywords: {e['keywords']}")
         summary = e.get("summary", "")
