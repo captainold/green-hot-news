@@ -27,9 +27,9 @@
 
 ## 🗂️ 关键架构（一句话版）
 
-- 抓取：`scripts/update_news.py`（24 源，`fetch_*` 函数 + `BUILTIN_SOURCES` 注册；AI 全链条源走 `AI_SITES` 白名单直通）
+- 抓取：`scripts/update_news.py`（26 源，`fetch_*` 函数 + `BUILTIN_SOURCES` 注册；AI 全链条源走 `AI_SITES` 白名单直通，GitHub 开源趋势走 `TECH_SITES` 直通）
 - 打分：`score_item()` → `score_content_strength()`（按维度自适应）/ `score_topic()` / `score_people()` / `score_freshness()`
-- 四维分类：`categorize_dimension()`（优先级 AI科技 > 金融 > 技术 > 政策；AI 判定只用标题+词边界 `\bai\b`，防反爬水印误判）
+- 四维分类：`categorize_dimension()`（优先级 AI科技 > 金融 > 技术 > 政策；站点级强制 `DIM_SITE_OVERRIDE`（radarai→技术）最先检查；AI 判定只用标题+词边界 `\bai\b`，防反爬水印误判）
 - 前端：`index.html`（顶部综合榜 + 政策/技术/金融/AI科技 四维榜）+ `assets/app.js` + `assets/styles.css`
 - 服务器：`/opt/green-hot-news/`（systemd timer 每 30 分钟，非 git 仓库，代码同步靠 scp）
 - wiki：`Notes/政策wiki/` 按四维导航（政策/技术/金融/AI科技 + 人物横切），新板块归入对应维度
