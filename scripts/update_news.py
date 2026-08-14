@@ -1092,9 +1092,11 @@ def main() -> int:
     # In CI (no Notes/ dir) the mapping comes from the committed published-index.json.
     archived_pub: dict[str, str] = {}
     archived_titles: dict[str, str] = {}
+    archived_summaries: dict[str, str] = {}
     if args.obsidian_dir:
         archived_pub = load_archived_published(args.obsidian_dir)
         archived_titles = load_archived_titles(args.obsidian_dir)
+        archived_summaries = load_archived_summaries(args.obsidian_dir)
     else:
         pub_index_path = output_dir / "published-index.json"
         if pub_index_path.exists():
@@ -1108,6 +1110,12 @@ def main() -> int:
                 archived_titles = json.loads(title_index_path.read_text(encoding="utf-8"))
             except Exception:
                 archived_titles = {}
+        summary_index_path = output_dir / "summary-index.json"
+        if summary_index_path.exists():
+            try:
+                archived_summaries = json.loads(summary_index_path.read_text(encoding="utf-8"))
+            except Exception:
+                archived_summaries = {}
 
     def _archived_to_iso(pub: str) -> str:
         if " " in pub:
@@ -1123,6 +1131,11 @@ def main() -> int:
         full_title = archived_titles.get(rec.get("url", ""))
         if full_title and len(full_title) > len(rec.get("title", "")):
             rec["title"] = full_title
+        # 摘要回填（前端可展开摘要，News Minimalist 风格；2026-08-14）
+        if not rec.get("summary"):
+            summary = archived_summaries.get(rec.get("url", ""))
+            if summary:
+                rec["summary"] = summary
         if not rec.get("published_at"):
             if rec.get("url") in archived_pub:
                 rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
@@ -1144,6 +1157,11 @@ def main() -> int:
     if archived_titles:
         (output_dir / "title-index.json").write_text(
             json.dumps(archived_titles, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    # Persist the url→summary map so CI runs can backfill summaries
+    if archived_summaries:
+        (output_dir / "summary-index.json").write_text(
+            json.dumps(archived_summaries, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # Backfilled times change sort order — re-sort newest first
     all_items_24h.sort(key=sort_key, reverse=True)
@@ -1407,6 +1425,33 @@ def load_archived_titles(base_dir_str: str) -> dict[str, str]:
             if not um:
                 continue
             mapping[um.group(1)] = m.group(1).strip()
+        except Exception:
+            continue
+    return mapping
+
+
+def load_archived_summaries(base_dir_str: str) -> dict[str, str]:
+    """Map url -> summary from existing notes' frontmatter (政策库 + 媒体库).
+
+    2026-08-14 新增：首页学 News Minimalist 做「可展开摘要」，需要把笔记里的
+    summary 同步进 JSON（前端无需再抓正文）。
+    """
+    mapping: dict[str, str] = {}
+    notes_root = Path(base_dir_str) / "Notes"
+    if not notes_root.exists():
+        return mapping
+    for p in notes_root.rglob("*.md"):
+        if p.name in ("政策库.md", "媒体库.md", "ai-index.md"):
+            continue
+        try:
+            content = p.read_text(encoding="utf-8")
+            um = re.search(r"^url:\s*(\S+)", content, re.M)
+            sm = re.search(r'^summary:\s*"?(.+?)"?\s*$', content, re.M)
+            if not um or not sm:
+                continue
+            summary = sm.group(1).strip().rstrip('"')
+            if summary and len(summary) > 8:
+                mapping[um.group(1)] = summary
         except Exception:
             continue
     return mapping

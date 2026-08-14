@@ -4,7 +4,7 @@
 
 ## 在线入口
 
-- 线上页面：`https://ywm.life`（新加坡服务器 Nginx 直出）
+- 线上页面：`https://ywm.life`（新加坡服务器 Nginx 直出，双栏：官方新闻｜媒体新闻）
 - GitHub 镜像：`https://captainold.github.io/green-hot-news/`（仅代码归档，CI 已禁用）
 - Obsidian 笔记库：`C:\Users\wenyu\Documents\Obsidian_wen\green-hot-news\Notes\`
 - 服务器部署与运维文档：[docs/服务器部署与运维.md](docs/服务器部署与运维.md)
@@ -66,9 +66,10 @@ python3.11 scripts/update_news.py --output-dir data --window-hours 24
 
 - `data/latest-24h.json` — 24小时绿色政策信号（过滤后）
 - `data/latest-24h-all.json` — 24小时全量数据
-- `data/source-status.json` — 15 个源健康状态
+- `data/source-status.json` — 16 个源健康状态
 - `data/published-index.json` — 发布时间索引
 - `data/title-index.json` — 完整标题索引
+- `data/summary-index.json` — 摘要索引（前端可展开摘要，News Minimalist 风格）
 
 ## 同步机制
 

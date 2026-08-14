@@ -19,7 +19,7 @@
             </div>
           </div>
           <p class="hero-sub">
-            国内外最新绿色低碳政策动态 · 近 4 天滚动更新
+            国内外最新绿色低碳政策动态 · 官方新闻与媒体评论双栏展示
           </p>
         </div>
         <div class="hero-meta">
@@ -49,14 +49,6 @@
               </select>
             </label>
             <div class="field">
-              <span>库</span>
-              <div class="mode-switch">
-                <button id="libAllBtn" class="mode-btn active" type="button">全部</button>
-                <button id="libPolicyBtn" class="mode-btn" type="button">政策库</button>
-                <button id="libMediaBtn" class="mode-btn" type="button">媒体库</button>
-              </div>
-            </div>
-            <div class="field">
               <span>视图</span>
               <div class="mode-switch">
                 <button id="modeGreenBtn" class="mode-btn active" type="button">绿色政策</button>
@@ -69,12 +61,37 @@
         </div>
       </details>
 
-      <section class="list-wrap">
-        <div class="list-head">
-          <h2 id="listTitle">绿色政策信号流</h2>
-          <span id="resultCount">0 条</span>
-        </div>
-        <div id="newsList" class="news-list"></div>
+      <!-- 双栏：官方新闻（政策库）｜媒体新闻（媒体库） -->
+      <section class="dual-list">
+        <section class="col col-policy">
+          <div class="col-head">
+            <div class="col-title">
+              <span class="col-icon">🏛️</span>
+              <h2>官方新闻</h2>
+              <span class="col-sub">政府 · 国际组织 · 官方解读</span>
+            </div>
+            <div class="col-meta">
+              <span class="col-count" id="policyCount">0 条</span>
+              <button class="col-toggle" type="button" data-target="policyList" aria-expanded="true">收起</button>
+            </div>
+          </div>
+          <div class="col-body" id="policyList"></div>
+        </section>
+
+        <section class="col col-media">
+          <div class="col-head">
+            <div class="col-title">
+              <span class="col-icon">📰</span>
+              <h2>媒体新闻</h2>
+              <span class="col-sub">报刊 · 公众号 · 全网热点</span>
+            </div>
+            <div class="col-meta">
+              <span class="col-count" id="mediaCount">0 条</span>
+              <button class="col-toggle" type="button" data-target="mediaList" aria-expanded="true">收起</button>
+            </div>
+          </div>
+          <div class="col-body" id="mediaList"></div>
+        </section>
       </section>
     </main>
 
@@ -82,10 +99,11 @@
       <article class="news-card">
         <div class="meta-row">
           <span class="site"></span>
-          <span class="source"></span>
           <time class="time"></time>
         </div>
         <a class="title" target="_blank" rel="noopener noreferrer"></a>
+        <button class="summary-toggle" type="button" hidden>摘要</button>
+        <p class="summary" hidden></p>
       </article>
     </template>
 

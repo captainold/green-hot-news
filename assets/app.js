@@ -1,4 +1,6 @@
 // ── Green Hot News · 绿色政策雷达 — App ──────────────────────────────────────
+// 双栏布局（2026-08-14）：官方新闻（policy 库）｜媒体新闻（media 库）
+// 学 News Minimalist：来源徽章 + 相对时间 + 可展开摘要
 (function () {
   "use strict";
 
@@ -9,31 +11,26 @@
   let searchQuery = "";
   let selectedSite = "";
   let currentMode = "green"; // "green" | "all"
-  let currentLib = "all"; // "all" | "policy" | "media"
 
   // ── Dom refs ───────────────────────────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
-  const newsList = $("#newsList");
+  const policyList = $("#policyList");
+  const mediaList = $("#mediaList");
   const searchInput = $("#searchInput");
   const siteSelect = $("#siteSelect");
-  const resultCount = $("#resultCount");
+  const policyCount = $("#policyCount");
+  const mediaCount = $("#mediaCount");
   const updatedAt = $("#updatedAt");
   const stats = $("#stats");
-  const modeGreenBtn = $(" #modeGreenBtn ");
-  const modeAllBtn = $(" #modeAllBtn ");
-  const modeHint = $(" #modeHint ");
-  const libAllBtn = $(" #libAllBtn ");
-  const libPolicyBtn = $(" #libPolicyBtn ");
-  const libMediaBtn = $(" #libMediaBtn ");
-  const listTitle = $("#listTitle");
+  const modeGreenBtn = $("#modeGreenBtn");
+  const modeAllBtn = $("#modeAllBtn");
+  const modeHint = $("#modeHint");
   const advancedSummary = $("#advancedSummary");
   const sourceHealth = $("#sourceHealth");
   const sitePills = $("#sitePills");
   const itemTpl = $("#itemTpl");
 
   // ── Load data ──────────────────────────────────────────────────────────────
-  // Cache-buster: GitHub Pages serves data with max-age=600; a changing query
-  // param forces the browser (and CDN) to fetch fresh JSON every load.
   const cb = `?t=${Date.now()}`;
   async function loadData() {
     try {
@@ -50,7 +47,6 @@
       greenItems = greenData.items || [];
       allItemsRaw = allData.items || [];
 
-      // Merge green flag into allItemsRaw
       const greenIds = new Set(greenItems.map(i => i.id));
       allItems = allItemsRaw.map(i => ({ ...i, _green: greenIds.has(i.id) }));
 
@@ -65,7 +61,7 @@
       render();
     } catch (err) {
       console.error("Failed to load data:", err);
-      newsList.innerHTML = '<p style="color:var(--text-dim);padding:2rem;">数据加载中，请稍候...</p>';
+      policyList.innerHTML = '<p style="color:var(--text-dim);padding:2rem;">数据加载中，请稍候...</p>';
     }
   }
 
@@ -95,7 +91,6 @@
 
   function renderSourcePills(statusData) {
     const sites = statusData.sites || [];
-    // Build counts from greenItems
     const counts = {};
     greenItems.forEach(i => { counts[i.site_id] = (counts[i.site_id] || 0) + 1; });
 
@@ -107,7 +102,6 @@
 
     sitePills.innerHTML = pills.join("");
 
-    // Click handler
     sitePills.querySelectorAll(".site-pill").forEach(el => {
       el.addEventListener("click", () => {
         const sid = el.dataset.site;
@@ -126,33 +120,34 @@
     });
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
-  function render() {
-    const source = currentMode === "green" ? greenItems : allItems;
+  // ── Filtering ──────────────────────────────────────────────────────────────
+  function filterItems(source) {
     let items = [...source];
-
-    // Filter by search
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       items = items.filter(i =>
         (i.title || "").toLowerCase().includes(q) ||
         (i.site_name || "").toLowerCase().includes(q) ||
-        (i.source || "").toLowerCase().includes(q)
+        (i.source || "").toLowerCase().includes(q) ||
+        (i.summary || "").toLowerCase().includes(q)
       );
     }
-
-    // Filter by site
     if (selectedSite) {
       items = items.filter(i => i.site_id === selectedSite);
     }
+    return items;
+  }
 
-    // Filter by library (政策库/媒体库)
-    if (currentLib !== "all") {
-      items = items.filter(i => (i.library || "policy") === currentLib);
-    }
+  // ── Render ─────────────────────────────────────────────────────────────────
+  function render() {
+    const source = currentMode === "green" ? greenItems : allItems;
+    const filtered = filterItems(source);
 
-    resultCount.textContent = `${items.length} 条`;
-    listTitle.textContent = currentMode === "green" ? "绿色政策信号流" : "全量信号流";
+    const policyItems = filtered.filter(i => (i.library || "policy") === "policy");
+    const mediaItems = filtered.filter(i => (i.library || "policy") === "media");
+
+    policyCount.textContent = `${policyItems.length} 条`;
+    mediaCount.textContent = `${mediaItems.length} 条`;
     modeHint.textContent = currentMode === "green" ? "绿色政策" : "全量";
     advancedSummary.textContent = currentMode === "green"
       ? `绿色政策 ${greenItems.length} 条 / 全量 ${allItems.length} 条`
@@ -161,7 +156,7 @@
     // Populate site select
     const siteIds = new Set();
     const siteOptions = [["", "全部站点"]];
-    (currentMode === "green" ? greenItems : allItems).forEach(i => {
+    source.forEach(i => {
       if (!siteIds.has(i.site_id)) {
         siteIds.add(i.site_id);
         siteOptions.push([i.site_id, i.site_name]);
@@ -171,39 +166,66 @@
       `<option value="${id}" ${selectedSite === id ? "selected" : ""}>${name}</option>`
     ).join("");
 
-    // Render cards
+    renderList(policyList, policyItems, "暂无官方政策信号");
+    renderList(mediaList, mediaItems, "暂无媒体新闻");
+  }
+
+  function renderList(container, items, emptyText) {
     if (items.length === 0) {
-      newsList.innerHTML = '<p style="color:var(--text-dim);padding:2rem;text-align:center;">暂无匹配的政策信号</p>';
+      container.innerHTML = `<p style="color:var(--text-dim);padding:1rem;text-align:center;font-size:.8rem;">${emptyText}</p>`;
       return;
     }
 
-    newsList.innerHTML = "";
+    container.innerHTML = "";
     const frag = document.createDocumentFragment();
 
     items.forEach(item => {
       const card = itemTpl.content.cloneNode(true);
       card.querySelector(".site").textContent = item.site_name || item.site_id;
-      card.querySelector(".source").textContent = item.source || "";
       const timeEl = card.querySelector(".time");
       const timeTxt = formatTime(item.published_at);
-      // Scrape-time fallback (source site gives no publish time): mark it clearly
       timeEl.textContent = item.time_source === "scraped" ? `收录 ${timeTxt}` : timeTxt;
       timeEl.title = item.time_source === "scraped"
         ? "源站未提供发布时间，此时间为收录（抓取）时间"
         : "发布时间";
+
       const titleLink = card.querySelector(".title");
       titleLink.href = item.url;
       titleLink.textContent = item.title;
       titleLink.title = item.title;
+
+      // 可展开摘要（News Minimalist 风格；summary 来自 JSON 回填）
+      const summary = item.summary || "";
+      const sumEl = card.querySelector(".summary");
+      const toggleBtn = card.querySelector(".summary-toggle");
+      if (summary && summary.length > 8) {
+        sumEl.textContent = summary;
+        toggleBtn.hidden = false;
+        toggleBtn.addEventListener("click", () => {
+          const expanded = sumEl.hidden === false;
+          sumEl.hidden = expanded;
+          toggleBtn.textContent = expanded ? "摘要" : "收起";
+          toggleBtn.classList.toggle("open", !expanded);
+        });
+      }
       frag.appendChild(card);
     });
 
-    newsList.appendChild(frag);
+    container.appendChild(frag);
   }
 
+  // ── Collapse columns ───────────────────────────────────────────────────────
+  document.querySelectorAll(".col-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const body = document.getElementById(btn.dataset.target);
+      const expanded = body.style.display !== "none";
+      body.style.display = expanded ? "none" : "";
+      btn.textContent = expanded ? "展开" : "收起";
+      btn.setAttribute("aria-expanded", String(!expanded));
+    });
+  });
+
   // ── Helpers ────────────────────────────────────────────────────────────────
-  // Always show an absolute publish time (Beijing-local), hour precision,
-  // with 上午/下午 phrasing. Recent items get a relative hint appended.
   function formatAbsolute(d) {
     const h = d.getHours();
     const ap = h < 12 ? "上午" : "下午";
@@ -237,36 +259,16 @@
     render();
   });
 
-  modeGreenBtn.addEventListener("click", () => {
-    currentMode = "green";
-    modeGreenBtn.classList.add("active");
-    modeAllBtn.classList.remove("active");
-    selectedSite = "";
-    siteSelect.value = "";
-    render();
-  });
-
-  modeAllBtn.addEventListener("click", () => {
-    currentMode = "all";
-    modeAllBtn.classList.add("active");
-    modeGreenBtn.classList.remove("active");
-    selectedSite = "";
-    siteSelect.value = "";
-    render();
-  });
-
-  // ── Library switch (政策库/媒体库/全部) ───────────────────────────────────
-  function setLib(lib, btn) {
-    currentLib = lib;
-    [libAllBtn, libPolicyBtn, libMediaBtn].forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+  function setMode(mode, activeBtn, otherBtn) {
+    currentMode = mode;
+    activeBtn.classList.add("active");
+    otherBtn.classList.remove("active");
     selectedSite = "";
     siteSelect.value = "";
     render();
   }
-  libAllBtn.addEventListener("click", () => setLib("all", libAllBtn));
-  libPolicyBtn.addEventListener("click", () => setLib("policy", libPolicyBtn));
-  libMediaBtn.addEventListener("click", () => setLib("media", libMediaBtn));
+  modeGreenBtn.addEventListener("click", () => setMode("green", modeGreenBtn, modeAllBtn));
+  modeAllBtn.addEventListener("click", () => setMode("all", modeAllBtn, modeGreenBtn));
 
   // ── Init ───────────────────────────────────────────────────────────────────
   loadData();
