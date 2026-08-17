@@ -19,3 +19,7 @@ admin/_green-policy.conf.prod
 
 # 本地运维脚本（每次操作覆盖，勿提交）
 _server_ops.bat
+_deploy_cnp0.bat
+
+# Obsidian Git 冲突残留（插件生成，冲突解决后无需入库）
+conflict-files-obsidian-git.md
