@@ -384,3 +384,68 @@ body {
   /* 移动端四维榜堆叠 */
   .dim-grid { grid-template-columns: 1fr; }
 }
+
+/* ── 两区布局（2026-08-17 v3）：排行榜 + 时间线 ───────── */
+.board-rank .board-head { border-left: 3px solid #f59e0b; }
+.board-timeline .board-head { border-left: 3px solid #22c55e; }
+
+.rank-filters {
+  display: flex; flex-wrap: wrap; gap: .6rem 1.2rem;
+  padding: .6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+.filter-label { color: var(--text-dim); font-size: .78rem; }
+
+/* 时间线头部控制区 */
+.timeline-controls {
+  display: flex; align-items: center; gap: .45rem; flex-wrap: wrap;
+}
+.live-pill {
+  font-size: .7rem; font-weight: 600; color: var(--green-300);
+  background: rgba(34,197,94,.12); border: 1px solid var(--green-800);
+  padding: .12rem .5rem; border-radius: 999px;
+}
+.new-arrival-btn {
+  font-size: .72rem; font-weight: 600; cursor: pointer;
+  color: var(--green-200); background: var(--green-800);
+  border: 1px solid var(--green-600); border-radius: 999px;
+  padding: .18rem .65rem;
+  animation: pulse-arrival 1.6s ease-in-out infinite;
+}
+.new-arrival-btn:hover { background: var(--green-700); }
+@keyframes pulse-arrival {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,.35); }
+  50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+}
+
+.load-more {
+  display: block; width: calc(100% - 1.5rem); margin: 0 .75rem .75rem;
+  padding: .5rem; font-size: .78rem; cursor: pointer;
+  color: var(--green-300); background: var(--bg-surface);
+  border: 1px dashed var(--border-light); border-radius: var(--radius);
+}
+.load-more:hover { border-color: var(--green-600); background: var(--green-900); }
+
+/* 时间线容器：独立滚动（内部滚动，自动滚动不打断页面浏览） */
+.board-timeline .board-body {
+  max-height: 70vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 新条目插入高亮动画 */
+.news-card.flash-new {
+  animation: flash-new 2.2s ease-out;
+}
+@keyframes flash-new {
+  0%   { background: rgba(34,197,94,.35); border-color: var(--green-500); }
+  60%  { background: rgba(34,197,94,.18); }
+  100% { background: var(--bg-card); border-color: var(--border); }
+}
+
+@media (max-width: 640px) {
+  .rank-filters { gap: .4rem .8rem; }
+  .board-timeline .board-body { max-height: 60vh; }
+  .timeline-controls { justify-content: flex-end; }
+}

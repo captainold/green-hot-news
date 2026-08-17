@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Green Hot News · 绿色低碳动态雷达</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌿</text></svg>" />
-    <link rel="stylesheet" href="./assets/styles.css?v=2" />
+    <link rel="stylesheet" href="./assets/styles.css?v=3" />
   </head>
   <body>
     <main class="shell">
@@ -33,71 +33,52 @@
       <section class="primary-controls">
         <input id="searchInput" type="search" placeholder="搜索动态 / 来源 / 关键词" />
         <button id="digestBtn" class="digest-btn" type="button" title="A 级以上高分动态浓缩版，可直接转发">📋 当日浓缩</button>
-        <div class="mode-hint" id="modeHint">绿色动态</div>
+        <span class="mode-hint" id="modeHint">绿色动态</span>
       </section>
 
-      <!-- 综合评分排行榜 -->
-      <section class="board board-overall">
+      <!-- 区域一：排行榜（主题 × 周期 × 区域） -->
+      <section class="board board-rank">
         <div class="board-head">
           <div class="board-title">
             <span class="board-icon">🏆</span>
-            <h2>综合评分排行榜</h2>
-            <span class="board-sub" id="overallSub">全维度 · 按综合分</span>
+            <h2>排行榜</h2>
+            <span class="board-sub" id="rankSub">全部 · 国际 · 日</span>
           </div>
-          <span class="board-count" id="overallCount">0 条</span>
+          <span class="board-count" id="rankCount">0 条</span>
         </div>
-        <div class="board-body" id="overallList"></div>
+        <div class="rank-filters">
+          <div class="field">
+            <span class="filter-label">主题</span>
+            <div class="mode-switch" id="topicSwitch"></div>
+          </div>
+          <div class="field">
+            <span class="filter-label">周期</span>
+            <div class="mode-switch" id="periodSwitch"></div>
+          </div>
+          <div class="field">
+            <span class="filter-label">区域</span>
+            <div class="mode-switch" id="regionSwitch"></div>
+          </div>
+        </div>
+        <div class="board-body" id="rankList"></div>
       </section>
 
-      <!-- 四维排行榜 -->
-      <section class="dim-grid">
-        <section class="board dim-board" data-dim="政策">
-          <div class="board-head">
-            <div class="board-title">
-              <span class="board-icon">🏛️</span>
-              <h2>政策榜</h2>
-              <span class="board-sub">部委 · 国际组织 · 官方解读</span>
-            </div>
-            <span class="board-count" id="policyCount">0 条</span>
+      <!-- 区域二：时间线（跟随上方筛选，新条目自动插入滚动） -->
+      <section class="board board-timeline">
+        <div class="board-head">
+          <div class="board-title">
+            <span class="board-icon">⏱️</span>
+            <h2>时间线</h2>
+            <span class="board-sub" id="tlSub">跟随排行榜筛选 · 新→旧</span>
           </div>
-          <div class="board-body" id="policyList"></div>
-        </section>
-
-        <section class="board dim-board" data-dim="技术">
-          <div class="board-head">
-            <div class="board-title">
-              <span class="board-icon">🔋</span>
-              <h2>技术榜</h2>
-              <span class="board-sub">储能 · 氢能 · 光伏 · CCUS</span>
-            </div>
-            <span class="board-count" id="techCount">0 条</span>
+          <div class="timeline-controls">
+            <span class="live-pill" id="livePill" title="服务器每 30 分钟抓取，页面每 60 秒轮询新条目">🟢 实时</span>
+            <button id="tlPauseBtn" class="mode-btn" type="button">⏸ 暂停</button>
+            <button id="tlTopBtn" class="new-arrival-btn" type="button" hidden>✨ 有新条目 · 回到最新</button>
           </div>
-          <div class="board-body" id="techList"></div>
-        </section>
-
-        <section class="board dim-board" data-dim="金融">
-          <div class="board-head">
-            <div class="board-title">
-              <span class="board-icon">💰</span>
-              <h2>金融榜</h2>
-              <span class="board-sub">碳市场 · 碳价 · 绿色金融</span>
-            </div>
-            <span class="board-count" id="finCount">0 条</span>
-          </div>
-          <div class="board-body" id="finList"></div>
-        </section>
-
-        <section class="board dim-board" data-dim="AI科技">
-          <div class="board-head">
-            <div class="board-title">
-              <span class="board-icon">🤖</span>
-              <h2>AI科技榜</h2>
-              <span class="board-sub">AI×能碳 · 智能电网 · 数智化</span>
-            </div>
-            <span class="board-count" id="aiCount">0 条</span>
-          </div>
-          <div class="board-body" id="aiList"></div>
-        </section>
+        </div>
+        <div class="board-body" id="tlList"></div>
+        <button id="tlMoreBtn" class="load-more" type="button" hidden>加载更早</button>
       </section>
 
       <details class="advanced-panel">
@@ -114,17 +95,10 @@
               </select>
             </label>
             <div class="field">
-              <span>视图</span>
+              <span>模式</span>
               <div class="mode-switch">
                 <button id="modeGreenBtn" class="mode-btn active" type="button">绿色动态</button>
                 <button id="modeAllBtn" class="mode-btn" type="button">全量</button>
-              </div>
-            </div>
-            <div class="field">
-              <span>排序</span>
-              <div class="mode-switch">
-                <button id="sortScoreBtn" class="mode-btn active" type="button">按分数</button>
-                <button id="sortTimeBtn" class="mode-btn" type="button">按时间</button>
               </div>
             </div>
           </div>
@@ -168,6 +142,6 @@
       </article>
     </template>
 
-    <script src="./assets/app.js?v=2" defer></script>
+    <script src="./assets/app.js?v=3" defer></script>
   </body>
 </html>

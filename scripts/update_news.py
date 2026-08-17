@@ -2126,6 +2126,49 @@ def site_policy_group(site_id: str) -> str:
 
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
+def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> None:
+    """累积历史 data/history.json（2026-08-17）：前端排行榜日/周/月周期切换的数据源。
+
+    - 按 url 去重：已存在条目保留首次收录版本（分数/维度不重算），新条目追加
+    - 按 published_at（无则 first_seen_at）裁剪 62 天
+    - 读取失败/损坏 → 从空重建，不阻断主流程（服务器 set -euo pipefail 兼容）
+    """
+    path = output_dir / "history.json"
+    existing: list[dict] = []
+    if path.exists():
+        try:
+            existing = (json.loads(path.read_text(encoding="utf-8")) or {}).get("items", []) or []
+        except Exception:
+            existing = []
+    seen: dict[str, dict] = {}
+    for it in existing:
+        u = it.get("url") or ""
+        if u and u not in seen:
+            seen[u] = it
+    added = 0
+    for it in new_items:
+        u = it.get("url") or ""
+        if u and u not in seen:
+            seen[u] = it
+            added += 1
+    cutoff = now - timedelta(days=62)
+
+    def _item_time(it: dict):
+        ts = it.get("published_at") or it.get("first_seen_at") or ""
+        return parse_iso(ts) if ts else None
+
+    items = [it for it in seen.values() if (_item_time(it) or now) >= cutoff]
+    items.sort(key=lambda r: r.get("published_at") or "0000-00-00", reverse=True)
+    path.write_text(json.dumps({
+        "generated_at": iso(now),
+        "window_days": 62,
+        "count": len(items),
+        "items": items,
+    }, ensure_ascii=False), encoding="utf-8")
+    if added:
+        print(f"   History: +{added} new, {len(items)} total (62d window)")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Green Policy News Radar")
     parser.add_argument("--output-dir", default="data", help="Output directory for JSON files")
@@ -2311,6 +2354,8 @@ def main() -> int:
             rec.get("library", "media"),
         )
         rec["dimension"] = dimension
+        # 区域字段（2026-08-17）：前端排行榜/时间线「国内/国际」切换依赖
+        rec["region"] = detect_region(rec.get("site_id", ""), rec.get("title", ""))
         # 打分体系 v2.0（2026-08-14）：内容强度按维度自适应
         people = extract_people(rec.get("title", ""), rec.get("summary", ""), "")
         scoring = score_item(
@@ -2387,6 +2432,8 @@ def main() -> int:
         json.dumps(all_payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (output_dir / "source-status.json").write_text(
         json.dumps(status_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    # 历史累积（2026-08-17）：日/周/月排行榜数据源，每次抓取合并新条目
+    merge_history(output_dir, green_items_24h, now)
 
     print(f"✅ Green Policy Radar done.")
     print(f"   Green items: {len(green_items_24h)}")
@@ -2464,6 +2511,21 @@ SOURCE_REGION: dict[str, str] = {
     "reuters": "全球",
 }
 
+
+def detect_region(site_id: str, title: str) -> str:
+    """来源默认地域；"全球"源（reuters）按标题关键词再判定（2026-08-17 提取，
+    供数据导出 region 字段与 auto_tag 共用——前端区域切换（国内/国际）依赖此字段）。"""
+    region = SOURCE_REGION.get(site_id, "")
+    if region == "全球":
+        title_lower = (title or "").lower()
+        if any(kw in title_lower for kw in ["eu", "european", "europe", "european union", "brussels"]):
+            region = "欧盟"
+        elif any(kw in title_lower for kw in ["us ", "u.s.", "america", "biden", "trump", "washington"]):
+            region = "美国"
+        elif any(kw in title_lower for kw in ["中国", "china", "beijing", "shanghai"]):
+            region = "中国"
+    return region
+
 # Topic tag rules: (tag, [keywords])
 TOPIC_RULES: list[tuple[str, list[str]]] = [
     ("碳市场", ["碳交易", "碳市场", "碳价", "碳配额", "碳关税", "CBAM", "CCER", "碳排放权", "碳排",
@@ -2523,15 +2585,7 @@ def auto_tag(title: str, site_id: str) -> list[str]:
                 break  # one match per topic
 
     # Region tag
-    region = SOURCE_REGION.get(site_id, "")
-    # For "全球" sources, try to detect region from title
-    if region == "全球":
-        if any(kw in title_lower for kw in ["eu", "european", "europe", "european union", "brussels"]):
-            region = "欧盟"
-        elif any(kw in title_lower for kw in ["us ", "u.s.", "america", "biden", "trump", "washington"]):
-            region = "美国"
-        elif any(kw in title_lower for kw in ["中国", "china", "beijing", "shanghai"]):
-            region = "中国"
+    region = detect_region(site_id, title)
     if region:
         tags.insert(0, region)  # region first
 

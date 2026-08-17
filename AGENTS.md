@@ -30,7 +30,7 @@
 - 抓取：`scripts/update_news.py`（26 源，`fetch_*` 函数 + `BUILTIN_SOURCES` 注册；AI 全链条源走 `AI_SITES` 白名单直通，GitHub 开源趋势走 `TECH_SITES` 直通）
 - 打分：`score_item()` → `score_content_strength()`（按维度自适应）/ `score_topic()` / `score_people()` / `score_freshness()`
 - 四维分类：`categorize_dimension()`（优先级 AI科技 > 金融 > 技术 > 政策；AI 判定用标题关键词+词边界正则（radarai 额外看摘要，防反爬水印误判）；技术榜只放绿色低碳技术——GitHub 开源趋势（radarai）AI 项目归 AI科技榜，非 AI 项目落回技术兜底）
-- 前端：`index.html`（顶部综合榜 + 政策/技术/金融/AI科技 四维榜）+ `assets/app.js` + `assets/styles.css`
+- 前端：`index.html`（两区布局：上方排行榜——主题×周期(日/周/月)×区域(国内/国际)切换；下方实时时间线——跟随筛选、60s 轮询新条目自动插入高亮）+ `assets/app.js` + `assets/styles.css`；数据源 `data/history.json`（62 天累积，含 `region` 字段）+ `data/latest-24h.json`
 - 服务器：`/opt/green-hot-news/`（systemd timer 每 30 分钟，非 git 仓库，代码同步靠 scp）
 - wiki：`Notes/政策wiki/` 按四维导航（政策/技术/金融/AI科技 + 人物横切），新板块归入对应维度
 
