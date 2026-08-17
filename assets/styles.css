@@ -84,6 +84,58 @@ body {
   padding: .25rem .6rem; background: rgba(34,197,94,.1);
   border-radius: 999px; white-space: nowrap;
 }
+.digest-btn {
+  padding: .5rem .9rem; background: linear-gradient(135deg, var(--green-700), var(--green-600));
+  border: 1px solid var(--green-500); border-radius: var(--radius);
+  color: #fff; font-size: .85rem; font-weight: 600; cursor: pointer;
+  white-space: nowrap; transition: transform .12s, box-shadow .12s;
+  box-shadow: 0 2px 8px rgba(34,197,94,.25);
+}
+.digest-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(34,197,94,.35); }
+.digest-btn:active { transform: translateY(0); }
+
+/* ── 当日高分浓缩弹窗（2026-08-17） ───────────────────── */
+.modal-mask {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(5, 10, 5, .72);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
+.modal {
+  width: min(720px, 100%); max-height: 88vh;
+  display: flex; flex-direction: column;
+  background: var(--bg-surface); border: 1px solid var(--border-light);
+  border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.modal-head {
+  display: flex; align-items: baseline; gap: .6rem;
+  padding: 1rem 1.2rem; border-bottom: 1px solid var(--border);
+}
+.modal-head h3 { font-size: 1rem; color: var(--green-400); }
+.modal-sub { font-size: .72rem; color: var(--text-muted); flex: 1; }
+.modal-close {
+  background: none; border: none; color: var(--text-muted);
+  font-size: 1rem; cursor: pointer; padding: .2rem .4rem;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { overflow: auto; padding: 1rem 1.2rem; }
+.digest-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  font-size: .84rem; line-height: 1.75; color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+}
+.modal-foot {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .9rem 1.2rem; border-top: 1px solid var(--border);
+}
+.digest-copy {
+  padding: .5rem 1.1rem; background: var(--green-600);
+  border: none; border-radius: var(--radius); color: #fff;
+  font-size: .85rem; font-weight: 600; cursor: pointer;
+}
+.digest-copy:hover { background: var(--green-500); }
+.digest-hint { font-size: .72rem; color: var(--text-dim); }
 
 /* ── Advanced panel ───────────────────────────────────── */
 .advanced-panel {

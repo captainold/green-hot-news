@@ -38,6 +38,11 @@
   const sourceHealth = $("#sourceHealth");
   const sitePills = $("#sitePills");
   const itemTpl = $("#itemTpl");
+  const digestBtn = $("#digestBtn");
+  const digestMask = $("#digestMask");
+  const digestContent = $("#digestContent");
+  const digestCopy = $("#digestCopy");
+  const digestClose = $("#digestClose");
 
   // ── Load data ──────────────────────────────────────────────────────────────
   const cb = `?t=${Date.now()}`;
@@ -273,6 +278,69 @@
     if (diffMin < 24 * 60) return `${Math.floor(diffMin / 60)}小时前 · ${abs}`;
     return abs;
   }
+
+  // ── 当日高分浓缩（2026-08-17）────────────────────────────────────────────
+  // 读取服务器生成的 data/daily-digest.md（scripts/daily_digest.py 产出），
+  // 弹窗展示 + 一键复制，供转发微信群 / 朋友圈 / 自媒体。
+  let digestText = "";
+  let digestLoaded = false;
+
+  async function loadDigest() {
+    try {
+      const r = await fetch(`./data/daily-digest.md?t=${Date.now()}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      digestText = await r.text();
+      digestLoaded = true;
+      digestContent.textContent = digestText;
+    } catch (err) {
+      console.warn("digest not ready:", err);
+      digestLoaded = false;
+      digestText = "";
+      digestContent.textContent =
+        "浓缩版尚未生成：服务器每次抓取后自动生成（约每 30 分钟更新一次）。\n\n可稍后刷新再试，或在本地运行：\npython3.11 scripts/daily_digest.py";
+    }
+  }
+
+  function openDigest() {
+    digestMask.hidden = false;
+    document.body.style.overflow = "hidden";
+    if (!digestLoaded) loadDigest();
+  }
+  function closeDigest() {
+    digestMask.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  digestBtn.addEventListener("click", openDigest);
+  digestClose.addEventListener("click", closeDigest);
+  digestMask.addEventListener("click", (e) => {
+    if (e.target === digestMask) closeDigest();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !digestMask.hidden) closeDigest();
+  });
+  digestCopy.addEventListener("click", async () => {
+    if (!digestText) {
+      await loadDigest();
+      if (!digestText) return;
+    }
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(digestText);
+      copied = true;
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = digestText;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      copied = document.execCommand("copy");
+      ta.remove();
+    }
+    digestCopy.textContent = copied ? "✅ 已复制" : "⚠️ 复制失败";
+    setTimeout(() => { digestCopy.textContent = "📄 复制全文"; }, 2000);
+  });
 
   // ── Event listeners ────────────────────────────────────────────────────────
   searchInput.addEventListener("input", () => {

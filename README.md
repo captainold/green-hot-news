@@ -1,10 +1,10 @@
 # Green Hot News · 绿色低碳动态雷达
 
-国内外最新绿色低碳动态聚合站：**政策 + 技术 + 金融 + AI科技** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（44 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.0**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100），前端**综合榜 + 四维榜**展示 + 分数徽章（S/A/B/C/D 等级）。
+国内外最新绿色低碳动态聚合站：**政策 + 技术 + 金融 + AI科技** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（47 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.0**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100），前端**综合榜 + 四维榜**展示 + 分数徽章（S/A/B/C/D 等级），**当日高分浓缩**一键复制转发。
 
 ## 在线入口
 
-- 线上页面：`https://ywm.life` （your world message ）（新加坡服务器 Nginx 直出，顶部综合评分排行榜 + 政策/技术/金融/AI科技 四维榜）
+- 线上页面：`https://ywm.life` （your world message ）（新加坡服务器 Nginx 直出，顶部综合评分排行榜 + 政策/技术/金融/AI科技 四维榜 + 「📋 当日浓缩」一键复制转发）
 - 管理面板：`https://ywm.life/admin/`（消息源健康监控，Basic Auth 保护，不公开；账号见 docs/服务器部署与运维.md）
 - GitHub 镜像：`https://captainold.github.io/green-hot-news/`（仅代码归档，CI 已禁用）
 - Obsidian 笔记库：`C:\Users\wenyu\Documents\Obsidian_wen\green-hot-news\Notes\`
@@ -101,7 +101,8 @@ python3.11 scripts/update_news.py --output-dir data --window-hours 24
 
 - `data/latest-24h.json` — 24小时绿色动态信号（过滤后，含 `score`/`score_level`/`score_breakdown`/`dimension` 字段）
 - `data/latest-24h-all.json` — 24小时全量数据
-- `data/source-status.json` — 44 个源健康状态
+- `data/source-status.json` — 47 个源健康状态
+- `data/daily-digest.md` — 当日高分浓缩版（评分 ≥70 A 级以上，四维精选，可直接转发；`scripts/daily_digest.py` 生成，服务器每次抓取后自动更新）
 - `data/published-index.json` — 发布时间索引
 - `data/title-index.json` — 完整标题索引
 - `data/summary-index.json` — 摘要索引（前端可展开摘要，News Minimalist 风格）

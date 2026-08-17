@@ -32,6 +32,7 @@
 
       <section class="primary-controls">
         <input id="searchInput" type="search" placeholder="搜索动态 / 来源 / 关键词" />
+        <button id="digestBtn" class="digest-btn" type="button" title="A 级以上高分动态浓缩版，可直接转发">📋 当日浓缩</button>
         <div class="mode-hint" id="modeHint">绿色动态</div>
       </section>
 
@@ -132,6 +133,24 @@
         </div>
       </details>
     </main>
+
+    <!-- 当日高分浓缩弹窗（2026-08-17） -->
+    <div class="modal-mask" id="digestMask" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-label="当日高分浓缩">
+        <div class="modal-head">
+          <h3>📋 当日高分浓缩</h3>
+          <span class="modal-sub">A 级以上（评分 ≥ 70）· 四维精选 · 可直接转发</span>
+          <button id="digestClose" class="modal-close" type="button" aria-label="关闭">✕</button>
+        </div>
+        <div class="modal-body">
+          <pre id="digestContent" class="digest-content">加载中...</pre>
+        </div>
+        <div class="modal-foot">
+          <button id="digestCopy" class="digest-copy" type="button">📄 复制全文</button>
+          <span class="digest-hint">复制后可直接转发微信群 / 朋友圈 / 自媒体</span>
+        </div>
+      </div>
+    </div>
 
     <template id="itemTpl">
       <article class="news-card">
