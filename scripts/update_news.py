@@ -835,6 +835,109 @@ def fetch_jp_anre(session: requests.Session, now: datetime) -> list[RawItem]:
     ], limit=15, locale="ja")
 
 
+# ── 国际智库（2026-08-17 第三轮：E3G/Agora/TERI） ──────────────────────────
+def fetch_e3g(session: requests.Session, now: datetime) -> list[RawItem]:
+    """E3G（伦敦气候与能源智库）— RSS 直抓（2026-08-17 接入）。
+
+    欧洲最具影响力的气候政策智库之一，news 以欧盟/全球气候金融、能源转型评论为主，
+    政策浓度高。RSS /feed/ 活跃（约 12 条滚动），有 published 时间。
+    """
+    return fetch_rss_feed(
+        session, "https://www.e3g.org/feed/", "e3g", "E3G", now, limit=20,
+    )
+
+
+def fetch_agora(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Agora Energiewende（柏林能源转型智库）— news-events 列表页解析（2026-08-17 接入）。
+
+    德国能源转型权威智库，出报告/政策建议/声明，无 RSS（/feed 404），
+    列表页 /news-events 含文章卡片（标题+链接+发布日期 "1 August 2026"）。
+    归媒体库·国际（专家解读档）。
+    """
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.agora-energiewende.org/news-events", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        seen: set[tuple[str, str]] = set()
+        for a in soup.find_all("a", href=True):
+            href = a.get("href", "")
+            title = a.get_text(strip=True)
+            if not title or len(title) < 12:
+                continue
+            if not href.startswith("/news-events/"):
+                continue
+            if href.startswith("/news-events/filter"):
+                continue  # 导航过滤链接
+            if (title, href) in seen:
+                continue
+            seen.add((title, href))
+            if not href.startswith("http"):
+                href = urljoin("https://www.agora-energiewende.org", href)
+            published = None
+            cont = a.find_parent(["article", "li", "div"])
+            if cont is not None:
+                m = re.search(r"(\d{1,2}\s+\w+\s+\d{4})", cont.get_text())
+                if m:
+                    for fmt in ("%d %B %Y", "%d %b %Y"):
+                        try:
+                            published = datetime.strptime(m.group(1), fmt).replace(tzinfo=UTC)
+                            break
+                        except Exception:
+                            continue
+            items.append(RawItem(
+                site_id="agora", site_name="Agora·能源转型",
+                title=title, url=href, published_at=published,
+            ))
+    except Exception:
+        pass
+    return items[:20]
+
+
+def fetch_teri(session: requests.Session, now: datetime) -> list[RawItem]:
+    """TERI 印度能源与资源研究所 — press-release 列表页解析（2026-08-17 接入）。
+
+    印度最权威能源/环境智库，官网 /press-release 列表干净
+    （标题+链接+日期 "10 Aug 2026"）。补印度非官方视角（官方源已有 PIB）。
+    """
+    items: list[RawItem] = []
+    try:
+        r = session.get("https://www.teriin.org/press-release", timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        seen: set[tuple[str, str]] = set()
+        for a in soup.find_all("a", href=True):
+            href = a.get("href", "")
+            title = a.get_text(strip=True)
+            if not title or len(title) < 12:
+                continue
+            if not href.startswith("/press-release/"):
+                continue
+            if (title, href) in seen:
+                continue
+            seen.add((title, href))
+            if not href.startswith("http"):
+                href = urljoin("https://www.teriin.org", href)
+            published = None
+            cont = a.find_parent(["article", "li", "div"])
+            if cont is not None:
+                m = re.search(r"(\d{1,2}\s+\w+\w*\s+\d{4})", cont.get_text())
+                if m:
+                    for fmt in ("%d %B %Y", "%d %b %Y"):
+                        try:
+                            published = datetime.strptime(m.group(1), fmt).replace(tzinfo=UTC)
+                            break
+                        except Exception:
+                            continue
+            items.append(RawItem(
+                site_id="teri", site_name="TERI·印度能源与资源所",
+                title=title, url=href, published_at=published,
+            ))
+    except Exception:
+        pass
+    return items[:20]
+
+
 # ── 中国 P0 第二批（2026-08-14：人行/环交所/NCSC/CAEP/环境报/CNESA） ──
 
 def fetch_pbc(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1540,6 +1643,8 @@ SOURCE_SCORE: dict[str, int] = {
     # 美国/日本扩展官方源（2026-08-14 第二轮：部委/联邦机构档）
     "us_noaa": 25, "us_eia": 25, "us_ferc": 25, "us_carb": 25,
     "jp_moe": 25, "jp_meti": 25, "jp_anre": 25,
+    # 国际智库（2026-08-17 第三轮：专家解读/政策评论档，同碳道/CCAI）
+    "e3g": 18, "agora": 18, "teri": 18,
     # 中国 P0 第二批（2026-08-14：官方机构档）
     "pbc": 25, "cneeex": 25, "ncsc": 25, "caep": 25,
     "cenews": 16, "cnesa": 16,
@@ -1711,6 +1816,12 @@ POLICY_DIM_KW = [
     "发布会", "答记者问", "解读", "一图读懂", "政策", "文件", "国务院",
     "十五五", "碳达峰", "碳中和", "双碳", "目标", "标准", "规范",
     "法规", "实施", "行动方案", "指导意见", "政策文件", "政策解读",
+    # English（2026-08-17：国际智库 E3G/Agora/TERI 接入后补充——
+    # 英文政策/气候分析标题不再掉进媒体库"技术"兜底；已验证对存量数据 0 漂移）
+    "policy", "policies", "regulation", "regulatory", "legislation", "reform",
+    "roadmap", "framework", "agreement", "government", "minister", "parliament",
+    "mandate", "consultation", "strategy", "target", "commitment",
+    "energy transition", "climate action", "climate policy", "net zero", "net-zero",
 ]
 
 
@@ -1778,6 +1889,8 @@ GREEN_SITES = {
     "us_noaa", "us_eia", "us_ferc", "us_carb", "jp_moe", "jp_meti", "jp_anre",
     # 中国 P0 第二批（2026-08-14：官方机构直通；环境报/CNESA 走关键词过滤）
     "pbc", "cneeex", "ncsc", "caep",
+    # 国际智库（2026-08-17 第三轮：全站绿色主题，直通）
+    "e3g", "agora", "teri",
 }
 
 # 低频源宽窗口（2026-08-14）：国外官方源 + 中国智库型机构（NCSC/CAEP），
@@ -1787,6 +1900,12 @@ FOREIGN_GOV_SITES = {
     "eu_commission", "euractiv", "india_pib",
     "jp_moe", "jp_meti", "jp_anre",
     "ncsc", "caep",
+}
+
+# 超低频源（2026-08-17）：国际智库更新周级~双周级（Agora 最新条目可超 14 天），
+# 深度分析时效性弱于新闻 → 网站数据用 21 天宽窗口，避免整源被滤空
+LOW_FREQ_SITES = {
+    "e3g", "agora", "teri",
 }
 
 # AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
@@ -1862,6 +1981,10 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_jp_moe, "jp_moe", "日本环境省"),
     (fetch_jp_meti, "jp_meti", "日本经产省"),
     (fetch_jp_anre, "jp_anre", "日本资源能源厅"),
+    # 国际智库（2026-08-17 第三轮）
+    (fetch_e3g, "e3g", "E3G"),
+    (fetch_agora, "agora", "Agora·能源转型"),
+    (fetch_teri, "teri", "TERI·印度能源与资源所"),
     # 中国 P0 第二批（2026-08-14）
     (fetch_pbc, "pbc", "中国人民银行"),
     (fetch_cneeex, "cneeex", "上海环交所"),
@@ -1928,6 +2051,10 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "jp_moe":  ("policy", "国际组织"),
     "jp_meti": ("policy", "国际组织"),
     "jp_anre": ("policy", "国际组织"),
+    # 国际智库（2026-08-17 第三轮 → 媒体库：专家解读/政策评论）
+    "e3g":   ("media", ""),
+    "agora": ("media", ""),
+    "teri":  ("media", ""),
     # 中国 P0 第二批（2026-08-14）
     "pbc":    ("policy", "中国"),
     "cneeex": ("policy", "中国"),
@@ -2069,12 +2196,16 @@ def main() -> int:
     # 24h window filter for web output
     # 国外官方源更新频率低（周级）→ 用 7 天宽窗口，否则 96h 窗口常滤空
     # （2026-08-14：CARB 最新 08-07 / 环境省 08-07 / 资源能源厅 08-10 曾被 96h 滤掉）
+    # 国际智库（E3G/Agora/TERI）周级~双周级 → 21 天宽窗口（2026-08-17）
     window_start = now - timedelta(hours=args.window_hours)
     foreign_win = now - timedelta(hours=7 * 24)
+    low_freq_win = now - timedelta(hours=21 * 24)
     all_items_24h = [r for r in all_items if not r.get("published_at") or parse_iso(r["published_at"]) is None or parse_iso(r["published_at"]) >= window_start]
     green_items_24h = [r for r in green_items
                        if not r.get("published_at") or parse_iso(r["published_at"]) is None
-                       or parse_iso(r["published_at"]) >= (foreign_win if r.get("site_id") in FOREIGN_GOV_SITES else window_start)]
+                       or parse_iso(r["published_at"]) >= (low_freq_win if r.get("site_id") in LOW_FREQ_SITES
+                                                          else foreign_win if r.get("site_id") in FOREIGN_GOV_SITES
+                                                          else window_start)]
 
     # Sort
     def sort_key(r: dict) -> str:
@@ -2294,6 +2425,8 @@ SOURCE_REGION: dict[str, str] = {
     # 美国/日本扩展官方源（2026-08-14 第二轮）
     "us_noaa": "美国", "us_eia": "美国", "us_ferc": "美国", "us_carb": "美国",
     "jp_moe": "日本", "jp_meti": "日本", "jp_anre": "日本",
+    # 国际智库（2026-08-17 第三轮）
+    "e3g": "欧盟", "agora": "欧盟", "teri": "印度",
     # 中国 P0 第二批（2026-08-14）
     "pbc": "中国", "cneeex": "中国", "ncsc": "中国", "caep": "中国",
     "cenews": "中国", "cnesa": "中国",
