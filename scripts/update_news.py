@@ -837,14 +837,22 @@ def fetch_jp_anre(session: requests.Session, now: datetime) -> list[RawItem]:
 
 # ── 国际智库（2026-08-17 第三轮：E3G/Agora/TERI） ──────────────────────────
 def fetch_e3g(session: requests.Session, now: datetime) -> list[RawItem]:
-    """E3G（伦敦气候与能源智库）— RSS 直抓（2026-08-17 接入）。
+    """E3G（伦敦气候与能源智库）— RSS 直抓优先，Google News 兜底（2026-08-17 接入）。
 
     欧洲最具影响力的气候政策智库之一，news 以欧盟/全球气候金融、能源转型评论为主，
     政策浓度高。RSS /feed/ 活跃（约 12 条滚动），有 published 时间。
+    PITFALL: e3g.org/feed 在新加坡服务器 IP 被 Cloudflare 403（本地可抓）→
+    RSS 返回空时自动 fallback Google News 搜 site:e3g.org（同 CleanTechnica 模式）。
     """
-    return fetch_rss_feed(
+    items = fetch_rss_feed(
         session, "https://www.e3g.org/feed/", "e3g", "E3G", now, limit=20,
     )
+    if items:
+        return items
+    return fetch_foreign_gov(session, now, "e3g", "E3G", [
+        "site:e3g.org (climate OR energy OR emissions OR carbon) when:30d",
+        "site:e3g.org (finance OR policy OR transition OR grid) when:30d",
+    ], limit=20)
 
 
 def fetch_agora(session: requests.Session, now: datetime) -> list[RawItem]:
