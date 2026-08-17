@@ -1803,8 +1803,14 @@ AI_DIM_KW = [
     "ai芯片", "ai应用", "ai模型", "模型发布", "ai创业", "ai融资",
     "机器学习模型", "计算机视觉", "自然语言处理", "强化学习", "aigc",
     "大模型创业", "模型即服务", "ai agent", "mcp", "语义", "transformer架构",
+    # 2026-08-17：GitHub 趋势类 AI 项目（stable-diffusion-webui 等仓库名不含 AI 关键词，
+    # 但摘要必含 diffusion；radarai 摘要参与 AI 判定，故补此词）
+    "diffusion",
 ]
-AI_TITLE_RE = r"\bai\b"  # 标题级英文 AI（词边界，防 "tail" "said" 误报）
+# 标题级英文 AI：负向环视版词边界——ASCII 字母外的任意字符（中文/连字符/空格等）都算边界。
+# 比 \bai\b 更能命中中文上下文（Python \b 把汉字当 \w，"AI对气候…" 用 \bai\b 会漏判，
+# 实测漏判掉进技术榜），同时仍排除 "tail"/"said"/"again"/"Aira"/"taiyangnews" 等单词内 ai。
+AI_TITLE_RE = r"(?<![a-z])ai(?![a-z])"
 FINANCE_DIM_KW = [
     "碳市场", "碳交易", "碳价", "碳配额", "碳关税", "CBAM", "CCER",
     "ESG", "绿色金融", "碳金融", "债券", "融资", "投资", "基金", "期货",
@@ -1838,9 +1844,8 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     import re as _dim_re
     title_l = (title or "").lower()
     text = f"{title or ''} {summary or ''}".lower()
-    # 站点级维度强制（2026-08-14）：radarai = GitHub 开源项目趋势 → 技术。
-    # 比 AI_SITES 判定优先——GitHub 项目含大量 AI 关键词（deepseek/ollama…），
-    # 用户明确要求该源归「技术」维度，不能让 AI_DIM_KW 抢走。
+    # 站点级维度强制（机制保留，2026-08-17 起无强制项）：
+    # radarai 不再整源归「技术」——技术榜只放绿色低碳技术，AI 项目按关键词进 AI科技榜
     if site_id in DIM_SITE_OVERRIDE:
         return DIM_SITE_OVERRIDE[site_id]
     # AI 判定：AI_SITES 源全链条直通（AIHOT/机器之心等标题未必含 AI 关键词）
@@ -1849,6 +1854,15 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
         return "AI科技"
     if any(kw.lower() in title_l for kw in AI_DIM_KW) or _dim_re.search(AI_TITLE_RE, title_l):
         return "AI科技"
+    # GitHub 开源趋势（TECH_SITES/radarai）：仓库名常不含 AI 关键词
+    # （stable-diffusion-webui / browser-use 等），而 radarai 摘要是雷达站真实中文描述
+    # （无反爬水印风险）→ 允许摘要参与 AI 判定；AI 项目归 AI科技榜，其余一律归「技术」，
+    # 不再走政策/金融关键词级联——避免 framework/目标/投资 等通用词把 GitHub 项目
+    # 误分到政策榜/金融榜（2026-08-17：技术榜只放绿色低碳技术，AI 项目单独归 AI科技榜）
+    if site_id in TECH_SITES:
+        if any(kw.lower() in text for kw in AI_DIM_KW):
+            return "AI科技"
+        return "技术"
     for kw in FINANCE_DIM_KW:
         if kw.lower() in text:
             return "金融"
@@ -1925,20 +1939,23 @@ AI_SITES = {
     "venturebeat",  # VentureBeat AI（国际 AI 商业）
     "arxiv_ai",     # arXiv cs.AI（理论前沿）
     "aihot",        # AIHOT（AI 行业动态聚合：模型/产品/行业/论文，带 AI 评分）
+    # 2026-08-17：Climate Change AI（ccai）= 机器学习应对气候变化机构，
+    # 全部产出均为 AI×绿色低碳（AI 资助/工作坊/ML 基准）→ 归 AI科技榜，
+    # 避免 NeurIPS 工作坊/ML 基准等项目因标题不含 AI 关键词而落进技术榜
+    "ccai",         # Climate Change AI（AI×气候交叉）
 }
 
-# 技术全链条源（2026-08-14）：GitHub 开源项目趋势，全量直通（同 AI_SITES 逻辑），
-# 维度在 DIM_SITE_OVERRIDE 强制为「技术」（项目未必含 AI 关键词，且用户要求归技术类）
+# 技术全链条源（2026-08-14）：GitHub 开源项目趋势，全量直通（同 AI_SITES 逻辑）。
+# 维度（2026-08-17 调整）：非 AI 项目落回「技术」（媒体库兜底）；AI 项目在
+# categorize_dimension 中按关键词（标题+摘要）归 AI科技榜——技术榜只放绿色低碳技术
 TECH_SITES = {
     "radarai",      # RadarAI·GitHub趋势（开源项目热度追踪）
 }
 
-# 站点级维度强制（2026-08-14）：categorize_dimension 最先检查，优先于 AI_SITES 直通。
-# radarai = GitHub 开源项目趋势，用户明确归「技术」维度（项目标题含大量 AI 关键词，
-# 若不强制会被 AI_DIM_KW 抢到 AI科技）。
-DIM_SITE_OVERRIDE: dict[str, str] = {
-    "radarai": "技术",
-}
+# 站点级维度强制：categorize_dimension 最先检查，优先于 AI_SITES 直通。
+# 2026-08-17 起为空——radarai（GitHub 开源趋势）不再整源归「技术」：
+# 技术榜只放绿色低碳技术，AI 项目按关键词（含摘要）归 AI科技榜，非 AI 项目落回技术兜底。
+DIM_SITE_OVERRIDE: dict[str, str] = {}
 
 
 def is_policy_relevant(title: str, url: str = "", site_id: str = "") -> bool:
@@ -2045,20 +2062,20 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "mee_jiedu":  ("policy", "中国"),
     "nea":        ("policy", "中国"),
     "miit":       ("policy", "中国"),
-    # 国外主要国家政策源（2026-08-14 新增 → 政策库·国际）
-    "us_epa":       ("policy", "国际组织"),
-    "us_doe":       ("policy", "国际组织"),
-    "eu_commission":("policy", "国际组织"),
-    "euractiv":     ("policy", "国际组织"),
-    "india_pib":    ("policy", "国际组织"),
-    # 美国/日本扩展官方源（2026-08-14 第二轮 → 政策库·国际）
-    "us_noaa": ("policy", "国际组织"),
-    "us_eia":  ("policy", "国际组织"),
-    "us_ferc": ("policy", "国际组织"),
-    "us_carb": ("policy", "国际组织"),
-    "jp_moe":  ("policy", "国际组织"),
-    "jp_meti": ("policy", "国际组织"),
-    "jp_anre": ("policy", "国际组织"),
+    # 国外政府源（2026-08-17：按国家分组——政府与非政府区分，
+    # 「国际组织」只放政府间机构；Euractiv 是媒体移入媒体库）
+    "us_epa":       ("policy", "美国"),
+    "us_doe":       ("policy", "美国"),
+    "us_noaa":      ("policy", "美国"),
+    "us_eia":       ("policy", "美国"),
+    "us_ferc":      ("policy", "美国"),
+    "us_carb":      ("policy", "美国"),
+    "eu_commission":("policy", "欧盟"),
+    "jp_moe":       ("policy", "日本"),
+    "jp_meti":      ("policy", "日本"),
+    "jp_anre":      ("policy", "日本"),
+    "india_pib":    ("policy", "印度"),
+    "euractiv":     ("media", ""),
     # 国际智库（2026-08-17 第三轮 → 媒体库：专家解读/政策评论）
     "e3g":   ("media", ""),
     "agora": ("media", ""),

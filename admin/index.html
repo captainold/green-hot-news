@@ -259,21 +259,22 @@
         // ── per-site table（按类型分组：政府/国际组织/媒体/KOL/热榜）────
         // 新增源时在此登记 site_id → 分类；未登记自动归入「其他」
         const SITE_CAT = {
-          // 🏛️ 政府官方（部委）
+          // 🏛️ 政府官方（国内：部委/官方机构）
           'ndrc': 'gov', 'mee': 'gov', 'mee_jiedu': 'gov', 'nea': 'gov', 'miit': 'gov',
-          // 🌐 国际组织（政府间机构）
-          'iea': 'intl', 'irena': 'intl', 'unfccc': 'intl', 'worldbank': 'intl',
-          // 国外主要国家政策源（2026-08-14 新增）
-          'us_epa': 'intl', 'us_doe': 'intl', 'eu_commission': 'intl', 'euractiv': 'intl', 'india_pib': 'intl',
-          // 美国/日本扩展官方源（2026-08-14 第二轮）
-          'us_noaa': 'intl', 'us_eia': 'intl', 'us_ferc': 'intl', 'us_carb': 'intl',
-          'jp_moe': 'intl', 'jp_meti': 'intl', 'jp_anre': 'intl',
-          // 中国官方机构（2026-08-14 第三轮/人行）
           'pbc': 'gov', 'cneeex': 'gov', 'ncsc': 'gov', 'caep': 'gov',
+          // 🏛️ 政府官方（国外政府机构，2026-08-17 从「国际组织」移入——
+          //    政府与非政府须区分，国际组织只放政府间机构）
+          'us_epa': 'gov', 'us_doe': 'gov', 'eu_commission': 'gov', 'india_pib': 'gov',
+          'us_noaa': 'gov', 'us_eia': 'gov', 'us_ferc': 'gov', 'us_carb': 'gov',
+          'jp_moe': 'gov', 'jp_meti': 'gov', 'jp_anre': 'gov',
+          // 🌐 国际组织（政府间机构，不含各国政府）
+          'iea': 'intl', 'irena': 'intl', 'unfccc': 'intl', 'worldbank': 'intl',
           // 📰 媒体（行业/综合/专业媒体）
           'reuters': 'media', 'bjx': 'media', 'chinaenergy': 'media', 'carbonbrief': 'media',
           'stdaily': 'media', 'cleantechnica': 'media', 'tanpaifang': 'media', 'ideacarbon': 'media',
           'cenews': 'media', 'cnesa': 'media',
+          // Euractiv 是欧洲综合媒体，非政府机构（2026-08-17 从「国际组织」移入）
+          'euractiv': 'media',
           // 🧑‍🔬 KOL/研究（个人专家/研究社区/智库/AI 新源）
           'ccai': 'kol', 'jiqizhixin': 'kol', 'qbitai': 'kol', 'openai': 'kol',
           'venturebeat': 'kol', 'arxiv_ai': 'kol', 'aihot': 'kol',
@@ -283,8 +284,8 @@
           'allnet': 'hot', 'radarai': 'hot',
         };
         const CATS = [
-          { id: 'gov',   label: '🏛️ 政府官方' },
-          { id: 'intl',  label: '🌐 国际组织' },
+          { id: 'gov',   label: '🏛️ 政府官方（国内/国外）' },
+          { id: 'intl',  label: '🌐 国际组织（政府间）' },
           { id: 'media', label: '📰 媒体' },
           { id: 'kol',   label: '🧑‍🔬 KOL / 研究' },
           { id: 'hot',   label: '🔥 全网热榜' },

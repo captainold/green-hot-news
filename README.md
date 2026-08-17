@@ -62,10 +62,11 @@
 - **机器之心 / 量子位**（中文 AI 头部媒体，Google News fallback）
 - **VentureBeat AI**（国际 AI 商业，RSS 限量 30）
 - **AIHOT**（`aihot.virxact.com`，AI 行业动态聚合：X/公众号/RSS 几十源，精选 RSS 每 30 分钟抓取，带热度与 AI 评分；2026-08-14 接入）
+- **Climate Change AI**（AI×气候交叉机构，2026-08-17 起全链条归 AI科技榜——其产出均为机器学习应对气候项目，避免 NeurIPS 工作坊/ML 基准等项目落进技术榜）
 
 ### 技术趋势（媒体库 · 2026-08-14 新增）
-> GitHub 开源项目热度追踪，TECH_SITES 白名单直通 + DIM_SITE_OVERRIDE 站点级维度强制 → 技术维度
-- **RadarAI·GitHub趋势**（`radarai.top/trends`）：聚合 GitHub Trending 开源项目（中文摘要+star），抓 `/api/trends` JSON 取前 40 条，归「技术」维度（AIHOT 等源里的 deepseek/ollama 类项目不会抢到 AI科技榜）；无发布时间走收录时间兜底
+> GitHub 开源项目热度追踪，TECH_SITES 白名单直通；AI 项目按关键词（标题+摘要）归 AI科技榜，非 AI 项目归技术维度（2026-08-17 调整：技术榜只放绿色低碳技术，不再整源强制归技术）
+- **RadarAI·GitHub趋势**（`radarai.top/trends`）：聚合 GitHub Trending 开源项目（中文摘要+star），抓 `/api/trends` JSON 取前 40 条；DeepSeek/ollama/stable-diffusion 等 AI 项目进 AI科技榜，其余归「技术」维度；无发布时间走收录时间兜底
 
 ### 全网热点（媒体库 · 2026-08-13 新增）
 - **allnet.hot**（`https://api.allnet.hot/api/open/v1`）：抓取微博热搜、知乎热榜、今日头条热榜、澎湃热榜、IT之家最新 5 个榜单
