@@ -1454,6 +1454,11 @@ def fetch_tandao(session: requests.Session, now: datetime) -> list[RawItem]:
                 continue  # 碳道 news items live under /news_free/ or /newspc/
             if not href.startswith("http"):
                 href = urljoin("https://www.ideacarbon.org", href)
+            # 标题优先取列表卡片 .news-title 元素；a.get_text() 会把标题+摘要+
+            # 作者+相对时间全拼在一起（2026-08-17 修复：标题重复污染）
+            title_el = a.select_one(".news-title")
+            if title_el:
+                text = title_el.get_text(strip=True)
             items.append(RawItem(
                 site_id="ideacarbon", site_name="碳道",
                 title=text, url=href,
