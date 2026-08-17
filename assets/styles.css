@@ -101,6 +101,10 @@ body {
   display: flex; align-items: center; justify-content: center;
   padding: 1.5rem;
 }
+/* PITFALL(2026-08-17): .modal-mask 的 display:flex 会覆盖 HTML hidden 属性
+   （作者样式 > UA 样式），导致弹窗页面加载时就显示且内容永不加载。
+   必须显式声明 hidden 时隐藏。 */
+.modal-mask[hidden] { display: none; }
 .modal {
   width: min(720px, 100%); max-height: 88vh;
   display: flex; flex-direction: column;
