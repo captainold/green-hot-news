@@ -12,8 +12,10 @@ Design goals:
 
 from __future__ import annotations
 
+import json
 import re
 from typing import Any, Optional
+from urllib.parse import quote, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -25,10 +27,10 @@ BROWSER_UA = (
 
 # Nodes that are never article content
 GARBAGE_SELECTORS = (
-    "script,style,noscript,iframe,nav,footer,header,aside,form,button,"
-    "svg,canvas,figure,map,audio,video,select,option,"
+    "script,style,noscript,iframe,nav,footer,header,aside,button,"
+    "svg,canvas,figure,map,audio,video,select,option,input,"
     ".advertisement,.ads,.ad,.banner,.share,.sharebox,.related,.recommend,"
-    ".comment,.comments,.breadcrumb,.breadcrumbs,.pagination,.page-nav,"
+    ".comment,.comments,.breadcrumb,.breadcrumbs,[class*='breadcrumb'],.pagination,.page-nav,"
     ".toc,.toolbar,.qrcode,.footer,.header,.nav,.menu,"
     ".list,.listbox,.news_list,.news-list,.search,.searchbox,"
     ".tanlistbox_right,.list_r_b_x,.list_img_news,.about-read"  # 碳交易网推荐/相关阅读 (2026-08-11)
@@ -243,16 +245,51 @@ def _clean_title(raw: Optional[str]) -> Optional[str]:
         return None
     t = raw.strip()
     t = re.sub(r"\s+", " ", t)
-    # 去掉站点 SEO 后缀（"标题_站点名" 模式，如 碳排放交易网/国家发展和改革委员会）
-    for sep in ("_", "｜", "|", "——", "-"):
-        if sep in t:
-            head, tail = t.rsplit(sep, 1)
-            # 后缀是站点特征（含 网/委员会/官网/政府/部 等）或 tail 很短
-            if len(tail) <= 25 and re.search(
-                r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会)", tail):
-                t = head.strip()
-                break
+    # 去掉站点 SEO 后缀（"标题_站点名" 模式，如 碳排放交易网/国家发展和改革委员会，
+    # 以及英文源名后缀 " - EPA" / " - CleanTechnica" 等）
+    for sep in ("_", "｜", "|", "——", "-", "–", "—"):
+        if sep not in t:
+            continue
+        head, tail = t.rsplit(sep, 1)
+        tail_s = tail.strip()
+        if not tail_s:
+            continue
+        # 中文/日文站点后缀
+        if len(tail_s) <= 25 and re.search(
+                r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会|环境省|经产省"
+                r"|環境局|環境省|経産省|資源エネルギー庁)", tail_s):
+            t = head.strip()
+            break
+        # 英文源名后缀：纯大写缩写 / 含域名 / 已知英文媒体机构名
+        if len(tail_s) <= 30 and (
+            re.fullmatch(r"[A-Z][A-Z0-9]{1,8}", tail_s)
+            or re.search(r"\.(gov|com|org|net|in|eu|go\.jp)\b", tail_s, re.IGNORECASE)
+            or (tail_s[0].isupper() and re.search(
+                r"(CleanTechnica|Reuters|Carbon Brief|Asian Business Review|Euractiv|"
+                r"World Bank|Department of Energy|Environmental Protection|US EPA|U\.S\. EPA|"
+                r"European Commission|Climate Change AI|VentureBeat|Bloomberg|Guardian|"
+                r"Financial Times|Scientific American|The Economist|Agora|E3G)",
+                tail_s, re.IGNORECASE))
+        ):
+            t = head.strip()
+            break
     return t[:120] or None
+
+
+# 通用站名/栏目页标题（非文章标题）——PIB、gov 站点常见
+_GENERIC_SITE_TITLE_RE = re.compile(
+    r"(press release page|press information bureau|home\s*[|—–-]?|news\s*[|—–-]?|"
+    r"english releases|photo album|blogdescription|pib backgrounder)",
+    re.IGNORECASE,
+)
+
+
+def _is_generic_site_title(raw: str) -> bool:
+    """True if the <title> looks like a generic site/landing title, not an article."""
+    t = (raw or "").strip()
+    if not t:
+        return True
+    return bool(_GENERIC_SITE_TITLE_RE.search(t))
 
 
 def _cut_at_sentence(text: str, limit: int) -> str:
@@ -276,12 +313,21 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
     """Return (body_text, page_title). body_text is '' when nothing found."""
     if soup is None:
         soup = BeautifulSoup(html, "html.parser")
-    # 优先 h1（干净标题），fallback <title>（可能带站点 SEO 后缀）
+    # 优先 h1（干净标题），fallback <title>（可能带站点 SEO 后缀）。
+    # PIB 等站点无 h1，标题在 h2，且 <title> 是通用站名
+    # （"Press Release Page | Press Information Bureau"）→ 优先取 h2。
     h1_el = soup.find("h1")
     title_el = soup.find("title")
     page_title = None
     if h1_el is not None:
         page_title = _clean_title(h1_el.get_text())
+    if not page_title:
+        title_raw = title_el.get_text() if title_el is not None else ""
+        # 通用站名标题特征（非文章标题）
+        if _is_generic_site_title(title_raw):
+            h2_el = soup.find("h2")
+            if h2_el is not None:
+                page_title = _clean_title(h2_el.get_text())
     if not page_title and title_el is not None:
         page_title = _clean_title(title_el.get_text())
 
@@ -291,7 +337,10 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
     # 1) STRONG-PRIORITY containers: gov TRS systems mark the true article
     #    body with TRS_Editor / Custom_UnionStyle — trust it even if another
     #    candidate (e.g. a sidebar div) has more text.
-    for sel in ("[class*='TRS_Editor']", "[class*='Custom_UnionStyle']"):
+    #    [class*='wysiwyg'] 是日本政府站（环境省 env.go.jp / 经产省等）通用 CMS 正文容器
+    #    （2026-08-18：kyushu.env.go.jp 正文在 .wysiwyg 内，正文是直接文本节点 + <br>，
+    #    不包 <p>/<li>，旧逻辑落回 whole-container 会混入面包屑与导航）。
+    for sel in ("[class*='TRS_Editor']", "[class*='Custom_UnionStyle']", "[class*='wysiwyg']"):
         cands = soup.select(sel)
         if cands:
             text = cands[0].get_text(" ", strip=True)
@@ -353,7 +402,15 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
     if page_title and len(page_title) > 8:
         for i, b in enumerate(deduped):
             if b.startswith(page_title):
-                body = "\n\n".join(deduped[i + 1:])
+                rest = b[len(page_title):].strip()
+                if rest:
+                    # 标题只是该块的前缀（正文紧跟其后，例如单块 fallback 的
+                    # whole-container 文本）——保留剩余正文，不能整块丢弃。
+                    deduped[i] = rest
+                    body = "\n\n".join(deduped[i:])
+                else:
+                    # 该块就是标题本身（多块布局的首个标题块）——丢弃它
+                    body = "\n\n".join(deduped[i + 1:])
                 break
     return body, page_title
 
@@ -387,17 +444,89 @@ def extract_source_org(soup: BeautifulSoup) -> Optional[str]:
     return None
 
 
+def _decode_google_news_url(url: str, session: Optional[requests.Session] = None,
+                            timeout: tuple[int, int] = (10, 20)) -> Optional[str]:
+    """Decode a Google News redirect URL to its real source article URL.
+
+    Google News wraps every article link in an encrypted redirect
+    (news.google.com/rss/articles/<b64>?oc=5). 解码需两步：
+    1. GET https://news.google.com/articles/<b64> → 页面 c-wiz div 上的
+       data-n-a-sg（签名）与 data-n-a-ts（时间戳）。
+    2. POST batchexecute 协议（garturlreq）→ 返回真实 URL。
+    失败返回 None（调用方按原逻辑降级：无摘要）。
+    纯 requests 实现，不引入 selectolax 依赖。
+    """
+    path = urlparse(url).path
+    parts = path.split("/")
+    if "articles" not in parts:
+        return None
+    b64 = parts[-1].split("?")[0]
+    if not b64:
+        return None
+
+    own_session = session is None
+    sess = session
+    try:
+        if sess is None:
+            sess = requests.Session()
+            sess.headers.update({"User-Agent": BROWSER_UA,
+                                 "Accept-Language": "en-US,en;q=0.9"})
+        # 1) 取签名 + 时间戳
+        # 注意：必须走 /rss/articles/<b64>?oc=5（RSS 直链），而非 /articles/<b64>。
+        # /articles/<b64> 是「已解析文章页」，对无 Cookie 的脚本请求极易返回 429 限流，
+        # 而 /rss/articles/ 返回 200 且同样带 data-n-a-sg / data-n-a-ts（2026-08-18 实测）。
+        r = sess.get(f"https://news.google.com/rss/articles/{b64}?oc=5", timeout=timeout)
+        r.raise_for_status()
+        sg = re.search(r'data-n-a-sg="([^"]+)"', r.text)
+        ts = re.search(r'data-n-a-ts="([^"]+)"', r.text)
+        if not sg or not ts:
+            return None
+        signature, timestamp = sg.group(1), ts.group(1)
+        # 2) batchexecute 协议解码
+        payload = [
+            "Fbv4je",
+            '["garturlreq",[["X","X",["X","X"],null,null,1,1,"US:en",null,1,'
+            'null,null,null,null,null,0,1],"X","X",1,[1,1,1],1,1,null,0,0,null,0],'
+            f'"{b64}",{timestamp},"{signature}"]',
+        ]
+        body = "f.req=" + quote(json.dumps([[payload]]))
+        r2 = sess.post(
+            "https://news.google.com/_/DotsSplashUi/data/batchexecute",
+            headers={"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                     "User-Agent": BROWSER_UA},
+            data=body, timeout=timeout,
+        )
+        r2.raise_for_status()
+        parsed = json.loads(r2.text.split("\n\n")[1])[:-2]
+        decoded = json.loads(parsed[0][2])[1]
+        return decoded or None
+    except Exception:
+        return None
+    finally:
+        if own_session and sess is not None:
+            try:
+                sess.close()
+            except Exception:
+                pass
+
+
 def fetch_article(url: str, session: Optional[requests.Session] = None,
                   timeout: tuple[int, int] = (10, 20),
                   retries: int = 2) -> Optional[dict[str, Optional[str]]]:
     """Fetch article page, extract summary + body.
 
     Returns {"summary": str, "content": str, "title": str|None}
-    or None on any failure / non-HTML / Google-News redirect URL.
+    or None on any failure / non-HTML.
+    Google News redirect URLs are decoded to their real source URL first
+    (否则国外政府源摘要永远为空 — 2026-08-17)。
     """
     url = (url or "").strip()
-    if not url or url.startswith(("https://news.google.com", "http://news.google.com")):
+    if not url:
         return None
+    if url.lower().startswith(("https://news.google.com", "http://news.google.com")):
+        url = _decode_google_news_url(url, session=session) or ""
+        if not url:
+            return None
     if not url.lower().startswith(("http://", "https://")):
         return None
 

@@ -28,6 +28,12 @@ except ImportError:  # running as a plain script
     import article_content
 
 try:
+    from . import translator
+except ImportError:  # running as a plain script
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import translator
+
+try:
     import feedparser
 except ModuleNotFoundError:
     feedparser = None
@@ -677,6 +683,111 @@ def fetch_cleantechnica(session: requests.Session, now: datetime) -> list[RawIte
     return out[:20]
 
 
+def _strip_rss_source_suffix(title: str, entry) -> str:
+    """去掉 Google News RSS 标题尾部 " - 来源名" 标记。
+
+    Google News RSS 的 title 格式是 "真实标题 - 来源名"，如
+    "Government Ensures ... ISTS Framework - PIB" 或
+    "... - Department of Energy (.gov)"。用 entry 的 source 字段
+    （<source>PIB</source>）精确匹配尾部，匹配不上再按 " - " 分隔
+    末尾短片段兜底。
+    """
+    t = title.strip()
+    # 1) 用 entry source 精确匹配
+    src_name = ""
+    src = entry.get("source") if hasattr(entry, "get") else None
+    if src is not None:
+        src_name = (getattr(src, "title", None) or src.get("title") or "").strip()
+    if src_name:
+        tail = t.rsplit(" - ", 1)
+        if len(tail) == 2 and tail[1].strip().lower() == src_name.lower():
+            return tail[0].strip()
+    # 2) 兜底：末尾 " - 短来源名" 模式（含域名/机构特征）
+    tail = t.rsplit(" - ", 1)
+    if len(tail) == 2:
+        right = tail[1].strip()
+        if (len(right) <= 30 and re.search(
+                r"(\.gov|\.com|\.in|\.org|\.go\.jp|网|官网|委员会|政府|中心|门户|部$|PIB|EPA|DOE|NOAA|EIA|FERC|Euractiv|IEA|IRENA)", right)):
+            return tail[0].strip()
+    return t
+
+
+# 已知英文媒体/机构名（Google News RSS 标题尾部的来源名，非缩写/非域名部分）
+_EN_SOURCE_NAMES = re.compile(
+    r"(CleanTechnica|Reuters|Carbon Brief|Asian Business Review|Euractiv|"
+    r"World Bank|Department of Energy|Environmental Protection|US EPA|U\.S\. EPA|"
+    r"European Commission|Climate Change AI|VentureBeat|Bloomberg|Guardian|"
+    r"Financial Times|Scientific American|The Economist|Agora|E3G)",
+    re.IGNORECASE,
+)
+
+
+def _is_en_source_name(s: str) -> bool:
+    """判断尾部片段是否像英文源名/站点名（用于剥离标题后缀）。"""
+    s = (s or "").strip()
+    if not s or len(s) > 30:
+        return False
+    # 纯大写缩写（EPA/DOE/NOAA/EIA/FERC/IRENA/IEA/PIB 等）
+    if re.fullmatch(r"[A-Z][A-Z0-9]{1,8}", s):
+        return True
+    # 含域名（epa.gov / cleantechnica.com / meti.go.jp 等）
+    if re.search(r"\.(gov|com|org|net|in|eu|go\.jp)\b", s, re.IGNORECASE):
+        return True
+    # 已知英文媒体/机构名（首字母大写，避免误伤 "in six charts" 等正文短语）
+    if s[0].isupper() and _EN_SOURCE_NAMES.search(s):
+        return True
+    return False
+
+
+def _strip_title_suffix(title: str) -> str:
+    """统一清理标题尾部的源名/站点后缀（" - EPA"、" - CleanTechnica" 等）。
+
+    在构建 record 时对所有源统一应用，覆盖 fetch 函数未单独清理的
+    Google News RSS 源（如 CleanTechnica/IRENA），以及详情页 title 回填
+    后仍残留的英文源名后缀（2026-08-18）。
+    """
+    t = (title or "").strip()
+    if not t:
+        return t
+    # 清理混入正文的"摘要：..."污染（碳道列表页 a.get_text() 会把标题+摘要+
+    # 作者+相对时间拼在一起；旧笔记/title-index 回填时也会带进来 — 2026-08-18）
+    for marker in ("摘要：", "摘要:"):
+        if marker in t:
+            t = t.split(marker, 1)[0].strip()
+            break
+    for sep in (" - ", " — ", " – ", " | ", " ｜ ", " _ "):
+        if sep not in t:
+            continue
+        head, tail = t.rsplit(sep, 1)
+        tail_s = tail.strip()
+        if not tail_s:
+            continue
+        # 中文/日文站点后缀
+        if len(tail_s) <= 25 and re.search(
+                r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会|环境省|经产省"
+                r"|環境局|環境省|経産省|資源エネルギー庁)", tail_s):
+            return head.strip()
+        # 英文源名后缀
+        if _is_en_source_name(tail_s):
+            return head.strip()
+    return t
+
+
+# Google News 把站点导航/栏目页也当文章收录时的典型标题
+_NAV_JUNK_TITLE_RE = re.compile(
+    r"^(english releases|photo album|blogdescription|pib backgrounder|"
+    r"reports archives|archives|glossary|education|data in the classroom|"
+    r"station home page|tide predictions|daily weather map|"
+    r"pib|eia webinars|short-term energy outlook)\s*$",
+    re.IGNORECASE,
+)
+
+
+def _is_nav_junk_title(title_clean: str) -> bool:
+    """True if the cleaned title is a site navigation/landing-page title, not an article."""
+    return bool(_NAV_JUNK_TITLE_RE.match(title_clean.strip()))
+
+
 def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, site_name: str, queries: list[str], limit: int = 20, locale: str = "en-US") -> list[RawItem]:
     """国外主要国家政策源 — Google News RSS 按站点搜索（2026-08-14 新增）。
 
@@ -708,9 +819,12 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
                     continue  # 跳过站内导航类碎片（"News - EPA" 等）
                 if title.startswith("-") or title.count(" ") < 2:
                     continue  # 跳过 "- 机构名" 导航碎片、无描述性标题
-                # 去掉尾部 " - EPA (.gov)" 类来源标记再判导航碎片
-                title_clean = title.rsplit(" - ", 1)[0].strip()
+                # 去掉尾部 " - EPA (.gov)" 类来源标记
+                title_clean = _strip_rss_source_suffix(title, entry)
                 if len(title_clean) < 8:
+                    continue
+                # 过滤纯导航/栏目页标题（Google News 把站点导航页也当文章收录）
+                if _is_nav_junk_title(title_clean):
                     continue
                 published = None
                 if hasattr(entry, "published_parsed") and entry.published_parsed:
@@ -720,7 +834,7 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
                         pass
                 items.append(RawItem(
                     site_id=site_id, site_name=site_name,
-                    title=title, url=link, published_at=published,
+                    title=title_clean, url=link, published_at=published,
                 ))
         except Exception:
             continue
@@ -2163,6 +2277,17 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
         return parse_iso(ts) if ts else None
 
     items = [it for it in seen.values() if (_item_time(it) or now) >= cutoff]
+    # 统一清理历史条目的标题尾部源名后缀，并回填缺失的 title_zh（非中文才翻译，
+    # 带缓存；历史条目的旧标题可能残留 " - EPA" 等后缀 — 2026-08-18）
+    for it in items:
+        _t = _strip_title_suffix(it.get("title", "") or "")
+        if _t != it.get("title", ""):
+            it["title"] = _t
+        it.setdefault("title_zh", "")
+        if translator.needs_translation(it.get("title", "")) and not (it.get("title_zh") or "").strip():
+            _zh = translator.translate_title(it.get("title", ""))
+            if _zh:
+                it["title_zh"] = _zh
     items.sort(key=lambda r: r.get("published_at") or "0000-00-00", reverse=True)
     path.write_text(json.dumps({
         "generated_at": iso(now),
@@ -2237,6 +2362,30 @@ def main() -> int:
     all_items: list[dict[str, Any]] = []
     green_items: list[dict[str, Any]] = []
 
+    # ── 非中文标题批量翻译（腾讯云 TMT，失败静默降级）────────────────────
+    # 先收集去重后的干净标题，再并发翻译，避免逐条串行网络调用拖慢 pipeline。
+    # 结果写入 record 的 title_zh 字段（前端非中文标题显示中文翻译）。
+    _titles_to_translate: set[str] = set()
+    for raw in raw_items:
+        _t = _strip_title_suffix(raw.title)
+        if translator.needs_translation(_t):
+            _titles_to_translate.add(_t)
+    title_zh_map: dict[str, str] = {}
+    if _titles_to_translate:
+        # 并发 3：TMT 免费版默认 QPS=5，6 并发会触发 RequestLimitExceeded 限流
+        # （translator 内部已带退避重试，此处再降并发双保险 — 2026-08-18）
+        with ThreadPoolExecutor(max_workers=3) as _ex:
+            _futs = {_ex.submit(translator.translate_title, _t): _t
+                     for _t in _titles_to_translate}
+            for _fut in as_completed(_futs):
+                _t = _futs[_fut]
+                try:
+                    _zh = _fut.result()
+                except Exception:
+                    _zh = None
+                if _zh:
+                    title_zh_map[_t] = _zh
+
     for raw in raw_items:
         tid = make_item_id(raw.site_id, raw.title, raw.url)
         if tid in seen_ids:
@@ -2248,13 +2397,17 @@ def main() -> int:
             continue
         seen_items.add(title_key)
 
+        # 统一清理标题尾部源名后缀（" - EPA" / " - CleanTechnica" 等），
+        # 覆盖各 fetch 函数未单独清理的 Google News RSS 源（2026-08-18）
+        clean_title = _strip_title_suffix(raw.title)
         record = {
             "id": tid,
             "site_id": raw.site_id,
             "site_name": raw.site_name,
             "source": raw.source or raw.site_name,
             "library": site_library(raw.site_id),  # policy | media
-            "title": raw.title,
+            "title": clean_title,
+            "title_zh": title_zh_map.get(clean_title, ""),
             "url": raw.url,
             "published_at": iso(raw.published_at),
             "first_seen_at": iso(now),
@@ -2263,7 +2416,7 @@ def main() -> int:
         }
         all_items.append(record)
 
-        if is_policy_relevant(raw.title, raw.url, raw.site_id):
+        if is_policy_relevant(clean_title, raw.url, raw.site_id):
             green_items.append(record)
 
     # 24h window filter for web output
@@ -2332,10 +2485,16 @@ def main() -> int:
     # overwrite time_source).
     for rec in all_items:
         # 完整标题回填：笔记里的标题已用详情页标题修正，列表页截断标题
-        # （如碳交易网 "…现状与未"）会被覆盖为完整版（2026-08-11）
-        full_title = archived_titles.get(rec.get("url", ""))
+        # （如碳交易网 "…现状与未"）会被覆盖为完整版（2026-08-11）。
+        # 回填时同样清理尾部源名后缀（title-index.json 里可能存了旧带后缀标题）。
+        full_title = _strip_title_suffix(archived_titles.get(rec.get("url", "")) or "")
         if full_title and len(full_title) > len(rec.get("title", "")):
             rec["title"] = full_title
+            # 标题被回填修正后，重新翻译 title_zh（非中文才翻译，带缓存）
+            if translator.needs_translation(full_title):
+                _zh = translator.translate_title(full_title)
+                if _zh:
+                    rec["title_zh"] = _zh
         # 摘要回填（前端可展开摘要，News Minimalist 风格；2026-08-14）
         if not rec.get("summary"):
             summary = archived_summaries.get(rec.get("url", ""))
@@ -2726,14 +2885,24 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
     planned: list[tuple[Path, dict]] = []  # (filepath, item)
     # url → already exists in target dir? (文件名会因标题修正而变化，URL 稳定)
     seen_urls: set[str] = set()
+    # url → 缺摘要的旧笔记路径（需重新抓正文补摘要，之后替换/删除）
+    stale_files: dict[str, Path] = {}
     for existing in notes_root.rglob("*.md"):
         if existing.name in ("政策库.md", "媒体库.md", "ai-index.md"):
             continue
         try:
             _c = existing.read_text(encoding="utf-8")
             _m = _re.search(r"^url:\s*(\S+)", _c, re.M)
-            if _m:
-                seen_urls.add(_m.group(1))
+            if not _m:
+                continue
+            _url = _m.group(1)
+            # 有摘要的笔记才算「已完善」，跳过；缺摘要的笔记标为待刷新，
+            # 重新抓正文补摘要（修复国外政府源 Google News 解码后摘要为空 —
+            # 2026-08-18）。
+            if _re.search(r'^summary:\s*"[^"]', _c, re.M):
+                seen_urls.add(_url)
+            else:
+                stale_files[_url] = existing
         except Exception:
             continue
     for item in items:
@@ -2744,7 +2913,7 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         pub_date = item.get("published_at", "")
 
         if url in seen_urls:
-            continue  # 该 URL 已有笔记（任意文件名）
+            continue  # 该 URL 已有笔记且已含摘要
         safe_site = _re.sub(r'[<>:"/\\|?*]', '_', site_name).strip()
         # Library layout: 政策库/<分组>/<站点>/  or  媒体库/<站点>/
         if site_library(site_id) == "media":
@@ -2762,7 +2931,8 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             filename = f"{safe_title}.md"
         filepath = site_dir / filename
 
-        if filepath.exists():
+        # 同名文件已存在：只有「缺摘要待刷新」的旧笔记才允许覆盖重写
+        if filepath.exists() and url not in stale_files:
             continue
         planned.append((filepath, item))
 
@@ -2856,6 +3026,17 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
 
         fp.write_text("\n".join(lines), encoding="utf-8")
         new_count += 1
+
+    # 删除被替换的旧笔记（缺摘要 → 已重新生成；标题修正后文件名可能变化，
+    # 旧文件名会残留成重复笔记，需清理）
+    for fp, item in planned:
+        _url = item.get("url", "")
+        _old = stale_files.get(_url)
+        if _old and _old != fp and _old.exists():
+            try:
+                _old.unlink()
+            except Exception:
+                pass
 
     # Update index pages (政策库 + 媒体库)
     _update_obsidian_index(notes_root / "政策库", now)

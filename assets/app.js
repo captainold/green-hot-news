@@ -297,9 +297,20 @@
         : "发布时间";
 
       const titleLink = card.querySelector(".title");
+      const titleOrig = card.querySelector(".title-orig");
       titleLink.href = item.url;
-      titleLink.textContent = item.title;
-      titleLink.title = item.title;
+      // 非中文标题：主标题显示中文翻译（title_zh），原文作为小字副标题 + tooltip
+      const zh = item.title_zh || "";
+      if (zh && zh !== item.title) {
+        titleLink.textContent = zh;
+        titleLink.title = item.title;
+        titleOrig.textContent = item.title;
+        titleOrig.hidden = false;
+      } else {
+        titleLink.textContent = item.title;
+        titleLink.title = item.title;
+        titleOrig.hidden = true;
+      }
 
       const summary = item.summary || "";
       const sumEl = card.querySelector(".summary");

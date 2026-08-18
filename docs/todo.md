@@ -18,6 +18,8 @@
 	- [x] AI 维度全链条扩充（2026-08-14）——AI科技维度 = 理论→模型→市场→商业 + AI×能碳交叉；新增 OpenAI/arXiv·AI/机器之心/量子位/VentureBeat AI（共24源）；wiki 新增 AI进展 板块
 	- [x] 技术维度扩充（2026-08-14）——RadarAI·GitHub趋势 接入（radarai.top/trends，GitHub 开源项目热度追踪）；/api/trends JSON 取前 40 条，TECH_SITES 直通（共26源）；record 补 summary 通道参与打分/前端摘要（2026-08-17：取消 DIM_SITE_OVERRIDE 整源强制归技术——技术榜只放绿色低碳技术，AI 项目按标题+摘要关键词归 AI科技榜，非 AI 项目落回技术兜底）
 
+- [x] 非中文标题中文翻译（2026-08-18）——`scripts/translator.py` 腾讯云 TMT 翻译（专用子账号，凭据在项目根 `.env` 的 TENCENT_SECRET_ID/KEY），record 增 `title_zh` 字段，前端非中文标题显示中文主标题+原文小字副标题；`scripts/backfill_title_zh.py` 回填历史。踩坑：① TMT 需控制台开通 + 子账号 CAM 加 QcloudTMTFullAccess；② 免费版 QPS=5，并发>5 会 RequestLimitExceeded → translator 内带退避重试 + pipeline 翻译并发降为 3；③ 日本政府域名后缀是 .go.jp 不是 .gov，标题清理正则要单独补
+
 
 - [x] 添加这个：全网热点聚合：6ef1d8f4-8745-437c-a1e4-8c525ed8e971   https://api.allnet.hot/api/open/v1
 	- [x] 服务器 /opt/green-hot-news 接入 fetch_allnet（15个源，systemd定时已生效）
@@ -40,9 +42,8 @@
 
 包括政策，也包括技术动态，还有金融等。这里面当然也就包括了ai的和科技的。
 
-- [ ] obsidian新闻政策库是否完整？
-- [ ] 能下载的都下载，形成数据库。
 - [ ] 当日高分浓缩版，供我转发到群里和朋友圈，还有自媒体。
+- [ ] 还是应该像news学习，尽量简洁，首页上只放题目是最好的。但是背后要下载，组织自己的媒体数据库。
 
 - [ ] 还要确认：人形机器人、绿色智能家居、绿色生活，都在范围内。
 - [x] 现在国际来源主要就是国际组织，还要确定国外的主要国家政策发布的源。（2026-08-14：两轮接入共12源——美国EPA/DOE/NOAA/EIA/FERC/加州CARB、欧盟委员会/Euractiv、印度PIB、日本环境省/经产省/资源能源厅；Google News 搜 site + when:7d；政策维度 12→62 条。白宫/DOI/NREL/GX机构 Google 索引差未接，待人工跟踪）
@@ -75,3 +76,5 @@
 - [x] 重新设计打分体系
 - [x] AIHOT就直接用就行了。（2026-08-14：aihot.virxact.com 接入——精选 RSS feed.xml 每 30 分钟抓取，AI_SITES 白名单直通 AI科技 维度，25 源）
 - [x] 要有一个源一览表，分门别类放好。（2026-08-14：docs/信息收集目标列表.md v1.0——中美欧日印×8类机构+国际组织，★已接入/●P0/○P1/△P2 分级，附接入路线与维护规则）
+- [ ] 最起码要把我web收藏的，微信关注的这些都update进去啊。这个项目还真不好做。 
+- [ ] 

@@ -354,6 +354,13 @@ body {
 }
 .news-card .title:hover { color: var(--green-300); text-decoration: underline; }
 
+/* 非中文标题的原文副标题（小字灰色，主标题显示中文翻译 title_zh） */
+.news-card .title-orig {
+  display: block; margin-top: .2rem;
+  font-size: .72rem; color: var(--text-muted);
+  line-height: 1.35; word-break: break-word;
+}
+
 /* 摘要展开（News Minimalist 风格） */
 .summary-toggle {
   margin-top: .35rem; font-size: .68rem;
