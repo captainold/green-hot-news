@@ -2159,7 +2159,106 @@ def fetch_allnet(session: requests.Session, now: datetime) -> list[RawItem]:
     return items[:60]
 
 
-# ── OPML RSS ──────────────────────────────────────────────────────────────────
+# ── X 平台（x.com）官方账号快讯（2026-08-19 接入，零成本方案）─────────────
+# 原理：x.com 账号页对匿名请求返回 SSR HTML，内含 schema.org Microdata
+# （itemType="https://schema.org/SocialMediaPosting"），requests 直抓即可解析
+# 最近 5 条推文（推文 ID/全文/发布时间/互动数）。本地与新加坡服务器均实测
+# HTTP 200（220KB 左右）。无需 API key、无登录墙、无付费。
+# 账号清单：精选绿色低碳/能源/AI 领域的官方机构 + 权威 KOL（四维覆盖）。
+# 入库内容由 is_policy_relevant 的 X_SITES 分支过滤（命中绿色词或 AI 词）。
+X_ACCOUNTS: list[tuple[str, str]] = [
+    # (handle, 中文名)
+    # ── 官方机构（政策/国际组织/金融）──
+    ("IEA", "IEA国际能源署"),
+    ("IRENA", "IRENA国际可再生能源署"),
+    ("UNFCCC", "UNFCCC联合国气候"),
+    ("EU_ENV", "欧盟环境总司"),
+    ("EPA", "美国环保署"),
+    ("NGFS_", "央行绿色金融网络"),
+    ("ember_energy", "Ember气候能源数据"),
+    # ── 智库/媒体 ──
+    ("CarbonBrief", "Carbon Brief"),
+    ("BloombergNEF", "彭博新能源财经"),
+    # ── KOL（人物维度：机构掌门人/气候专员/科学家）──
+    ("fbirol", "IEA署长比罗尔"),
+    ("WBHoekstra", "欧盟气候专员霍克斯特拉"),
+    ("KHayhoe", "海伊霍·气候科学家"),
+    # ── AI 维度 ──
+    ("OpenAI", "OpenAI"),
+]
+X_PAGE_HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                   "AppleWebKit/537.36 (KHTML, like Gecko) "
+                   "Chrome/126.0 Safari/537.36"),
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+
+def parse_x_tweets(html: str, fallback_handle: str) -> list[dict]:
+    """从 x.com 账号页 SSR HTML 解析推文列表（schema.org Microdata）。"""
+    try:
+        from bs4 import BeautifulSoup
+    except ImportError:
+        return []
+    soup = BeautifulSoup(html, "html.parser")
+    posts = soup.find_all(attrs={"itemtype": "https://schema.org/SocialMediaPosting"})
+    out: list[dict] = []
+    for p in posts:
+        def meta(prop: str) -> str:
+            m = p.find(attrs={"itemprop": prop})
+            if m and m.get("content"):
+                return m["content"]
+            return ""
+        author_block = p.find(attrs={"itemprop": "author"})
+        a_handle = ""
+        if author_block:
+            hm = author_block.find(attrs={"itemprop": "alternateName"})
+            a_handle = hm.get("content", "") if hm else ""
+        tid = meta("identifier")
+        text = meta("text") or ""
+        if not tid or not text:
+            continue
+        handle = a_handle or fallback_handle
+        out.append({
+            "id": tid,
+            "handle": handle,
+            "url": f"https://x.com/{handle}/status/{tid}",
+            "published_at": meta("datePublished") or meta("dateCreated"),
+            "text": text,
+        })
+    return out
+
+
+def fetch_x(session: requests.Session, now: datetime) -> list[RawItem]:
+    """X 平台官方账号快讯 — 抓取 X_ACCOUNTS 每个账号的最近 5 条推文。
+
+    零成本方案：账号页 SSR 自带 schema.org Microdata，无需 API key/cookie。
+    单账号失败静默跳过（不影响其他账号与其他源）。推文时间戳为 UTC ISO，
+    置顶推文会混入 SSR 输出 → 按发布时间重排，旧置顶由窗口过滤自然滤掉。
+    推文全文同时作为 title 与 meta.summary（前端摘要展开 + 打分参与）。
+    """
+    items: list[RawItem] = []
+    for handle, name in X_ACCOUNTS:
+        try:
+            r = session.get(f"https://x.com/{handle}", timeout=20, headers=X_PAGE_HEADERS)
+            r.raise_for_status()
+            for t in parse_x_tweets(r.text, handle):
+                text = re.sub(r"\s+", " ", t["text"]).strip()
+                if not text or not t["url"]:
+                    continue
+                published = parse_iso(t["published_at"]) if t["published_at"] else None
+                items.append(RawItem(
+                    site_id="x", site_name="X平台",
+                    source=f"@{handle}",
+                    title=text, url=t["url"],
+                    published_at=published,
+                    meta={"summary": text[:500]},
+                ))
+        except Exception:
+            continue
+    # SSR 输出顺序是「置顶+热门」非纯时间序 → 按发布时间倒序重排
+    items.sort(key=lambda it: it.published_at or datetime.min.replace(tzinfo=UTC), reverse=True)
+    return items
 def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> list[RawItem]:
     """Read an OPML file and fetch all RSS feeds listed in it."""
     items: list[RawItem] = []
@@ -2306,6 +2405,8 @@ SOURCE_SCORE: dict[str, int] = {
     "greenpeace": 18, "mongabay": 18,       # 环保 NGO / 环境新闻专业媒体
     # 全网热榜
     "allnet": 8,
+    # X 平台快讯（2026-08-19：官方机构账号权威但推文是快讯短文本 → 专业媒体档）
+    "x": 16,
 }
 DEFAULT_SOURCE_SCORE = 10
 
@@ -2440,6 +2541,10 @@ AI_DIM_KW = [
     "ai芯片", "ai应用", "ai模型", "模型发布", "ai创业", "ai融资",
     "机器学习模型", "计算机视觉", "自然语言处理", "强化学习", "aigc",
     "大模型创业", "模型即服务", "ai agent", "mcp", "语义", "transformer架构",
+    # 2026-08-19：数据中心（X 源接入后实测——IEA 的 AI 数据中心能源推文
+    # 「AI boom driving infrastructure expansion」因无 AI 字样被滤掉；
+    # 数据中心=AI 算力基础设施，含此词归 AI 维度）
+    "data centre", "data center", "数据中心",
     # 2026-08-17：GitHub 趋势类 AI 项目（stable-diffusion-webui 等仓库名不含 AI 关键词，
     # 但摘要必含 diffusion；radarai 摘要参与 AI 判定，故补此词）
     "diffusion",
@@ -2656,6 +2761,13 @@ ROBOT_SITES = {
     "spectrum",         # IEEE Spectrum（机器人/科技权威媒体）
 }
 
+# X 平台快讯（2026-08-19 接入，零成本方案）：精选绿色/能源/AI 账号。
+# 同 AI_MEDIA_SITES 逻辑——命中绿色词或 AI 词才入库（过滤 KOL 的非主题推文），
+# categorize_dimension 走常规关键词判定（政策/行业/金融/AI 自然分流）。
+X_SITES = {
+    "x",
+}
+
 # 站点级维度强制：categorize_dimension 最先检查，优先于 AI_SITES 直通。
 # 2026-08-17 起为空——radarai（GitHub 开源趋势）不再整源归「技术」：
 # 技术榜只放绿色低碳技术，AI 项目按关键词（含摘要）归 AI科技榜，非 AI 项目落回技术兜底。
@@ -2685,6 +2797,14 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "", summary: st
     # AI 综合媒体（2026-08-19）：36氪/虎嗅是科技商业媒体——命中绿色词或 AI 词
     # 才入库（与 TECH_SITES 同逻辑，过滤无关科技商业噪音）
     if site_id in AI_MEDIA_SITES:
+        t = f"{title or ''} {summary or ''}".lower()
+        if any(kw.lower() in t for kw in POLICY_KEYWORDS):
+            return True
+        if any(kw.lower() in t for kw in AI_DIM_KW):
+            return True
+        return False
+    # X 平台快讯（2026-08-19）：命中绿色词或 AI 词才入库（同 AI_MEDIA_SITES 逻辑）
+    if site_id in X_SITES:
         t = f"{title or ''} {summary or ''}".lower()
         if any(kw.lower() in t for kw in POLICY_KEYWORDS):
             return True
@@ -2805,6 +2925,8 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_mongabay, "mongabay", "Mongabay"),
     # Aggregated hot boards (filtered by policy keywords)
     (fetch_allnet, "allnet", "全网热点"),
+    # X 平台官方账号快讯（2026-08-19 接入，零成本方案：SSR Microdata 直抓）
+    (fetch_x, "x", "X平台"),
 ]
 
 # ── Library layout: site_id → (库类型, 政策库内分组) ─────────────────────────
@@ -2894,6 +3016,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "cheaa":          ("media", ""),
     "greenpeace":     ("media", ""),
     "mongabay":       ("media", ""),
+    "x":              ("media", ""),  # X 平台快讯（社交快讯→媒体库）
 }
 
 
@@ -2960,6 +3083,10 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
             _zh = translator.translate_title(it.get("title", ""))
             if _zh:
                 it["title_zh"] = _zh
+        # 回填主题标签（2026-08-19）：旧条目无 topics 字段时按标题补算，
+        # 前端关系图谱依赖（地域/政策类型管理标签不导出）
+        if not it.get("topics"):
+            it["topics"] = extract_topic_tags(it.get("title", "") or "")
     items.sort(key=lambda r: r.get("published_at") or "0000-00-00", reverse=True)
     path.write_text(json.dumps({
         "generated_at": iso(now),
@@ -3195,6 +3322,9 @@ def main() -> int:
         rec["dimension"] = dimension
         # 区域字段（2026-08-17）：前端排行榜/时间线「国内/国际」切换依赖
         rec["region"] = detect_region(rec.get("site_id", ""), rec.get("title", ""))
+        # 主题标签（2026-08-19）：仅主题标签（TOPIC_RULES），供前端「关系图谱」
+        # 展示主题标签共现；地域/政策类型等数据库管理标签不导出、前端不显示
+        rec["topics"] = extract_topic_tags(rec.get("title", ""))
         # 打分体系 v2.0（2026-08-14）：内容强度按维度自适应
         people = extract_people(rec.get("title", ""), rec.get("summary", ""), "")
         scoring = score_item(
@@ -3360,6 +3490,7 @@ SOURCE_REGION: dict[str, str] = {
     "therobotreport": "全球", "spectrum": "全球", "mongabay": "全球",
     "greenbuilder": "美国", "greenpeace": "中国",
     "qianjia": "中国", "cheaa": "中国",
+    "x": "全球",
 }
 
 
@@ -3414,13 +3545,15 @@ POLICY_TYPE_RULES: list[tuple[str, list[str]]] = [
 ]
 
 
-def auto_tag(title: str, site_id: str) -> list[str]:
-    """Generate tags for a news item based on title and source."""
-    import re as _tag_re
-    tags: list[str] = []
-    title_lower = title.lower()
+def extract_topic_tags(title: str) -> list[str]:
+    """仅提取主题标签（TOPIC_RULES），不含地域/政策类型等管理标签（2026-08-19）。
 
-    # Topic tags
+    前端「关系图谱」依赖此字段展示主题标签共现关系——地域(#中国/#欧盟…)与
+    政策类型(#政策文件/#数据报告…)属于数据库管理标签，不在此导出、前端不显示。
+    """
+    import re as _tag_re
+    title_lower = (title or "").lower()
+    tags: list[str] = []
     for tag, keywords in TOPIC_RULES:
         for kw in keywords:
             kw_lower = kw.lower()
@@ -3434,6 +3567,13 @@ def auto_tag(title: str, site_id: str) -> list[str]:
             elif kw_lower in title_lower:
                 tags.append(tag)
                 break  # one match per topic
+    return tags
+
+
+def auto_tag(title: str, site_id: str) -> list[str]:
+    """Generate tags for a news item based on title and source."""
+    tags: list[str] = extract_topic_tags(title)
+    title_lower = title.lower()
 
     # Region tag
     region = detect_region(site_id, title)
