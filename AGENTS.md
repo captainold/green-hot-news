@@ -52,3 +52,11 @@ python3.11 -m http.server 8899
 - 禁止 `rm -rf`、`git reset --hard`、`git push --force`
 - 数据文件冲突：`git pull --rebase` + `git checkout --theirs data/`（接受远程）
 - 服务器同步走 scp（见 docs/服务器部署与运维.md），GitHub 仅代码归档
+
+### 多终端并行开发纪律（2026-08-19 老温确认：会同时开多个终端写不同功能）
+
+**不用分支隔离**（同一工作目录下 `git checkout` 会重写工作区文件，互相踩踏；独立 clone 又太重）。用三层纪律：
+
+1. **提交纪律**：`git add`/`git commit` 前先 `git diff HEAD --stat` 确认改动范围；update_news.py 等单文件多人改的场景，只 add 自己负责的文件，别人的半成品改动**不要**带进自己的 commit（用 `git add -p` 挑自己的 hunk，或等对方自己提交）
+2. **区域约定**：update_news.py 按功能区域切分（fetch 函数区 / BUILTIN_SOURCES / SOURCE_SCORE / SITE_LAYOUT / 关键词区 / 白名单组），并行会话尽量写不同区域，冲突最小；临时探测脚本统一 `scripts/_probe_*.py` 前缀
+3. **部署纪律**：谁最后收尾谁 scp 到服务器；scp 前对比服务器 md5 确认同步方向；部署前必须 `py_compile` + 确认 BUILTIN_SOURCES 注册无悬空引用（防半成品崩服务器 timer）
