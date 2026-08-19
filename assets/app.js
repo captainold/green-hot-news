@@ -279,7 +279,7 @@
         toggleBtn.addEventListener("click", () => {
           const expanded = sumEl.hidden === false;
           sumEl.hidden = expanded;
-          toggleBtn.textContent = expanded ? "摘要" : "收起";
+          toggleBtn.textContent = expanded ? "展开摘要" : "收起";
           sumEl.classList.toggle("expanded", !expanded);
         });
       }
