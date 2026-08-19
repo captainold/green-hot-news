@@ -63,8 +63,8 @@ code("""# ⚠️ plotly 6.x 的 px.pie(names=...) 不再自动聚合（逐行 la
 dim_counts = df["dimension"].value_counts().reset_index()
 dim_counts.columns = ["dimension", "count"]
 fig1 = px.pie(dim_counts, names="dimension", values="count",
-              title="四维分布（政府/行业/金融/AI）",
-              hole=0.45, category_orders={"dimension": ["政府", "行业", "金融", "AI"]})
+              title="四维分布（政策/产业/市场信号/AI）",
+              hole=0.45, category_orders={"dimension": ["政策", "产业", "市场信号", "AI"]})
 fig1.update_traces(textinfo="value+percent")
 fig1.show()""")
 

@@ -1,0 +1,95 @@
+#!/usr/bin/env python3.11
+"""四维迁移（2026-08-19 主体化：政策→政府、技术→行业、AI科技→AI；
+2026-08-20 观察窗口化复用：政府→政策、行业→产业、金融→市场信号）。
+
+- 重算 history.json 所有条目的 dimension（用新 categorize_dimension）
+- 重打分（score_item 内容强度按新维度 key 计算——CONTENT_STRENGTH_RULES 的 key 变了）
+- 同时迁移 latest-24h.json / latest-24h-all.json 的 dimension 字段
+- 幂等：可重复运行；不改 url/标题等原始字段
+
+用法：python3.11 scripts/migrate_dimensions.py
+"""
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+
+import importlib.util  # noqa: E402
+
+spec = importlib.util.spec_from_file_location("un", str(ROOT / "scripts" / "update_news.py"))
+un = importlib.util.module_from_spec(spec)
+sys.modules["un"] = un
+spec.loader.exec_module(un)
+
+from datetime import datetime  # noqa: E402
+
+NOW = datetime.now().astimezone()
+
+
+def migrate_file(path: Path) -> int:
+    if not path.exists():
+        print(f"  跳过（不存在）: {path.name}")
+        return 0
+    data = json.loads(path.read_text(encoding="utf-8"))
+    items = data.get("items", data) if isinstance(data, dict) else data
+    changed = 0
+    kept: list[dict] = []
+    removed = 0
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        # radarai 清理（2026-08-19）：GitHub 开源项目趋势仅保留绿色主题或 AI 项目，
+        # 与 is_policy_relevant 新规则对齐——vitejs/vite 等无关项目从历史数据移除
+        if it.get("site_id") == "radarai":
+            if not un.is_policy_relevant(it.get("title", ""), it.get("url", ""), "radarai", it.get("summary", "")):
+                removed += 1
+                continue
+        old = it.get("dimension")
+        new = un.categorize_dimension(
+            it.get("site_id", ""),
+            it.get("title", ""),
+            it.get("summary", ""),
+            it.get("library", "media"),
+        )
+        it["dimension"] = new
+        # 重打分：内容强度按新维度 key；people 重提取（打分依赖）
+        people = it.get("people") or un.extract_people(it.get("title", ""), it.get("summary", ""), "")
+        scoring = un.score_item(
+            it.get("site_id", ""),
+            it.get("title", ""),
+            it.get("summary", ""),
+            people,
+            it.get("published_at", ""),
+            NOW,
+            new,
+        )
+        it.update(scoring)
+        if people:
+            it["people"] = people
+        if old != new:
+            changed += 1
+        kept.append(it)
+    if isinstance(data, dict) and "items" in data:
+        data["count"] = len(kept)
+        data["generated_at"] = un.iso(NOW)
+        data["items"] = kept
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    else:
+        path.write_text(json.dumps(kept, ensure_ascii=False), encoding="utf-8")
+    print(f"  {path.name}: {len(kept)} 条（移除 {removed} 条 radarai 无关项目），维度变化 {changed} 条")
+    return changed
+
+
+def main() -> int:
+    print("四维迁移（2026-08-20 观察窗口化：政策/产业/市场信号/AI）")
+    total = 0
+    for fn in ("history.json", "latest-24h.json", "latest-24h-all.json"):
+        total += migrate_file(ROOT / "data" / fn)
+    print(f"完成，共 {total} 条维度变化")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

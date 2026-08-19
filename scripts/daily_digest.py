@@ -24,8 +24,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-DIM_ICON = {"政策": "🏛️", "技术": "🔋", "金融": "💰", "AI科技": "🤖"}
-DIM_ORDER = ["政策", "技术", "金融", "AI科技"]
+DIM_ICON = {"政策": "🏛️", "产业": "🔋", "市场信号": "💰", "AI": "🤖"}
+DIM_ORDER = ["政策", "产业", "市场信号", "AI"]
 TOTAL_SITES = 47  # 雷达信源总数（README/信息收集目标列表同步维护）
 
 

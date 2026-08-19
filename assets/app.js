@@ -20,9 +20,17 @@
   let graphChart = null;        // ECharts 关系图谱实例（须在 initTheme 前声明，避免 TDZ）
   let graphResizeBound = false; // resize 监听只挂一次（dispose/re-init 不重复挂）
 
-  // 四大主题 = 四维（政府/行业/金融/AI，行为主体划分）；关系图谱节点用的
-  // 是「主题标签」（碳市场/新能源…），见 TOPIC_COLORS
-  const DIMS = ["全部", "政府", "行业", "金融", "AI"];
+  // 四大主题 = 四维（政策/产业/市场信号/AI，四个观察窗口而非互斥分类：
+  // 政策=部委发文动向、产业=企业进展兜底、市场信号=碳市场/绿色资本、AI=AI×绿色落地）；
+  // 关系图谱节点用的是「主题标签」（碳市场/新能源…），见 TOPIC_COLORS
+  const DIMS = ["全部", "政策", "产业", "市场信号", "AI"];
+  // 四维 tab 副标题（2026-08-20）：消除「金融⊂行业」式层级误解
+  const DIM_SUBS = {
+    "政策": "部委文件·官方信号",
+    "产业": "企业进展·行业动态",
+    "市场信号": "碳市场·绿色资本",
+    "AI": "AI×绿色落地",
+  };
   const PERIODS = ["日", "周", "月"];
   const REGIONS = ["国内", "国际"];
   const SORTS = ["重要性", "新到旧"];
@@ -99,9 +107,19 @@
     });
   }
 
-  // 四大主题选择器（四维：政府/行业/金融/AI + 全部）
+  // 四大主题选择器（四维：政策/产业/市场信号/AI + 全部，tab 带观察窗口副标题）
   function buildDimSwitch() {
     buildSwitch(topicSwitch, DIMS, currentDim, (v) => { currentDim = v; page = 1; render(); });
+    topicSwitch.querySelectorAll(".mode-btn").forEach((b) => {
+      const sub = DIM_SUBS[b.textContent];
+      if (sub) {
+        b.classList.add("mode-btn-sub");
+        const span = document.createElement("span");
+        span.className = "mode-sub";
+        span.textContent = sub;
+        b.appendChild(span);
+      }
+    });
   }
 
   // ── Load data ──────────────────────────────────────────────────────────────
@@ -140,7 +158,7 @@
   function filterItems() {
     let items = [...historyItems];
     if (currentDim !== "全部") {
-      items = items.filter(i => (i.dimension || "政府") === currentDim);
+      items = items.filter(i => (i.dimension || "政策") === currentDim);
     }
     if (currentRegion === "国内") {
       items = items.filter(i => (i.region || "") === "中国");
@@ -227,9 +245,9 @@
         ? `综合 ${score} 分\n来源权威 ${bd.source} + 内容强度 ${bd.strength} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
         : "暂无评分";
 
-      // 四维标签（政府/行业/金融/AI）
+      // 四维标签（政策/产业/市场信号/AI）
       const dimTag = card.querySelector(".dim-tag");
-      const dim = item.dimension || "政府";
+      const dim = item.dimension || "政策";
       dimTag.textContent = dim;
       dimTag.classList.add(`dim-${dim}`);
 

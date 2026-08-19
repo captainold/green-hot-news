@@ -1,6 +1,6 @@
 # Green Hot News · 绿色低碳动态雷达
 
-国内外最新绿色低碳动态聚合站：**政策 + 技术 + 金融 + AI科技** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（69 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.0**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100），前端**两区布局**：上方**排行榜**（主题 × 周期日/周/月 × 区域国内/国际 三组切换器，按综合分排名）+ 下方**实时时间线**（跟随筛选、新条目自动插入高亮滚动、可暂停、加载更早），分数徽章（S/A/B/C/D 等级），**当日高分浓缩**一键复制转发。
+国内外最新绿色低碳动态聚合站：**政策 + 产业 + 市场信号 + AI** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（69 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.2**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100）。前端**三区布局**：顶部 **📈 四维趋势图**（政策/产业/市场信号/AI 四色时序曲线，纵轴=新闻数量、横轴=原文发表时间，当日/3天/1周/1月/自定义范围切换 + dataZoom 缩放联动桶粒度，点击浮窗新闻跳转定位到下方卡片）+ 中部**排行榜**（排名序号 1. 2. 3. 前三金银铜 + 级别颜色圆点 + 主题/周期/区域/**分数段**四组切换器，按综合分排名）+ 底部**实时时间线**（跟随筛选、新条目自动插入高亮滚动、加载更早），评分弱化（分数藏摘要、级别用颜色暗示），**当日高分浓缩**一键复制转发。
 
 ## 在线入口
 
@@ -10,7 +10,7 @@
 - Obsidian 笔记库：`C:\Users\wenyu\Documents\Obsidian_wen\green-hot-news\Notes\`
 - 服务器部署与运维文档：[docs/服务器部署与运维.md](docs/服务器部署与运维.md)
 
-## 架构总览（2026-08-14 现状）
+## 架构总览（2026-08-19 现状）
 
 ```
 新加坡服务器 47.82.211.111 (Alibaba Cloud Linux 3)
@@ -64,10 +64,10 @@
 - **VentureBeat AI**（国际 AI 商业，RSS 限量 30）
 - **AIHOT**（`aihot.virxact.com`，AI 行业动态聚合：X/公众号/RSS 几十源，精选 RSS 每 30 分钟抓取，带热度与 AI 评分；2026-08-14 接入）
 - **Artificial Analysis**（AI 模型评测/API 市场数据，Google News，AI_SITES 直通，2026-08-19 接入）
-- **Climate Change AI**（AI×气候交叉机构，2026-08-17 起全链条归 AI科技榜——其产出均为机器学习应对气候项目，避免 NeurIPS 工作坊/ML 基准等项目落进技术榜）
+- **Climate Change AI**（AI×气候交叉机构，2026-08-17 起全链条归 AI 榜——其产出均为机器学习应对气候项目，避免 NeurIPS 工作坊/ML 基准等项目落进产业榜）
 
 ### 技术趋势（媒体库 · 2026-08-14 新增）
-> GitHub 开源项目热度追踪，TECH_SITES 白名单直通；AI 项目按关键词（标题+摘要）归 AI科技榜，非 AI 项目归技术维度（2026-08-17 调整：技术榜只放绿色低碳技术，不再整源强制归技术）
+> GitHub 开源项目热度追踪，TECH_SITES 白名单直通；AI 项目按关键词（标题+摘要）归 AI 榜，非 AI 项目归产业维度（2026-08-17 调整：产业榜只放绿色低碳技术，不再整源强制归产业）
 - **RadarAI·GitHub趋势**（`radarai.top/trends`）：聚合 GitHub Trending 开源项目（中文摘要+star），抓 `/api/trends` JSON 取前 40 条；DeepSeek/ollama/stable-diffusion 等 AI 项目进 AI科技榜，其余归「技术」维度；无发布时间走收录时间兜底
 
 ### 全网热点（媒体库 · 2026-08-13 新增）
@@ -96,15 +96,15 @@ python3.11 scripts/update_news.py --output-dir data --window-hours 24
 | 维度 | 定位 | 信源 |
 |------|------|------|
 | 🏛️ 政策 | 制度锚点 | 国内 9 部委/机构 + 官方解读 + 6 国际组织 + 美日印官方发布 |
-| 🔋 技术 | 产业脉搏 | 中国能源报、北极星、CleanTechnica、RadarAI·GitHub趋势 |
-| 💰 金融 | 市场温度计 | 碳交易网、碳道、Carbon Brief、财新、高盛 |
-| 🤖 AI科技 | 新视野（理论→模型→市场→商业 + 交叉） | OpenAI、arXiv·AI、机器之心、量子位、VentureBeat AI、Climate Change AI、中国科技网、Artificial Analysis |
+| 🔋 产业 | 产业脉搏 | 中国能源报、北极星、CleanTechnica、RadarAI·GitHub趋势 |
+| 💰 市场信号 | 市场温度计 | 碳交易网、碳道、Carbon Brief、财新、高盛 |
+| 🤖 AI | 新视野（理论→模型→市场→商业 + 交叉） | OpenAI、arXiv·AI、机器之心、量子位、VentureBeat AI、Climate Change AI、中国科技网、Artificial Analysis |
 
 ## 数据输出
 
 - `data/latest-24h.json` — 24小时绿色动态信号（过滤后，含 `score`/`score_level`/`score_breakdown`/`dimension`/`region` 字段）
 - `data/latest-24h-all.json` — 24小时全量数据
-- `data/history.json` — 62 天历史累积（2026-08-17：排行榜日/周/月周期切换数据源；每次抓取按 url 去重合并，含 `region` 字段）
+- `data/history.json` — 62 天历史累积（2026-08-17：排行榜日/周/月周期切换数据源；去重按规范化标题 `_title_dedup_key`——2026-08-19 修复 Google News 聚合 URL base64 每次抓取不同导致同新闻 x8 重复，含 `region` 字段）
 - `data/source-status.json` — 69 个源健康状态
 - `data/daily-digest.md` — 当日高分浓缩版（评分 ≥70 A 级以上，四维精选，可直接转发；`scripts/daily_digest.py` 生成，服务器每次抓取后自动更新）
 - `data/published-index.json` — 发布时间索引

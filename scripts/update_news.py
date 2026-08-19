@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import html
 import json
@@ -716,11 +717,17 @@ def _strip_rss_source_suffix(title: str, entry) -> str:
         if len(tail) == 2 and tail[1].strip().lower() == src_name.lower():
             return tail[0].strip()
     # 2) 兜底：末尾 " - 短来源名" 模式（含域名/机构特征）
+    #    2026-08-19：len 30→70 放行 EIA/NOAA 长站名（"U.S. Energy Information
+    #    Administration (EIA) (.gov)" 42 字符、"NOAA National Centers for
+    #    Environmental Information (NCEI) (.gov)" 66 字符），机构特征补
+    #    Commission/Agency/Administration 等
     tail = t.rsplit(" - ", 1)
     if len(tail) == 2:
         right = tail[1].strip()
-        if (len(right) <= 30 and re.search(
-                r"(\.gov|\.com|\.in|\.org|\.go\.jp|网|官网|委员会|政府|中心|门户|部$|PIB|EPA|DOE|NOAA|EIA|FERC|Euractiv|IEA|IRENA)", right)):
+        if (len(right) <= 70 and re.search(
+                r"(\.gov|\.com|\.in|\.org|\.go\.jp|网|官网|委员会|政府|中心|门户|部$|"
+                r"PIB|EPA|DOE|NOAA|EIA|FERC|Euractiv|IEA|IRENA|NHC|CPC|"
+                r"Administration|Commission|Agency|Department|Bureau|Institute)", right)):
             return tail[0].strip()
     return t
 
@@ -750,6 +757,25 @@ def _is_en_source_name(s: str) -> bool:
     if s[0].isupper() and _EN_SOURCE_NAMES.search(s):
         return True
     return False
+
+
+def _title_similar(a: str, b: str) -> float:
+    """标题字符重叠比例（0-1），用于判断详情页标题与列表标题是否同一篇文章。
+
+    2026-08-19：详情页 title 覆盖列表标题前必须通过相似度门槛——否则源站
+    <title> 写死为站名/栏目名（chinanecc "国家节能中心公共服务网 - 节能研究"、
+    EIA 站名、arXiv 分类面包屑）时会把正常列表标题覆盖成垃圾。
+    """
+    def norm(s: str) -> str:
+        return re.sub(r"[\s\-—–|｜_【】\[\]（）()《》〈〉<>「」『』\"'“”‘’.,，。:：;；!！?？、…]", "", s or "").lower()
+    na, nb = norm(a), norm(b)
+    if not na or not nb:
+        return 0.0
+    # 截断关系视为同一篇（X 平台推文 150 字符截断、央行通知文号截断等——
+    # 列表标题是详情页标题的子串时相似度应满分，避免阈值边缘误挡）
+    if na in nb or nb in na:
+        return 1.0
+    return difflib.SequenceMatcher(None, na, nb).ratio()
 
 
 def _strip_title_suffix(title: str) -> str:
@@ -788,7 +814,8 @@ def _strip_title_suffix(title: str) -> str:
                 break
             # 中文/日文站点后缀
             if len(tail_s) <= 25 and re.search(
-                    r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会|环境省|经产省"
+                    r"(网|官网|委员会|政府|部$|中心|门户|交易所|资讯|信息网|服务网|新闻中心"
+                    r"|生态环境部|发展和改革委员会|环境省|经产省"
                     r"|環境局|環境省|経産省|資源エネルギー庁)", tail_s):
                 t = head.strip()
                 continue
@@ -805,11 +832,33 @@ def _strip_title_suffix(title: str) -> str:
 
 
 # Google News 把站点导航/栏目页也当文章收录时的典型标题
+# 2026-08-19 增强：EIA/DOE/NOAA 等站名页、工具页、栏目页（列表标题层过滤，
+# 与 article_content 的详情页标题提取防御互补）
 _NAV_JUNK_TITLE_RE = re.compile(
     r"^(english releases|photo album|blogdescription|pib backgrounder|"
     r"reports archives|.* archives|archives|glossary|education|data in the classroom|"
     r"station home page|tide predictions|daily weather map|"
-    r"pib|eia webinars|short-term energy outlook)\s*$",
+    r"pib|eia webinars|short-term energy outlook|"
+    r"contact us|about us|opendata|databases|dashboard|webinars|maps and data|energy explained|faqs|"
+    r"hourly electric grid monitor|real-time operating grid|new england dashboard|"
+    r"weekly petroleum status report|gasoline and diesel fuel update|steo data browser|"
+    r"learn more about|map a career|renewable energy maps|data access viewer|sea level analysis tool|"
+    r"archived directives|women in energy|from our blogs|grid talk|innovation|"
+    r"energy workforce|find careers|find financing|credit subsidy|technical project officer|"
+    r"collegiate wind competition|state energy advisory board|shara mohtadi|veronica jackson|"
+    r"deploy 2024|energy improvements in rural|getting to know lpo|loan program office|aes marahu|"
+    r"u\.s\. energy & employment report|marine energy basics|regional clean hydrogen hubs|"
+    r"quarterly solar industry update|critical minerals and materials|solar workforce|"
+    r"solar photovoltaic|types of hydropower|how distributed wind|hydrogen production|"
+    r"solar cybersecurity|end-of-life management for solar|3 reasons why nuclear|5 fast facts about nuclear|"
+    r"does eia project|what can i expect to pay for heating|national weather service marine forecast\b.*|"
+    r"tropical storm \w+ forecast discussion\b.*|station \d+\b.*|station [a-z0-9]{3,6} \b.*|snow station information\b.*|"
+    r"multi-state regions|electric matters|statements and speeches|data tool|"
+    r"air quality system|public water system service areas|clean school bus program|"
+    r"transmission facility financing|what types of cmei funding exist|30d new clean vehicle credit|"
+    r"u\.s\. energy information administration\b.*|southwestern power administration\b.*|"
+    r"california air resources board\b.*|federal energy regulatory commission\b.*|"
+    r"national hurricane center\b.*|climate prediction center\b.*)\s*$",
     re.IGNORECASE,
 )
 
@@ -2321,14 +2370,14 @@ def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> 
 #    （技术突破词并入行业档）」「AI科技→AI」；决策点 B：火箭回收/核电装料等技术突破
 #    归行业档，不做子分类
 CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
-    "政府": [
+    "政策": [
         (30, ["印发", "通知", "意见", "条例", "办法", "规划", "方案", "公告",
               "答记者问", "政策文件", "发布", "国务院"]),
         (25, ["解读", "一图读懂", "新闻发布会", "吹风会"]),
         (20, ["报告", "数据", "统计", "年报", "季报"]),
         (10, []),
     ],
-    "行业": [
+    "产业": [
         (30, ["突破", "首次", "首发", "成功", "世界首个", "全球首个", "里程碑",
               "实现", "投产", "并网", "交付", "建成"]),
         (20, ["进展", "研发", "上线", "落地", "试点", "示范", "应用", "试验",
@@ -2337,7 +2386,7 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
               "recycle", "yield", "output", "test", "upgrade", "efficiency"]),
         (10, []),
     ],
-    "金融": [
+    "市场信号": [
         (30, ["扩围", "大涨", "突破", "新高", "首次", "创纪录", "启动", "成交",
               "破", "亿元", "覆盖"]),
         (20, ["价格", "指数", "报告", "数据", "融资", "投资", "交易", "配额"]),
@@ -2366,7 +2415,7 @@ DEFAULT_STRENGTH = 8
 def score_content_strength(dimension: str, title: str, summary: str) -> int:
     """内容强度分：按维度关键词档位，从高到低取第一命中档。"""
     text = f"{title or ''} {summary or ''}".lower()
-    rules = CONTENT_STRENGTH_RULES.get(dimension, CONTENT_STRENGTH_RULES["政府"])
+    rules = CONTENT_STRENGTH_RULES.get(dimension, CONTENT_STRENGTH_RULES["政策"])
     for score, kws in rules:
         if any(kw.lower() in text for kw in kws):
             return score
@@ -2503,10 +2552,10 @@ def score_freshness(published_at: str, now: datetime) -> int:
 
 
 def score_item(site_id: str, title: str, summary: str, people: list[str],
-               published_at: str, now: datetime, dimension: str = "政府") -> dict[str, Any]:
+               published_at: str, now: datetime, dimension: str = "政策") -> dict[str, Any]:
     """五维打分（v2.0）→ {'score': 0-100, 'score_level': S/A/B/C/D, 'strength': int, ...}
 
-    内容强度按 dimension 自适应（政府/行业/金融/AI 各自关键词档位），
+    内容强度按 dimension 自适应（政策/产业/市场信号/AI 各自关键词档位），
     替代 v1.0 只认政策文件的"政策类型"分。
     """
     src = SOURCE_SCORE.get(site_id, DEFAULT_SOURCE_SCORE)
@@ -2623,8 +2672,10 @@ POLICY_WEAK_KW = [
 
 
 def categorize_dimension(site_id: str, title: str, summary: str, library: str) -> str:
-    """四维分类（2026-08-19 主体化）：政府/行业/金融/AI。
+    """四维分类（2026-08-20 观察窗口化）：政策/产业/市场信号/AI。
 
+    四维=四个观察窗口而非互斥分类：政策=政府机关发文动向、产业=企业进展与
+    行业动态（兜底桶）、市场信号=碳市场/绿色资本、AI=AI×绿色落地。
     优先级：AI_SITES 直通 > 政府强词 > 政策库 > 双碳核心词（A1 双碳优先）
     > AI 词 > 金融词 > 行业词 > 政策弱词 > 行业兜底。
     """
@@ -2640,36 +2691,36 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
         return "AI"
     # GitHub 开源趋势（TECH_SITES/radarai）：仓库名常不含 AI 关键词
     # （stable-diffusion-webui / browser-use 等），而 radarai 摘要是雷达站真实中文描述
-    # （无反爬水印风险）→ 允许摘要参与 AI 判定；AI 项目归 AI，其余一律归「行业」，
-    # 且优先于政府词判定（避免仓库摘要里的 framework/target 等泛词误抢政府）
+    # （无反爬水印风险）→ 允许摘要参与 AI 判定；AI 项目归 AI，其余一律归「产业」，
+    # 且优先于政府词判定（避免仓库摘要里的 framework/target 等泛词误抢政策）
     if site_id in TECH_SITES:
         if any(kw.lower() in text for kw in AI_DIM_KW):
             return "AI"
-        return "行业"
-    # 政府强词（仅标题：印发/通知/部委名/政策…）→ 政府
+        return "产业"
+    # 政府强词（仅标题：印发/通知/部委名/政策…）→ 政策
     if any(kw.lower() in title_l for kw in GOV_STRONG_KW):
-        return "政府"
-    # 金融词（碳市场/碳交易/碳价/ETS…）→ 金融——先于双碳判定：
-    # "碳排放权交易/碳市场"是金融信号而非行业（2026-08-19 实测防"碳排放"误抢金融）
+        return "政策"
+    # 金融词（碳市场/碳交易/碳价/ETS…）→ 市场信号——先于双碳判定：
+    # "碳排放权交易/碳市场"是金融信号而非产业（2026-08-19 实测防"碳排放"误抢金融）
     for kw in FINANCE_DIM_KW:
         if kw.lower() in text:
-            return "金融"
-    # 决策点 A1 双碳优先：双碳核心词 → 行业（即使标题含 AI 背景词）
+            return "市场信号"
+    # 决策点 A1 双碳优先：双碳核心词 → 产业（即使标题含 AI 背景词）
     if any(kw.lower() in text for kw in DUAL_CARBON_KW):
-        return "行业"
+        return "产业"
     # AI 词（标题级，词边界）→ AI
     if any(kw.lower() in title_l for kw in AI_DIM_KW) or _dim_re.search(AI_TITLE_RE, title_l):
         return "AI"
     for kw in INDUSTRY_DIM_KW:
         if kw.lower() in text:
-            return "行业"
-    # 政策库（官方原文）默认政府——官方文件即使含双碳词也不改判行业
+            return "产业"
+    # 政策库（官方原文）默认政策——官方文件即使含双碳词也不改判产业
     if library == "policy":
-        return "政府"
+        return "政策"
     for kw in POLICY_WEAK_KW:
         if kw.lower() in text:
-            return "政府"
-    return "行业"  # 兜底：媒体库行业动态归行业
+            return "政策"
+    return "产业"  # 兜底：媒体库行业动态归产业
 
 
 # ── Policy relevance filter ──────────────────────────────────────────────────
@@ -3308,8 +3359,13 @@ def main() -> int:
         # 完整标题回填：笔记里的标题已用详情页标题修正，列表页截断标题
         # （如碳交易网 "…现状与未"）会被覆盖为完整版（2026-08-11）。
         # 回填时同样清理尾部源名后缀（title-index.json 里可能存了旧带后缀标题）。
+        # 2026-08-19 防污染：回填标题若本身是站名/导航（title-index 旧坏数据，
+        # 如 chinanecc "国家节能中心公共服务网 - 节能研究"）或与列表标题不相似
+        # （不是同一篇），禁止覆盖。
         full_title = _strip_title_suffix(archived_titles.get(rec.get("url", "")) or "")
-        if full_title and len(full_title) > len(rec.get("title", "")):
+        if (full_title and len(full_title) > len(rec.get("title", ""))
+                and not _is_nav_junk_title(full_title)
+                and _title_similar(full_title, rec.get("title", "")) >= 0.45):
             rec["title"] = full_title
             # 标题被回填修正后，重新翻译 title_zh（非中文才翻译，带缓存）
             if translator.needs_translation(full_title):
@@ -3851,9 +3907,13 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             url = real_url
             item["url"] = real_url  # record 共享引用 → JSON 同步
         # 详情页标题优先：列表页标题常被源站截断（如碳交易网列表页
-        # "…现状与未"），详情页 <title>/<h1> 是完整的（2026-08-11）
+        # "…现状与未"），详情页 <title>/<h1> 是完整的（2026-08-11）。
+        # 2026-08-19 加相似度门槛：详情页 title 是站名/栏目/导航（chinanecc
+        # "国家节能中心公共服务网 - 节能研究"、EIA 站名、arXiv 分类面包屑）时
+        # 与列表标题重叠 < 0.5，禁止覆盖，保留列表标题。
         page_title = (res or {}).get("title") or ""
-        if page_title and len(page_title) > len(title):
+        if (page_title and len(page_title) > len(title)
+                and _title_similar(page_title, title) >= 0.45):
             title = page_title.strip()
             item["title"] = title  # record 共享引用 → JSON 同步
         summary = (res or {}).get("summary") or ""

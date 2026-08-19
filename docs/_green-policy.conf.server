@@ -23,6 +23,14 @@ server {
     root /opt/green-hot-news;
     index index.html;
 
+    # HTML 不缓存（2026-08-19）：版本号靠 CSS/JS 查询串（styles.css?v=N）控制，
+    # HTML 本身必须每次取最新——否则 Chrome 启发式缓存旧 index.html（引用旧版
+    # CSS，如 v3 深色主题），导致"Chrome 黑底 / Wave 白底"显示不一致。
+    location = /index.html {
+        expires -1;
+        add_header Cache-Control "no-store";
+    }
+
     # 静态文件缓存
     location ~* \.(css|js|png|jpg|jpeg|gif|svg|ico|webp)$ {
         expires 10m;

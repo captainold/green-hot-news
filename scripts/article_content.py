@@ -245,6 +245,10 @@ def _clean_title(raw: Optional[str]) -> Optional[str]:
         return None
     t = raw.strip()
     t = re.sub(r"\s+", " ", t)
+    # 剥标题标签前缀（arXiv 详情页 h1 是 "Title: xxx" 格式，2026-08-19）
+    m = re.match(r"^(title|标题|题名|文章标题)\s*[:：]\s*", t, re.IGNORECASE)
+    if m:
+        t = t[m.end():].strip()
     # 去掉站点 SEO 后缀（"标题_站点名" 模式，如 碳排放交易网/国家发展和改革委员会，
     # 以及英文源名后缀 " - EPA" / " - CleanTechnica" 等）
     for sep in ("_", "｜", "|", "——", "-", "–", "—"):
@@ -254,9 +258,11 @@ def _clean_title(raw: Optional[str]) -> Optional[str]:
         tail_s = tail.strip()
         if not tail_s:
             continue
-        # 中文/日文站点后缀
+        # 中文/日文站点后缀（2026-08-19 补 交易所/资讯/信息网/服务网——上海环交所
+        # 详情页 title "标题-上海环境能源交易所"、chinanecc "…公共服务网" 等）
         if len(tail_s) <= 25 and re.search(
-                r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会|环境省|经产省"
+                r"(网|官网|委员会|政府|部$|中心|门户|交易所|资讯|信息网|服务网|新闻中心"
+                r"|生态环境部|发展和改革委员会|环境省|经产省"
                 r"|環境局|環境省|経産省|資源エネルギー庁)", tail_s):
             t = head.strip()
             break
@@ -276,10 +282,27 @@ def _clean_title(raw: Optional[str]) -> Optional[str]:
     return t[:120] or None
 
 
-# 通用站名/栏目页标题（非文章标题）——PIB、gov 站点常见
+# 通用站名/栏目页标题（非文章标题）——PIB、gov 站点常见。
+# 2026-08-19 大幅增强（chinanecc/EIA/arXiv/生态环境部/CARB 污染教训）：
+#   - 中文"站名 - 栏目名"（国家节能中心公共服务网 - 节能研究，该站详情页 <title> 写死）
+#   - 跳转确认页（生态环境部"您访问的链接即将离开…是否继续？"）
+#   - 英文站名 + SEO 后缀（EIA "U.S. Energy Information Administration - EIA - Independent Statistics and Analysis"）
+#   - GitHub 仓库 SEO 前缀（"GitHub - owner/repo: desc"）、arXiv 分类面包屑（"Computer Science > AI"）
+#   - 栏目/导航词（Today in Energy / Main navigation / 相关阅读推荐 等）
 _GENERIC_SITE_TITLE_RE = re.compile(
     r"(press release page|press information bureau|home\s*[|—–-]?|news\s*[|—–-]?|"
-    r"english releases|photo album|blogdescription|pib backgrounder)",
+    r"english releases|photo album|blogdescription|pib backgrounder|"
+    r"independent statistics and analysis|california air resources board|"
+    r"snow station information|national hurricane center|main navigation|navigation menu|"
+    r"today in energy|page not found|\b404\b|contact us|"
+    r"computer science\s*>|github\s*-\s*[\w.-]+/[\w.-]+|"
+    r"即将离开|是否继续|正在跳转|"
+    r"相关阅读推荐|您可能对以下文章感兴趣|相关推荐|热门推荐|热点新闻|"
+    r"^[\u4e00-\u9fff]{2,24}(网|中心|部|局|署|厅|院|站|官网|门户|平台)[\s\u3000]*[-—–|｜_][\s\u3000]*"
+    r"[\u4e00-\u9fff]{0,8}?"
+    r"(研究|动态|要闻|新闻|资讯|公告|通知|政策|法规|标准|专题|党建|简介|概况|机构|"
+    r"服务|指南|文献|期刊|学报|目录|下载|数据|资源|招聘|版权|联系我们|首页|信息公开|"
+    r"政务公开|互动交流|办事服务|政策法规|专题报道|工作动态|行业动态)\s*$)",
     re.IGNORECASE,
 )
 
@@ -309,27 +332,37 @@ def _cut_at_sentence(text: str, limit: int) -> str:
     return head
 
 
+def _first_article_heading(soup: BeautifulSoup, tags: tuple[str, ...]) -> Optional[str]:
+    """遍历 h1/h2，返回第一个「非通用站名/栏目/导航」的标题。
+
+    2026-08-19 教训（chinanecc/EIA/arXiv/mee 实测）：
+      - chinanecc 详情页无 h1，正文标题是 h2，<title> 写死为"站名 - 栏目名"
+      - EIA 详情页有 3 个 h1：站名 → 栏目名（Today in Energy）→ 文章标题（第 3 个才是）
+      - arXiv abs 页第 1 个 h1 是分类面包屑 "Computer Science > AI"，第 2 个是 "Title: xxx"
+      - 生态环境部 h1 是跳转确认提示（"您访问的链接即将离开…是否继续？"），h2 才是标题
+    """
+    for tag in tags:
+        for el in soup.find_all(tag):
+            t = _clean_title(el.get_text())
+            if t and not _is_generic_site_title(t):
+                return t
+    return None
+
+
 def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[str, Optional[str]]:
     """Return (body_text, page_title). body_text is '' when nothing found."""
     if soup is None:
         soup = BeautifulSoup(html, "html.parser")
-    # 优先 h1（干净标题），fallback <title>（可能带站点 SEO 后缀）。
-    # PIB 等站点无 h1，标题在 h2，且 <title> 是通用站名
-    # （"Press Release Page | Press Information Bureau"）→ 优先取 h2。
-    h1_el = soup.find("h1")
-    title_el = soup.find("title")
-    page_title = None
-    if h1_el is not None:
-        page_title = _clean_title(h1_el.get_text())
+    # 标题提取：h1 们（跳过站名/栏目）→ h2 们 → <title>（清洗 + 跳过站名）→ None。
+    # 旧逻辑只取第一个 h1 / 只在一个 h2，导致 EIA 站名、arXiv 分类面包屑、
+    # chinanecc 站名-栏目、生态环境部跳转提示被当成标题（2026-08-19）。
+    page_title = _first_article_heading(soup, ("h1", "h2"))
     if not page_title:
-        title_raw = title_el.get_text() if title_el is not None else ""
-        # 通用站名标题特征（非文章标题）
-        if _is_generic_site_title(title_raw):
-            h2_el = soup.find("h2")
-            if h2_el is not None:
-                page_title = _clean_title(h2_el.get_text())
-    if not page_title and title_el is not None:
-        page_title = _clean_title(title_el.get_text())
+        title_el = soup.find("title")
+        if title_el is not None:
+            t = _clean_title(title_el.get_text())
+            if t and not _is_generic_site_title(t):
+                page_title = t
 
     for el in soup.select(GARBAGE_SELECTORS):
         el.decompose()
@@ -624,7 +657,10 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
         soup = BeautifulSoup(resp.text, "html.parser")
         body, page_title = extract_readable(resp.text, soup)
         head = body[:120]
-        if len(body) < MIN_PARAGRAPH_CHARS or any(m in head for m in ERROR_PAGE_MARKERS):
+        # 404/错误页检测（2026-08-19 大小写不敏感——CARB 404 页 "Page not found"
+        # 曾被当正常文章抓取，素材 H1 变成站名）
+        if (not page_title and not body) or len(body) < MIN_PARAGRAPH_CHARS or \
+                any(m.lower() in head.lower() for m in ERROR_PAGE_MARKERS):
             return None
         summary = _cut_at_sentence(body, MAX_SUMMARY_CHARS)
         summary = _clean_summary_meta(summary)  # 作者行/摘要前缀清洗（2026-08-19 碳道）
