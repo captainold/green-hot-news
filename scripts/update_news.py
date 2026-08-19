@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import os
 import re
@@ -749,6 +750,9 @@ def _strip_title_suffix(title: str) -> str:
     t = (title or "").strip()
     if not t:
         return t
+    # 解码 HTML 实体（AIHOT 等源 feed 标题是 CDATA 包裹 + 内部 HTML 转义，
+    # feedparser 不解 CDATA 里的实体，残留 &quot;/&amp; 等 — 2026-08-19）
+    t = html.unescape(t)
     # 清理混入正文的"摘要：..."污染（碳道列表页 a.get_text() 会把标题+摘要+
     # 作者+相对时间拼在一起；旧笔记/title-index 回填时也会带进来 — 2026-08-18）
     for marker in ("摘要：", "摘要:"):

@@ -1,7 +1,7 @@
 
 
 
-
+- [ ] 这篇新闻：Strengthening democratic over sight in national security。事关国家级安全，政治、ai、民主的这样一个话题，对我来说是关注度很高的话题。请检查评分标准，针对此类话题进行优化。
 
 - [x] 标签体系
 - [x] 政策库文件，不是按照wiki方式组织的。而是按照单位。
