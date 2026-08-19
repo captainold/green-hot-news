@@ -137,6 +137,42 @@ fig10 = px.scatter(df, x="src_score", y="score", color="dimension",
                    title="来源权威分 vs 综合得分（按维度着色）")
 fig10.show()""")
 
+code("""# ⚠️ 库里 freshness 是「首次收录时刻快照」，不随采集更新（老条目永不衰减）
+# → 用 published_at 和当前时间重算"真实时效分"，对比出哪些条目虚高
+from datetime import datetime, timezone
+
+NOW = datetime.now(timezone.utc)
+
+def real_freshness(published_at):
+    dt = pd.to_datetime(published_at, utc=True, errors="coerce")
+    if pd.isna(dt):
+        return 0
+    hours = (NOW - dt).total_seconds() / 3600
+    if hours < 0:
+        return 10
+    if hours < 24:
+        return 10
+    if hours < 48:
+        return 8
+    if hours < 72:
+        return 6
+    if hours < 96:
+        return 4
+    return 2
+
+df["freshness_real"] = df["published_at"].map(real_freshness)
+df["freshness_diff"] = df["freshness"] - df["freshness_real"]  # >0 = 库里虚高
+
+inflated = int((df["freshness_diff"] > 0).sum())
+print(f"库里 freshness 虚高的条目: {inflated}/{len(df)}（占 {inflated/len(df):.0%}）")
+print("示例（库里 10 分但真实时效已衰减）：")
+for _, r in df[df["freshness_diff"] > 0].sort_values("freshness_diff", ascending=False).head(5).iterrows():
+    print(f"  [{r['dimension']}] {str(r['title'])[:34]} | 快照{r['freshness']} → 实时{r['freshness_real']}")
+
+fig10b = px.histogram(df, x="freshness_diff", nbins=12,
+                      title="快照 freshness − 实时 freshness（>0 = 库里虚高）")
+fig10b.show()""")
+
 # ---------- 6. 关键词云 ----------
 md("""## 六、关键词透视
 
