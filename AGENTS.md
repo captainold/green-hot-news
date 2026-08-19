@@ -27,7 +27,7 @@
 
 ## 🗂️ 关键架构（一句话版）
 
-- 抓取：`scripts/update_news.py`（69 源，`fetch_*` 函数 + `BUILTIN_SOURCES` 注册；AI 全链条源走 `AI_SITES` 白名单直通，GitHub 开源趋势走 `TECH_SITES` 直通但需绿色/AI 词过滤，人形机器人源走 `ROBOT_SITES` 直通，36氪/虎嗅等 AI 综合媒体走 `AI_MEDIA_SITES` 过滤；Google News 源一律单主题词 query + when:30d——括号 OR 语法返回全站混合内容，勿用）
+- 抓取：`scripts/update_news.py`（70 源，`fetch_*` 函数 + `BUILTIN_SOURCES` 注册；AI 全链条源走 `AI_SITES` 白名单直通，GitHub 开源趋势走 `TECH_SITES` 直通但需绿色/AI 词过滤，人形机器人源走 `ROBOT_SITES` 直通，36氪/虎嗅等 AI 综合媒体走 `AI_MEDIA_SITES` 过滤，X 平台快讯走 `X_SITES` + `X_ACCOUNTS` 账号白名单过滤（2026-08-19 零成本方案：x.com 账号页 SSR 含 schema.org Microdata，requests 直抓，无需 API key）；Google News 源一律单主题词 query + when:30d——括号 OR 语法返回全站混合内容，勿用）
 - 打分：`score_item()` → `score_content_strength()`（按维度自适应）/ `score_topic()` / `score_people()` / `score_freshness()`
 - 四维分类：`categorize_dimension()`（**2026-08-19 主体化：政府/行业/金融/AI**；优先级 AI_SITES直通 > 政府强词(仅标题) > 金融词 > 双碳核心词(A1 双碳优先) > AI词 > 行业词 > 政策库默认政府 > 政策弱词 > 行业兜底；技术突破归行业档，radarai 需绿色/AI 词过滤）
 - 前端：`index.html`（两区布局：上方排行榜——主题×周期(日/周/月)×区域(国内/国际)切换；下方实时时间线——跟随筛选、60s 轮询新条目自动插入高亮）+ `assets/app.js` + `assets/styles.css`；数据源 `data/history.json`（62 天累积，含 `region` 字段）+ `data/latest-24h.json`
