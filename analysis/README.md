@@ -6,8 +6,40 @@
 
 | 文件 | 说明 |
 |------|------|
-| `四维透视.ipynb` | 主文件：8 大章节、15 个代码块，Positron 打开即用（已预跑，打开即可看到全部图表） |
+| `四维透视.ipynb` | 主文件：8 大章节、16 个代码块，Positron 打开即用（已预跑，打开即可看到全部图表） |
+| `四维透视-报告.html` | **纯结果展示版**（隐藏代码，只有图表/表格），浏览器直接打开即看，适合分享；由 nbconvert 从 ipynb 导出 |
 | `build_radar_notebook.py` | Notebook 生成脚本（数据更新后重跑它可重新生成 + 重新预跑） |
+
+## 展示 vs 编辑
+
+- **想看得清爽**：双击 `四维透视-报告.html` 用浏览器打开（图表交互、无代码）
+- **想改/重跑分析**：Positron 打开 `.ipynb`（代码和输出一体，逐格运行）
+- **Positron 里临时隐藏代码**：鼠标移到代码块左侧点折叠图标
+
+## 重新生成报告（数据更新后）
+
+> 需要 `nbconvert`：`python3.11 -m pip install nbconvert`（Windows 侧用 `python -m pip install nbconvert`）
+
+```bash
+cd analysis
+# 1. 重新生成 notebook（含预跑输出）
+python3.11 ../analysis/build_radar_notebook.py
+# 2. 转 HTML 报告（隐藏代码；plotly 特殊格式需先转 text/html）
+python3.11 - <<'EOF'
+import nbformat, json
+import plotly.io as pio
+nb = nbformat.read("四维透视.ipynb", as_version=4)
+for c in nb.cells:
+    if c.cell_type != "code": continue
+    for o in c.get("outputs", []):
+        d = o.get("data", {})
+        if "application/vnd.plotly.v1+json" in d:
+            fig = pio.from_json(json.dumps(d["application/vnd.plotly.v1+json"]))
+            d["text/html"] = pio.to_html(fig, include_plotlyjs="cdn", full_html=False)
+nbformat.write(nb, "/tmp/report.ipynb")
+EOF
+python3.11 -m nbconvert --to html --no-input --output 四维透视-报告 /tmp/report.ipynb
+```
 
 ## 使用方法（Positron）
 
