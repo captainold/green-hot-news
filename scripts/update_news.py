@@ -870,24 +870,41 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
 def fetch_us_epa(session: requests.Session, now: datetime) -> list[RawItem]:
     """美国环保署 EPA — 温室气体法规、发电厂排放标准（2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "us_epa", "美国EPA", [
-        "site:epa.gov (climate OR emissions OR greenhouse) when:7d",
-        "site:epa.gov (power plant OR methane OR carbon pollution) when:7d",
+        "site:epa.gov climate when:7d",
+        "site:epa.gov emissions when:7d",
+        "site:epa.gov greenhouse when:7d",
+        "site:epa.gov power plant when:7d",
+        "site:epa.gov methane when:7d",
+        "site:epa.gov carbon pollution when:7d",
     ])
 
 
 def fetch_us_doe(session: requests.Session, now: datetime) -> list[RawItem]:
     """美国能源部 DOE — 清洁能源计划、关键矿产、贷款项目（2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "us_doe", "美国DOE", [
-        "site:energy.gov (clean energy OR solar OR grid OR battery OR hydrogen) when:7d",
-        "site:energy.gov (loan program OR critical minerals OR nuclear OR wind) when:7d",
+        "site:energy.gov clean energy when:7d",
+        "site:energy.gov solar when:7d",
+        "site:energy.gov grid when:7d",
+        "site:energy.gov battery when:7d",
+        "site:energy.gov hydrogen when:7d",
+        "site:energy.gov loan program when:7d",
+        "site:energy.gov critical minerals when:7d",
+        "site:energy.gov nuclear when:7d",
+        "site:energy.gov wind when:7d",
     ])
 
 
 def fetch_eu_commission(session: requests.Session, now: datetime) -> list[RawItem]:
     """欧盟委员会 — 气候行动总司/能源总司：Fit for 55、CBAM、EU ETS（2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "eu_commission", "欧盟委员会", [
-        "site:ec.europa.eu (climate OR emissions OR CBAM OR carbon) when:7d",
-        "site:ec.europa.eu (energy OR renewables OR hydrogen OR grid) when:7d",
+        "site:ec.europa.eu climate when:7d",
+        "site:ec.europa.eu emissions when:7d",
+        "site:ec.europa.eu CBAM when:7d",
+        "site:ec.europa.eu carbon when:7d",
+        "site:ec.europa.eu energy when:7d",
+        "site:ec.europa.eu renewables when:7d",
+        "site:ec.europa.eu hydrogen when:7d",
+        "site:ec.europa.eu grid when:7d",
     ])
 
 
@@ -897,16 +914,28 @@ def fetch_euractiv(session: requests.Session, now: datetime) -> list[RawItem]:
     归政策库·国际（欧盟政策一手报道），媒体属性但政策浓度高。
     """
     return fetch_foreign_gov(session, now, "euractiv", "Euractiv·欧盟", [
-        "site:euractiv.com (climate OR energy OR emissions OR carbon) when:7d",
-        "site:euractiv.com (CBAM OR ETS OR renewables OR green deal) when:7d",
+        "site:euractiv.com climate when:7d",
+        "site:euractiv.com energy when:7d",
+        "site:euractiv.com emissions when:7d",
+        "site:euractiv.com carbon when:7d",
+        "site:euractiv.com CBAM when:7d",
+        "site:euractiv.com ETS when:7d",
+        "site:euractiv.com renewables when:7d",
+        "site:euractiv.com green deal when:7d",
     ])
 
 
 def fetch_india_pib(session: requests.Session, now: datetime) -> list[RawItem]:
     """印度新闻信息局 PIB — 绿氢使命、气候政策、可再生能源（2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "india_pib", "印度PIB", [
-        "site:pib.gov.in (climate OR renewable OR solar OR energy) when:7d",
-        "site:pib.gov.in (green hydrogen OR emissions OR carbon OR sustainability) when:7d",
+        "site:pib.gov.in climate when:7d",
+        "site:pib.gov.in renewable when:7d",
+        "site:pib.gov.in solar when:7d",
+        "site:pib.gov.in energy when:7d",
+        "site:pib.gov.in green hydrogen when:7d",
+        "site:pib.gov.in emissions when:7d",
+        "site:pib.gov.in carbon when:7d",
+        "site:pib.gov.in sustainability when:7d",
     ])
 
 
@@ -914,56 +943,89 @@ def fetch_india_pib(session: requests.Session, now: datetime) -> list[RawItem]:
 def fetch_us_noaa(session: requests.Session, now: datetime) -> list[RawItem]:
     """美国国家海洋大气局 NOAA — 气候科学、温室气体监测、海洋与大气（2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "us_noaa", "美国NOAA", [
-        "site:noaa.gov (climate change OR greenhouse OR carbon dioxide) when:7d",
-        "site:noaa.gov (ocean warming OR sea level OR emissions) when:7d",
+        "site:noaa.gov climate change when:7d",
+        "site:noaa.gov greenhouse when:7d",
+        "site:noaa.gov carbon dioxide when:7d",
+        "site:noaa.gov ocean warming when:7d",
+        "site:noaa.gov sea level when:7d",
+        "site:noaa.gov emissions when:7d",
     ])
 
 
 def fetch_us_eia(session: requests.Session, now: datetime) -> list[RawItem]:
     """美国能源信息署 EIA — 能源统计与预测（天然气/电力/可再生，权威数据源，2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "us_eia", "美国EIA", [
-        "site:eia.gov (natural gas OR electricity OR renewables) when:7d",
-        "site:eia.gov (emissions OR energy outlook OR battery OR solar) when:7d",
+        "site:eia.gov natural gas when:7d",
+        "site:eia.gov electricity when:7d",
+        "site:eia.gov renewables when:7d",
+        "site:eia.gov emissions when:7d",
+        "site:eia.gov energy outlook when:7d",
+        "site:eia.gov battery when:7d",
+        "site:eia.gov solar when:7d",
     ])
 
 
 def fetch_us_ferc(session: requests.Session, now: datetime) -> list[RawItem]:
     """美国联邦能源监管委员会 FERC — 电网/输电/LNG/电力市场监管（2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "us_ferc", "美国FERC", [
-        "site:ferc.gov (grid OR transmission OR electricity OR LNG) when:14d",
-        "site:ferc.gov (reliability OR interconnection OR wholesale market) when:14d",
+        "site:ferc.gov grid when:14d",
+        "site:ferc.gov transmission when:14d",
+        "site:ferc.gov electricity when:14d",
+        "site:ferc.gov LNG when:14d",
+        "site:ferc.gov reliability when:14d",
+        "site:ferc.gov interconnection when:14d",
+        "site:ferc.gov wholesale market when:14d",
     ])
 
 
 def fetch_us_carb(session: requests.Session, now: datetime) -> list[RawItem]:
     """加州空气资源委员会 CARB — 零排放汽车、碳市场、气候政策（美国州级最权威，2026-08-14 新增）。"""
     return fetch_foreign_gov(session, now, "us_carb", "加州CARB", [
-        "site:ww2.arb.ca.gov (climate OR zero emission OR cap and trade) when:30d",
-        "site:ww2.arb.ca.gov (trucks OR cars OR diesel OR regulations) when:30d",
+        "site:ww2.arb.ca.gov climate when:30d",
+        "site:ww2.arb.ca.gov zero emission when:30d",
+        "site:ww2.arb.ca.gov cap and trade when:30d",
+        "site:ww2.arb.ca.gov trucks when:30d",
+        "site:ww2.arb.ca.gov cars when:30d",
+        "site:ww2.arb.ca.gov diesel when:30d",
+        "site:ww2.arb.ca.gov regulations when:30d",
     ])
 
 
 def fetch_jp_moe(session: requests.Session, now: datetime) -> list[RawItem]:
     """日本环境省 MOE — 气候政策、脱碳、碳市场（2026-08-14 新增，日语关键词）。"""
     return fetch_foreign_gov(session, now, "jp_moe", "日本环境省", [
-        "site:env.go.jp (脱炭素 OR 気候変動対策 OR カーボンニュートラル) when:14d",
-        "site:env.go.jp (地球温暖化 OR 温室効果ガス OR 排出量取引) when:14d",
+        "site:env.go.jp 脱炭素 when:14d",
+        "site:env.go.jp 気候変動対策 when:14d",
+        "site:env.go.jp カーボンニュートラル when:14d",
+        "site:env.go.jp 地球温暖化 when:14d",
+        "site:env.go.jp 温室効果ガス when:14d",
+        "site:env.go.jp 排出量取引 when:14d",
     ], limit=15, locale="ja")
 
 
 def fetch_jp_meti(session: requests.Session, now: datetime) -> list[RawItem]:
     """日本经济产业省 METI — 能源政策、GX、氢能（2026-08-14 新增，日语关键词）。"""
     return fetch_foreign_gov(session, now, "jp_meti", "日本经产省", [
-        "site:meti.go.jp (エネルギー OR 脱炭素 OR 水素 OR GX) when:14d",
-        "site:meti.go.jp (再生可能エネルギー OR 電力 OR カーボン) when:14d",
+        "site:meti.go.jp エネルギー when:14d",
+        "site:meti.go.jp 脱炭素 when:14d",
+        "site:meti.go.jp 水素 when:14d",
+        "site:meti.go.jp GX when:14d",
+        "site:meti.go.jp 再生可能エネルギー when:14d",
+        "site:meti.go.jp 電力 when:14d",
+        "site:meti.go.jp カーボン when:14d",
     ], limit=15, locale="ja")
 
 
 def fetch_jp_anre(session: requests.Session, now: datetime) -> list[RawItem]:
     """日本资源能源厅 ANRE（经产省下属）— 电力/油气/可再生能源政策（2026-08-14 新增，日语关键词）。"""
     return fetch_foreign_gov(session, now, "jp_anre", "日本资源能源厅", [
-        "site:enecho.meti.go.jp (再生可能 OR 水素 OR 脱炭素) when:14d",
-        "site:enecho.meti.go.jp (電力 OR エネルギー OR 石油 OR ガス) when:14d",
+        "site:enecho.meti.go.jp 再生可能 when:14d",
+        "site:enecho.meti.go.jp 水素 when:14d",
+        "site:enecho.meti.go.jp 脱炭素 when:14d",
+        "site:enecho.meti.go.jp 電力 when:14d",
+        "site:enecho.meti.go.jp エネルギー when:14d",
+        "site:enecho.meti.go.jp 石油 when:14d",
+        "site:enecho.meti.go.jp ガス when:14d",
     ], limit=15, locale="ja")
 
 
@@ -982,8 +1044,14 @@ def fetch_e3g(session: requests.Session, now: datetime) -> list[RawItem]:
     if items:
         return items
     return fetch_foreign_gov(session, now, "e3g", "E3G", [
-        "site:e3g.org (climate OR energy OR emissions OR carbon) when:30d",
-        "site:e3g.org (finance OR policy OR transition OR grid) when:30d",
+        "site:e3g.org climate when:30d",
+        "site:e3g.org energy when:30d",
+        "site:e3g.org emissions when:30d",
+        "site:e3g.org carbon when:30d",
+        "site:e3g.org finance when:30d",
+        "site:e3g.org policy when:30d",
+        "site:e3g.org transition when:30d",
+        "site:e3g.org grid when:30d",
     ], limit=20)
 
 
@@ -1204,8 +1272,14 @@ def fetch_caixin(session: requests.Session, now: datetime) -> list[RawItem]:
     ⚠️ 英文 query 会被成人站污染（site:caixin.com 的 en query 返回垃圾）→ 只用 zh-CN。
     """
     return fetch_foreign_gov(session, now, "caixin", "财新", [
-        "site:caixin.com (碳 OR 双碳 OR 碳中和 OR 碳市场) when:7d",
-        "site:caixin.com (绿色金融 OR 能源 OR 环保 OR 排放) when:7d",
+        "site:caixin.com 碳 when:7d",
+        "site:caixin.com 双碳 when:7d",
+        "site:caixin.com 碳中和 when:7d",
+        "site:caixin.com 碳市场 when:7d",
+        "site:caixin.com 绿色金融 when:7d",
+        "site:caixin.com 能源 when:7d",
+        "site:caixin.com 环保 when:7d",
+        "site:caixin.com 排放 when:7d",
     ], locale="zh-CN")
 
 
@@ -1251,8 +1325,16 @@ def fetch_thepaper(session: requests.Session, now: datetime) -> list[RawItem]:
     非洲贸易绿色化/绿色算力，质量高）。版图综合媒体 P1（绿政公署栏目）。
     """
     return fetch_foreign_gov(session, now, "thepaper", "澎湃新闻", [
-        "site:thepaper.cn (绿色 OR 低碳 OR 双碳 OR 碳市场 OR 能源 OR 环保) when:7d",
-        "site:thepaper.cn (碳中和 OR 储能 OR 新能源 OR 排放) when:7d",
+        "site:thepaper.cn 绿色 when:7d",
+        "site:thepaper.cn 低碳 when:7d",
+        "site:thepaper.cn 双碳 when:7d",
+        "site:thepaper.cn 碳市场 when:7d",
+        "site:thepaper.cn 能源 when:7d",
+        "site:thepaper.cn 环保 when:7d",
+        "site:thepaper.cn 碳中和 when:7d",
+        "site:thepaper.cn 储能 when:7d",
+        "site:thepaper.cn 新能源 when:7d",
+        "site:thepaper.cn 排放 when:7d",
     ], locale="zh-CN")
 
 
@@ -1266,8 +1348,14 @@ def fetch_artificialanalysis(session: requests.Session, now: datetime) -> list[R
     AI 维度权威数据源。归 AI_SITES 直通。
     """
     return fetch_foreign_gov(session, now, "artificialanalysis", "Artificial Analysis", [
-        "site:artificialanalysis.ai (model OR AI OR benchmark OR intelligence) when:14d",
-        "site:artificialanalysis.ai (performance OR price OR LLM OR GPT) when:14d",
+        "site:artificialanalysis.ai model when:14d",
+        "site:artificialanalysis.ai AI when:14d",
+        "site:artificialanalysis.ai benchmark when:14d",
+        "site:artificialanalysis.ai intelligence when:14d",
+        "site:artificialanalysis.ai performance when:14d",
+        "site:artificialanalysis.ai price when:14d",
+        "site:artificialanalysis.ai LLM when:14d",
+        "site:artificialanalysis.ai GPT when:14d",
     ])
 
 
@@ -1278,8 +1366,16 @@ def fetch_36kr(session: requests.Session, now: datetime) -> list[RawItem]:
     综合科技商业媒体：走 AI_MEDIA_SITES 过滤（命中绿色词或 AI 词才入库）。
     """
     return fetch_foreign_gov(session, now, "36kr", "36氪", [
-        "site:36kr.com (AI OR 大模型 OR 新能源 OR 储能 OR 碳中和) when:7d",
-        "site:36kr.com (智能体 OR 算力 OR 芯片 OR 绿色 OR 碳) when:7d",
+        "site:36kr.com AI when:7d",
+        "site:36kr.com 大模型 when:7d",
+        "site:36kr.com 新能源 when:7d",
+        "site:36kr.com 储能 when:7d",
+        "site:36kr.com 碳中和 when:7d",
+        "site:36kr.com 智能体 when:7d",
+        "site:36kr.com 算力 when:7d",
+        "site:36kr.com 芯片 when:7d",
+        "site:36kr.com 绿色 when:7d",
+        "site:36kr.com 碳 when:7d",
     ], locale="zh-CN")
 
 
@@ -1290,8 +1386,15 @@ def fetch_huxiu(session: requests.Session, now: datetime) -> list[RawItem]:
     AI焚书/甲骨文算力）。综合科技商业媒体：走 AI_MEDIA_SITES 过滤。
     """
     return fetch_foreign_gov(session, now, "huxiu", "虎嗅", [
-        "site:huxiu.com (AI OR 大模型 OR 新能源 OR 碳中和) when:7d",
-        "site:huxiu.com (智能体 OR 算力 OR 芯片 OR 储能 OR 绿色) when:7d",
+        "site:huxiu.com AI when:7d",
+        "site:huxiu.com 大模型 when:7d",
+        "site:huxiu.com 新能源 when:7d",
+        "site:huxiu.com 碳中和 when:7d",
+        "site:huxiu.com 智能体 when:7d",
+        "site:huxiu.com 算力 when:7d",
+        "site:huxiu.com 芯片 when:7d",
+        "site:huxiu.com 储能 when:7d",
+        "site:huxiu.com 绿色 when:7d",
     ], locale="zh-CN")
 
 
@@ -1375,8 +1478,13 @@ def fetch_cneeex(session: requests.Session, now: datetime) -> list[RawItem]:
     if not items:
         # fallback: Google News（服务器直连被拦时）
         items = fetch_foreign_gov(session, now, "cneeex", "上海环交所", [
-            "site:cneeex.com (碳市场 OR 碳价 OR 配额 OR 碳交易) when:30d",
-            "site:cneeex.com (碳排放 OR 环交所 OR 碳金融) when:30d",
+            "site:cneeex.com 碳市场 when:30d",
+        "site:cneeex.com 碳价 when:30d",
+        "site:cneeex.com 配额 when:30d",
+        "site:cneeex.com 碳交易 when:30d",
+            "site:cneeex.com 碳排放 when:30d",
+        "site:cneeex.com 环交所 when:30d",
+        "site:cneeex.com 碳金融 when:30d",
         ], limit=15, locale="zh-CN")
     return items[:20]
 
@@ -1384,24 +1492,38 @@ def fetch_cneeex(session: requests.Session, now: datetime) -> list[RawItem]:
 def fetch_ncsc(session: requests.Session, now: datetime) -> list[RawItem]:
     """国家应对气候变化战略研究和国际合作中心 NCSC — 气候战略/碳市场研究（2026-08-14 接入）。"""
     return fetch_foreign_gov(session, now, "ncsc", "NCSC国家气候中心", [
-        "site:ncsc.org.cn (气候 OR 碳市场 OR 碳中和 OR 碳达峰) when:30d",
-        "site:ncsc.org.cn (温室气体 OR 减排 OR 政策) when:30d",
+        "site:ncsc.org.cn 气候 when:30d",
+        "site:ncsc.org.cn 碳市场 when:30d",
+        "site:ncsc.org.cn 碳中和 when:30d",
+        "site:ncsc.org.cn 碳达峰 when:30d",
+        "site:ncsc.org.cn 温室气体 when:30d",
+        "site:ncsc.org.cn 减排 when:30d",
+        "site:ncsc.org.cn 政策 when:30d",
     ], limit=10, locale="zh-CN")
 
 
 def fetch_caep(session: requests.Session, now: datetime) -> list[RawItem]:
     """生态环境部环境规划院 CAEP — 环境规划/双碳路径（2026-08-14 接入）。"""
     return fetch_foreign_gov(session, now, "caep", "环境规划院CAEP", [
-        "site:caep.org.cn (环境 OR 双碳 OR 规划 OR 美丽中国) when:30d",
-        "site:caep.org.cn (碳 OR 气候 OR 减污降碳) when:30d",
+        "site:caep.org.cn 环境 when:30d",
+        "site:caep.org.cn 双碳 when:30d",
+        "site:caep.org.cn 规划 when:30d",
+        "site:caep.org.cn 美丽中国 when:30d",
+        "site:caep.org.cn 碳 when:30d",
+        "site:caep.org.cn 气候 when:30d",
+        "site:caep.org.cn 减污降碳 when:30d",
     ], limit=10, locale="zh-CN")
 
 
 def fetch_cenews(session: requests.Session, now: datetime) -> list[RawItem]:
     """中国环境报 — 生态环境部机关报（2026-08-14 接入，媒体库）。"""
     return fetch_foreign_gov(session, now, "cenews", "中国环境报", [
-        "site:cenews.com.cn (生态 OR 环境 OR 双碳) when:14d",
-        "site:cenews.com.cn (碳市场 OR 绿色 OR 污染防治) when:14d",
+        "site:cenews.com.cn 生态 when:14d",
+        "site:cenews.com.cn 环境 when:14d",
+        "site:cenews.com.cn 双碳 when:14d",
+        "site:cenews.com.cn 碳市场 when:14d",
+        "site:cenews.com.cn 绿色 when:14d",
+        "site:cenews.com.cn 污染防治 when:14d",
     ], limit=15, locale="zh-CN")
 
 
@@ -1452,8 +1574,12 @@ def fetch_therobotreport(session: requests.Session, now: datetime) -> list[RawIt
     humanoid/robot 命中 AI_DIM_KW → AI 榜（人形机器人=具身智能），纯产业动态落行业。
     """
     return fetch_foreign_gov(session, now, "therobotreport", "The Robot Report", [
-        "site:therobotreport.com humanoid OR robot OR robotics when:7d",
-        "site:therobotreport.com humanoid robots OR embodied AI OR robotics funding when:7d",
+        "site:therobotreport.com humanoid when:7d",
+        "site:therobotreport.com robot when:7d",
+        "site:therobotreport.com robotics when:7d",
+        "site:therobotreport.com humanoid robots when:7d",
+        "site:therobotreport.com embodied AI when:7d",
+        "site:therobotreport.com robotics funding when:7d",
     ], limit=20)
 
 
@@ -1471,8 +1597,12 @@ def fetch_spectrum_robotics(session: requests.Session, now: datetime) -> list[Ra
     if items:
         return items
     return fetch_foreign_gov(session, now, "spectrum", "IEEE Spectrum", [
-        "site:spectrum.ieee.org robot OR robotics OR humanoid when:7d",
-        "site:spectrum.ieee.org drone OR autonomous OR AI when:7d",
+        "site:spectrum.ieee.org robot when:7d",
+        "site:spectrum.ieee.org robotics when:7d",
+        "site:spectrum.ieee.org humanoid when:7d",
+        "site:spectrum.ieee.org drone when:7d",
+        "site:spectrum.ieee.org autonomous when:7d",
+        "site:spectrum.ieee.org AI when:7d",
     ], limit=20)
 
 
@@ -1483,8 +1613,11 @@ def fetch_qianjia(session: requests.Session, now: datetime) -> list[RawItem]:
     全站非绿色主题（智能家居商业新闻多）→ 走 is_policy_relevant 关键词过滤。
     """
     return fetch_foreign_gov(session, now, "qianjia", "千家网", [
-        "site:qianjia.com 智能家居 OR 绿色 OR 节能 when:7d",
-        "site:qianjia.com 智能家居 OR 以旧换新 OR 家电 when:7d",
+        "site:qianjia.com 智能家居 when:7d",
+        "site:qianjia.com 绿色 when:7d",
+        "site:qianjia.com 节能 when:7d",
+        "site:qianjia.com 以旧换新 when:7d",
+        "site:qianjia.com 家电 when:7d",
     ], limit=15, locale="zh-CN")
 
 
@@ -1495,8 +1628,12 @@ def fetch_greenbuilder(session: requests.Session, now: datetime) -> list[RawItem
     全站绿色主题 → GREEN_SITES 直通（不走过滤）。
     """
     return fetch_foreign_gov(session, now, "greenbuilder", "Green Builder Media", [
-        "site:greenbuildermedia.com green home OR smart home OR energy efficiency when:7d",
-        "site:greenbuildermedia.com green building OR electrification OR resilient when:14d",
+        "site:greenbuildermedia.com green home when:7d",
+        "site:greenbuildermedia.com smart home when:7d",
+        "site:greenbuildermedia.com energy efficiency when:7d",
+        "site:greenbuildermedia.com green building when:14d",
+        "site:greenbuildermedia.com electrification when:14d",
+        "site:greenbuildermedia.com resilient when:14d",
     ], limit=15)
 
 
@@ -1507,8 +1644,12 @@ def fetch_cheaa(session: requests.Session, now: datetime) -> list[RawItem]:
     GNews zh；全站非绿色主题 → is_policy_relevant 过滤（含新增词"以旧换新"）。
     """
     return fetch_foreign_gov(session, now, "cheaa", "中国家电网", [
-        "site:cheaa.com 家电 OR 节能 OR 以旧换新 when:7d",
-        "site:cheaa.com 绿色 OR 能效 OR 智能家居 when:7d",
+        "site:cheaa.com 家电 when:7d",
+        "site:cheaa.com 节能 when:7d",
+        "site:cheaa.com 以旧换新 when:7d",
+        "site:cheaa.com 绿色 when:7d",
+        "site:cheaa.com 能效 when:7d",
+        "site:cheaa.com 智能家居 when:7d",
     ], limit=15, locale="zh-CN")
 
 
@@ -1520,8 +1661,13 @@ def fetch_greenpeace(session: requests.Session, now: datetime) -> list[RawItem]:
     全站环保主题 → GREEN_SITES 直通。
     """
     return fetch_foreign_gov(session, now, "greenpeace", "绿色和平", [
-        "site:greenpeace.org.cn 气候 OR 能源 OR 环境 when:30d",
-        "site:greenpeace.org.cn 绿色 OR 低碳 OR 转型 OR 报告 when:30d",
+        "site:greenpeace.org.cn 气候 when:30d",
+        "site:greenpeace.org.cn 能源 when:30d",
+        "site:greenpeace.org.cn 环境 when:30d",
+        "site:greenpeace.org.cn 绿色 when:30d",
+        "site:greenpeace.org.cn 低碳 when:30d",
+        "site:greenpeace.org.cn 转型 when:30d",
+        "site:greenpeace.org.cn 报告 when:30d",
     ], limit=15, locale="zh-CN")
 
 
@@ -1539,8 +1685,12 @@ def fetch_mongabay(session: requests.Session, now: datetime) -> list[RawItem]:
     if items:
         return items
     return fetch_foreign_gov(session, now, "mongabay", "Mongabay", [
-        "site:mongabay.com climate OR conservation OR deforestation when:7d",
-        "site:mongabay.com green energy OR biodiversity OR wildlife when:7d",
+        "site:mongabay.com climate when:7d",
+        "site:mongabay.com conservation when:7d",
+        "site:mongabay.com deforestation when:7d",
+        "site:mongabay.com green energy when:7d",
+        "site:mongabay.com biodiversity when:7d",
+        "site:mongabay.com wildlife when:7d",
     ], limit=20)
 
 
