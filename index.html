@@ -5,7 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Green Hot News · 绿色低碳动态雷达</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌿</text></svg>" />
-    <link rel="stylesheet" href="./assets/styles.css?v=3" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/styles.css?v=12" />
+    <script>
+      // 主题预加载（2026-08-19）：在 CSS 应用前设置 data-theme，防闪白/闪黑。
+      (function () {
+        try {
+          var t = localStorage.getItem("ghn-theme");
+          if (t === "dark") document.documentElement.setAttribute("data-theme", "dark");
+        } catch (e) { /* ignore */ }
+      })();
+    </script>
   </head>
   <body>
     <main class="shell">
@@ -18,117 +33,91 @@
               <h1>绿色低碳动态雷达</h1>
             </div>
           </div>
-          <p class="hero-sub">
-            政策 · 技术 · 金融 · AI科技 四维覆盖 · 评分排行榜
-          </p>
+          <p class="hero-sub">政府 · 行业 · 金融 · AI 四维覆盖 · 主题标签关系图谱</p>
         </div>
         <div class="hero-meta">
           <span class="updated-label">更新时间</span>
           <span class="updated" id="updatedAt">加载中...</span>
+          <button
+            id="themeToggle"
+            class="theme-toggle"
+            type="button"
+            title="日间 / 夜间护眼模式切换"
+            aria-label="切换日间/夜间模式"
+          >🌙</button>
         </div>
-
-        <section class="stats" id="stats"></section>
       </header>
 
-      <section class="primary-controls">
-        <input id="searchInput" type="search" placeholder="搜索动态 / 来源 / 关键词" />
-        <button id="digestBtn" class="digest-btn" type="button" title="A 级以上高分动态浓缩版，可直接转发">📋 当日浓缩</button>
-        <span class="mode-hint" id="modeHint">绿色动态</span>
-      </section>
-
-      <!-- 区域一：排行榜（主题 × 周期 × 区域） -->
-      <section class="board board-rank">
-        <div class="board-head">
-          <div class="board-title">
-            <span class="board-icon">🏆</span>
-            <h2>排行榜</h2>
-            <span class="board-sub" id="rankSub">全部 · 国际 · 日</span>
-          </div>
-          <span class="board-count" id="rankCount">0 条</span>
-        </div>
-        <div class="rank-filters">
+      <!-- 区域一：顶部控制（选择主题·四维 · 时间段 · 一键复制） -->
+      <section class="board board-controls">
+        <div class="controls-row">
           <div class="field">
             <span class="filter-label">主题</span>
             <div class="mode-switch" id="topicSwitch"></div>
           </div>
           <div class="field">
-            <span class="filter-label">周期</span>
+            <span class="filter-label">时间段</span>
             <div class="mode-switch" id="periodSwitch"></div>
           </div>
           <div class="field">
             <span class="filter-label">区域</span>
             <div class="mode-switch" id="regionSwitch"></div>
           </div>
+          <div class="controls-spacer"></div>
+          <button id="copyBtn" class="copy-btn" type="button" title="复制当前主题 × 时间段内的文字版概要（含网站宣传）">
+            📋 一键复制概要
+          </button>
         </div>
-        <div class="board-body" id="rankList"></div>
       </section>
 
-      <!-- 区域二：时间线（跟随上方筛选，新条目自动插入滚动） -->
-      <section class="board board-timeline">
+      <!-- 区域二：中部列表（两种排序 · 每页条数可选 · 紧凑分页） -->
+      <section class="board board-list">
         <div class="board-head">
           <div class="board-title">
-            <span class="board-icon">⏱️</span>
-            <h2>时间线</h2>
-            <span class="board-sub" id="tlSub">跟随排行榜筛选 · 新→旧</span>
+            <span class="board-icon">📰</span>
+            <h2>动态</h2>
+            <span class="board-sub" id="listSub"></span>
           </div>
-          <div class="timeline-controls">
-            <span class="live-pill" id="livePill" title="服务器每 30 分钟抓取，页面每 60 秒轮询新条目">🟢 实时</span>
-            <button id="tlPauseBtn" class="mode-btn" type="button">⏸ 暂停</button>
-            <button id="tlTopBtn" class="new-arrival-btn" type="button" hidden>✨ 有新条目 · 回到最新</button>
-          </div>
-        </div>
-        <div class="board-body" id="tlList"></div>
-        <button id="tlMoreBtn" class="load-more" type="button" hidden>加载更早</button>
-      </section>
-
-      <details class="advanced-panel">
-        <summary>
-          <span>高级筛选与源状态</span>
-          <span class="advanced-summary" id="advancedSummary">加载中...</span>
-        </summary>
-        <div class="advanced-content">
-          <div class="advanced-controls">
-            <label class="field">
-              <span>站点</span>
-              <select id="siteSelect">
-                <option value="">全部站点</option>
+          <div class="list-controls">
+            <div class="mode-switch" id="sortSwitch"></div>
+            <label class="page-size">
+              <span>每页</span>
+              <select id="pageSizeSelect">
+                <option value="10">10 条</option>
+                <option value="20" selected>20 条</option>
+                <option value="50">50 条</option>
               </select>
             </label>
-            <div class="field">
-              <span>模式</span>
-              <div class="mode-switch">
-                <button id="modeGreenBtn" class="mode-btn active" type="button">绿色动态</button>
-                <button id="modeAllBtn" class="mode-btn" type="button">全量</button>
-              </div>
-            </div>
           </div>
-          <div class="source-health" id="sourceHealth">源状态加载中...</div>
-          <section class="site-pills" id="sitePills"></section>
         </div>
-      </details>
-    </main>
+        <div class="board-body" id="listBody"></div>
+        <div class="pager" id="pager" hidden>
+          <button id="prevPage" class="pager-btn" type="button">‹ 上一页</button>
+          <span class="pager-info" id="pagerInfo"></span>
+          <button id="nextPage" class="pager-btn" type="button">下一页 ›</button>
+        </div>
+      </section>
 
-    <!-- 当日高分浓缩弹窗（2026-08-17） -->
-    <div class="modal-mask" id="digestMask" hidden>
-      <div class="modal" role="dialog" aria-modal="true" aria-label="当日高分浓缩">
-        <div class="modal-head">
-          <h3>📋 当日高分浓缩</h3>
-          <span class="modal-sub">A 级以上（评分 ≥ 70）· 四维精选 · 可直接转发</span>
-          <button id="digestClose" class="modal-close" type="button" aria-label="关闭">✕</button>
+      <!-- 区域三：底部趋势（关系图谱——主题标签共现） -->
+      <section class="board board-graph">
+        <div class="board-head">
+          <div class="board-title">
+            <span class="board-icon">🕸️</span>
+            <h2>主题关系图谱</h2>
+            <span class="board-sub" id="graphSub"></span>
+          </div>
+          <span class="board-count" id="graphCount"></span>
         </div>
-        <div class="modal-body">
-          <pre id="digestContent" class="digest-content">加载中...</pre>
+        <div class="board-body">
+          <div id="graphChart" class="graph-chart" style="height: 420px"></div>
         </div>
-        <div class="modal-foot">
-          <button id="digestCopy" class="digest-copy" type="button">📄 复制全文</button>
-          <span class="digest-hint">复制后可直接转发微信群 / 朋友圈 / 自媒体</span>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <template id="itemTpl">
       <article class="news-card">
         <div class="card-top">
+          <span class="rank-num" hidden></span>
           <span class="score-badge" title=""></span>
           <span class="dim-tag" title="四维分类"></span>
           <div class="meta-row">
@@ -138,11 +127,13 @@
         </div>
         <a class="title" target="_blank" rel="noopener noreferrer"></a>
         <span class="title-orig" hidden></span>
+        <div class="topic-chips"></div>
         <button class="summary-toggle" type="button" hidden>摘要</button>
         <p class="summary" hidden></p>
       </article>
     </template>
 
-    <script src="./assets/app.js?v=3" defer></script>
+    <script src="./assets/echarts.min.js" defer></script>
+    <script src="./assets/app.js?v=23" defer></script>
   </body>
 </html>

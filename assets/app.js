@@ -1,62 +1,86 @@
-// ── Green Hot News · 绿色低碳动态雷达 — App ──────────────────────────────────
-// 布局（2026-08-17 v3）：区域一 排行榜（主题 × 周期 × 区域切换）+ 区域二 时间线
-// （跟随筛选，新条目自动插入顶部高亮；服务器每 30 分钟抓取，页面 60s 轮询）
+// ── Green Hot News · 绿色低碳动态雷达 — App（2026-08-19 v22 主页重构）─────────
+// 三段式布局：
+//   ① 顶部控制：主题（主题标签）· 时间段 · 区域 · 一键复制概要（含网站宣传）
+//   ② 中部列表：重要性 / 新到旧 两种排序 + 每页条数可选（紧凑分页，避免过长）
+//   ③ 底部趋势：关系图谱——主题标签共现（只显示主题标签，地域/政策类型等
+//      数据库管理标签不显示）
+// 数据源：data/history.json（62 天累积，含 topics 主题标签字段）
 (function () {
   "use strict";
 
   // ── State ──────────────────────────────────────────────────────────────────
-  let greenItems = [];        // latest-24h.json（绿色动态）
-  let allItemsRaw = [];       // latest-24h-all.json（全量，仅 96h 窗口）
-  let historyItems = [];      // history.json（62 天累积，日/周/月数据源）
-  let historyLoaded = false;  // history 是否可用（404 → 降级 latest-24h）
-  let searchQuery = "";
-  let selectedSite = "";
-  let currentMode = "green"; // "green" | "all"
-  let currentTopic = "全部"; // 全部 | 政策 | 技术 | 金融 | AI科技
-  let currentPeriod = "日";  // 日 | 周 | 月
-  let currentRegion = "国际"; // 国内 | 国际（国际=全部含国内）
-  let tlPaused = false;      // 时间线实时暂停
-  let tlCursor = 50;         // 时间线已渲染条数（分页）
-  let tlAllIds = new Set();  // 时间线已渲染 url 集合（diff 新条目用）
+  let historyItems = [];        // history.json（62 天累积，主数据源）
+  let currentDim = "全部";      // 四大主题（四维）：全部 | 政府 | 行业 | 金融 | AI
+  let currentPeriod = "周";     // 日 | 周 | 月
+  let currentRegion = "国际";   // 国内 | 国际（互斥：国内=region中国，国际=非中国，2026-08-19）
+  let sortMode = "重要性";      // 重要性 | 新到旧
+  let pageSize = 20;
+  let page = 1;
+  let lastFiltered = [];        // 最近一次筛选结果（供日/夜主题切换时重绘图谱）
+  let graphChart = null;        // ECharts 关系图谱实例（须在 initTheme 前声明，避免 TDZ）
+  let graphResizeBound = false; // resize 监听只挂一次（dispose/re-init 不重复挂）
 
-  const TOPICS = ["全部", "政策", "技术", "金融", "AI科技"];
+  // 四大主题 = 四维（政府/行业/金融/AI，行为主体划分）；关系图谱节点用的
+  // 是「主题标签」（碳市场/新能源…），见 TOPIC_COLORS
+  const DIMS = ["全部", "政府", "行业", "金融", "AI"];
   const PERIODS = ["日", "周", "月"];
   const REGIONS = ["国内", "国际"];
-  const RANK_LIMIT = 20;
-  const TL_PAGE = 50;
-  const POLL_MS = 60 * 1000;
+  const SORTS = ["重要性", "新到旧"];
   const HOUR = 3600 * 1000;
+  const POLL_MS = 60 * 1000;
+
+  // 主题标签稳定配色（关系图谱节点颜色）
+  const TOPIC_COLORS = {
+    "碳市场": "#16a34a", "新能源": "#eab308", "储能": "#0ea5e9", "电力": "#6366f1",
+    "化石能源": "#f97316", "节能降碳": "#10b981", "气候变化": "#14b8a6",
+    "绿色金融": "#22c55e", "环境保护": "#3b82f6", "循环经济": "#84cc16",
+    "电动车": "#06b6d4", "政策法规": "#64748b", "AI科技": "#a855f7",
+  };
 
   // ── Dom refs ───────────────────────────────────────────────────────────────
   const $ = (sel) => document.querySelector(sel);
-  const rankList = $("#rankList");
-  const rankCount = $("#rankCount");
-  const rankSub = $("#rankSub");
-  const tlList = $("#tlList");
-  const tlSub = $("#tlSub");
-  const tlMoreBtn = $("#tlMoreBtn");
-  const livePill = $("#livePill");
-  const tlPauseBtn = $("#tlPauseBtn");
-  const tlTopBtn = $("#tlTopBtn");
   const topicSwitch = $("#topicSwitch");
   const periodSwitch = $("#periodSwitch");
   const regionSwitch = $("#regionSwitch");
-  const searchInput = $("#searchInput");
-  const siteSelect = $("#siteSelect");
+  const sortSwitch = $("#sortSwitch");
+  const copyBtn = $("#copyBtn");
+  const pageSizeSelect = $("#pageSizeSelect");
+  const listSub = $("#listSub");
+  const listBody = $("#listBody");
+  const pager = $("#pager");
+  const pagerInfo = $("#pagerInfo");
+  const prevPage = $("#prevPage");
+  const nextPage = $("#nextPage");
+  const graphSub = $("#graphSub");
+  const graphCount = $("#graphCount");
   const updatedAt = $("#updatedAt");
-  const stats = $("#stats");
-  const modeGreenBtn = $("#modeGreenBtn");
-  const modeAllBtn = $("#modeAllBtn");
-  const modeHint = $("#modeHint");
-  const advancedSummary = $("#advancedSummary");
-  const sourceHealth = $("#sourceHealth");
-  const sitePills = $("#sitePills");
   const itemTpl = $("#itemTpl");
-  const digestBtn = $("#digestBtn");
-  const digestMask = $("#digestMask");
-  const digestContent = $("#digestContent");
-  const digestCopy = $("#digestCopy");
-  const digestClose = $("#digestClose");
+  const themeToggle = $("#themeToggle");
+
+  // ── 日/夜主题切换（2026-08-19）：整页联动 + localStorage 记忆，默认白天 ──
+  function applyTheme(dark) {
+    const root = document.documentElement;
+    if (dark) {
+      root.setAttribute("data-theme", "dark");
+      if (themeToggle) themeToggle.textContent = "☀️";
+    } else {
+      root.removeAttribute("data-theme");
+      if (themeToggle) themeToggle.textContent = "🌙";
+    }
+    try { localStorage.setItem("ghn-theme", dark ? "dark" : "light"); } catch (e) { /* ignore */ }
+    if (graphChart) renderGraph(lastFiltered);
+  }
+  function initTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem("ghn-theme"); } catch (e) { /* ignore */ }
+    applyTheme(saved === "dark");
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        applyTheme(document.documentElement.getAttribute("data-theme") !== "dark");
+      });
+    }
+  }
+  initTheme();
 
   // ── 切换器构建 ────────────────────────────────────────────────────────────
   function buildSwitch(container, opts, current, onPick) {
@@ -75,231 +99,152 @@
     });
   }
 
+  // 四大主题选择器（四维：政府/行业/金融/AI + 全部）
+  function buildDimSwitch() {
+    buildSwitch(topicSwitch, DIMS, currentDim, (v) => { currentDim = v; page = 1; render(); });
+  }
+
   // ── Load data ──────────────────────────────────────────────────────────────
   const cb = `?t=${Date.now()}`;
   async function loadData() {
     try {
-      const [greenResp, allResp, statusResp] = await Promise.all([
-        fetch(`./data/latest-24h.json${cb}`),
-        fetch(`./data/latest-24h-all.json${cb}`),
-        fetch(`./data/source-status.json${cb}`),
-      ]);
-      const greenData = await greenResp.json();
-      const allData = await allResp.json();
-      const statusData = await statusResp.json();
-
-      greenItems = greenData.items || [];
-      allItemsRaw = allData.items || [];
-
-      renderStats(greenData, statusData);
-      renderSourcePills(statusData);
-      renderSourceHealth(statusData);
-      if (greenData.generated_at) updatedAt.textContent = formatTime(greenData.generated_at);
-
-      if (!historyLoaded) await loadHistory();
-      renderAll();
+      let d = null;
+      try {
+        const r = await fetch(`./data/history.json${cb}`);
+        if (r.ok) d = await r.json();
+      } catch (e) { /* fallthrough */ }
+      if (!d || !Array.isArray(d.items)) {
+        const r = await fetch(`./data/latest-24h.json${cb}`);
+        d = await r.json();
+      }
+      historyItems = d.items || [];
+      if (d.generated_at) updatedAt.textContent = formatTime(d.generated_at);
+      render();
     } catch (err) {
       console.error("Failed to load data:", err);
-      rankList.innerHTML = '<p style="color:var(--text-dim);padding:2rem;">数据加载中，请稍候...</p>';
+      listBody.innerHTML = '<p style="color:var(--text-dim);padding:2rem;text-align:center;">数据加载中，请稍候...</p>';
     }
   }
 
-  async function loadHistory() {
-    try {
-      const r = await fetch(`./data/history.json${cb}`);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const d = await r.json();
-      historyItems = d.items || [];
-      historyLoaded = true;
-    } catch (err) {
-      console.warn("history.json not ready, fallback to latest-24h:", err);
-      historyLoaded = false;
-      historyItems = greenItems;
-    }
+  // ── Filtering ──────────────────────────────────────────────────────────────
+  function itemTime(i) { return i.published_at || i.first_seen_at || ""; }
+  function timeMs(i) {
+    const t = Date.parse(itemTime(i));
+    return isNaN(t) ? 0 : t;
   }
-
-  // ── Stats ──────────────────────────────────────────────────────────────────
-  function renderStats(greenData, statusData) {
-    const siteCount = greenData.site_count || 0;
-    const totalGreen = greenData.total_items || 0;
-    const success = statusData.successful || 0;
-    const failed = statusData.failed || 0;
-    stats.innerHTML = [
-      `<span class="stat-item">📡 <strong>${siteCount}</strong> 个源</span>`,
-      `<span class="stat-item">🟢 <strong>${totalGreen}</strong> 条动态</span>`,
-      `<span class="stat-item">✅ ${success} 正常</span>`,
-      failed > 0 ? `<span class="stat-item" style="color:#f87171">⚠️ ${failed} 异常</span>` : "",
-    ].join("");
-  }
-
-  function renderSourceHealth(statusData) {
-    const sites = statusData.sites || [];
-    const ok = sites.filter(s => s.ok).length;
-    const fail = sites.filter(s => !s.ok).length;
-    const total = ok + fail || 1;
-    const pct = Math.round((ok / total) * 100);
-    sourceHealth.textContent = `源健康: ${ok}/${total} 正常 (${pct}%)`;
-  }
-
-  function renderSourcePills(statusData) {
-    const sites = statusData.sites || [];
-    const counts = {};
-    greenItems.forEach(i => { counts[i.site_id] = (counts[i.site_id] || 0) + 1; });
-    const pills = sites.map(s => {
-      const count = counts[s.site_id] || 0;
-      const cls = s.ok ? "" : "err";
-      return `<span class="site-pill ${cls}" data-site="${s.site_id}" title="${s.site_name}: ${count} 条">${s.site_name}<span class="count">${count}</span></span>`;
-    });
-    sitePills.innerHTML = pills.join("");
-    sitePills.querySelectorAll(".site-pill").forEach(el => {
-      el.addEventListener("click", () => {
-        const sid = el.dataset.site;
-        if (selectedSite === sid) {
-          selectedSite = "";
-          el.classList.remove("active");
-          siteSelect.value = "";
-        } else {
-          selectedSite = sid;
-          sitePills.querySelectorAll(".site-pill").forEach(e => e.classList.remove("active"));
-          el.classList.add("active");
-          siteSelect.value = sid;
-        }
-        renderAll();
-      });
-    });
-  }
-
-  // ── Filtering（主题 × 周期 × 区域 × 站点 × 搜索 × 模式）──────────────────
-  function itemTime(i) {
-    return i.published_at || i.first_seen_at || "";
-  }
-
   function periodStart() {
     const h = currentPeriod === "日" ? 24 : currentPeriod === "周" ? 24 * 7 : 24 * 30;
     return Date.now() - h * HOUR;
   }
 
-  function filterItems(source) {
-    let items = [...source];
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      items = items.filter(i =>
-        (i.title || "").toLowerCase().includes(q) ||
-        (i.site_name || "").toLowerCase().includes(q) ||
-        (i.source || "").toLowerCase().includes(q) ||
-        (i.summary || "").toLowerCase().includes(q)
-      );
+  function filterItems() {
+    let items = [...historyItems];
+    if (currentDim !== "全部") {
+      items = items.filter(i => (i.dimension || "政府") === currentDim);
     }
-    if (selectedSite) items = items.filter(i => i.site_id === selectedSite);
-    if (currentTopic !== "全部") items = items.filter(i => (i.dimension || "政策") === currentTopic);
-    if (currentRegion === "国内") items = items.filter(i => (i.region || "") === "中国");
-    // 周期过滤（时间线/排行榜共用）
+    if (currentRegion === "国内") {
+      items = items.filter(i => (i.region || "") === "中国");
+    } else if (currentRegion === "国际") {
+      // 2026-08-19：国际=排除中国（原「全部含国内」被老温否掉——
+      // 选国际却出现工信部/国家节能中心等国内新闻）
+      items = items.filter(i => (i.region || "") !== "中国");
+    }
     const start = periodStart();
     items = items.filter(i => {
       const t = Date.parse(itemTime(i));
-      return isNaN(t) || t >= start; // 无时间的条目保留（收录即最新）
+      return isNaN(t) || t >= start; // 无时间的条目保留
     });
     return items;
   }
 
+  function sortItems(items) {
+    const arr = [...items];
+    if (sortMode === "重要性") {
+      arr.sort((a, b) => {
+        const sa = a.score || 0, sb = b.score || 0;
+        if (sa !== sb) return sb - sa;
+        return timeMs(b) - timeMs(a);
+      });
+    } else {
+      arr.sort((a, b) => timeMs(b) - timeMs(a));
+    }
+    return arr;
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
-  function renderAll() {
-    modeHint.textContent = currentMode === "green" ? "绿色动态" : "全量";
-    advancedSummary.textContent = currentMode === "green"
-      ? `历史 ${historyItems.length} 条 / 近24h ${greenItems.length} 条`
-      : `全量（仅96h窗口） ${allItemsRaw.length} 条`;
+  function render() {
+    const filtered = sortItems(filterItems());
+    lastFiltered = filtered;
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (page > totalPages) page = totalPages;
 
-    populateSiteSelect(currentMode === "green" ? historyItems : allItemsRaw);
+    // 副标题
+    const periodLabel = currentPeriod === "日" ? "近24小时" : currentPeriod === "周" ? "近一周" : "近一月";
+    listSub.textContent = `${currentDim} · ${currentRegion} · ${periodLabel} · ${filtered.length} 条`;
 
-    const source = currentMode === "green" ? historyItems : allItemsRaw;
-    const filtered = filterItems(source);
+    // 列表（分页切片）
+    const start = (page - 1) * pageSize;
+    renderList(listBody, filtered.slice(start, start + pageSize));
 
-    renderRank(filtered);
-    renderTimeline(filtered, true);
-  }
-
-  function populateSiteSelect(source) {
-    const siteIds = new Set();
-    const siteOptions = [["", "全部站点"]];
-    source.forEach(i => {
-      if (!siteIds.has(i.site_id)) {
-        siteIds.add(i.site_id);
-        siteOptions.push([i.site_id, i.site_name]);
-      }
-    });
-    siteSelect.innerHTML = siteOptions.map(([id, name]) =>
-      `<option value="${id}" ${selectedSite === id ? "selected" : ""}>${name}</option>`
-    ).join("");
-  }
-
-  // 排行榜：综合分降序 Top N
-  function renderRank(filtered) {
-    const scope = currentRegion === "国内" ? "国内" : "国际";
-    rankSub.textContent = `${currentTopic} · ${scope} · ${currentPeriod}`;
-    rankCount.textContent = `${filtered.length} 条`;
-
-    const ranked = [...filtered].sort((a, b) => {
-      const sa = a.score || 0, sb = b.score || 0;
-      if (sa !== sb) return sb - sa;
-      return String(itemTime(b)).localeCompare(String(itemTime(a)));
-    });
-    if (currentMode === "all" && currentPeriod !== "日") {
-      rankList.innerHTML = `<p style="color:var(--text-dim);padding:1.5rem;text-align:center;font-size:.8rem;">全量模式仅覆盖 96h 窗口，请切换到「日」周期查看</p>`;
-      return;
+    // 分页控件
+    if (filtered.length > pageSize) {
+      pager.hidden = false;
+      pagerInfo.textContent = `第 ${page} / ${totalPages} 页 · 共 ${filtered.length} 条`;
+      prevPage.disabled = page <= 1;
+      nextPage.disabled = page >= totalPages;
+    } else {
+      pager.hidden = true;
     }
-    renderList(rankList, ranked.slice(0, RANK_LIMIT), "暂无动态");
+
+    renderGraph(filtered);
   }
 
-  // 时间线：时间倒序，分页；跟随排行榜筛选
-  function renderTimeline(filtered, reset) {
-    const tl = [...filtered].sort((a, b) => String(itemTime(b)).localeCompare(String(itemTime(a))));
-    if (reset) {
-      tlCursor = TL_PAGE;
-      tlAllIds = new Set(tl.slice(0, tlCursor).map(i => i.url));
-    }
-    tlSub.textContent = `跟随排行榜 · ${currentTopic} · ${currentRegion} · ${currentPeriod} · ${tl.length} 条`;
-    const slice = tl.slice(0, tlCursor);
-    if (tlAllIds.size === 0) tlAllIds = new Set(slice.map(i => i.url));
-    renderList(tlList, slice, "暂无动态");
-    tlMoreBtn.hidden = tl.length <= tlCursor;
-  }
-
-  function renderList(container, items, emptyText) {
+  function renderList(container, items) {
     if (items.length === 0) {
-      container.innerHTML = `<p style="color:var(--text-dim);padding:1rem;text-align:center;font-size:.8rem;">${emptyText}</p>`;
+      container.innerHTML = '<p style="color:var(--text-dim);padding:1rem;text-align:center;font-size:.8rem;">暂无动态</p>';
       return;
     }
     container.innerHTML = "";
     const frag = document.createDocumentFragment();
-    items.forEach(item => {
+    items.forEach((item, idx) => {
       const card = itemTpl.content.cloneNode(true);
-      const badge = card.querySelector(".score-badge");
       const score = item.score || 0;
       const level = item.score_level || "";
-      badge.textContent = score ? `${level}${score}` : "—";
+
+      // 排名序号：仅「重要性」排序显示 1. 2. 3.（前三名金/银/铜）
+      const rankNum = card.querySelector(".rank-num");
+      if (sortMode === "重要性") {
+        rankNum.textContent = `${(page - 1) * pageSize + idx + 1}`;
+        rankNum.hidden = false;
+        if (idx < 3 && page === 1) rankNum.classList.add(`rank-${idx + 1}`);
+      }
+
+      // 评分圆点（颜色=级别）+ 悬停五维分解
+      const badge = card.querySelector(".score-badge");
       badge.classList.add(`lv-${level || "none"}`);
       const bd = item.score_breakdown || {};
       badge.title = score
-        ? `综合 ${score} 分（${level}级）\n来源权威 ${bd.source} + 内容强度 ${bd.strength} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
+        ? `综合 ${score} 分\n来源权威 ${bd.source} + 内容强度 ${bd.strength} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
         : "暂无评分";
 
+      // 四维标签（政府/行业/金融/AI）
       const dimTag = card.querySelector(".dim-tag");
-      const dim = item.dimension || "政策";
+      const dim = item.dimension || "政府";
       dimTag.textContent = dim;
       dimTag.classList.add(`dim-${dim}`);
 
+      // 站点 + 时间
       card.querySelector(".site").textContent = item.site_name || item.site_id;
       const timeEl = card.querySelector(".time");
       const timeTxt = formatTime(itemTime(item));
       timeEl.textContent = item.time_source === "scraped" ? `收录 ${timeTxt}` : timeTxt;
       timeEl.title = item.time_source === "scraped"
-        ? "源站未提供发布时间，此时间为收录（抓取）时间"
-        : "发布时间";
+        ? "源站未提供发布时间，此时间为收录（抓取）时间" : "发布时间";
 
+      // 标题（非中文显示中文翻译 + 原文小字）
       const titleLink = card.querySelector(".title");
       const titleOrig = card.querySelector(".title-orig");
       titleLink.href = item.url;
-      // 非中文标题：主标题显示中文翻译（title_zh），原文作为小字副标题 + tooltip
       const zh = item.title_zh || "";
       if (zh && zh !== item.title) {
         titleLink.textContent = zh;
@@ -312,64 +257,225 @@
         titleOrig.hidden = true;
       }
 
+      // 主题标签 chips（仅主题标签；地域/政策类型管理标签不显示）
+      const chips = card.querySelector(".topic-chips");
+      (item.topics || []).forEach(t => {
+        const c = document.createElement("span");
+        c.className = "topic-chip";
+        c.textContent = t;
+        c.title = "主题标签";
+        chips.appendChild(c);
+      });
+
+      // 摘要（含评分，点开展开）
       const summary = item.summary || "";
       const sumEl = card.querySelector(".summary");
       const toggleBtn = card.querySelector(".summary-toggle");
-      if (summary && summary.length > 8) {
-        sumEl.textContent = summary;
+      const scoreLine = score ? `综合评分 ${score} 分` : "";
+      const fullSummary = [scoreLine, summary].filter(Boolean).join("　");
+      if (fullSummary && fullSummary.length > 8) {
+        sumEl.textContent = fullSummary;
         toggleBtn.hidden = false;
         toggleBtn.addEventListener("click", () => {
           const expanded = sumEl.hidden === false;
           sumEl.hidden = expanded;
           toggleBtn.textContent = expanded ? "摘要" : "收起";
-          toggleBtn.classList.toggle("open", !expanded);
+          sumEl.classList.toggle("expanded", !expanded);
         });
       }
-      if (item._flashNew) card.classList.add("flash-new");
+
       frag.appendChild(card);
     });
     container.appendChild(frag);
   }
 
-  // ── 时间线实时轮询（2026-08-17）：新扫描条目自动插入顶部 ──────────────────
-  async function pollNew() {
-    if (tlPaused) return;
-    try {
-      const r = await fetch(`./data/latest-24h.json${cb}`);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const d = await r.json();
-      const latest = d.items || [];
-      const known = new Set(historyItems.map(i => i.url));
-      const fresh = latest.filter(i => !known.has(i.url));
-      if (fresh.length === 0) {
-        livePill.textContent = "🟢 实时";
-        return;
-      }
-      // 新条目并入 historyItems（保持时间线完整性），并按当前筛选决定是否展示
-      historyItems = fresh.concat(historyItems);
-      if (currentMode === "green") {
-        const filtered = filterItems(historyItems);
-        const tl = [...filtered].sort((a, b) => String(itemTime(b)).localeCompare(String(itemTime(a))));
-        const newcomers = tl.filter(i => fresh.some(f => f.url === i.url));
-        if (newcomers.length > 0) {
-          const atTop = tlList.scrollTop < 60;
-          const slice = tl.slice(0, tlCursor);
-          slice.forEach(i => { if (newcomers.some(n => n.url === i.url)) i._flashNew = true; });
-          renderList(tlList, slice, "暂无动态");
-          tlSub.textContent = `跟随排行榜 · ${currentTopic} · ${currentRegion} · ${currentPeriod} · ${tl.length} 条`;
-          if (atTop && !tlPaused) {
-            tlList.scrollTop = 0;
-          } else {
-            tlTopBtn.hidden = false;
-          }
-          livePill.textContent = `🟢 实时 · +${newcomers.length}`;
-          // 动画结束后清除标记，避免下次全量重渲染误高亮
-          setTimeout(() => { fresh.forEach(i => { delete i._flashNew; }); }, 3000);
+  // ── 关系图谱（2026-08-19）：主题标签共现 ──────────────────────────────────
+  function renderGraph(filtered) {
+    const el = document.getElementById("graphChart");
+    if (!el || typeof echarts === "undefined") return;
+
+    // 聚合：主题标签节点（按出现次数）+ 共现边（同一篇新闻内两个标签）
+    const nodeCount = {};
+    const edgeWeight = {};
+    let taggedItems = 0;
+    for (const it of filtered) {
+      const topics = it.topics || [];
+      if (topics.length === 0) continue;
+      taggedItems += 1;
+      const uniq = [...new Set(topics)];
+      uniq.forEach(t => { nodeCount[t] = (nodeCount[t] || 0) + 1; });
+      for (let a = 0; a < uniq.length; a++) {
+        for (let b = a + 1; b < uniq.length; b++) {
+          const key = [uniq[a], uniq[b]].sort().join("||");
+          edgeWeight[key] = (edgeWeight[key] || 0) + 1;
         }
       }
-    } catch (err) {
-      console.warn("poll failed:", err);
     }
+
+    const tags = Object.keys(nodeCount).sort((a, b) => nodeCount[b] - nodeCount[a]);
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    const labelColor = dark ? "#f2f4f7" : "#0a0b0d";
+    const subColor = dark ? "#8a93a0" : "#5b616e";
+    const edgeColor = dark ? "rgba(245,246,247,.28)" : "rgba(91,97,110,.32)";
+
+    graphSub.textContent =
+      `${currentDim === "全部" ? "全部维度" : currentDim} · ${tags.length} 个相关主题标签 · ${taggedItems} 条带标签动态`;
+    graphCount.textContent = `${tags.length} 个标签`;
+
+    if (tags.length === 0) {
+      // 空态：销毁实例并显示提示文字（避免 el.innerHTML 清空却保留旧实例导致
+      // 后续 setOption 画不出图）；实例销毁后下次有数据时在下方 if(!graphChart) 重新 init。
+      if (graphChart) { graphChart.dispose(); graphChart = null; }
+      el.innerHTML = '<p style="color:var(--text-dim);padding:3rem;text-align:center;font-size:.8rem;">该维度 × 时间段内暂无主题标签数据</p>';
+      return;
+    }
+
+    const maxCount = Math.max(...tags.map(t => nodeCount[t]));
+    const nodes = tags.map(t => {
+      const count = nodeCount[t];
+      const size = 22 + Math.round((count / maxCount) * 38);
+      const color = TOPIC_COLORS[t] || "#0052ff";
+      return {
+        name: t,
+        value: count,
+        count,
+        symbolSize: size,
+        itemStyle: {
+          color,
+          borderColor: "transparent",
+          borderWidth: 0,
+          shadowBlur: 6,
+          shadowColor: color,
+          opacity: 0.9,
+        },
+        label: {
+          show: true,
+          color: labelColor,
+          fontSize: 12,
+          fontWeight: 500,
+          formatter: `{b}\n{c|${count} 条}`,
+          rich: { c: { color: subColor, fontSize: 10, lineHeight: 14 } },
+        },
+      };
+    });
+
+    const links = Object.entries(edgeWeight).map(([key, w]) => {
+      const [s, t] = key.split("||");
+      return { source: s, target: t, value: w };
+    });
+
+    if (!graphChart) {
+      el.innerHTML = ""; // 清除空态提示文字（仅首次 init 前安全）
+      graphChart = echarts.init(el);
+      if (!graphResizeBound) {
+        graphResizeBound = true;
+        window.addEventListener("resize", () => graphChart && graphChart.resize());
+      }
+    }
+
+    graphChart.setOption({
+      backgroundColor: "transparent",
+      tooltip: {
+        trigger: "item",
+        formatter: (p) => {
+          if (p.dataType === "node") {
+            return `<b>${p.data.name}</b><br/>出现 ${p.data.count} 条动态`;
+          }
+          return `${p.data.source} ↔ ${p.data.target}<br/>共现 ${p.data.value} 条`;
+        },
+        backgroundColor: dark ? "rgba(20,22,27,.95)" : "rgba(255,255,255,.97)",
+        borderColor: dark ? "rgba(245,246,247,.15)" : "rgba(91,97,110,.2)",
+        textStyle: { color: labelColor, fontSize: 12 },
+      },
+      series: [{
+        type: "graph",
+        layout: "force",
+        data: nodes,
+        links,
+        roam: true,
+        draggable: true,
+        label: { show: true, position: "right" },
+        edgeSymbol: ["none", "none"],
+        lineStyle: { color: edgeColor, width: 1.2, curveness: 0.15, opacity: 0.7 },
+        emphasis: { focus: "adjacency", lineStyle: { width: 2.5 } },
+        force: {
+          repulsion: 280,
+          edgeLength: [60, 150],
+          gravity: 0.15,
+          layoutAnimation: true,
+        },
+      }],
+    }, true);
+  }
+
+  // ── 一键复制概要（含网站宣传）──────────────────────────────────────────────
+  // 摘要清洗：去「摘要：」前缀/发布时间/小编水印/阅读量（与 daily_digest.clean_summary 对齐）
+  function cleanSummary(s) {
+    if (!s) return "";
+    let t = s.replace(/\s+/g, " ").trim();
+    if (t.includes("摘要：")) t = t.split("摘要：", 2)[1].trim();
+    t = t.replace(/发布时间：\d{4}-\d{2}-\d{2}\s*/g, "");
+    t = t.replace(/[\u4e00-\u9fff]{0,6}(小编|编辑)\s*[^\u4e00-\u9fff]*\d*[天小时分]?前/g, "");
+    t = t.replace(/阅读量\s*[：:·]?\s*\d+/g, "");
+    return t.slice(0, 90).replace(/[，。、；：,.;:·\s]+$/, "");
+  }
+
+  function buildDigestText(items) {
+    const periodLabel = currentPeriod === "日" ? "近24小时" : currentPeriod === "周" ? "近一周" : "近一月";
+    const head = [
+      "🌿 绿色低碳动态雷达 · 精选概要",
+      `主题：${currentDim}　｜　时间段：${periodLabel}　｜　区域：${currentRegion}`,
+      `更新时间：${updatedAt.textContent}`,
+      "━━━━━━━━━━━━━━━━━━━━",
+      "",
+    ].join("\n");
+
+    const body = items.slice(0, 20).map((it, idx) => {
+      const score = it.score || 0;
+      const title = it.title_zh || it.title || "";
+      const site = it.site_name || "";
+      const dim = it.dimension || "";
+      const line1 = `${idx + 1}. 【${score}分】${title}`;
+      const line2 = `${site} · ${dim}`;
+      const sum = cleanSummary(it.summary);
+      return `${line1}\n　　${line2}${sum ? "\n　　" + sum : ""}`;
+    }).join("\n\n");
+
+    const promo = [
+      "",
+      "━━━━━━━━━━━━━━━━━━━━",
+      "📡 绿色低碳动态雷达 · ywm.life",
+      "　 四维覆盖：政府 · 行业 · 金融 · AI",
+      "　 聚合 60+ 权威源，每日自动更新",
+      "　 👉 https://ywm.life",
+    ].join("\n");
+
+    return head + "\n" + (body || "（该范围内暂无动态）") + promo;
+  }
+
+  async function copyDigest() {
+    const filtered = sortItems(filterItems()); // 重要性排序取前 20
+    const text = buildDigestText(filtered);
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      ok = document.execCommand("copy");
+      ta.remove();
+    }
+    copyBtn.textContent = ok ? "✅ 已复制" : "⚠️ 复制失败";
+    copyBtn.classList.toggle("copied", ok);
+    setTimeout(() => {
+      copyBtn.textContent = "📋 一键复制概要";
+      copyBtn.classList.remove("copied");
+    }, 2000);
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -380,7 +486,6 @@
     const min = String(d.getMinutes()).padStart(2, "0");
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${ap}${h12}:${min}`;
   }
-
   function formatTime(isoStr) {
     if (!isoStr) return "时间未知";
     let d;
@@ -394,119 +499,34 @@
     return abs;
   }
 
-  // ── 当日高分浓缩（2026-08-17）────────────────────────────────────────────
-  let digestText = "";
-  let digestLoaded = false;
-  async function loadDigest() {
+  // ── 实时轮询：新条目并入（2026-08-19，保持实时感）─────────────────────────
+  async function pollNew() {
     try {
-      const r = await fetch(`./data/daily-digest.md?t=${Date.now()}`);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      digestText = await r.text();
-      digestLoaded = true;
-      digestContent.textContent = digestText;
-    } catch (err) {
-      console.warn("digest not ready:", err);
-      digestLoaded = false;
-      digestText = "";
-      digestContent.textContent =
-        "浓缩版尚未生成：服务器每次抓取后自动生成（约每 30 分钟更新一次）。\n\n可稍后刷新再试，或在本地运行：\npython3.11 scripts/daily_digest.py";
-    }
+      const r = await fetch(`./data/latest-24h.json${cb}`);
+      if (!r.ok) return;
+      const d = await r.json();
+      const latest = d.items || [];
+      const known = new Set(historyItems.map(i => (i.title || "").trim()));
+      const fresh = latest.filter(i => !known.has((i.title || "").trim()));
+      if (fresh.length === 0) return;
+      historyItems = fresh.concat(historyItems);
+      if (d.generated_at) updatedAt.textContent = formatTime(d.generated_at);
+      render();
+    } catch (e) { /* ignore */ }
   }
-  function openDigest() {
-    digestMask.hidden = false;
-    document.body.style.overflow = "hidden";
-    if (!digestLoaded) loadDigest();
-  }
-  function closeDigest() {
-    digestMask.hidden = true;
-    document.body.style.overflow = "";
-  }
-  digestBtn.addEventListener("click", openDigest);
-  digestClose.addEventListener("click", closeDigest);
-  digestMask.addEventListener("click", (e) => { if (e.target === digestMask) closeDigest(); });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !digestMask.hidden) closeDigest();
-  });
-  digestCopy.addEventListener("click", async () => {
-    if (!digestText) {
-      await loadDigest();
-      if (!digestText) return;
-    }
-    let copied = false;
-    try {
-      await navigator.clipboard.writeText(digestText);
-      copied = true;
-    } catch {
-      const ta = document.createElement("textarea");
-      ta.value = digestText;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      copied = document.execCommand("copy");
-      ta.remove();
-    }
-    digestCopy.textContent = copied ? "✅ 已复制" : "⚠️ 复制失败";
-    setTimeout(() => { digestCopy.textContent = "📄 复制全文"; }, 2000);
-  });
 
   // ── Event listeners ────────────────────────────────────────────────────────
-  searchInput.addEventListener("input", () => {
-    searchQuery = searchInput.value.trim();
-    renderAll();
-  });
-  siteSelect.addEventListener("change", () => {
-    selectedSite = siteSelect.value;
-    renderAll();
-  });
-
-  function setMode(mode, activeBtn, otherBtn) {
-    currentMode = mode;
-    activeBtn.classList.add("active");
-    otherBtn.classList.remove("active");
-    selectedSite = "";
-    siteSelect.value = "";
-    renderAll();
-  }
-  modeGreenBtn.addEventListener("click", () => setMode("green", modeGreenBtn, modeAllBtn));
-  modeAllBtn.addEventListener("click", () => setMode("all", modeAllBtn, modeGreenBtn));
-
-  // 切换器
-  buildSwitch(topicSwitch, TOPICS, currentTopic, (v) => { currentTopic = v; renderAll(); });
-  buildSwitch(periodSwitch, PERIODS, currentPeriod, (v) => { currentPeriod = v; renderAll(); });
-  buildSwitch(regionSwitch, REGIONS, currentRegion, (v) => { currentRegion = v; renderAll(); });
-
-  // 时间线实时控制
-  tlPauseBtn.addEventListener("click", () => {
-    tlPaused = !tlPaused;
-    tlPauseBtn.textContent = tlPaused ? "▶ 继续" : "⏸ 暂停";
-    livePill.textContent = tlPaused ? "⏸ 已暂停" : "🟢 实时";
-    if (!tlPaused) pollNew();
-  });
-  tlTopBtn.addEventListener("click", () => {
-    tlList.scrollTop = 0;
-    tlTopBtn.hidden = true;
-  });
-  tlMoreBtn.addEventListener("click", () => {
-    tlCursor += TL_PAGE;
-    const source = currentMode === "green" ? historyItems : allItemsRaw;
-    renderTimeline(filterItems(source), false);
-  });
-  // 滚动到底自动加载更早
-  tlList.addEventListener("scroll", () => {
-    if (tlList.scrollHeight - tlList.scrollTop - tlList.clientHeight < 300) {
-      const source = currentMode === "green" ? historyItems : allItemsRaw;
-      const filtered = filterItems(source);
-      if (filtered.length > tlCursor) {
-        tlCursor += TL_PAGE;
-        renderTimeline(filtered, false);
-      }
-    }
-  });
+  buildDimSwitch();
+  buildSwitch(periodSwitch, PERIODS, currentPeriod, (v) => { currentPeriod = v; page = 1; render(); });
+  buildSwitch(regionSwitch, REGIONS, currentRegion, (v) => { currentRegion = v; page = 1; render(); });
+  buildSwitch(sortSwitch, SORTS, sortMode, (v) => { sortMode = v; page = 1; render(); });
+  pageSizeSelect.addEventListener("change", () => { pageSize = Number(pageSizeSelect.value); page = 1; render(); });
+  prevPage.addEventListener("click", () => { if (page > 1) { page--; render(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+  nextPage.addEventListener("click", () => { page++; render(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+  copyBtn.addEventListener("click", copyDigest);
 
   // ── Init ───────────────────────────────────────────────────────────────────
   loadData();
-  loadDigest();
-  setInterval(loadData, 10 * 60 * 1000);   // 全量刷新（含 history 重新拉取）
-  setInterval(pollNew, POLL_MS);           // 时间线新条目轮询（60s）
+  setInterval(loadData, 10 * 60 * 1000);  // 全量刷新（含 history 重新拉取）
+  setInterval(pollNew, POLL_MS);          // 新条目轮询（60s）
 })();

@@ -3098,6 +3098,10 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
             _zh = translator.translate_title(it.get("title", ""))
             if _zh:
                 it["title_zh"] = _zh
+        # 回填地域（2026-08-19 修复）：旧条目首次收录时 region 可能为空（早期逻辑
+        # 未算）或按 site 误标（中国站转载国际新闻被标「中国」）——每次 merge
+        # 用最新 detect_region 重算，前端国内/国际筛选依赖此字段
+        it["region"] = detect_region(it.get("site_id", ""), it.get("title", "") or "")
         # 回填主题标签（2026-08-19）：旧条目无 topics 字段时按标题补算，
         # 前端关系图谱依赖（地域/政策类型管理标签不导出）
         if not it.get("topics"):
@@ -3506,22 +3510,56 @@ SOURCE_REGION: dict[str, str] = {
     "greenbuilder": "美国", "greenpeace": "中国",
     "qianjia": "中国", "cheaa": "中国",
     "x": "全球",
+    # 2026-08-19 审计补：radarai（GitHub 全球项目）/ allnet（微博知乎等国内热榜）
+    "radarai": "国际", "allnet": "中国",
 }
 
 
 def detect_region(site_id: str, title: str) -> str:
-    """来源默认地域；"全球"源（reuters）按标题关键词再判定（2026-08-17 提取，
-    供数据导出 region 字段与 auto_tag 共用——前端区域切换（国内/国际）依赖此字段）。"""
-    region = SOURCE_REGION.get(site_id, "")
-    if region == "全球":
-        title_lower = (title or "").lower()
-        if any(kw in title_lower for kw in ["eu", "european", "europe", "european union", "brussels"]):
-            region = "欧盟"
-        elif any(kw in title_lower for kw in ["us ", "u.s.", "america", "biden", "trump", "washington"]):
-            region = "美国"
-        elif any(kw in title_lower for kw in ["中国", "china", "beijing", "shanghai"]):
-            region = "中国"
-    return region
+    """来源默认地域 + 标题地域词修正（2026-08-19 修复）。
+
+    之前只对「全球」源按标题细分——中国站（碳交易网/北极星/中国能源报）转载的
+    国际新闻（欧委会/哥斯达黎加/马耳他/美国国会…）全被标成「中国」，前端
+    「国内/国际」筛选错乱（老温实测国内出现欧委会/哥斯达黎加新闻）。
+    改为：标题地域词判定**优先于 site 默认**（所有源），无命中回落 site 默认，
+    再兜底「国际」。优先级：中国 > 欧盟 > 美国 > 日本 > 印度 > 泛国际。
+    """
+    t = title or ""
+    t_lower = t.lower()
+    # 1) 中国（具体机构名/国名，避免「国际/国家」泛词误判）
+    if any(k in t for k in ("中国", "我国", "国内", "国家发改委", "发展改革委", "工信部", "国务院",
+                            "生态环境部", "能源局", "人民银行", "央行", "全国碳市场", "国产")) \
+       or any(k in t_lower for k in ("china", "beijing", "shanghai", "shenzhen")):
+        return "中国"
+    # 2) 欧盟（含「欧委会」——中国媒体对 European Commission 的简称；成员国家名）
+    if any(k in t for k in ("欧委会", "欧盟", "欧洲", "马耳他", "德国", "法国", "英国", "意大利",
+                            "西班牙", "荷兰", "比利时", "芬兰", "瑞典", "波兰", "葡萄牙", "爱尔兰",
+                            "丹麦", "奥地利", "希腊", "匈牙利", "捷克", "罗马尼亚", "保加利亚",
+                            "克罗地亚", "斯洛文尼亚", "斯洛伐克", "立陶宛", "拉脱维亚", "爱沙尼亚")) \
+       or any(k in t_lower for k in ("eu ", "european", "brussels", "germany", "france", "italy",
+                                     "spain", "poland", "netherlands", "sweden", "portugal")):
+        return "欧盟"
+    # 3) 美国
+    if any(k in t for k in ("美国", "特朗普", "拜登", "加州")) \
+       or any(k in t_lower for k in ("us ", "u.s.", "america", "washington", "trump", "biden",
+                                     "california")):
+        return "美国"
+    # 4) 日本
+    if any(k in t for k in ("日本", "东京")) or any(k in t_lower for k in ("japan", "tokyo")):
+        return "日本"
+    # 5) 印度
+    if "印度" in t or "india" in t_lower:
+        return "印度"
+    # 6) 泛国际（其他地区/国际组织）
+    if any(k in t for k in ("国际", "联合国", "全球", "伊朗", "中东", "沙特", "澳大利亚", "巴西",
+                            "加拿大", "俄罗斯", "韩国", "乌克兰", "印尼", "越南", "非洲", "挪威",
+                            "瑞士", "新加坡", "以色列", "土耳其", "墨西哥", "智利", "阿根廷",
+                            "哥斯达黎加", "新西兰")) \
+       or any(k in t_lower for k in ("international", "united nations", "global", "iran", "brazil",
+                                     "canada", "russia", "korea", "ukraine", "australia", "saudi",
+                                     "singapore", "turkey", "mexico", "chile")):
+        return "国际"
+    return SOURCE_REGION.get(site_id, "") or "国际"
 
 # Topic tag rules: (tag, [keywords])
 TOPIC_RULES: list[tuple[str, list[str]]] = [
