@@ -1079,33 +1079,32 @@ def fetch_teri(session: requests.Session, now: datetime) -> list[RawItem]:
 
 
 # ── 国际智库/投行（2026-08-19 第四轮：Brookings/Bruegel/PIIE/CSIS/Chatham/Carnegie/RAND/CAP/高盛）──
+# PITFALL(2026-08-19 实测): Google News 的括号 OR 语法（site:x (a OR b) when:7d）
+# 返回该站全站混合内容（军事/政治/经济都混进来，绿色命中率 <10%），
+# 而单主题词 query（site:x climate）返回 70-90% 绿色相关内容。
+# → 全部改用单主题词 query，不用括号 OR、不带 when（Google News 默认按相关+时间排序）。
 
 def fetch_brookings(session: requests.Session, now: datetime) -> list[RawItem]:
     """Brookings 布鲁金斯学会 — 气候与能源经济政策（2026-08-19 接入）。
 
-    RSS /feed/ 是 HTML 壳 → Google News 搜 site 兜底（与 E3G 同款模式）。
+    RSS /feed/ 是 HTML 壳 → Google News 搜 site（单主题词 query）。
     美国顶级智库，能源/气候经济政策浓度高。归媒体库（专家解读档 18 分）。
     """
     return fetch_foreign_gov(session, now, "brookings", "Brookings", [
-        "site:brookings.edu (climate OR energy OR emissions OR carbon) when:14d",
-        "site:brookings.edu (clean energy OR green OR transition OR net zero) when:14d",
+        "site:brookings.edu climate when:30d",
+        "site:brookings.edu energy when:30d",
     ])
 
 
 def fetch_bruegel(session: requests.Session, now: datetime) -> list[RawItem]:
     """Bruegel 布鲁盖尔研究所 — 欧盟经济政策×绿色新政（2026-08-19 接入）。
 
-    RSS /rss.xml 可用（出版物+活动流）→ 直抓；空则 Google News 兜底。
-    欧洲最权威经济智库之一，CBAM/碳关税/绿色新政分析强。
+    RSS /rss.xml 是会议日程流（Session/Lunch/Coffee break，无文章）→ 不可用，
+    直接用 Google News 搜 site。欧洲最权威经济智库之一，CBAM/碳关税/绿色新政分析强。
     """
-    items = fetch_rss_feed(
-        session, "https://www.bruegel.org/rss.xml", "bruegel", "Bruegel", now, limit=20,
-    )
-    if items:
-        return items
     return fetch_foreign_gov(session, now, "bruegel", "Bruegel", [
-        "site:bruegel.org (climate OR energy OR carbon OR green) when:30d",
-        "site:bruegel.org (CBAM OR emissions OR trade OR regulation) when:30d",
+        "site:bruegel.org climate when:30d",
+        "site:bruegel.org carbon when:30d",
     ], limit=20)
 
 
@@ -1115,8 +1114,8 @@ def fetch_piie(session: requests.Session, now: datetime) -> list[RawItem]:
     RSS 404 → Google News 搜 site。国际经济政策权威，碳关税/贸易×气候分析强。
     """
     return fetch_foreign_gov(session, now, "piie", "PIIE", [
-        "site:piie.com (climate OR carbon OR energy OR trade) when:14d",
-        "site:piie.com (tariff OR CBAM OR green OR emissions) when:14d",
+        "site:piie.com climate when:30d",
+        "site:piie.com energy when:30d",
     ])
 
 
@@ -1127,8 +1126,8 @@ def fetch_csis(session: requests.Session, now: datetime) -> list[RawItem]:
     能源安全/气候地缘/清洁技术政策，美国核心智库。
     """
     return fetch_foreign_gov(session, now, "csis", "CSIS", [
-        "site:csis.org (climate OR energy OR clean OR carbon) when:14d",
-        "site:csis.org (energy security OR grid OR renewables OR emissions) when:14d",
+        "site:csis.org climate when:30d",
+        "site:csis.org energy when:30d",
     ])
 
 
@@ -1139,8 +1138,8 @@ def fetch_chatham(session: requests.Session, now: datetime) -> list[RawItem]:
     气候/能源地缘政治权威。归媒体库（专家解读档）。
     """
     return fetch_foreign_gov(session, now, "chatham", "Chatham House", [
-        "site:chathamhouse.org (climate OR energy OR carbon OR environment) when:14d",
-        "site:chathamhouse.org (clean energy OR net zero OR green OR emissions) when:14d",
+        "site:chathamhouse.org climate when:30d",
+        "site:chathamhouse.org energy when:30d",
     ])
 
 
@@ -1151,8 +1150,8 @@ def fetch_carnegie(session: requests.Session, now: datetime) -> list[RawItem]:
     Geothermal and Nuclear Strategy、Battery Manufacturing Monopoly 等能源内容质量高）。
     """
     return fetch_foreign_gov(session, now, "carnegie", "Carnegie", [
-        "site:carnegieendowment.org (climate OR energy OR nuclear OR battery) when:14d",
-        "site:carnegieendowment.org (geothermal OR clean OR carbon OR grid) when:14d",
+        "site:carnegieendowment.org climate when:30d",
+        "site:carnegieendowment.org energy when:30d",
     ])
 
 
@@ -1163,8 +1162,8 @@ def fetch_rand(session: requests.Session, now: datetime) -> list[RawItem]:
     AI 内容多命中 AI 关键词自然归 AI 维度。
     """
     return fetch_foreign_gov(session, now, "rand", "RAND", [
-        "site:rand.org (climate OR energy OR carbon OR environment) when:14d",
-        "site:rand.org (AI OR clean OR emissions OR security) when:14d",
+        "site:rand.org climate when:30d",
+        "site:rand.org energy when:30d",
     ])
 
 
@@ -1175,20 +1174,23 @@ def fetch_americanprogress(session: requests.Session, now: datetime) -> list[Raw
     气候政策/环境治理（实测 Deep-Sea Mining Scheme 等环境议题报道多）。
     """
     return fetch_foreign_gov(session, now, "americanprogress", "CAP", [
-        "site:americanprogress.org (climate OR energy OR environment) when:14d",
-        "site:americanprogress.org (clean OR carbon OR emissions OR green) when:14d",
+        "site:americanprogress.org climate when:30d",
+        "site:americanprogress.org energy when:30d",
     ])
 
 
 def fetch_goldman(session: requests.Session, now: datetime) -> list[RawItem]:
-    """高盛 Greater China Insights — 投行研报（2026-08-19 接入）。
+    """高盛 — 投行研报（2026-08-19 接入）。
 
-    页面 JS 渲染（HTML 空壳）→ Google News 搜 site。投行级能源转型/
-    绿色金融研究，补金融维度权威（版图券商研究 P0）。归媒体库（研报档 18）。
+    官网 Greater China Insights 页 JS 渲染（HTML 空壳）；且 goldmansachs.com
+    官方站 Google News 索引极差（site: 查询 ≤10 条且多为公司公告）→
+    改用「"Goldman Sachs" + 主题词」搜索媒体转述的高盛研报观点（实测
+    GS SUSTAIN/Adaptation/碳市场报告等绿色浓度 70%+）。补金融维度权威
+    （版图券商研究 P0）。归媒体库（研报档 18）。
     """
-    return fetch_foreign_gov(session, now, "goldman", "高盛Insights", [
-        "site:goldmansachs.com (energy OR climate OR carbon OR clean) when:14d",
-        "site:goldmansachs.com (green OR sustainability OR transition OR EV) when:14d",
+    return fetch_foreign_gov(session, now, "goldman", "高盛", [
+        '"Goldman Sachs" climate when:30d',
+        '"Goldman Sachs" energy when:30d',
     ])
 
 
@@ -2541,9 +2543,16 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "", summary: st
         return False
     title_lower = title.lower()
     url_lower = url.lower()
+    # PITFALL(2026-08-19): 纯 ASCII 短关键词（EV/COP/NDC/ESG 等 ≤4 字符）必须用
+    # \b 词边界正则——子串匹配会把 "development" 里的 "EV"、"copper" 里的 "COP"
+    # 误判为命中（实测 Brookings "Stablecoins ... development" 因 EV 误放行）。
+    # 中文关键词不用 \b（汉字是 \w，\b 边界不适用）。
     for kw in POLICY_KEYWORDS:
         kw_lower = kw.lower()
-        if kw_lower in title_lower:
+        if kw_lower.isascii() and len(kw_lower) <= 4:
+            if re.search(rf"\b{re.escape(kw_lower)}\b", title_lower):
+                return True
+        elif kw_lower in title_lower:
             return True
         # PITFALL(2026-08-14): Google News 的 base64 URL（news.google.com/rss/articles/...）
         # 常"碰巧包含"短英文关键词（coal/wind/gas 等），导致无关条目被误放行
@@ -3179,6 +3188,14 @@ SOURCE_REGION: dict[str, str] = {
     "jp_moe": "日本", "jp_meti": "日本", "jp_anre": "日本",
     # 国际智库（2026-08-17 第三轮）
     "e3g": "欧盟", "agora": "欧盟", "teri": "印度",
+    # 国际智库/投行（2026-08-19 第四轮）
+    "brookings": "美国", "bruegel": "欧盟", "piie": "美国", "csis": "美国",
+    "chatham": "欧盟", "carnegie": "美国", "rand": "美国",
+    "americanprogress": "美国", "goldman": "美国",
+    # 中国 P0 扩容（2026-08-19 第四轮）
+    "caixin": "中国", "chinanecc": "中国", "thepaper": "中国",
+    # AI 维度扩容（2026-08-19 第四轮）
+    "artificialanalysis": "国际", "36kr": "中国", "huxiu": "中国",
     # 中国 P0 第二批（2026-08-14）
     "pbc": "中国", "cneeex": "中国", "ncsc": "中国", "caep": "中国",
     "cenews": "中国", "cnesa": "中国",
