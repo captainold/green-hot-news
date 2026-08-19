@@ -1,6 +1,6 @@
 # Green Hot News · 绿色低碳动态雷达
 
-国内外最新绿色低碳动态聚合站：**政策 + 技术 + 金融 + AI科技** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（47 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.0**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100），前端**两区布局**：上方**排行榜**（主题 × 周期日/周/月 × 区域国内/国际 三组切换器，按综合分排名）+ 下方**实时时间线**（跟随筛选、新条目自动插入高亮滚动、可暂停、加载更早），分数徽章（S/A/B/C/D 等级），**当日高分浓缩**一键复制转发。
+国内外最新绿色低碳动态聚合站：**政策 + 技术 + 金融 + AI科技** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（69 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.0**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100），前端**两区布局**：上方**排行榜**（主题 × 周期日/周/月 × 区域国内/国际 三组切换器，按综合分排名）+ 下方**实时时间线**（跟随筛选、新条目自动插入高亮滚动、可暂停、加载更早），分数徽章（S/A/B/C/D 等级），**当日高分浓缩**一键复制转发。
 
 ## 在线入口
 
@@ -16,7 +16,7 @@
 新加坡服务器 47.82.211.111 (Alibaba Cloud Linux 3)
 ├── systemd timer: green-policy.timer（每30分钟）
 │     └→ green-policy-sync.sh
-│           ├─ 1. update_news.py 抓取 44 个源
+│           ├─ 1. update_news.py 抓取 69 个源
 │           │     ├─ 官方部委/国际组织 → Notes/政策库/
 │           │     ├─ 媒体/热榜/AI → Notes/媒体库/（四维分类 + 打分 v2.0）
 │           │     └─ 生成 data/*.json 网站数据（含 score/dimension 字段）
@@ -31,10 +31,10 @@
       └─ 每30分钟 auto-push → 服务器 bare 仓库
 ```
 
-## 覆盖范围（47 个源，2026-08-17 服务器为准）
+## 覆盖范围（69 个源，2026-08-19 服务器为准）
 
 ### 国内政策源（政策库 · 中国）
-- 国家发改委、生态环境部、生态环境部·解读、国家能源局、工信部、中国人民银行（新闻发布+政策文件）、NCSC 国家气候中心、环境规划院 CAEP
+- 国家发改委、生态环境部、生态环境部·解读、国家能源局、工信部、中国人民银行（新闻发布+政策文件）、NCSC 国家气候中心、环境规划院 CAEP、国家节能中心（官网直抓，官方解读/一图读懂，2026-08-19 接入）
 
 ### 国际政策源（政策库 · 国际组织 + 主要国家）
 - 国际组织：IEA、IRENA、UNFCCC、World Bank Climate、欧盟委员会、Euractiv·欧盟
@@ -42,15 +42,16 @@
 - 日本：环境省、经产省 METI、资源能源厅 ANRE
 - 印度：PIB 新闻局
 
-### 国际智库（媒体库 · 2026-08-17 新增）
+### 国际智库（媒体库 · 2026-08-17 / 08-19 接入）
 > 权威能源/气候智库的深度分析与政策评论，更新周级~双周级 → 网站数据用 21 天宽窗口
 - **E3G**（伦敦气候与能源智库，RSS）、**Agora Energiewende**（柏林能源转型智库，news-events 列表页）、**TERI**（印度能源与资源研究所，press-release 列表页）
+- **Brookings 布鲁金斯**、**Bruegel 布鲁盖尔**、**PIIE 彼得森**、**CSIS**、**Chatham House 查塔姆**、**Carnegie 卡内基**、**RAND 兰德**、**CAP 美国进步中心**、**高盛**（全部 Google News 单主题词 query + when:30d，2026-08-19 书签批次接入；高盛官方站索引差，用「"Goldman Sachs"+主题词」搜媒体转述研报观点）
 
 ### 碳市场/绿色金融（媒体库）
-- 上海环交所（碳交易）、中国碳交易网、碳道、Carbon Brief
+- 上海环交所（碳交易）、中国碳交易网、碳道、Carbon Brief、**财新**（Google News 中文碳词，2026-08-19 接入）
 
 ### 行业媒体（媒体库）
-- Reuters Energy、北极星电力网、中国能源报、中国环境报、CNESA 储能联盟
+- Reuters Energy、北极星电力网、中国能源报、中国环境报、CNESA 储能联盟、**澎湃新闻**（Google News 中文绿色词，2026-08-19 接入）、**36氪 / 虎嗅**（AI_MEDIA_SITES 过滤：命中绿色词或 AI 词才入库，2026-08-19 接入）
 
 ### 绿色科技/AI（媒体库）
 - **Climate Change AI**（AI×气候交叉）、**中国科技网**（科技日报）、**CleanTechnica**（清洁技术）
@@ -62,6 +63,7 @@
 - **机器之心 / 量子位**（中文 AI 头部媒体，Google News fallback）
 - **VentureBeat AI**（国际 AI 商业，RSS 限量 30）
 - **AIHOT**（`aihot.virxact.com`，AI 行业动态聚合：X/公众号/RSS 几十源，精选 RSS 每 30 分钟抓取，带热度与 AI 评分；2026-08-14 接入）
+- **Artificial Analysis**（AI 模型评测/API 市场数据，Google News，AI_SITES 直通，2026-08-19 接入）
 - **Climate Change AI**（AI×气候交叉机构，2026-08-17 起全链条归 AI科技榜——其产出均为机器学习应对气候项目，避免 NeurIPS 工作坊/ML 基准等项目落进技术榜）
 
 ### 技术趋势（媒体库 · 2026-08-14 新增）
@@ -93,17 +95,17 @@ python3.11 scripts/update_news.py --output-dir data --window-hours 24
 
 | 维度 | 定位 | 信源 |
 |------|------|------|
-| 🏛️ 政策 | 制度锚点 | 国内 8 部委/机构 + 官方解读 + 6 国际组织 + 美日印官方发布 |
+| 🏛️ 政策 | 制度锚点 | 国内 9 部委/机构 + 官方解读 + 6 国际组织 + 美日印官方发布 |
 | 🔋 技术 | 产业脉搏 | 中国能源报、北极星、CleanTechnica、RadarAI·GitHub趋势 |
-| 💰 金融 | 市场温度计 | 碳交易网、碳道、Carbon Brief |
-| 🤖 AI科技 | 新视野（理论→模型→市场→商业 + 交叉） | OpenAI、arXiv·AI、机器之心、量子位、VentureBeat AI、Climate Change AI、中国科技网 |
+| 💰 金融 | 市场温度计 | 碳交易网、碳道、Carbon Brief、财新、高盛 |
+| 🤖 AI科技 | 新视野（理论→模型→市场→商业 + 交叉） | OpenAI、arXiv·AI、机器之心、量子位、VentureBeat AI、Climate Change AI、中国科技网、Artificial Analysis |
 
 ## 数据输出
 
 - `data/latest-24h.json` — 24小时绿色动态信号（过滤后，含 `score`/`score_level`/`score_breakdown`/`dimension`/`region` 字段）
 - `data/latest-24h-all.json` — 24小时全量数据
 - `data/history.json` — 62 天历史累积（2026-08-17：排行榜日/周/月周期切换数据源；每次抓取按 url 去重合并，含 `region` 字段）
-- `data/source-status.json` — 47 个源健康状态
+- `data/source-status.json` — 69 个源健康状态
 - `data/daily-digest.md` — 当日高分浓缩版（评分 ≥70 A 级以上，四维精选，可直接转发；`scripts/daily_digest.py` 生成，服务器每次抓取后自动更新）
 - `data/published-index.json` — 发布时间索引
 - `data/title-index.json` — 完整标题索引

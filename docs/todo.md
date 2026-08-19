@@ -5,6 +5,8 @@
 - [ ] 今天要把这个动态雷达的首页展示弄得更精致和合理一些。 然后就可以给处室里看了。 有了一个好想法，嘿嘿。 
 - 太丑
 - 分布还不合理
+- 还是要学会不同分支的工作方法
+- 
 
 - 源还要继续增加（微信公众号？）
 
@@ -18,7 +20,7 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 - [ ] 当日高分浓缩版，供我转发到群里和朋友圈，还有自媒体。
 
 - [x] 还要确认：人形机器人、绿色智能家居、绿色生活，都在范围内。（2026-08-19：**确认并在范围内**——新增 7 源：人形机器人 The Robot Report/IEEE Spectrum（ROBOT_SITES 直通→AI 榜）、绿色智能家居 千家网/Green Builder Media/中国家电网（关键词过滤，POLICY_KEYWORDS 补"以旧换新"）、绿色生活 绿色和平/Mongabay（GREEN_SITES 直通）。探测放弃：高工机器人/数智网/TreeHugger/EcoWatch/Energy Star/环保在线）
-- [ ] 最起码要把我web收藏的，微信关注的这些都update进去啊。这个项目还真不好做。 
+- [x] 最起码要把我web收藏的，微信关注的这些都update进去啊。这个项目还真不好做。（2026-08-19：**书签批次 A~O 完成**——`inbox/bookmarks_8_19_26.html` 筛选 18 候选 → 接入 15 源：国际智库/投行 9（Brookings/Bruegel/PIIE/CSIS/Chatham/Carnegie/RAND/CAP/高盛）、中国 4（财新/国家节能中心/澎湃/36氪）、AI 2（Artificial Analysis/虎嗅）；探测放弃 3（绿证平台 JS壳/WaytoAGI RSS404/Wilson Center Google 0条）。★ 达 62 源、线上 69 源。⚠️ PITFALL：Google News 括号 OR 语法返回全站混合内容（绿色命中<10%）→ 全部改用单主题词 query + when:30d；高盛官方站索引差 → 用「"Goldman Sachs"+主题词」；金融维度 23→39 条补弱成功。后续待办：微信公众账号源、X.com、agent 接口（MCP））
 - [ ] 还是应该像news学习，尽量简洁，首页上只放题目是最好的。但是背后要下载，组织自己的媒体数据库。
 
 
@@ -36,7 +38,9 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 	- **2026-08-19 已实施**：A1 双碳优先 + 政府/行业/金融/AI 主体化 + 技术突破并入行业档 + migrate_dimensions.py 迁移 1156 条 + radarai 绿色/AI 词过滤；腾讯报告→行业 73 分 A；分布 政府204/AI149/行业141/金融35
 - [x] 日/夜护眼模式切换（2026-08-19 v8）：hero 右上角 🌙/☀️ 按钮，CSS 变量双主题（:root 白天 + html[data-theme="dark"] 夜晚），整页联动（hero/排行榜/时间线同主题——解决"页面白+时间线黑"割裂）；localStorage 记忆（ghn-theme）+ head 内联脚本防闪白；默认白天。已部署线上 md5 验证通过
 - [x] 新闻重复修复（2026-08-19）：Google News RSS 聚合 URL 是 base64 且每次抓取不同，按 url 去重会漏（实测日本环境省一条新闻 x8 重复）。改为按规范化标题去重（_title_dedup_key：去空白/标点后小写取前120字符），三处生效：fetch_foreign_gov 跨 query、主流程 seen_items、merge_history；新增 scripts/dedup_items.py 清理存量（本地 39 条、服务器 62 条）。已部署 md5 一致
+- [x] 旧源 Google News query 括号 OR → 单主题词（2026-08-19）：实测 `site:x (a OR b) when:7d` 返回该站全站混合内容（绿色命中<10%），`site:x a when:30d` 返回 70-90% 相关内容。`scripts/_split_or_queries.py`（幂等，备份 /tmp 后自动拆分）批量改 58 处——覆盖 EPA/DOE/EU/PIB/NOAA/EIA/FERC/CARB/日本三省厅/Euractiv/E3G兜底/环交所/NCSC/CAEP/环境报/机器人 7 源。验证：总量 477→482，NOAA +4/Robot Report +3/EPA +2；四维均衡 政府169/AI135/行业155/金融23。已部署
 - [x] 四维趋势图（2026-08-19 v9）：排行榜上方新增 📈 四维趋势图（ECharts 5.5.1 本地自托管）——政府/行业/金融/AI 四色折线，横轴=原文发表时间（published_at 非抓取时间）、纵轴=该时段最高分（重要性峰值），tooltip 显示该时段最高分新闻标题；范围切换 当日/3天内/1周内/1月内/自定义日期；1d/3d 按小时桶、7d+/自定义按天桶；跟随日/夜主题配色。PITFALL：ECharts time 轴 data 必须 [时间戳,值] 对（纯数值数组画不出线，实测仅 350px→修复后 9600px）。已部署 md5 一致
+- [x] 趋势图 v5 tooltip 标题完整显示（2026-08-19）：去掉 max-width+ellipsis+nowrap 截断（长标题"显示不全"），改为 white-space:normal 自动换行 + 容器 max-width:480px 防溢出 + word-break:break-all；行布局改 align-items:flex-start 保证多行对齐。实测 135 字符长标题完整显示。已部署 md5 一致
 - [ ] 
 
 - [x] 标签体系
