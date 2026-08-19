@@ -103,6 +103,18 @@ def normalize_url(raw_url: str) -> str:
         return raw_url.strip()
 
 
+def _title_dedup_key(title: str) -> str:
+    """规范化标题用于去重（2026-08-19）。
+
+    Google News RSS 的聚合 URL 是 base64 且每次抓取都不同（同一篇新闻被多个
+    搜索词命中时 URL 各异），按 url 去重会漏——实测日本环境省一条新闻 x8 重复。
+    标题才是稳定标识：去空白/全角空格/常见标点后小写，取前 120 字符。
+    """
+    import re as _re
+    t = _re.sub(r"[\s\u3000\-_—–()（）【】\[\]「」『』・,，.。:：;；/\\|]", "", (title or "").lower())
+    return t[:120]
+
+
 def create_session() -> requests.Session:
     session = requests.Session()
     session.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"})
@@ -842,10 +854,12 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
                 ))
         except Exception:
             continue
-    seen: set[tuple[str, str]] = set()
+    # 跨 query 去重（2026-08-19）：Google News 对同一新闻的聚合 URL 是 base64 且
+    # 每次抓取不同，按 url 去重会漏（实测一条新闻 x8 重复）→ 按规范化标题去重
+    seen: set[str] = set()
     out: list[RawItem] = []
     for it in items:
-        key = (it.title, it.url)
+        key = _title_dedup_key(it.title)
         if key in seen:
             continue
         seen.add(key)
@@ -1209,6 +1223,108 @@ def fetch_cnesa(session: requests.Session, now: datetime) -> list[RawItem]:
         seen.add(key)
         out.append(it)
     return out[:15]
+
+
+# ── 人形机器人 / 绿色智能家居 / 绿色生活（2026-08-19 新增） ────────────────
+def fetch_therobotreport(session: requests.Session, now: datetime) -> list[RawItem]:
+    """The Robot Report — 国际机器人产业头部媒体（2026-08-19 新增）。
+
+    人形机器人（Figure/Tesla Optimus/宇树等）/工业机器人/具身智能行业动态。
+    GNews site: 搜索（服务器安全；RSS 直连存在但避免新加坡 IP 被 Cloudflare 拦）。
+    归 ROBOT_SITES 白名单直通（is_policy_relevant 放行），categorize 按关键词：
+    humanoid/robot 命中 AI_DIM_KW → AI 榜（人形机器人=具身智能），纯产业动态落行业。
+    """
+    return fetch_foreign_gov(session, now, "therobotreport", "The Robot Report", [
+        "site:therobotreport.com humanoid OR robot OR robotics when:7d",
+        "site:therobotreport.com humanoid robots OR embodied AI OR robotics funding when:7d",
+    ], limit=20)
+
+
+def fetch_spectrum_robotics(session: requests.Session, now: datetime) -> list[RawItem]:
+    """IEEE Spectrum — 权威工程科技媒体（2026-08-19 新增，robotics 栏目）。
+
+    RSS 直连 `https://spectrum.ieee.org/feeds/topic/robotics.rss`（robotics 栏目，
+    实测 2026-08-18 有 10 条新鲜条目，含人形机器人/无人机/机器人回收再利用）；
+    直连失败/空则 GNews site: 兜底。归 ROBOT_SITES 直通。
+    """
+    items = fetch_rss_feed(
+        session, "https://spectrum.ieee.org/feeds/topic/robotics.rss",
+        "spectrum", "IEEE Spectrum", now, limit=30,
+    )
+    if items:
+        return items
+    return fetch_foreign_gov(session, now, "spectrum", "IEEE Spectrum", [
+        "site:spectrum.ieee.org robot OR robotics OR humanoid when:7d",
+        "site:spectrum.ieee.org drone OR autonomous OR AI when:7d",
+    ], limit=20)
+
+
+def fetch_qianjia(session: requests.Session, now: datetime) -> list[RawItem]:
+    """千家网 — 国内头部智能家居门户（2026-08-19 新增）。
+
+    绿色智能家居/节能家电/智能家居行业。GNews zh locale。
+    全站非绿色主题（智能家居商业新闻多）→ 走 is_policy_relevant 关键词过滤。
+    """
+    return fetch_foreign_gov(session, now, "qianjia", "千家网", [
+        "site:qianjia.com 智能家居 OR 绿色 OR 节能 when:7d",
+        "site:qianjia.com 智能家居 OR 以旧换新 OR 家电 when:7d",
+    ], limit=15, locale="zh-CN")
+
+
+def fetch_greenbuilder(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Green Builder Media — 美国绿色建筑/绿色家居专业媒体（2026-08-19 新增）。
+
+    Whole Home Automation / 绿色建筑 / 电气化 / 能效。GNews en。
+    全站绿色主题 → GREEN_SITES 直通（不走过滤）。
+    """
+    return fetch_foreign_gov(session, now, "greenbuilder", "Green Builder Media", [
+        "site:greenbuildermedia.com green home OR smart home OR energy efficiency when:7d",
+        "site:greenbuildermedia.com green building OR electrification OR resilient when:14d",
+    ], limit=15)
+
+
+def fetch_cheaa(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中国家电网 — 家电行业权威媒体（2026-08-19 新增）。
+
+    绿色家电/以旧换新/能效标准（2026 国补"以旧换新"是绿色消费政策热点）。
+    GNews zh；全站非绿色主题 → is_policy_relevant 过滤（含新增词"以旧换新"）。
+    """
+    return fetch_foreign_gov(session, now, "cheaa", "中国家电网", [
+        "site:cheaa.com 家电 OR 节能 OR 以旧换新 when:7d",
+        "site:cheaa.com 绿色 OR 能效 OR 智能家居 when:7d",
+    ], limit=15, locale="zh-CN")
+
+
+def fetch_greenpeace(session: requests.Session, now: datetime) -> list[RawItem]:
+    """绿色和平（中文站）— 国际环保 NGO（2026-08-19 新增）。
+
+    气候/能源转型/绿色消费/ESG 报告与倡议（绿电上车、就近消纳、钢企气候转型等）。
+    GNews zh locale（site:greenpeace.org.cn）；月级更新 → 加 LOW_FREQ_SITES 宽窗口。
+    全站环保主题 → GREEN_SITES 直通。
+    """
+    return fetch_foreign_gov(session, now, "greenpeace", "绿色和平", [
+        "site:greenpeace.org.cn 气候 OR 能源 OR 环境 when:30d",
+        "site:greenpeace.org.cn 绿色 OR 低碳 OR 转型 OR 报告 when:30d",
+    ], limit=15, locale="zh-CN")
+
+
+def fetch_mongabay(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Mongabay — 国际环境新闻专业媒体（2026-08-19 新增）。
+
+    森林/生物多样性/气候/碳市场（全球知名环境新闻站，日更）。
+    RSS 直连 news.mongabay.com/feed/；失败/空则 GNews site: 兜底。
+    全站环境主题 → GREEN_SITES 直通。
+    """
+    items = fetch_rss_feed(
+        session, "https://news.mongabay.com/feed/",
+        "mongabay", "Mongabay", now, limit=30,
+    )
+    if items:
+        return items
+    return fetch_foreign_gov(session, now, "mongabay", "Mongabay", [
+        "site:mongabay.com climate OR conservation OR deforestation when:7d",
+        "site:mongabay.com green energy OR biodiversity OR wildlife when:7d",
+    ], limit=20)
 
 
 def fetch_nea(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1720,19 +1836,23 @@ def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> 
 
 # 1) 内容强度分（按维度自适应，0-30）——每维度按关键词从高到低取第一档
 #    结构: {dimension: [(score, [keywords]), ...]}，末尾 () 为默认档
+#    维度（2026-08-19 四维主体化）：政府/行业/金融/AI——原「政策→政府」「技术→行业
+#    （技术突破词并入行业档）」「AI科技→AI」；决策点 B：火箭回收/核电装料等技术突破
+#    归行业档，不做子分类
 CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
-    "政策": [
+    "政府": [
         (30, ["印发", "通知", "意见", "条例", "办法", "规划", "方案", "公告",
               "答记者问", "政策文件", "发布", "国务院"]),
         (25, ["解读", "一图读懂", "新闻发布会", "吹风会"]),
         (20, ["报告", "数据", "统计", "年报", "季报"]),
         (10, []),
     ],
-    "技术": [
+    "行业": [
         (30, ["突破", "首次", "首发", "成功", "世界首个", "全球首个", "里程碑",
               "实现", "投产", "并网", "交付", "建成"]),
         (20, ["进展", "研发", "上线", "落地", "试点", "示范", "应用", "试验",
               "回收", "产量", "扩产", "测试", "验证", "升级", "改造", "效率",
+              "报告", "发布", "数据",
               "recycle", "yield", "output", "test", "upgrade", "efficiency"]),
         (10, []),
     ],
@@ -1742,7 +1862,7 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
         (20, ["价格", "指数", "报告", "数据", "融资", "投资", "交易", "配额"]),
         (8, []),
     ],
-    "AI科技": [
+    "AI": [
         (30, ["落地", "应用", "发布", "大模型", "智能体", "突破", "首发",
               "平台", "上线", "部署", "启用",
               # AI 治理/安全信号（2026-08-19）：AI 与政治/民主/国家安全的顶层交叉
@@ -1765,7 +1885,7 @@ DEFAULT_STRENGTH = 8
 def score_content_strength(dimension: str, title: str, summary: str) -> int:
     """内容强度分：按维度关键词档位，从高到低取第一命中档。"""
     text = f"{title or ''} {summary or ''}".lower()
-    rules = CONTENT_STRENGTH_RULES.get(dimension, CONTENT_STRENGTH_RULES["政策"])
+    rules = CONTENT_STRENGTH_RULES.get(dimension, CONTENT_STRENGTH_RULES["政府"])
     for score, kws in rules:
         if any(kw.lower() in text for kw in kws):
             return score
@@ -1802,6 +1922,11 @@ SOURCE_SCORE: dict[str, int] = {
     "radarai": 12,
     # 行业媒体
     "chinaenergy": 13, "bjx": 13, "reuters": 13,
+    # 人形机器人/智能家居/绿色生活（2026-08-19 新增）
+    "therobotreport": 16, "spectrum": 16,   # 机器人/科技权威媒体（专业媒体档）
+    "qianjia": 13, "cheaa": 13,             # 智能家居/家电行业媒体（行业媒体档）
+    "greenbuilder": 16,                     # 绿色建筑家居专业媒体
+    "greenpeace": 18, "mongabay": 18,       # 环保 NGO / 环境新闻专业媒体
     # 全网热榜
     "allnet": 8,
 }
@@ -1885,10 +2010,10 @@ def score_freshness(published_at: str, now: datetime) -> int:
 
 
 def score_item(site_id: str, title: str, summary: str, people: list[str],
-               published_at: str, now: datetime, dimension: str = "政策") -> dict[str, Any]:
+               published_at: str, now: datetime, dimension: str = "政府") -> dict[str, Any]:
     """五维打分（v2.0）→ {'score': 0-100, 'score_level': S/A/B/C/D, 'strength': int, ...}
 
-    内容强度按 dimension 自适应（政策/技术/金融/AI科技 各自关键词档位），
+    内容强度按 dimension 自适应（政府/行业/金融/AI 各自关键词档位），
     替代 v1.0 只认政策文件的"政策类型"分。
     """
     src = SOURCE_SCORE.get(site_id, DEFAULT_SOURCE_SCORE)
@@ -1917,15 +2042,19 @@ def score_item(site_id: str, title: str, summary: str, people: list[str],
     }
 
 
-# ── 四维分类（2026-08-14 主题定位：政策/技术/金融/AI科技） ─────────────────────
-# 优先级：AI科技 > 金融 > 技术 > 政策。
+# ── 四维分类（2026-08-19 主体化：政府/行业/金融/AI） ─────────────────────────
+# 优先级：AI_SITES直通 > 政府强词 > 政策库 > 双碳核心词 > AI词 > 金融词 > 行业词 > 政策弱词 > 行业兜底
+# 决策点 A1（2026-08-19 双碳优先）：命中双碳核心词（碳中和/碳达峰/双碳/碳排放/净零等）
+# → 优先归「行业」，只有纯 AI 信号（大模型/智能体/OpenAI 等无双碳词）才归 AI。
+# 例：腾讯《碳中和中期报告 AI时代如何稳住碳排放》→ 行业（主体是双碳报告，AI 是背景词）。
+# 纯 AI 源（机器之心/量子位/OpenAI 等）仍直通 AI，不受双碳优先影响。
 # PITFALL: AI 判定只用标题（摘要常含反爬水印 "t a np ai fan g.com" 的 "ai "，
 # 2026-08-14 实测误判"走进零碳园区"为 AI科技）且用词边界正则。
 AI_DIM_KW = [
     "人工智能", "大模型", "机器学习", "智能电网", "数字孪生", "碳监测",
-    "能碳", "智算", "算法", "机器人", "无人机", "卫星", "自动驾驶",
+    "能碳", "智算", "算法", "机器人", "具身智能", "无人机", "卫星", "自动驾驶",
     "artificial intelligence", "machine learning", "smart grid",
-    "robot", "autonomous", "drone", "satellite",
+    "robot", "humanoid", "autonomous", "drone", "satellite",
     # AI 领域全链条（2026-08-14 扩充：理论/模型/市场/商业）
     "大语言模型", "多模态", "生成式", "深度学习", "神经网络", "transformer",
     "llm", "gpt", "claude", "gemini", "deepseek", "qwen", "llama",
@@ -1942,6 +2071,34 @@ AI_DIM_KW = [
 # 比 \bai\b 更能命中中文上下文（Python \b 把汉字当 \w，"AI对气候…" 用 \bai\b 会漏判，
 # 实测漏判掉进技术榜），同时仍排除 "tail"/"said"/"again"/"Aira"/"taiyangnews" 等单词内 ai。
 AI_TITLE_RE = r"(?<![a-z])ai(?![a-z])"
+# 双碳核心词（2026-08-19 决策点 A1）：命中即优先归「行业」——双碳/碳中和内容是行业主体
+# 议题，即使标题含 AI 背景词（如"AI时代如何稳住碳排放"）也不改判 AI。
+# 注意：碳市场/碳价/碳配额等留在 FINANCE_DIM_KW（金融信号），不在此表。
+DUAL_CARBON_KW = [
+    "碳中和", "碳达峰", "双碳", "碳排放", "碳减排", "净零", "降碳",
+    "碳足迹", "碳普惠", "碳中和管理", "零碳", "气候中和",
+    "net zero", "net-zero", "carbon neutral", "carbon neutrality",
+    "decarboni", "emission reduction", "climate action", "climate policy",
+    "energy transition", "netzero",
+]
+# 政府行为强词（2026-08-19）：官方文件/发布/解读动作 + 部委名，**仅用标题判定**
+# （摘要常含"目标/方案/实施"等泛词，用 text 会误抢行业/金融内容）
+# 从原 POLICY_DIM_KW 拆出（原表混有双碳主题词，会误抢行业内容）。
+GOV_STRONG_KW = [
+    "印发", "通知", "意见", "条例", "规划", "方案",
+    "发布会", "答记者问", "解读", "一图读懂", "政策", "国务院",
+    "十五五", "法规", "实施", "行动方案", "指导意见",
+    "政策文件", "政策解读", "标准", "规范", "部委",
+    # 部委名（2026-08-19 补：发改委/能源局等是明确政府主体信号）
+    "发改委", "发展改革委", "能源局", "生态环境部", "工信部", "生态环境",
+    "住建部", "财政部", "商务部", "交通运输部", "水利部",
+    "农业农村部", "人民银行", "央行", "国资委", "科技部",
+    # English（2026-08-17 补充：国际智库 E3G/Agora/TERI 标题识别）
+    "policy", "policies", "regulation", "regulatory", "legislation", "reform",
+    "roadmap", "framework", "agreement", "government", "minister", "parliament",
+    "mandate", "consultation", "strategy", "commitment", "target", "goal",
+    "official", "ministry", "department", "commission", "agency",
+]
 FINANCE_DIM_KW = [
     "碳市场", "碳交易", "碳价", "碳配额", "碳关税", "CBAM", "CCER",
     "ESG", "绿色金融", "碳金融", "债券", "融资", "投资", "基金", "期货",
@@ -1949,64 +2106,73 @@ FINANCE_DIM_KW = [
     "carbon market", "carbon price", "carbon trading", "ETS",
     "green bond", "finance", "investment", "fund",
 ]
-TECH_DIM_KW = [
+# 行业词（原 TECH_DIM_KW，2026-08-19 改名并扩充行业动态词）：
+# 绿色低碳技术/产业 + 企业/产能/项目等主体动态。技术突破（火箭回收/核电装料）也归行业。
+INDUSTRY_DIM_KW = [
     "储能", "氢能", "光伏", "风电", "电池", "CCUS", "碳捕集", "技术",
     "研发", "突破", "材料", "工艺", "装备", "光热", "绿氢", "甲醇",
     "甲烷", "负排放", "DAC", "BECCS", "生物炭", "核能", "生物质",
+    "装机", "投产", "并网", "产能", "产量", "出口", "工厂", "公司",
+    "集团", "项目", "电站", "电网", "充电桩", "电动车", "新能源汽车",
     "solar", "wind", "battery", "hydrogen", "storage", "technology",
-    "carbon capture", "renewable", "nuclear",
+    "carbon capture", "renewable", "nuclear", "factory", "plant",
+    "gigafactory", "ev", "electric vehicle",
 ]
-POLICY_DIM_KW = [
-    "印发", "通知", "意见", "规划", "方案", "条例", "办法", "公告",
-    "发布会", "答记者问", "解读", "一图读懂", "政策", "文件", "国务院",
-    "十五五", "碳达峰", "碳中和", "双碳", "目标", "标准", "规范",
-    "法规", "实施", "行动方案", "指导意见", "政策文件", "政策解读",
-    # English（2026-08-17：国际智库 E3G/Agora/TERI 接入后补充——
-    # 英文政策/气候分析标题不再掉进媒体库"技术"兜底；已验证对存量数据 0 漂移）
-    "policy", "policies", "regulation", "regulatory", "legislation", "reform",
-    "roadmap", "framework", "agreement", "government", "minister", "parliament",
-    "mandate", "consultation", "strategy", "target", "commitment",
-    "energy transition", "climate action", "climate policy", "net zero", "net-zero",
+# 政策弱词（2026-08-19）：兜底前的政府信号（GOV_STRONG_KW 之外的剩余原政策词）
+POLICY_WEAK_KW = [
+    "目标", "承诺", "路线图", "白皮书", "纲要", "立法", "修正案",
+    "target", "pledge", "white paper", "outline", "amendment",
 ]
 
 
 def categorize_dimension(site_id: str, title: str, summary: str, library: str) -> str:
-    """四维分类：AI科技 > 金融 > 技术 > 政策。"""
+    """四维分类（2026-08-19 主体化）：政府/行业/金融/AI。
+
+    优先级：AI_SITES 直通 > 政府强词 > 政策库 > 双碳核心词（A1 双碳优先）
+    > AI 词 > 金融词 > 行业词 > 政策弱词 > 行业兜底。
+    """
     import re as _dim_re
     title_l = (title or "").lower()
     text = f"{title or ''} {summary or ''}".lower()
     # 站点级维度强制（机制保留，2026-08-17 起无强制项）：
-    # radarai 不再整源归「技术」——技术榜只放绿色低碳技术，AI 项目按关键词进 AI科技榜
+    # radarai 不再整源归「技术」——技术榜只放绿色低碳技术，AI 项目按关键词进 AI榜
     if site_id in DIM_SITE_OVERRIDE:
         return DIM_SITE_OVERRIDE[site_id]
-    # AI 判定：AI_SITES 源全链条直通（AIHOT/机器之心等标题未必含 AI 关键词）
-    # + 标题关键词 + 标题级英文 AI 词边界
+    # 纯 AI 源全链条直通（AIHOT/机器之心等标题未必含 AI 关键词）
     if site_id in AI_SITES:
-        return "AI科技"
-    if any(kw.lower() in title_l for kw in AI_DIM_KW) or _dim_re.search(AI_TITLE_RE, title_l):
-        return "AI科技"
+        return "AI"
     # GitHub 开源趋势（TECH_SITES/radarai）：仓库名常不含 AI 关键词
     # （stable-diffusion-webui / browser-use 等），而 radarai 摘要是雷达站真实中文描述
-    # （无反爬水印风险）→ 允许摘要参与 AI 判定；AI 项目归 AI科技榜，其余一律归「技术」，
-    # 不再走政策/金融关键词级联——避免 framework/目标/投资 等通用词把 GitHub 项目
-    # 误分到政策榜/金融榜（2026-08-17：技术榜只放绿色低碳技术，AI 项目单独归 AI科技榜）
+    # （无反爬水印风险）→ 允许摘要参与 AI 判定；AI 项目归 AI，其余一律归「行业」，
+    # 且优先于政府词判定（避免仓库摘要里的 framework/target 等泛词误抢政府）
     if site_id in TECH_SITES:
         if any(kw.lower() in text for kw in AI_DIM_KW):
-            return "AI科技"
-        return "技术"
+            return "AI"
+        return "行业"
+    # 政府强词（仅标题：印发/通知/部委名/政策…）→ 政府
+    if any(kw.lower() in title_l for kw in GOV_STRONG_KW):
+        return "政府"
+    # 金融词（碳市场/碳交易/碳价/ETS…）→ 金融——先于双碳判定：
+    # "碳排放权交易/碳市场"是金融信号而非行业（2026-08-19 实测防"碳排放"误抢金融）
     for kw in FINANCE_DIM_KW:
         if kw.lower() in text:
             return "金融"
-    for kw in TECH_DIM_KW:
+    # 决策点 A1 双碳优先：双碳核心词 → 行业（即使标题含 AI 背景词）
+    if any(kw.lower() in text for kw in DUAL_CARBON_KW):
+        return "行业"
+    # AI 词（标题级，词边界）→ AI
+    if any(kw.lower() in title_l for kw in AI_DIM_KW) or _dim_re.search(AI_TITLE_RE, title_l):
+        return "AI"
+    for kw in INDUSTRY_DIM_KW:
         if kw.lower() in text:
-            return "技术"
-    # 政策库（官方原文）默认政策；媒体库看关键词
+            return "行业"
+    # 政策库（官方原文）默认政府——官方文件即使含双碳词也不改判行业
     if library == "policy":
-        return "政策"
-    for kw in POLICY_DIM_KW:
+        return "政府"
+    for kw in POLICY_WEAK_KW:
         if kw.lower() in text:
-            return "政策"
-    return "技术"  # 兜底：媒体库行业动态归技术
+            return "政府"
+    return "行业"  # 兜底：媒体库行业动态归行业
 
 
 # ── Policy relevance filter ──────────────────────────────────────────────────
@@ -2018,7 +2184,7 @@ POLICY_KEYWORDS = [
     "碳交易", "碳市场", "碳关税", "碳足迹", "碳普惠",
     "ESG", "可持续发展", "循环经济", "绿色制造", "绿色金融",
     "能源转型", "电力市场", "新型电力系统",
-    "生态环境", "污染防治", "蓝天保卫战",
+    "生态环境", "污染防治", "蓝天保卫战", "以旧换新",
     "CCUS", "碳捕集",
     "发改", "能源", "电力", "成品油", "天然气", "煤炭",
     # English
@@ -2044,6 +2210,9 @@ GREEN_SITES = {
     "pbc", "cneeex", "ncsc", "caep",
     # 国际智库（2026-08-17 第三轮：全站绿色主题，直通）
     "e3g", "agora", "teri",
+    # 人形机器人/智能家居/绿色生活（2026-08-19 新增：全站绿色主题直通；
+    # greenbuilder 是绿色建筑+地产混合媒体 → 走关键词过滤不进直通）
+    "greenpeace", "mongabay",
 }
 
 # 低频源宽窗口（2026-08-14）：国外官方源 + 中国智库型机构（NCSC/CAEP），
@@ -2059,6 +2228,7 @@ FOREIGN_GOV_SITES = {
 # 深度分析时效性弱于新闻 → 网站数据用 21 天宽窗口，避免整源被滤空
 LOW_FREQ_SITES = {
     "e3g", "agora", "teri",
+    "greenpeace",  # 绿色和平中文站（月级更新，2026-08-19 新增）
 }
 
 # AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
@@ -2083,13 +2253,21 @@ TECH_SITES = {
     "radarai",      # RadarAI·GitHub趋势（开源项目热度追踪）
 }
 
+# 机器人/具身智能全链条源（2026-08-19）：人形机器人/工业机器人/无人机。
+# 同 AI_SITES 逻辑直通（不进 GREEN_SITES——非绿色主题媒体），categorize 按关键词：
+# humanoid/robot 命中 AI_DIM_KW → AI 榜（人形机器人=具身智能核心），纯产业动态落行业。
+ROBOT_SITES = {
+    "therobotreport",   # The Robot Report（国际机器人产业头部媒体）
+    "spectrum",         # IEEE Spectrum（机器人/科技权威媒体）
+}
+
 # 站点级维度强制：categorize_dimension 最先检查，优先于 AI_SITES 直通。
 # 2026-08-17 起为空——radarai（GitHub 开源趋势）不再整源归「技术」：
 # 技术榜只放绿色低碳技术，AI 项目按关键词（含摘要）归 AI科技榜，非 AI 项目落回技术兜底。
 DIM_SITE_OVERRIDE: dict[str, str] = {}
 
 
-def is_policy_relevant(title: str, url: str = "", site_id: str = "") -> bool:
+def is_policy_relevant(title: str, url: str = "", site_id: str = "", summary: str = "") -> bool:
     """Check if a title/URL/site is related to green/low-carbon policy."""
     # Auto-pass for known green sites
     if site_id in GREEN_SITES:
@@ -2097,8 +2275,17 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "") -> bool:
     # AI 领域全链条源（2026-08-14）：理论/模型/市场/商业全通过
     if site_id in AI_SITES:
         return True
-    # 技术全链条源（2026-08-14）：GitHub 开源项目趋势全通过
+    # 技术全链条源（2026-08-14）：GitHub 开源项目趋势——2026-08-19 起不再全通过，
+    # 需命中绿色主题词或 AI 词（否则 vitejs/vite 等与绿色低碳无关的开源项目混入行业榜）
     if site_id in TECH_SITES:
+        t = f"{title or ''} {summary or ''}".lower()
+        if any(kw.lower() in t for kw in POLICY_KEYWORDS):
+            return True
+        if any(kw.lower() in t for kw in AI_DIM_KW):
+            return True
+        return False
+    # 机器人/具身智能全链条源（2026-08-19）：人形机器人/工业机器人直通
+    if site_id in ROBOT_SITES:
         return True
     title_lower = title.lower()
     url_lower = url.lower()
@@ -2178,6 +2365,14 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_aihot, "aihot", "AIHOT"),
     # RadarAI — GitHub 开源项目趋势（2026-08-14 接入；/api/trends 干净 JSON）
     (fetch_radarai, "radarai", "RadarAI·GitHub趋势"),
+    # 人形机器人/绿色智能家居/绿色生活（2026-08-19 新增）
+    (fetch_therobotreport, "therobotreport", "The Robot Report"),
+    (fetch_spectrum_robotics, "spectrum", "IEEE Spectrum"),
+    (fetch_qianjia, "qianjia", "千家网"),
+    (fetch_greenbuilder, "greenbuilder", "Green Builder Media"),
+    (fetch_cheaa, "cheaa", "中国家电网"),
+    (fetch_greenpeace, "greenpeace", "绿色和平"),
+    (fetch_mongabay, "mongabay", "Mongabay"),
     # Aggregated hot boards (filtered by policy keywords)
     (fetch_allnet, "allnet", "全网热点"),
 ]
@@ -2243,6 +2438,14 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "arxiv_ai":    ("media", ""),
     "aihot":       ("media", ""),
     "radarai":     ("media", ""),
+    # 人形机器人/智能家居/绿色生活（2026-08-19 新增，全部媒体库）
+    "therobotreport": ("media", ""),
+    "spectrum":       ("media", ""),
+    "qianjia":        ("media", ""),
+    "greenbuilder":   ("media", ""),
+    "cheaa":          ("media", ""),
+    "greenpeace":     ("media", ""),
+    "mongabay":       ("media", ""),
 }
 
 
@@ -2274,12 +2477,21 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
     seen: dict[str, dict] = {}
     for it in existing:
         u = it.get("url") or ""
-        if u and u not in seen:
+        # 2026-08-19：按规范化标题去重（Google News 聚合 URL 每次抓取不同，
+        # 按 url 会累积同一条新闻的多份副本——实测日本环境省 x8 重复）
+        k = _title_dedup_key(it.get("title", ""))
+        if k and k not in seen:
+            seen[k] = it
+        elif u and not k:
             seen[u] = it
     added = 0
     for it in new_items:
         u = it.get("url") or ""
-        if u and u not in seen:
+        k = _title_dedup_key(it.get("title", ""))
+        if k and k not in seen:
+            seen[k] = it
+            added += 1
+        elif u and not k and u not in seen:
             seen[u] = it
             added += 1
     cutoff = now - timedelta(days=62)
@@ -2369,7 +2581,7 @@ def main() -> int:
 
     # ── Dedup (no time window) for Obsidian export ──────────────────────────
     seen_ids: set[str] = set()
-    seen_items: set[tuple[str, str]] = set()
+    seen_items: set[str] = set()  # 2026-08-19: 统一按规范化标题去重（见下）
 
     all_items: list[dict[str, Any]] = []
     green_items: list[dict[str, Any]] = []
@@ -2404,7 +2616,10 @@ def main() -> int:
             continue
         seen_ids.add(tid)
 
-        title_key = (raw.title.strip().lower()[:80], normalize_url(raw.url))
+        # 去重（2026-08-19）：统一按规范化标题——Google News 聚合 URL 是 base64
+        # 且每次抓取不同，按 url 去重会漏（实测日本环境省一条新闻 x8 重复）。
+        # seen_ids（url 维度）仍保留作快速通道；真正防重复靠 title_key。
+        title_key = _title_dedup_key(raw.title)
         if title_key in seen_items:
             continue
         seen_items.add(title_key)
@@ -2428,7 +2643,7 @@ def main() -> int:
         }
         all_items.append(record)
 
-        if is_policy_relevant(clean_title, raw.url, raw.site_id):
+        if is_policy_relevant(clean_title, raw.url, raw.site_id, raw.meta.get("summary", "")):
             green_items.append(record)
 
     # 24h window filter for web output
@@ -2685,6 +2900,10 @@ SOURCE_REGION: dict[str, str] = {
     "jiqizhixin": "中国", "qbitai": "中国", "openai": "国际",
     "venturebeat": "国际", "arxiv_ai": "国际", "aihot": "中国",
     "reuters": "全球",
+    # 人形机器人/智能家居/绿色生活（2026-08-19 新增）
+    "therobotreport": "全球", "spectrum": "全球", "mongabay": "全球",
+    "greenbuilder": "美国", "greenpeace": "中国",
+    "qianjia": "中国", "cheaa": "中国",
 }
 
 
@@ -2972,6 +3191,13 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         url = item.get("url", "")
         pub_date = item.get("published_at", "")
         res = bodies.get(str(fp))
+        # Google News 解码成功 → 用真实 URL 覆盖（2026-08-19）：
+        # ① 笔记 frontmatter 存真实链接（而非 base64 假链接，Obsidian 里可直接打开）
+        # ② 下次抓取同一新闻（解码后同一真实 URL）可匹配 stale_files 自动补正文
+        real_url = (res or {}).get("real_url") or ""
+        if real_url and real_url != url:
+            url = real_url
+            item["url"] = real_url  # record 共享引用 → JSON 同步
         # 详情页标题优先：列表页标题常被源站截断（如碳交易网列表页
         # "…现状与未"），详情页 <title>/<h1> 是完整的（2026-08-11）
         page_title = (res or {}).get("title") or ""
