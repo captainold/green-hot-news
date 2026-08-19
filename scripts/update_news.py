@@ -1744,7 +1744,15 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
     ],
     "AI科技": [
         (30, ["落地", "应用", "发布", "大模型", "智能体", "突破", "首发",
-              "平台", "上线", "部署", "启用"]),
+              "平台", "上线", "部署", "启用",
+              # AI 治理/安全信号（2026-08-19）：AI 与政治/民主/国家安全的顶层交叉
+              # —— OpenAI 等源的治理表态、AI 监管/安全，用户关注的高价值话题。
+              # "监督"不单列（会误命中"监督学习"），用"民主监督"+英文 "oversight" 覆盖。
+              "治理", "监管", "问责", "合规", "立法", "管控",
+              "国家安全", "网络安全", "民主监督",
+              "governance", "oversight", "regulation", "regulatory",
+              "accountability", "national security", "cybersecurity",
+              "democratic", "safety", "cyber"]),
         (20, ["研究", "方法", "评估", "预测", "优化", "监测", "算法", "模型",
               "adaptation", "response", "pathway", "framework", "system",
               "tool", "dataset", "workshop", "grant"]),
@@ -1756,10 +1764,10 @@ DEFAULT_STRENGTH = 8
 
 def score_content_strength(dimension: str, title: str, summary: str) -> int:
     """内容强度分：按维度关键词档位，从高到低取第一命中档。"""
-    text = f"{title or ''} {summary or ''}"
+    text = f"{title or ''} {summary or ''}".lower()
     rules = CONTENT_STRENGTH_RULES.get(dimension, CONTENT_STRENGTH_RULES["政策"])
     for score, kws in rules:
-        if any(kw in text for kw in kws):
+        if any(kw.lower() in text for kw in kws):
             return score
     return DEFAULT_STRENGTH
 
