@@ -58,8 +58,13 @@ md("""## 二、总览仪表盘
 
 四维分布 / 评分等级 / 区域版图，一眼看清 62 天数据全貌。""")
 
-code("""fig1 = px.pie(df, names="dimension", title="四维分布（政府/行业/金融/AI）",
-             hole=0.45, category_orders={"dimension": ["政府", "行业", "金融", "AI"]})
+code("""# ⚠️ plotly 6.x 的 px.pie(names=...) 不再自动聚合（逐行 labels + 空 values），
+# Positron 渲染时会把每行当独立扇区 → 必须先用 value_counts 显式聚合
+dim_counts = df["dimension"].value_counts().reset_index()
+dim_counts.columns = ["dimension", "count"]
+fig1 = px.pie(dim_counts, names="dimension", values="count",
+              title="四维分布（政府/行业/金融/AI）",
+              hole=0.45, category_orders={"dimension": ["政府", "行业", "金融", "AI"]})
 fig1.update_traces(textinfo="value+percent")
 fig1.show()""")
 
@@ -67,7 +72,11 @@ code("""fig2 = px.histogram(df, x="score", color="score_level", nbins=20,
                    title="评分分布（S≥85 / A≥70 / B≥55 / C≥40 / D）")
 fig2.show()""")
 
-code("""fig3 = px.pie(df, names="region", title="区域版图（中国/国际/美国/印度/欧盟/日本）", hole=0.4)
+code("""# 同上：区域图也要显式聚合（空 region 显示为"未标注"）
+region_counts = df["region"].replace("", "未标注").value_counts().reset_index()
+region_counts.columns = ["region", "count"]
+fig3 = px.pie(region_counts, names="region", values="count",
+              title="区域版图（中国/国际/美国/印度/欧盟/日本）", hole=0.4)
 fig3.show()""")
 
 # ---------- 3. 时间序列 ----------
