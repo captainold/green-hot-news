@@ -3923,10 +3923,14 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
         published = (res or {}).get("published") or ""
         if not published:
             published = format_published(item.get("published_at", ""))
-
-        date_val = pub_date[:10] if pub_date else now.strftime("%Y-%m-%d")
-        if not published:
-            published = date_val  # last resort: the date field itself
+        # 2026-08-20 修复：详情页/RSS 都没有时间 → published 留空，**绝不拿抓取当天
+        # 冒充发布时间**——兜底当天会被 published-index 永久固化（实测 chinanecc
+        # 4-23 的《碳达峰碳中和综合评价考核办法》答记者问被标成 8-19 首抓日）。
+        # 无时间条目由 JSON 侧 first_seen_at + time_source='scraped' 表达「收录时间」，
+        # 前端显示「收录 X」（抓取时间仅作新鲜度判断，不冒充原文发布时间）。
+        date_val = (item.get("published_at") or "")[:10]
+        if published and not date_val:
+            date_val = published[:10]
         tags = auto_tag(title, item.get("site_id", ""))
         tag_str = ", ".join(tags)
         kw_set = set(tags)
@@ -3940,10 +3944,11 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             f'source: "{site_name}"',
             f"url: {url}",
             f"date: {date_val}",
-            f'published: "{published}"',
             f"tags: [{tag_str}]",
             f"keywords: [{kw_str}]",
         ]
+        if published:
+            lines.append(f'published: "{published}"')
         if source_org:
             safe_org = source_org.replace(chr(34), chr(39))
             lines.append(f'author: "{safe_org}"')
@@ -3962,9 +3967,10 @@ def export_to_obsidian(items: list[dict], base_dir_str: str, now: datetime) -> t
             f"[原文链接]({url})",
             "",
             f"> 来源: {site_name}",
-            f"> 发布时间: {published}",
             f"> 首次抓取: {now.strftime('%Y-%m-%d %H:%M')} UTC",
         ]
+        if published:
+            lines.append(f"> 发布时间: {published}")
         if source_org:
             lines.append(f"> 作者: {source_org}")
         if people:

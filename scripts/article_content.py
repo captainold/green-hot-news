@@ -670,12 +670,20 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
         if published:
             # Safety net: a publish time in the future is extraction garbage.
             # Detail-page times are Beijing-naive; compare against UTC now.
+            # 2026-08-20 修复：date-only（'YYYY-MM-DD'）之前被 strptime(%H:%M) 抛
+            # ValueError 误杀置 None——chinanecc 详情页只有日期（4-23），结果丢失
+            # 原文时间落回首抓日。现在两种格式分别校验：date-only 判未来按天容差。
             try:
                 import datetime as dtm
                 bj_tz = dtm.timezone(dtm.timedelta(hours=8))
-                pub_dt = dtm.datetime.strptime(published, "%Y-%m-%d %H:%M").replace(tzinfo=bj_tz)
-                if pub_dt > dtm.datetime.now(dtm.timezone.utc) + dtm.timedelta(hours=1):
-                    published = None
+                if len(published) > 10:
+                    pub_dt = dtm.datetime.strptime(published, "%Y-%m-%d %H:%M").replace(tzinfo=bj_tz)
+                    if pub_dt > dtm.datetime.now(dtm.timezone.utc) + dtm.timedelta(hours=1):
+                        published = None
+                else:
+                    pub_dt = dtm.datetime.strptime(published, "%Y-%m-%d").replace(tzinfo=bj_tz)
+                    if pub_dt > dtm.datetime.now(dtm.timezone.utc) + dtm.timedelta(days=1):
+                        published = None
             except (TypeError, ValueError):
                 published = None
         return {"summary": summary, "content": content, "title": page_title,
