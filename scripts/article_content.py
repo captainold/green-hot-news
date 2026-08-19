@@ -510,6 +510,25 @@ def _decode_google_news_url(url: str, session: Optional[requests.Session] = None
                 pass
 
 
+def _solve_tst_cookie(html: str) -> Optional[str]:
+    """解析 __tst_status JS 反爬挑战脚本 → 计算 cookie 串。
+
+    挑战页结构（cnenergynews 详情页实测，2026-08-19）：
+      var e={WTKkN:<n1>,bOYDu:<n2>,dtzqS:...,wyeCN:<n3>,...}
+      case"3":t=a[_0x649a("0x7")](t,<n4>)   ← EO_Bot_Ssid 值
+    JS 逻辑（解混淆后）：t = n1+n2+n3；cookie = "__tst_status=<t>#; EO_Bot_Ssid=<n4>;"
+    数字每次请求随机生成 → 必须从当前挑战页提取。正则提取失败返回 None。
+    """
+    import re as _re
+    m1 = _re.search(r"WTKkN:(\d+),bOYDu:(\d+).*?wyeCN:(\d+)", html)
+    m2 = _re.search(r"\(t,(\d+)\)", html)
+    if not m1 or not m2:
+        return None
+    n1, n2, n3 = int(m1.group(1)), int(m1.group(2)), int(m1.group(3))
+    n4 = int(m2.group(1))
+    return f"__tst_status={n1 + n2 + n3}#; EO_Bot_Ssid={n4};"
+
+
 def fetch_article(url: str, session: Optional[requests.Session] = None,
                   timeout: tuple[int, int] = (10, 20),
                   retries: int = 2) -> Optional[dict[str, Optional[str]]]:
@@ -523,10 +542,12 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
     url = (url or "").strip()
     if not url:
         return None
+    real_url = url
     if url.lower().startswith(("https://news.google.com", "http://news.google.com")):
-        url = _decode_google_news_url(url, session=session) or ""
-        if not url:
+        real_url = _decode_google_news_url(url, session=session) or ""
+        if not real_url:
             return None
+        url = real_url
     if not url.lower().startswith(("http://", "https://")):
         return None
 
@@ -542,6 +563,15 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
         for attempt in range(max(1, retries + 1)):
             try:
                 resp = sess.get(url, timeout=timeout, allow_redirects=True)
+                # JS 反爬挑战页（__tst_status cookie 混淆，2026-08-19 cnenergynews 实测）：
+                # 被拦时响应极小（~986B）且含挑战脚本特征 → 解码 cookie 后带 Cookie 重试，
+                # 成功拿到完整正文页（30KB）。同 AIHOT 教训的通用处理——但 cnenergynews
+                # 无官方 RSS 可走，只能绕挑战。
+                if len(resp.text) < 5000 and "__tst_status" in resp.text:
+                    ck = _solve_tst_cookie(resp.text)
+                    if ck:
+                        resp = sess.get(url, timeout=timeout, allow_redirects=True,
+                                        headers={"Cookie": ck})
                 break
             except Exception:  # network flakiness: retry fresh
                 if attempt >= retries:
@@ -575,7 +605,8 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
             except (TypeError, ValueError):
                 published = None
         return {"summary": summary, "content": content, "title": page_title,
-                "published": published, "source_org": source_org}
+                "published": published, "source_org": source_org,
+                "real_url": real_url}
     except Exception:
         return None
     finally:
