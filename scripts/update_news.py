@@ -792,7 +792,7 @@ def _strip_title_suffix(title: str) -> str:
 # Google News 把站点导航/栏目页也当文章收录时的典型标题
 _NAV_JUNK_TITLE_RE = re.compile(
     r"^(english releases|photo album|blogdescription|pib backgrounder|"
-    r"reports archives|archives|glossary|education|data in the classroom|"
+    r"reports archives|.* archives|archives|glossary|education|data in the classroom|"
     r"station home page|tide predictions|daily weather map|"
     r"pib|eia webinars|short-term energy outlook)\s*$",
     re.IGNORECASE,
@@ -1076,6 +1076,221 @@ def fetch_teri(session: requests.Session, now: datetime) -> list[RawItem]:
     except Exception:
         pass
     return items[:20]
+
+
+# ── 国际智库/投行（2026-08-19 第四轮：Brookings/Bruegel/PIIE/CSIS/Chatham/Carnegie/RAND/CAP/高盛）──
+
+def fetch_brookings(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Brookings 布鲁金斯学会 — 气候与能源经济政策（2026-08-19 接入）。
+
+    RSS /feed/ 是 HTML 壳 → Google News 搜 site 兜底（与 E3G 同款模式）。
+    美国顶级智库，能源/气候经济政策浓度高。归媒体库（专家解读档 18 分）。
+    """
+    return fetch_foreign_gov(session, now, "brookings", "Brookings", [
+        "site:brookings.edu (climate OR energy OR emissions OR carbon) when:14d",
+        "site:brookings.edu (clean energy OR green OR transition OR net zero) when:14d",
+    ])
+
+
+def fetch_bruegel(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Bruegel 布鲁盖尔研究所 — 欧盟经济政策×绿色新政（2026-08-19 接入）。
+
+    RSS /rss.xml 可用（出版物+活动流）→ 直抓；空则 Google News 兜底。
+    欧洲最权威经济智库之一，CBAM/碳关税/绿色新政分析强。
+    """
+    items = fetch_rss_feed(
+        session, "https://www.bruegel.org/rss.xml", "bruegel", "Bruegel", now, limit=20,
+    )
+    if items:
+        return items
+    return fetch_foreign_gov(session, now, "bruegel", "Bruegel", [
+        "site:bruegel.org (climate OR energy OR carbon OR green) when:30d",
+        "site:bruegel.org (CBAM OR emissions OR trade OR regulation) when:30d",
+    ], limit=20)
+
+
+def fetch_piie(session: requests.Session, now: datetime) -> list[RawItem]:
+    """PIIE 彼得森国际经济研究所 — 贸易×碳边境调节/CBAM（2026-08-19 接入）。
+
+    RSS 404 → Google News 搜 site。国际经济政策权威，碳关税/贸易×气候分析强。
+    """
+    return fetch_foreign_gov(session, now, "piie", "PIIE", [
+        "site:piie.com (climate OR carbon OR energy OR trade) when:14d",
+        "site:piie.com (tariff OR CBAM OR green OR emissions) when:14d",
+    ])
+
+
+def fetch_csis(session: requests.Session, now: datetime) -> list[RawItem]:
+    """CSIS 战略与国际研究中心 — 能源安全/气候地缘（2026-08-19 接入）。
+
+    RSS /rss.xml 只有 2016 年 events 流（不可用）→ Google News 搜 site。
+    能源安全/气候地缘/清洁技术政策，美国核心智库。
+    """
+    return fetch_foreign_gov(session, now, "csis", "CSIS", [
+        "site:csis.org (climate OR energy OR clean OR carbon) when:14d",
+        "site:csis.org (energy security OR grid OR renewables OR emissions) when:14d",
+    ])
+
+
+def fetch_chatham(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Chatham House 查塔姆研究所 — 气候治理/国际关系（2026-08-19 接入）。
+
+    RSS 403（WAF）→ Google News 搜 site。英国皇家国际事务研究所，
+    气候/能源地缘政治权威。归媒体库（专家解读档）。
+    """
+    return fetch_foreign_gov(session, now, "chatham", "Chatham House", [
+        "site:chathamhouse.org (climate OR energy OR carbon OR environment) when:14d",
+        "site:chathamhouse.org (clean energy OR net zero OR green OR emissions) when:14d",
+    ])
+
+
+def fetch_carnegie(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Carnegie 卡内基国际和平基金会 — 气候能源项目（2026-08-19 接入）。
+
+    RSS 404 → Google News 搜 site。能源转型/核能/电池地缘研究（实测
+    Geothermal and Nuclear Strategy、Battery Manufacturing Monopoly 等能源内容质量高）。
+    """
+    return fetch_foreign_gov(session, now, "carnegie", "Carnegie", [
+        "site:carnegieendowment.org (climate OR energy OR nuclear OR battery) when:14d",
+        "site:carnegieendowment.org (geothermal OR clean OR carbon OR grid) when:14d",
+    ])
+
+
+def fetch_rand(session: requests.Session, now: datetime) -> list[RawItem]:
+    """RAND 兰德公司 — 气候安全/能源/AI 政策研究（2026-08-19 接入）。
+
+    RSS 404 → Google News 搜 site。综合政策智库（气候/能源/国防交叉），
+    AI 内容多命中 AI 关键词自然归 AI 维度。
+    """
+    return fetch_foreign_gov(session, now, "rand", "RAND", [
+        "site:rand.org (climate OR energy OR carbon OR environment) when:14d",
+        "site:rand.org (AI OR clean OR emissions OR security) when:14d",
+    ])
+
+
+def fetch_americanprogress(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Center for American Progress — 美国进步中心（2026-08-19 接入）。
+
+    RSS /feed/ 是 HTML 壳 → Google News 搜 site。美国自由派智库，
+    气候政策/环境治理（实测 Deep-Sea Mining Scheme 等环境议题报道多）。
+    """
+    return fetch_foreign_gov(session, now, "americanprogress", "CAP", [
+        "site:americanprogress.org (climate OR energy OR environment) when:14d",
+        "site:americanprogress.org (clean OR carbon OR emissions OR green) when:14d",
+    ])
+
+
+def fetch_goldman(session: requests.Session, now: datetime) -> list[RawItem]:
+    """高盛 Greater China Insights — 投行研报（2026-08-19 接入）。
+
+    页面 JS 渲染（HTML 空壳）→ Google News 搜 site。投行级能源转型/
+    绿色金融研究，补金融维度权威（版图券商研究 P0）。归媒体库（研报档 18）。
+    """
+    return fetch_foreign_gov(session, now, "goldman", "高盛Insights", [
+        "site:goldmansachs.com (energy OR climate OR carbon OR clean) when:14d",
+        "site:goldmansachs.com (green OR sustainability OR transition OR EV) when:14d",
+    ])
+
+
+# ── 中国 P0 扩容（2026-08-19 第四轮：财新双碳/国家节能中心/澎湃） ──
+
+def fetch_caixin(session: requests.Session, now: datetime) -> list[RawItem]:
+    """财新网 — 双碳/绿色金融/能源（2026-08-19 接入）。
+
+    双碳专栏博客是 JS SPA（HTML 空壳、无 RSS）→ Google News 搜 site:caixin.com
+    中文绿色词（实测 21 条/7d：油气十五五规划/碳市场扩围/再生铜，质量高）。
+    ⚠️ 英文 query 会被成人站污染（site:caixin.com 的 en query 返回垃圾）→ 只用 zh-CN。
+    """
+    return fetch_foreign_gov(session, now, "caixin", "财新", [
+        "site:caixin.com (碳 OR 双碳 OR 碳中和 OR 碳市场) when:7d",
+        "site:caixin.com (绿色金融 OR 能源 OR 环保 OR 排放) when:7d",
+    ], locale="zh-CN")
+
+
+def fetch_chinanecc(session: requests.Session, now: datetime) -> list[RawItem]:
+    """国家节能中心 — 节能降碳官方解读（2026-08-19 接入）。
+
+    发改委下属事业单位（公共服务网），首页直抓 /website/News!view.shtml?id= 列表，
+    内容为节能降碳官方文件/专家解读/一图读懂（实测 8 条全是高价值政策解读）。
+    归政策库·中国（官方机构档 22），GREEN_SITES 直通。
+    """
+    items: list[RawItem] = []
+    try:
+        r = session.get("http://www.chinanecc.cn/website/index.shtml", timeout=30)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding or "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        seen: set[tuple[str, str]] = set()
+        for a in soup.find_all("a", href=True):
+            href = a.get("href", "")
+            title = a.get_text(strip=True)
+            if not title or len(title) < 12:
+                continue
+            if "/website/News!view.shtml?id=" not in href:
+                continue
+            if (title, href) in seen:
+                continue
+            seen.add((title, href))
+            if not href.startswith("http"):
+                href = urljoin("http://www.chinanecc.cn", href)
+            items.append(RawItem(
+                site_id="chinanecc", site_name="国家节能中心",
+                title=title, url=href, published_at=None,
+            ))
+    except Exception:
+        pass
+    return items[:20]
+
+
+def fetch_thepaper(session: requests.Session, now: datetime) -> list[RawItem]:
+    """澎湃新闻 — 绿政/能源/AI 报道（2026-08-19 接入）。
+
+    首页 JS 加载 → Google News 搜 site 中文绿色词（实测：上海港绿色甲醇/
+    非洲贸易绿色化/绿色算力，质量高）。版图综合媒体 P1（绿政公署栏目）。
+    """
+    return fetch_foreign_gov(session, now, "thepaper", "澎湃新闻", [
+        "site:thepaper.cn (绿色 OR 低碳 OR 双碳 OR 碳市场 OR 能源 OR 环保) when:7d",
+        "site:thepaper.cn (碳中和 OR 储能 OR 新能源 OR 排放) when:7d",
+    ], locale="zh-CN")
+
+
+# ── AI 维度扩容（2026-08-19 第四轮：Artificial Analysis/36氪/虎嗅） ──
+
+def fetch_artificialanalysis(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Artificial Analysis — AI 模型评测/API 市场（2026-08-19 接入）。
+
+    SPA JS 渲染（HTML 空壳、无 RSS）→ Google News 搜 site。
+    AI 模型 Intelligence/Performance/Price 评测（实测 GLM-5.3/Search Index 发布），
+    AI 维度权威数据源。归 AI_SITES 直通。
+    """
+    return fetch_foreign_gov(session, now, "artificialanalysis", "Artificial Analysis", [
+        "site:artificialanalysis.ai (model OR AI OR benchmark OR intelligence) when:14d",
+        "site:artificialanalysis.ai (performance OR price OR LLM OR GPT) when:14d",
+    ])
+
+
+def fetch_36kr(session: requests.Session, now: datetime) -> list[RawItem]:
+    """36氪 — AI/新能源/储能（2026-08-19 接入）。
+
+    首页 JS → Google News 搜 site 中文词（实测：新能源渗透率首破60%/储能/双碳）。
+    综合科技商业媒体：走 AI_MEDIA_SITES 过滤（命中绿色词或 AI 词才入库）。
+    """
+    return fetch_foreign_gov(session, now, "36kr", "36氪", [
+        "site:36kr.com (AI OR 大模型 OR 新能源 OR 储能 OR 碳中和) when:7d",
+        "site:36kr.com (智能体 OR 算力 OR 芯片 OR 绿色 OR 碳) when:7d",
+    ], locale="zh-CN")
+
+
+def fetch_huxiu(session: requests.Session, now: datetime) -> list[RawItem]:
+    """虎嗅 — AI/新能源（2026-08-19 接入）。
+
+    首页 JS + RSS HTML 壳 → Google News 搜 site 中文词（实测：百度AI业务/
+    AI焚书/甲骨文算力）。综合科技商业媒体：走 AI_MEDIA_SITES 过滤。
+    """
+    return fetch_foreign_gov(session, now, "huxiu", "虎嗅", [
+        "site:huxiu.com (AI OR 大模型 OR 新能源 OR 碳中和) when:7d",
+        "site:huxiu.com (智能体 OR 算力 OR 芯片 OR 储能 OR 绿色) when:7d",
+    ], locale="zh-CN")
 
 
 # ── 中国 P0 第二批（2026-08-14：人行/环交所/NCSC/CAEP/环境报/CNESA） ──
@@ -1904,6 +2119,16 @@ SOURCE_SCORE: dict[str, int] = {
     "jp_moe": 25, "jp_meti": 25, "jp_anre": 25,
     # 国际智库（2026-08-17 第三轮：专家解读/政策评论档，同碳道/CCAI）
     "e3g": 18, "agora": 18, "teri": 18,
+    # 国际智库/投行（2026-08-19 第四轮：智库 18 / 投行研报 18——权威度同级）
+    "brookings": 18, "bruegel": 18, "piie": 18, "csis": 18, "chatham": 18,
+    "carnegie": 18, "rand": 18, "americanprogress": 18, "goldman": 18,
+    # 中国 P0 扩容（2026-08-19 第四轮）
+    "caixin": 18,      # 财新（专业财经媒体，双碳/绿金报道权威）
+    "chinanecc": 22,   # 国家节能中心（官方机构档，略低于部委 25）
+    "thepaper": 16,    # 澎湃新闻（主流综合媒体，绿政公署栏目）
+    # AI 维度扩容（2026-08-19 第四轮）
+    "artificialanalysis": 16,  # AI 模型评测（专业数据档）
+    "36kr": 13, "huxiu": 13,   # 综合科技商业媒体（行业媒体档）
     # 中国 P0 第二批（2026-08-14：官方机构档）
     "pbc": 25, "cneeex": 25, "ncsc": 25, "caep": 25,
     "cenews": 16, "cnesa": 16,
@@ -2213,6 +2438,8 @@ GREEN_SITES = {
     # 人形机器人/智能家居/绿色生活（2026-08-19 新增：全站绿色主题直通；
     # greenbuilder 是绿色建筑+地产混合媒体 → 走关键词过滤不进直通）
     "greenpeace", "mongabay",
+    # 国家节能中心（2026-08-19 接入：发改委下属事业单位，全站节能降碳官方解读）
+    "chinanecc",
 }
 
 # 低频源宽窗口（2026-08-14）：国外官方源 + 中国智库型机构（NCSC/CAEP），
@@ -2229,6 +2456,12 @@ FOREIGN_GOV_SITES = {
 LOW_FREQ_SITES = {
     "e3g", "agora", "teri",
     "greenpeace",  # 绿色和平中文站（月级更新，2026-08-19 新增）
+    # 国际智库/投行第四轮（2026-08-19 接入：Brookings/Bruegel/PIIE/CSIS/Chatham/
+    # Carnegie/RAND/CAP/高盛——智库周级~双周级更新，同 E3G/Agora 21 天宽窗口）
+    "brookings", "bruegel", "piie", "csis", "chatham",
+    "carnegie", "rand", "americanprogress", "goldman",
+    # 国家节能中心（官方解读周级更新，2026-08-19 接入）
+    "chinanecc",
 }
 
 # AI 领域全链条源（2026-08-14 扩充）：理论/模型/市场/商业 全部通过，
@@ -2244,6 +2477,16 @@ AI_SITES = {
     # 全部产出均为 AI×绿色低碳（AI 资助/工作坊/ML 基准）→ 归 AI科技榜，
     # 避免 NeurIPS 工作坊/ML 基准等项目因标题不含 AI 关键词而落进技术榜
     "ccai",         # Climate Change AI（AI×气候交叉）
+    # 2026-08-19：Artificial Analysis（AI 模型评测/API 市场数据——纯 AI 内容直通）
+    "artificialanalysis",
+}
+
+# AI 综合媒体（2026-08-19 第四轮接入：36氪/虎嗅是科技商业综合媒体，非纯 AI 源）。
+# 与 TECH_SITES 同逻辑：命中绿色词或 AI 词才入库（过滤无关科技商业噪音），
+# 但 categorize_dimension 走常规关键词判定（不强制归 AI/行业）。
+AI_MEDIA_SITES = {
+    "36kr",   # 36氪（AI/新能源/储能/碳中和报道）
+    "huxiu",  # 虎嗅（AI/新能源报道）
 }
 
 # 技术全链条源（2026-08-14）：GitHub 开源项目趋势，全量直通（同 AI_SITES 逻辑）。
@@ -2287,6 +2530,15 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "", summary: st
     # 机器人/具身智能全链条源（2026-08-19）：人形机器人/工业机器人直通
     if site_id in ROBOT_SITES:
         return True
+    # AI 综合媒体（2026-08-19）：36氪/虎嗅是科技商业媒体——命中绿色词或 AI 词
+    # 才入库（与 TECH_SITES 同逻辑，过滤无关科技商业噪音）
+    if site_id in AI_MEDIA_SITES:
+        t = f"{title or ''} {summary or ''}".lower()
+        if any(kw.lower() in t for kw in POLICY_KEYWORDS):
+            return True
+        if any(kw.lower() in t for kw in AI_DIM_KW):
+            return True
+        return False
     title_lower = title.lower()
     url_lower = url.lower()
     for kw in POLICY_KEYWORDS:
@@ -2328,6 +2580,25 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_e3g, "e3g", "E3G"),
     (fetch_agora, "agora", "Agora·能源转型"),
     (fetch_teri, "teri", "TERI·印度能源与资源所"),
+    # 国际智库/投行（2026-08-19 第四轮：Brookings/Bruegel/PIIE/CSIS/Chatham/
+    # Carnegie/RAND/CAP/高盛——补版图 2.4/3.4 智库 P0 + 券商研报 P0）
+    (fetch_brookings, "brookings", "Brookings"),
+    (fetch_bruegel, "bruegel", "Bruegel"),
+    (fetch_piie, "piie", "PIIE"),
+    (fetch_csis, "csis", "CSIS"),
+    (fetch_chatham, "chatham", "Chatham House"),
+    (fetch_carnegie, "carnegie", "Carnegie"),
+    (fetch_rand, "rand", "RAND"),
+    (fetch_americanprogress, "americanprogress", "CAP"),
+    (fetch_goldman, "goldman", "高盛Insights"),
+    # 中国 P0 扩容（2026-08-19 第四轮：财新双碳/国家节能中心/澎湃）
+    (fetch_caixin, "caixin", "财新"),
+    (fetch_chinanecc, "chinanecc", "国家节能中心"),
+    (fetch_thepaper, "thepaper", "澎湃新闻"),
+    # AI 维度扩容（2026-08-19 第四轮：Artificial Analysis/36氪/虎嗅）
+    (fetch_artificialanalysis, "artificialanalysis", "Artificial Analysis"),
+    (fetch_36kr, "36kr", "36氪"),
+    (fetch_huxiu, "huxiu", "虎嗅"),
     # 中国 P0 第二批（2026-08-14）
     (fetch_pbc, "pbc", "中国人民银行"),
     (fetch_cneeex, "cneeex", "上海环交所"),
@@ -2406,6 +2677,24 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "e3g":   ("media", ""),
     "agora": ("media", ""),
     "teri":  ("media", ""),
+    # 国际智库/投行（2026-08-19 第四轮 → 媒体库：专家解读/研报档）
+    "brookings":        ("media", ""),
+    "bruegel":          ("media", ""),
+    "piie":             ("media", ""),
+    "csis":             ("media", ""),
+    "chatham":          ("media", ""),
+    "carnegie":         ("media", ""),
+    "rand":             ("media", ""),
+    "americanprogress": ("media", ""),
+    "goldman":          ("media", ""),
+    # 中国 P0 扩容（2026-08-19 第四轮）
+    "caixin":     ("media", ""),       # 财新（双碳专栏，专业财经媒体）
+    "chinanecc":  ("policy", "中国"),  # 国家节能中心（官方机构→政策库·中国）
+    "thepaper":   ("media", ""),       # 澎湃新闻（绿政公署栏目）
+    # AI 维度扩容（2026-08-19 第四轮 → 媒体库）
+    "artificialanalysis": ("media", ""),
+    "36kr":               ("media", ""),
+    "huxiu":              ("media", ""),
     # 中国 P0 第二批（2026-08-14）
     "pbc":    ("policy", "中国"),
     "cneeex": ("policy", "中国"),
