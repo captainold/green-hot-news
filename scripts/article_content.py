@@ -529,6 +529,28 @@ def _solve_tst_cookie(html: str) -> Optional[str]:
     return f"__tst_status={n1 + n2 + n3}#; EO_Bot_Ssid={n4};"
 
 
+def _clean_summary_meta(s: str) -> str:
+    """清洗摘要开头的作者行/来源水印（2026-08-19 审计）。
+
+    碳道详情页把作者行「碳道小编 · 2026-08-19 20:08 · 阅读量 · 16」+「摘要：」
+    渲染在正文前，article_content 提取时一起进了 summary → 前端摘要显示
+    「碳道小编 · 时间 · 阅读量 · N 摘要：xxx」。同样处理其他「小编/编辑」作者行。
+    """
+    s = (s or "").strip()
+    # 作者行：<可选标题前缀><名>小编/编辑 · YYYY-MM-DD HH:MM · 阅读量 · N
+    # （前缀允许 0-50 字符——碳道部分摘要开头是「《标题》发布 推进… 碳道小编 · 时间 ·
+    # 阅读量 · 6 摘要：」结构，小编不在开头 — 2026-08-19 审计二轮）
+    s = re.sub(
+        r"^.{0,50}?(小编|編輯|编辑)\s*[·.]\s*\d{4}-\d{2}-\d{2}.*?阅读量\s*[·:：]?\s*\d+\s*",
+        "", s)
+    # 详情页显式「摘要：」前缀
+    for m in ("摘要：", "摘要:"):
+        if s.startswith(m):
+            s = s[len(m):].strip()
+            break
+    return s.strip()
+
+
 def fetch_article(url: str, session: Optional[requests.Session] = None,
                   timeout: tuple[int, int] = (10, 20),
                   retries: int = 2) -> Optional[dict[str, Optional[str]]]:
@@ -590,6 +612,7 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
         if len(body) < MIN_PARAGRAPH_CHARS or any(m in head for m in ERROR_PAGE_MARKERS):
             return None
         summary = _cut_at_sentence(body, MAX_SUMMARY_CHARS)
+        summary = _clean_summary_meta(summary)  # 作者行/摘要前缀清洗（2026-08-19 碳道）
         content = _cut_at_sentence(body, MAX_BODY_CHARS)
         published = extract_published_at(soup)
         source_org = extract_source_org(soup)

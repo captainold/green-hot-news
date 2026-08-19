@@ -730,7 +730,7 @@ _EN_SOURCE_NAMES = re.compile(
     r"(CleanTechnica|Reuters|Carbon Brief|Asian Business Review|Euractiv|"
     r"World Bank|Department of Energy|Environmental Protection|US EPA|U\.S\. EPA|"
     r"European Commission|Climate Change AI|VentureBeat|Bloomberg|Guardian|"
-    r"Financial Times|Scientific American|The Economist|Agora|E3G)",
+    r"Financial Times|Scientific American|The Economist|Agora|E3G|Mongabay)",  # Mongabay 2026-08-19 审计补
     re.IGNORECASE,
 )
 
@@ -771,21 +771,36 @@ def _strip_title_suffix(title: str) -> str:
         if marker in t:
             t = t.split(marker, 1)[0].strip()
             break
+    # 可剥的通用尾段（非源名但属于站点/栏目后缀的一部分——Mongabay
+    # RSS 标题 "xxx - news - Mongabay" 需先剥 Mongabay 再剥 news — 2026-08-19）
+    _GENERIC_TAIL_WORDS = {
+        "news", "press", "releases", "updates", "media", "staff",
+        "report", "blog", "daily", "weekly", "monthly",
+    }
     for sep in (" - ", " — ", " – ", " | ", " ｜ ", " _ "):
         if sep not in t:
             continue
-        head, tail = t.rsplit(sep, 1)
-        tail_s = tail.strip()
-        if not tail_s:
-            continue
-        # 中文/日文站点后缀
-        if len(tail_s) <= 25 and re.search(
-                r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会|环境省|经产省"
-                r"|環境局|環境省|経産省|資源エネルギー庁)", tail_s):
-            return head.strip()
-        # 英文源名后缀
-        if _is_en_source_name(tail_s):
-            return head.strip()
+        # 循环剥离尾部源名/通用段（原只 rsplit 一次，剥不掉 " - news - Mongabay"）
+        while sep in t:
+            head, tail = t.rsplit(sep, 1)
+            tail_s = tail.strip()
+            if not tail_s:
+                break
+            # 中文/日文站点后缀
+            if len(tail_s) <= 25 and re.search(
+                    r"(网|官网|委员会|政府|部$|中心|门户|生态环境部|发展和改革委员会|环境省|经产省"
+                    r"|環境局|環境省|経産省|資源エネルギー庁)", tail_s):
+                t = head.strip()
+                continue
+            # 英文源名后缀
+            if _is_en_source_name(tail_s):
+                t = head.strip()
+                continue
+            # 通用栏目后缀段（news/press/releases…）
+            if tail_s.lower() in _GENERIC_TAIL_WORDS:
+                t = head.strip()
+                continue
+            break
     return t
 
 
@@ -3511,9 +3526,10 @@ def detect_region(site_id: str, title: str) -> str:
 # Topic tag rules: (tag, [keywords])
 TOPIC_RULES: list[tuple[str, list[str]]] = [
     ("碳市场", ["碳交易", "碳市场", "碳价", "碳配额", "碳关税", "CBAM", "CCER", "碳排放权", "碳排",
-                "carbon market", "carbon price", "carbon trading", "emissions trading", "ETS", "carbon border"]),
+                "carbon market", "carbon price", "carbon trading", "emissions trading", "ETS", "carbon border",
+                "carbon", "emission", "emissions"]),  # 2026-08-19 审计补裸英文词（land-use emissions 等）
     ("新能源", ["新能源", "光伏", "风电", "光热", "氢能", "核能", "生物质", "水电",
-                "solar", "wind power", "hydrogen", "nuclear", "renewable energy", "renewables"]),
+                "solar", "wind power", "wind", "hydrogen", "nuclear", "renewable energy", "renewables"]),
     ("储能", ["储能", "电池", "抽水蓄能", "battery", "energy storage"]),
     ("电力", ["电力", "电网", "电价", "电力市场", "新型电力系统", "消纳", "用电", "发电",
               "electricity", "power grid", "power market"]),
@@ -3521,10 +3537,10 @@ TOPIC_RULES: list[tuple[str, list[str]]] = [
     ("节能降碳", ["节能", "能效", "绿色制造", "绿色低碳", "零碳工厂", "减排", "降碳",
                   "energy efficiency", "decarboni", "net zero", "net-zero", "zero carbon"]),
     ("气候变化", ["气候", "COP", "NDC", "巴黎协定", "碳中和", "碳达峰", "双碳", "温室气体",
-                  "climate change", "climate policy", "paris agreement", "greenhouse"]),
+                  "climate change", "climate policy", "climate", "paris agreement", "greenhouse"]),
     ("绿色金融", ["ESG", "绿色金融", "碳金融", "碳资产", "green finance", "green bond"]),
     ("环境保护", ["生态环境", "环境保护", "污染防治", "空气质量", "蓝天保卫战",
-                  "environment", "pollution", "air quality"]),
+                  "environment", "pollution", "air quality", "conservation", "wildlife"]),
     ("循环经济", ["循环经济", "资源循环", "废弃物", "circular economy"]),
     ("电动车", ["电动车", "电动汽车", "EV", "充电桩", "electric vehicle"]),
     ("政策法规", ["条例", "办法", "规定", "标准", "规范", "法律法规", "司法解释",
@@ -3557,10 +3573,12 @@ def extract_topic_tags(title: str) -> list[str]:
     for tag, keywords in TOPIC_RULES:
         for kw in keywords:
             kw_lower = kw.lower()
-            # Word-boundary check for short abbreviations
+            # ASCII 短词用「负向环视」词边界（2026-08-19 审计修复）：
+            # Python \b 把汉字当 \w，\bai\b 在 "AI诉讼" 中不匹配 → AI科技标签
+            # 漏标大量中文标题（实测 Anthropic AI诉讼/DeepMind AI路线 全漏）。
+            # (?<![a-z])ai(?![a-z]) 只认 ASCII 字母边界，中文上下文也能命中。
             if len(kw) <= 3 and kw.isascii() and kw.isalpha():
-                # Match only as whole word (e.g. "EV" not in "several")
-                pattern = r'\b' + _tag_re.escape(kw_lower) + r'\b'
+                pattern = r"(?<![a-z])" + _tag_re.escape(kw_lower) + r"(?![a-z])"
                 if _tag_re.search(pattern, title_lower):
                     tags.append(tag)
                     break
