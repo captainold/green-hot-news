@@ -14,6 +14,8 @@ export PATH="/root/.local/bin:$PATH"
 # 1.6) 当日高分浓缩版（前端「📋 当日浓缩」数据源；失败不阻断主流程）
 .venv/bin/python scripts/daily_digest.py >/dev/null || echo "daily digest failed"
 
+# 1.7) 数据质量检查（QA：只报告不修复，输出 data/qa-report.json + qa-report.md，供人工/agent 会话开始时审阅）
+.venv/bin/python scripts/qa_check.py || echo "qa check failed"
 # 2) 素材层 git 提交（服务器生成 + 本地 Obsidian 手工编辑双向同步）
 if [ -d /srv/git/green-policy-materials.git ]; then
     # 2a) 提交服务器侧新生成/修改的笔记（无改动则跳过）

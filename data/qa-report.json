@@ -1,0 +1,2160 @@
+{
+ "generated_at": "2026-08-21T02:17:05.555837+00:00",
+ "data_file": "latest-24h.json",
+ "score": 72.5,
+ "score_level": "C",
+ "totals": {
+  "items": 497,
+  "error": 11,
+  "warn": 11,
+  "info": 274
+ },
+ "stats": {
+  "items": 497,
+  "no_title_zh": 1,
+  "scraped_time": 0,
+  "empty_summary": 123
+ },
+ "issues": [
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081919184870631/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608191"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081915294182128/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608191"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/CarbonBrief/status/2090114334328303937",
+   "msg": "标题超长(245字): Q&A: What does China’s 15th ‘five-year plan’ for renewables mean for climate cha…"
+  },
+  {
+   "level": "error",
+   "item": "B5",
+   "source": "X平台",
+   "url": "https://x.com/CarbonBrief/status/2090114334328303937",
+   "msg": "摘要含 HTML 残留: Q&amp;A: What does China’s 15th ‘five-year plan’ for renewab…"
+  },
+  {
+   "level": "warn",
+   "item": "C2",
+   "source": "X平台",
+   "url": "https://x.com/CarbonBrief/status/2090114334328303937",
+   "msg": "title_zh 机翻残留英文: 问答：中国可再生能源“十五”规划对气候变化意味着什么？✍️ Written by @_AN_Patel and Leka"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/EPA/status/2090110117471498688",
+   "msg": "标题超长(276字): Communities all across this country deserve clear rules, responsible development…"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/IEA/status/2090107795509022867",
+   "msg": "标题超长(276字): Global electricity consumption from data centres surged in 2025, driven by AI An…"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/CarbonBrief/status/2090096200103936039",
+   "msg": "标题超长(274字): Interested in the intersection between food systems, land use, nature and climat…"
+  },
+  {
+   "level": "error",
+   "item": "C1",
+   "source": "Mongabay",
+   "url": "https://news.mongabay.com/2026/08/new-zealand-opens-marine-reserves-with-groundbreaking-maori-co-management-model/",
+   "msg": "非中文标题缺 title_zh: New Zealand opens marine reserves with groundbreaking Māori "
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/CarbonBrief/status/2090085137199386926",
+   "msg": "标题超长(201字): Guest post: What 1.5C overshoot would mean for climate impacts and adaptation | …"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2090085125245514128",
+   "msg": "标题超长(274字): 📢 Don't miss out & submit your projects now! To help accelerate the region's ene…"
+  },
+  {
+   "level": "error",
+   "item": "B5",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2090085125245514128",
+   "msg": "摘要含 HTML 残留: 📢 Don't miss out &amp; submit your projects now! To help acc…"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/IEA/status/2090084160291446842",
+   "msg": "标题超长(275字): AI is becoming dramatically more energy efficient. At the same time, electricity…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EIA",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1oTEdqbmh0WUhMY1VUWkMtZUlVTG52QlBYTXpab3dNQlpUZkNXUFRxRWdFODh1NzhhWTBHckFpOFpBQVFwRTRqZWV3QkpsM05WblFFRW5wS0NZaGhTWWpHSmNMdw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE05cGxaUFFlaTR2NFJtZy1la09NZkJwa1V3cDJDSTJQakpTUEs5T0NheXZkaGhsMHpTdVZyblQ3SU84OU94emRQdHJsT1NzQ3pCUWpTTg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本资源能源厅",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1lM25sRnJfRzJLbWVfUDlkS0VlcWtoVzcteE5WcEpSSlY1UFBSM3BHZnV0Z3poZTl6YlE4eFYzZ0MtVEFuYUw4TDhqdHZpRTYtN3ZkQnNLVTFGT3Q1UXlPN0xCNVVNakwxZEVLcFdzQ3FRYVB0?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 令和8年度「運輸部門におけるエネルギーの使用合理化・非化石エネルギー転換推進事業 → 2008财政年度“运输部门能源使用合理化/非化石能源转换促进项目费补贴（内河航运"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本资源能源厅",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1lM25sRnJfRzJLbWVfUDlkS0VlcWtoVzcteE5WcEpSSlY1UFBSM3BHZnV0Z3poZTl6YlE4eFYzZ0MtVEFuYUw4TDhqdHZpRTYtN3ZkQnNLVTFGT3Q1UXlPN0xCNVVNakwxZEVLcFdzQ3FRYVB0?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE9HZS1ZbEIxTmd5UUVlb2FzS19iZnNZUDA3SnBVQXNFQlJrQXgzN2RmUW1BOHEtMmJuYkhXR0NXVjd2MHBUcGxpWlBoWUlZSmd4WWNmQ0JUdmVtSUZ2dUE?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE1jbG1FdmpIblU1M2tpM3g1Uzh4YkI4eFRySG9MTEF3ZHNVdWtmbTgxVkZSY091SG5PSlg2alBfM2RpT3NZV1ZlczdaYmtYYjNDQlJLaA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2090031021844472308",
+   "msg": "标题超长(253字): Smart, #renewable-powered electrification is essential to a net-zero future. @IR…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5yNlBMZ2RPVThPVW90UFhmdHJmSEFfeVZMb3R0OW80aUpvODRma1ZtcDlacWZCdGZ6QXIyVnBIOTNjc0hmUmYyNDdMS0twcnlo?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5uN1pibGk0NHpoQmhpSEpjdTFHNVZ1MEhUN0FPNm9vVzItcTRkcThFQnNrLUREVTlNczRYLWVRajhkYkVTdGpqb3ZlbUVNejBOYUwtU2xaSXAybjRCSkFsWktUUDBvQzZhUWwtUFF5RUJJWlprcXFxVldDalA?oc=5",
+   "msg": "标题超长(192字): Cabinet approves four multitracking projects covering eight Districts in West Be…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5uN1pibGk0NHpoQmhpSEpjdTFHNVZ1MEhUN0FPNm9vVzItcTRkcThFQnNrLUREVTlNczRYLWVRajhkYkVTdGpqb3ZlbUVNejBOYUwtU2xaSXAybjRCSkFsWktUUDBvQzZhUWwtUFF5RUJJWlprcXFxVldDalA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE1fWmdMdHduZ3g4SW1qU0J3YVVyOG1QQVA0a2xYVEtVaWpLSFgzRldxWlo2c0pja3JOT1dha2xaQUg0TTN2TEpQdHR2UGJqUzIzNmdjZ0Z1NGFqYW80TVNIQy1kR2JhQk1PNVZKT3BHRG95dHNXLWVrZw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE15VzJOUjdGWG53VmR3anpwc3Z2QnlNWE0zdEx2WlR0Zk5oRmxjTVh4MHd4R01PcEJXM212c1J0MHlObU45SGg2YW9qdndRY19JX3B2Zk92a3hLUURKQ01YRFhMUTBaazBO?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBGYTZZcjM0QXFtcnctdU00OGlBNWdiUUNReldIeWVIaHJBT3BfN2pnZU15NjNyREY5WVRfRGpjb2U1OVJwUy1PUXBxVTR5RlFvYmZZOA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5rN3Y4NWV4emo4RWdmaHFOME9PTWdWRFVSdUZ2bjRncWo0aWxTSE9lWXlKeGdOdmtFM05Rc2dvck95ZWtHamZwaDVqLTNDdUZmU0ZhcQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "澎湃新闻",
+   "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9hbllkMkpfd3Zxem1kbTNyUm90b2hHT3JYcEdidzZyQTd4SHRBbmxGSlhzSnRHcnNnRzFyTi1IaUozNFNxWmdGd1lkZmFwb0ZBMGNqLUdjYk16SG91Qmp3Xw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5VWGFzZ0tNWXlnaWcxSkptVFJNcklzZFdfam45el9vekREVFhEZ2sxNkYwckx0ODM3YmZuRFhFNnhlOFhRdG5maF8xdW9FdFR0MWprLQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/ember_energy/status/2089971881268936969",
+   "msg": "标题超长(276字): DATA TOOL | 5 out of 10 top solar and wind generators in the world are provinces…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPZUtmRE83V1A0a1ZiU0pUVU00Q3dya2RySktBN2lfejhEQnRlOXNjX3BneHJxekxLNHhCMnlkbWhNZ3EyNld5emg5eERVMWxRTTBmcmNHWFVodUtUUG5tWlJhT0RNcVFpWkFjcXJhQWppZTQ1WXcxdUV2VXp4cWlnNTJxLUgyRnFBSlR0NWpEbjZ1Y1JrN2xnN1dDUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2089957783664037896",
+   "msg": "标题超长(173字): Digitalisation increasingly becomes an important part of renewable-powered #Tran…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQeUdpbmFNQk5HVng0WjFjN1dNaGhsblU1d2tZSnpoS0RpUzIzTTM5TlBXT29yUEY0QWF5RGVVQmt3NWNxTldNdEkwUXlYUy1nM1BuT0xQbDhORUhmWlV6TlptU2pmUFc3dkstVnZLdFpET0lIc0pMcldVREVEUkRYcw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE12ZlFKTk9BaHAycFAzSHM5cG9KU0E2Qk9yQTczdHNFWm12MXZzYzZaVnEtb2J5Q2hYTDBPVXgxcDdEcXhJaDllYlA5eVR0VEF1bnFfTEpmSQ?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 「第２回気候変動関連データの活用と適応に関する実践パネル」の開催について → “气候变化相关数据使用和适应问题实践小组第二次会议”"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE12ZlFKTk9BaHAycFAzSHM5cG9KU0E2Qk9yQTczdHNFWm12MXZzYzZaVnEtb2J5Q2hYTDBPVXgxcDdEcXhJaDllYlA5eVR0VEF1bnFfTEpmSQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE84a2liVXNFbHhmWmFNTlBfbTdmS2JleVFsNnlGdUtfd0s2dV92bERTeVZDckRRaXlSTGthb3NCV1l3R2Q0OEFrcGlrV2x4NDQ5V0dYZW9BaVJvYmJINmc?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "warn",
+   "item": "C2",
+   "source": "arXiv·AI",
+   "url": "https://arxiv.org/abs/2608.16890",
+   "msg": "title_zh 机翻残留英文: GxP-Agent：Process-DAQ Topology，用于使用LLM Agent进行可靠的临床试验编程"
+  },
+  {
+   "level": "warn",
+   "item": "B4",
+   "source": "arXiv·AI",
+   "url": "https://arxiv.org/abs/2608.16956",
+   "msg": "摘要截断在非终止标点: …ffort term or its omission, output rail,"
+  },
+  {
+   "level": "warn",
+   "item": "B4",
+   "source": "arXiv·AI",
+   "url": "https://arxiv.org/abs/2608.17202",
+   "msg": "摘要截断在非终止标点: …direction out of the weights in minutes,"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "arXiv·AI",
+   "url": "https://arxiv.org/abs/2608.17270",
+   "msg": "标题超长(144字): Do LLMs Know a Good Hypothesis When They See One? Logit-Based Energy Scoring Out…"
+  },
+  {
+   "level": "warn",
+   "item": "B4",
+   "source": "arXiv·AI",
+   "url": "https://arxiv.org/abs/2608.17352",
+   "msg": "摘要截断在非终止标点: …e detection process that senses traffic,"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "财新",
+   "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1fS2U5VFdCblF1alh2eUVIVnNEUUtVSm1QeVdHa3BheExQWmwzWDNpVkFQZ0NlS3pubHNMWElEcVN2bVVUUVJfNzhuVnhTMkI2QlV6anF6VkxJVVBhS1ZETWVjSS1ZNEk?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPdHlsSXVBY0VDX2V1RTJYOFdIQXBhaGxuamphb2ZKTElmZWhEckRIZVZ5Z2VtRHRoaUktaldac3NUS19JWm13Zk1BNUVFSmIxNm5ldk92cS1VOGM2eDU1cDFUWDJEN2V6Nl9uM2xjLWtwV25OSUpPelBjazktN0lXOVRnczdpVGFLMTlnQ2xaS2xhbFdCZU51Y2Q3b2M2VUlxRHRqZg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPS2JPaU85RGEyVGh6cy10dFhBT3R4VGM1UEZLUEtTc2R4M25IVHQ2U191SHdhcEVZTUY5UElUZWdCQS16MXdxSkItZkJBV3g1dFBKenhYMDRnWWRET21wc0h4Y200SUljM1dRUU5LelQwMHdZTXNnVk1CRkJxT2N6R0c3MzhRTUN4?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 地域脱炭素マッチングイベント 参加自治体情報 低 → 地区脱碳匹配活动参与地方政府信息低"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPS2JPaU85RGEyVGh6cy10dFhBT3R4VGM1UEZLUEtTc2R4M25IVHQ2U191SHdhcEVZTUY5UElUZWdCQS16MXdxSkItZkJBV3g1dFBKenhYMDRnWWRET21wc0h4Y200SUljM1dRUU5LelQwMHdZTXNnVk1CRkJxT2N6R0c3MzhRTUN4?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxPTlpCVkRDcml5dWZTcGtPbHRvMnJWeUJLczNDN09PYXY3czJfS0FvLXFqblZUYkFZMF9EYmZQM3BGQmFhZkN3RjdYODVrUFA4S0xtbmlXbnByQy1uTDU2X3BlbWFFZ25ON2ZDeG9XalNjaTBSR0R6YkZ4bzkxZ2xQVTFWQ3Uzdkt2OFF6YmdFa1N3ZGxSRFdiSHNwYkJSbmJ3QmQ0WDM5LW40ODYyMmFPaGxlQjd1WVA2d1JELV9rQ1VwRGZSV1hoN1hwNUJjVjRjNHdGbEUwbDNQeC1oRzg4X0RDSnpRd2w3Q0ZCWA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE4wX1JuU2syeUZsSjNmWW9ZNnBva0JKQ3JrcER6VGdXTVdjV2JVcXc2djBSUlo3Vlk3VEVJU1MtTFhSY0ZWVm1YemtfejhRbThvZkpValZfbUtobFFKd0RneDZJbXM?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 子どもパークレンジャー事業 ―島のお宝さがしin似島―（広島地区）の開催について → 关于儿童公园管理员事业-寻找岛上的宝藏in似岛-（广岛地区）的举办"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE4wX1JuU2syeUZsSjNmWW9ZNnBva0JKQ3JrcER6VGdXTVdjV2JVcXc2djBSUlo3Vlk3VEVJU1MtTFhSY0ZWVm1YemtfejhRbThvZkpValZfbUtobFFKd0RneDZJbXM?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339230",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339230"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339226",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339226"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339222",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339222"
+  },
+  {
+   "level": "error",
+   "item": "B2",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339218",
+   "msg": "摘要含垃圾词['首页', '网站首页', '联系我们', '加入收藏', '打印本页', '关闭窗口', '返回顶端']: ● 打印本页 ●    ● 关闭窗口 ● << 返回顶端  网站首页 | 联系我们 | 加入收藏 | 网上调查 | 成绩…"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339218",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339218"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339214",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339214"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339210",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339210"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339206",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339206"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339202",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339202"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339198",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339198"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339194",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=339194"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=293214",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=293214"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=290447",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=290447"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=290443",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=290443"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=290439",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=290439"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=290389",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=290389"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=290366",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=290366"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=290362",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=290362"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=290374",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=290374"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=289954",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=289954"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "国家节能中心",
+   "url": "http://www.chinanecc.cn/website/News!view.shtml?id=289922",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.chinanecc.cn/website/News!view.shtml?id=289922"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081218034520348/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608121"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Artificial Analysis",
+   "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5PSWhNR0NsdGJZZUVzQkI0dkhYekcwYmZBMjk3ZmcySVV4YkJXaEJjakpkSTRlY0IySkVLWm9aQlRJSzBtQWhsX093eGhXdkJCUzI2TFRDRjFxT3VjUzBrZG9vUzA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Artificial Analysis",
+   "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFBEdEt0a1ZNamswU0JZcEdWTXQ1bjRTLUozU1BfWmM2X2w1d2tDZmVpOHR5OWxUVVIzSUViS21iTF9xM3BBQTdNMFEtcnBTaEprRmJxTnBlMA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9nY2dXN0xGX0VubXNzVzVpSkFQeVBFRlhQOWxIWU9nanlDUF9jOTlfSmdQMWVyVjYtTmV1d3pRdFZ0R1FTX0tldWYwVnhDOFo1c1JZ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE04dXVZdS1PRnZXYmxtWGwwS1hUN09fZ3kzSHF6NTQwaGVTbGFkVU5hcG8wV2MzcmRuOXRkRWpFQng3YnRwT2tUWVh2enpkUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Artificial Analysis",
+   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1icGRwMkcyM0x2WVlxYUZrQy1SZWw4X05HYVB0ckdiZVZWRXVGTFlrN1RIb2tYNkxOdTlSdkcwWmJxNThSM25Ielprd0llc2xRUGl4SU80bTlLYndOcVE?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFA5TGVVTzVhNjU4RHk2Wjd0M2pMWWUwNmpsWTN6MlkxaDFUSE5UaVVxREZmTkU0b21HT0FGTXlsZzBCQWJJTHhIb05tdkhjZw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Artificial Analysis",
+   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9jLTZqVTZyLUFITERCU0xGVDlzOUFlSlhNaUlaMTdPRl9qeGR1OTU5LTRZZkljbFYwUWlwU19FOU1uc1AzcTJYampKbkR1TUpWNWVNTkpUVkhsR2c?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/OpenAI/status/2089777845187031262",
+   "msg": "标题超长(270字): As models become more capable, the risks associated with developing and testing …"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Artificial Analysis",
+   "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE5raXlRZG45UWh1eDBEb2xTUjVUSkZBUkdZRGtPY3VoeEZTUUtGbUplRnI4VEtaRUxueTQ4QkRNb3dPWWR0WnRxZ25aNTFwYmUwM2Q3RTZ0TUxUbURWblpBWnN3?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Chatham House",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNVVV4eTNJanNDd1JqdUd6MUtINkQ1bXdaS1czelZ1OF9wdmRrZFdpR3hQU3l1aTV5RFpoUVg1bzVuTEY1Zm1Ic21Md2U2NzR3YS1GU21VRHNyemhCRTAxVTR4dmdyWTYtN1FrbzZDZXBfOElBdDd4aktsOS1aMGRXMFFZaFpEcS1sYVp5enJMMFRDTTJCY0w5bE41Wk5vdVREUGQ2Vm5vMl9pNU5KR05LUTRvSENsQnJGQXdB?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "CleanTechnica",
+   "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQY3BCSEhwYUhFNF9WR1RobGJOZzR0UGZfT2U1cUgtRXc1X21MVnRWcF82bE8xUEJILUZlTlNoVmx5UGlYWjE3YndyS3lLdzE0aHdLdEdXVGdlNG1mY0oyY0JCMllUS2pGU01pNmhZZ3dxXzhHZ3ZJdmV0UXFsNXBXb0pEd2xZTFNMX25kU1YzT05WcFVWQ0JwWTAxWC1xR083UjV0NkNNUG4?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国FERC",
+   "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1HeW95MzhJazAybkZWSkYyZDZfTHlrWGZjdDdiTUtjSnNuMjIyZ2tEWHNxbVFoWnA0T3hWZk14aktZZEkxclViLWlEWUZieVhpcjdtbTJKd2l2MXR3WjR0YUlhS0pzeFVKeFZBa2tCSHZMdE41S0VybmkzOEliQQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPSVRWREpUT3ZFSGpMYjkxX2QweF9UT05IZHYwYVRDRm9nVkhLOVVXN3pOVUxUTDF4YndFS2s3dlpRS29aUHZoUG54WGFMcG9wNmVUR3Z3ZUV1ODVKWVVyZGlmVFZyZDJfN1FaUHV4Yy1FRmd6ZHk0ZDlncDhDeTA0ZktteTR1TWtGak9KdnBacE9Lc3FqTGFqVzhqSGh6aFRtblkzYkxxYlFRNXJHd2RvNDBBcTlmdjg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国NOAA",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5Ka0k5bGxHY3V3b2U3SnRUblE3ZkllMXNtRlZYVmRQMFhoRzFkLWxrRUJGMW5jVm9DOFZoVGxWZS1MbU8yMXZvaV84V0laaXFqdlcyd1VPLUZkc2ZsbGt5TlozakNTeHJWbWVLejYzWnpicU5N?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2089717704013889846",
+   "msg": "标题超长(277字): Renewables-based electrification will bring energy #TransitionPathways to a new …"
+  },
+  {
+   "level": "error",
+   "item": "B5",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2089717704013889846",
+   "msg": "摘要含 HTML 残留: Renewables-based electrification will bring energy #Transiti…"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120309.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120309.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120308.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120308.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120309.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120309.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120308.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120308.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120303.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120303.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120302.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120302.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120303.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120303.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120302.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120302.html"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/ember_energy/status/2089714011587629118",
+   "msg": "标题超长(212字): In California and Bulgaria, batteries has enabled solar to meet around a quarter…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBuX1NGUEN4Rms2Z1lBSFIta3UxQmRSLVd1SVMzRUNYTmJpZ3FzWnVGeEdaVndCMnNjRHBRNlQzcWRjdEktUF83LVNBbHZoUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Carnegie",
+   "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOdFJYN2VBSk93ZmZhakV2NHdTLU4zUm1zbUZNdWlwTlpiZm92YmNtZFNmVm56ODI4MDBiRVlqckNrOS1SWk1HWmJaSWtLeHhkSkp2MzB1WW5KUC1pSl9nOHNYVU52LXhTY19lREhmaFYtZURzYk80RTcwUlhhemRMWk1hcVZWUnZyekE?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE55WFlJeVhMN0dGTmVaeFBRbU5LWjBFSGs2STFuNUNaSUdLUy04YUN3MDRMUWluUDkwQ0VyVXN4OERoTWc5ZndhSVBMOXk5QQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120298.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120298.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120298.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120298.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120296.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120296.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120295.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120295.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120288.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120288.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120284.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120284.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0818/120282.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120282.html"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "CleanTechnica",
+   "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOY3ROZmlRMl9CUGk5QVRaQlJ5ZFZqOGVfdWNOZnZPMFFFQjVsQklTWDJMcE9Ub2FxNEVlYlhaVXgyc203TDU1Nmt6Z1pjS0R1RnVPQ0YwYU9YeDhVN25OaDEyRHQzRTVXN2Fpa0Jkb3hCeWZDTGZPOXl5cTR0bk9MdVJUbFQtVGdRWXZueFY1eFpYeXBYWm1XXw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9hV09GNzBfMC1XZGN0eUVWTlVwRkxRNEV2UHNVUmhrcTZsMVY0NmY5Y2VMSzE4bU1lNk1TeE5DdUFOWVV6LU1zQnAzS000dFVtN25UVXI3M0MxVFd3SV9IZks5SlcwMW5i?oc=5",
+   "msg": "标题超长(121字): India calls for People-Centric, Implementation-Oriented Environmental Action at …"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9hV09GNzBfMC1XZGN0eUVWTlVwRkxRNEV2UHNVUmhrcTZsMVY0NmY5Y2VMSzE4bU1lNk1TeE5DdUFOWVV6LU1zQnAzS000dFVtN25UVXI3M0MxVFd3SV9IZks5SlcwMW5i?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "环境规划院CAEP",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5YZnRvcjdVaXFiaWJwbjlmbXhkNy12Ymhxcld1VGtMcjA2Q2gtR0U4MXdPMEdsdHlPQ0RyNW1DcmVvcWZ3ajh2aFlfZEowbVczVUVBNEYzZHRJdDRkNXRvaVhrSlNOVEZwbmRKc2tUTQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBqbGt6a2U0R3VOc2tVSXZSdzFGX2ZjTkNRUS1GOGZrZk5hTEJMQTZkMFRHLXJQaVRfQjlHb0tXWGNJUm0wRWV6cGdOZktpUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9uM3RIMmpPUWNCZmtVdm9YODJIWTRvcEdVZ2lfT0lzNW1WeFFpZjVxRlhhY0NJcnk5WDFHRjlzcEo4Uks0RDlBalp6VEZ5VE1xRDRFazZ3amN5dnhKQ3lHTmxXdmMtWmhDZHRj?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTE8zdW5HRFdqc1RvLUFhUWdScFVvV081MXV2X1ZidVQyblgzRUhoaEo2bnpzMFF0bkdkUXZ3dm1QWjFsTjdlSFZyMEtVbXJ4NWlyYXhRSEVuMjJwQ3d4MUN3anNDNWpBMVFvZy1V?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "error",
+   "item": "B2",
+   "source": "中国环境报",
+   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFA1ZGxVNW10enZub295SnQxdzRNN1NQT0tmTzEtank3SWdBSHpaV1BfSkJ4ejdJcEVPYV8wd3REREl4U3VxYnRyWUlxcUlxa1BOeWdySGNkaHRseU0?oc=5",
+   "msg": "摘要含垃圾词['联系我们']: 时间：{{content.publishTime}} 来源：{{content.source}} 作者：{{conten…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "中国环境报",
+   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFA1ZGxVNW10enZub295SnQxdzRNN1NQT0tmTzEtank3SWdBSHpaV1BfSkJ4ejdJcEVPYV8wd3REREl4U3VxYnRyWUlxcUlxa1BOeWdySGNkaHRseU0?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/BloombergNEF/status/2089608236022255626",
+   "msg": "标题超长(267字): The #BNEFSummit New Delhi 2026 is right around the corner! 📢 We are delighted to…"
+  },
+  {
+   "level": "warn",
+   "item": "B4",
+   "source": "X平台",
+   "url": "https://x.com/BloombergNEF/status/2089608236022255626",
+   "msg": "摘要截断在非终止标点: …vernment of India 🔸Yashodhara Chaudhary,"
+  },
+  {
+   "level": "error",
+   "item": "B5",
+   "source": "X平台",
+   "url": "https://x.com/BloombergNEF/status/2089608236022255626",
+   "msg": "摘要含 HTML 残留: The #BNEFSummit New Delhi 2026 is right around the corner! 📢…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "CleanTechnica",
+   "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPd09aVkY1NW50S2kwNXpSQ2VHRnVCcVRoYUxTR0xHTU14R1Z1ZlRkTWUwNExjSXFyMFprSW9WSjU0V1FNNG5UcWtNU1pldEYtMTFiWUZfczhuT0E2RldQN2dCUWNkY3R6d0RsSzRBNzBwM0UyUEJ2cFlyRmtNall0clhxTQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EIA",
+   "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE5GSFlKTEU3YXRDUVFMemtCNXFzQXAwQnc1dkQ0SDdINC14RXU2S1lSaEtyZ2xvWWZkVzV1WUc3d1piNWNsNmFyU2FQSE9hVHVMVWZGcl9valZXX0xDUV9B?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBzQW1ZYVhaRnp1SjhsalJSRjYyeUk5ZFczQWRRaW9TM0ZNRFEwU2U5LVh4MlJFU043dDIzVThFc2FnUVN4b19kanRoMjhpWjJ3WHdmaW9HdWVBZmE0ZUQwLS1XbzZHWHlyRl9sOXpBSHFSRkdh?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 総合資源エネルギー調査会 再生可能エネルギー主力電源化小委員会（第4回） → 综合资源能源调查会可再生能源主力电源化小委员会（第4次）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBzQW1ZYVhaRnp1SjhsalJSRjYyeUk5ZFczQWRRaW9TM0ZNRFEwU2U5LVh4MlJFU043dDIzVThFc2FnUVN4b19kanRoMjhpWjJ3WHdmaW9HdWVBZmE0ZUQwLS1XbzZHWHlyRl9sOXpBSHFSRkdh?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "澎湃新闻",
+   "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBzdEtpRjEtYl9iZTVjNjRScGxXbmk5T1N0Qlh6aktBNjN3MklObnVfUVdZTGg0V3hjT1dlOWMtWURWNUZERHVDSTFDel95ajZyVHZKeXl4WFRLQnMxUXctcQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "澎湃新闻",
+   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE04bnBzWWRWMl9aR2s1NHFhNkNoZlpVTWItWXkya0pmU25iYXdhbkNvNlNZTHZtUU9YU2JWc3dBdHZVLVk3VVhEdVVYZlF1b2R1ejh2cERCYXZWTFZ0SXc?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/ember_energy/status/2089547837000319375",
+   "msg": "标题超长(250字): SOON | China's solar and wind generation grew 27% in H1 2025, contributing to a …"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "财新",
+   "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBFa2lqMk4yZ2FucE56QWphSUhibVZiSFhFaktHXzNLMklac0luLTZRaktGV0VTQXR6T1JhUDBHY2k5ZllpZTk1LVlGRDNOakpBTTlxMjM4aEF0bFBXNi1pZQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/KHayhoe/status/2089486268673503603",
+   "msg": "标题超长(267字): I never expected one class to redirect my life. But that’s the thing about curio…"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/EPA/status/2089478629314941133",
+   "msg": "标题超长(277字): Last week, Administrator Zeldin announced the revitalization of the Local Govern…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "财新",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1tb1h0OGVfOTZraDU3TTd6SlJkaUVxZmpmUUtUVVppakh3SlgzNTZRQllkUHVobW5uaERmbUxNN04zYk96cGM4aXU1UmRvTG13dGlkclRhUzFPekd1Zkx6Z1ItNA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Artificial Analysis",
+   "url": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE1seUVsM252TGlGQk5NS2EydExvZXo3YmpFMVhEcFFyYllRZ3VjandnRjBQdGtDT1lrX0h0bmV0YXBIckhkZ2liME1MVFQ5LVFjV2p3UnR4c05VbWRY?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Green Builder Media",
+   "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOZjlvRG5pZHBGbWdyaEt1UGljbXJLUjg4TEVjR1NMMVlhS1J6VktLdkt1RXowaTlJYmN1V1dRaWR0T3dTRFJsUk4tdWp5dDdaQUs2ZzMwaHZpOF84LTFCNnNtd0pwa2gxWGk5bjVmREN5TFZsMk81MG5mR2p4bl9QQk9nTGtCUG110gGYAUFVX3lxTE5RaXd0cGFuYWlGUW5CVWN0QXB4eXlvQ0ZFaV9oTlY5UXBIaGExQWtjRjFZLVBjU0hta1hfbExZWDFXbkJQTDZpYXo1WER6N09YY3pOc0N6US1RYmhUcV9CU0NZcHFMUlNqdXJPanhrczZkX0R3TWZjZDNfa2Iyc09YNWQ3b0xEX0Q2Nk1qLVFRc0hIUkhhSFp2?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBJRU1jZFZ3R0psbS1PZXIyQk5fc3c0TV90dTNXUWFYV2pMbTItRVhaTGNId3c1VEVITWx2YldaSGJsVGV5OFZ3WWlEOWh4clFxT2Y1QUxybmxMMlZUVXJyMm93LWxfeWVi?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/ember_energy/status/2089366643352785002",
+   "msg": "标题超长(193字): Bulgaria and Chile added enough battery storage in 2025 to shift MORE THAN THREE…"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081714114337358/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608171"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE9YRy1ReHFtUXowUC1EUW5zSWJJSkV3Z3VYOVZRNEg2TGxwV1JBMklNVUJ5TnY1R0VlZkV0MXlBeFZvdTA1bWFTdmwxRURPNjdLa0pSRA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "RAND",
+   "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE90OFJaQWRGakFHTUxVaXp0ZGhodGFmVzhRczdFQTBXWVJiQ00zTFMwd2YtcFpSMjhURGNvbzVJQlJLak4wRlFIRlA5M0lzdWMwWDVfNU1weDZIbnZ5V1VxdElydHRHMWFHQ3hleA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "财新",
+   "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5LVWRwazhtVXl1N1NyY1IwRXRJSXBFMnh5ZjVYVV91MFBLakZRU3VaNElqNmk0Znk3Mk5maXltbHpHV1gwVkNRdzNVRk5wOG9Cbk9IZTFRdFZfS1FqLVIxdGktNnhfUlk?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNUFVCTWJSUnloTldIMk5BUzFYR3NPZy1uUUtkRkxHendlejB3V29sdVJnUE5qQlpHN25HclFXblRuaVFIWUNBcy0tNXNwSTM5MEljbzBjZzJwWFp2SGwxc0luaGh5M3ktdVNOa2VqX0dfc0NTbHpIMEtsUGRYSldpMzVxU21rOGRDTXBfa0JkZ3NBRkktZ3phSW1Hd0pqSTNmb1FzcG9uT3hIX3dkd1dtNmF6VlBrU1QwTkRZ?oc=5",
+   "msg": "标题超长(130字): EPA Seeks Comments on Intent to Issue Permit to Vault Alliance CCS for a UIC Cla…"
+  },
+  {
+   "level": "warn",
+   "item": "C2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNUFVCTWJSUnloTldIMk5BUzFYR3NPZy1uUUtkRkxHendlejB3V29sdVJnUE5qQlpHN25HclFXblRuaVFIWUNBcy0tNXNwSTM5MEljbzBjZzJwWFp2SGwxc0luaGh5M3ktdVNOa2VqX0dfc0NTbHpIMEtsUGRYSldpMzVxU21rOGRDTXBfa0JkZ3NBRkktZ3phSW1Hd0pqSTNmb1FzcG9uT3hIX3dkd1dtNmF6VlBrU1QwTkRZ?oc=5",
+   "msg": "title_zh 机翻残留英文: EPA征求对向印第安纳州蒙哥马利县UIC VI级注入井Vault Alliance CCS发放许可证的意见"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNUFVCTWJSUnloTldIMk5BUzFYR3NPZy1uUUtkRkxHendlejB3V29sdVJnUE5qQlpHN25HclFXblRuaVFIWUNBcy0tNXNwSTM5MEljbzBjZzJwWFp2SGwxc0luaGh5M3ktdVNOa2VqX0dfc0NTbHpIMEtsUGRYSldpMzVxU21rOGRDTXBfa0JkZ3NBRkktZ3phSW1Hd0pqSTNmb1FzcG9uT3hIX3dkd1dtNmF6VlBrU1QwTkRZ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "RAND",
+   "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBSVDJXZm5zcU12MDduRFlXRWQyb2lmWDhMUGgtaU5JeWk4TXhVREhtNmMyTlpzYWtTOGloUlhPODBIeGZPUGhwTHJlYTNaT2dxRGJaMllVLXJlclJucVJRT1VLb1BPSDhEVmFSZQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EIA",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBZOWszc0E1a2tLWGhMM1l1dHp6bGVhRnBranNQSF9xSGQ2NWE3TzhYQm12U2JDTkxmN3BtQWlrbVZ2R19LT0k1aDZ6Z01MQ0V5MkR3ekx3ZXA0c3RsTVcwVHljUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5rZ1pxb2VSN05VRU01RUY2Q0JnOTRTYlQxWVliU2htUWRiNHlMaDZUYm1rSVNENTNyNUtuSVFabHFYYnJxRnpKODZUUTVfN29NQjY4Tw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Euractiv·欧盟",
+   "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPZGxTbG5Fc2xKbnBKUjF0UWlIRjNGVWtHNE9TZW1lQWFGOVlSNlpqa0dtQTh3UV9fYmN4SVlxS1FabXFwT1dkOExGM1llSmhFM0xYUWxXR0d2bnJ6UHFoUFRSTFdJTDR0dkpvVWM3NGxDbmJFN1oyS2MzdF9mMjVZamZHWlhaRHRfc1dJdDR5cTJZeVdvSVJV?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQT0JWSVUzT3J2YkJfWmcxSFRLYTZlb0NrMDdoM2gteFBhSWxLeHY0Z21pdENMZDlvY0lkdWNxZ3h3aHFYQk5PaXRaWEZybTlEWm0xWkNvaEs2YXExazBFOHZuMC1ET2poUTRtZVgwcVJ0WDRWRk5hMXZFdjBVTE9QblBnUDRiV0YyRk1WVlVuLWktVkJPQlhqY0UyYmtKd3lxZ3Qwb2lQU1BvdVFKOVV0Vy1HTVNWZVFjajhKRlFCYmQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国NOAA",
+   "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNMHJTX0tsRXdRWE9teXJkT0dBWV9BUFVVM0ZYTDdQV1FqZWlKNnNNZ29OU0pYMEEzRTgwdjBWUU9peklUNUxEMXQ1VHZVdmp2TVF4Y3JtbXdPZ0xPTEJHaGNVTncyNXpmTHlNRUx1SlhvNE1iZnk3T3pQUzZJc1hEZmozWGU0T3Z4UGkxYmVwTTVVdDQ4RmQzQnAxakI?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "中国家电网",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5Mc2NpRUpDS1ZGNGdyb2RfUVBjZVd0ZmVqZnRnSFZpb084YUlwLWZmUzZjLUU4ZEpxVGdvcThJQnFUQ0Jrbm0zYVdWUVN6azJORl9MYQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE9XM3k2aW1CYm5JZE1OZWpYTTNNOVVrYmdTM29sbmFLYm4yQVNrZzZWRHpBTDQwUEZxYTN2cExZZzZtUElUdjRnSTJZYjhaXzRMU1dzeA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5obzB5MnlEemE0SDZuaXF3M21UZWdpWHpTTlJoYmQzZUdfUEFMT0lub2IzUFBaX2RRdkQ5SDNNbkZMQ2FHMklzTmhEa1dVZzktRE1KR3UwbFdVbGFqLVRTdA?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 令和８年度地域脱炭素の実現に向けた地方公共団体と企業とのマッチングイベント企画運 → 令和8年度面向地区脱碳的实现地方公共团体和企业的匹配活动企划运营委托业务"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5obzB5MnlEemE0SDZuaXF3M21UZWdpWHpTTlJoYmQzZUdfUEFMT0lub2IzUFBaX2RRdkQ5SDNNbkZMQ2FHMklzTmhEa1dVZzktRE1KR3UwbFdVbGFqLVRTdA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "环境规划院CAEP",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5ERzJSOUtVUWRFLU85WXk0Wl9tZk9zQk4tcld3TFNRMVdxTWlsRnZuQWFwQzdIZkpMcGVoM2Jza2I1dGNLbi1ycXgzQmpsMm03aEhoWVd0c2Y4NHdYWVhtY3JCTTlEaGlnNkZqRkp3cw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5uazhJREVoRnZOU0JiZXdWN2M4SnlGOTFEcnJpZW1hcUFad2d0MUlRam5tX1A2UEdQV3p2eXVkOE1WS1JqSWFHRElSSHNHRDE0eE9PQkhHb3ZlRDJ4N0ZIQ2hRWHFwZDVfellPazc3eDBsNjg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFB4akRpQkNueXQ5YmJUdGJ6dnZCd0Ztc0hOcThnM2djRlNsd1lMYnpIbElOTUp4bEUtQ1ZKYlF0dXVlczRDQjZyYlA2VGRoWDJQMk8tekQ1RQ?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 令和８年度「地域の公共交通×脱炭素化移行促進事業」の二次公募について → 2008财政年度“地方公共交通×脱碳过渡促进项目”的第二次申请"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFB4akRpQkNueXQ5YmJUdGJ6dnZCd0Ztc0hOcThnM2djRlNsd1lMYnpIbElOTUp4bEUtQ1ZKYlF0dXVlczRDQjZyYlA2VGRoWDJQMk8tekQ1RQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "澎湃新闻",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE9fdTh1b1VFWi1SellhUUw4YkVmbUZfZDU2REpfUG5WenZLWk9xdU9RUUlBTElRa3l3dWhFcTBtM09BZ0FXR1ZOVXVZWUF5QQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/EU_ENV/status/2089267666112442600",
+   "msg": "标题超长(271字): 🥵🌡️ Another summer - another series of extreme heatwaves, water scarcity and dro…"
+  },
+  {
+   "level": "warn",
+   "item": "C2",
+   "source": "X平台",
+   "url": "https://x.com/EU_ENV/status/2089267666112442600",
+   "msg": "title_zh 机翻残留英文: 🥵🌡️Another summer - another series of extreme heatwaves, wat"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "CleanTechnica",
+   "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOZ0pHZEhPdVN4TDV2aWU5a1VnY0F6cHVSb3JPZDlKYTFINUxxVm9GNUNucURsLW45U09jUGZ3ck1xZFJzeHBhd1djM3BwVloxYVU1ZmJfWGxEWFh1TVF5aUZRbWwyb3d6T2xwMXlndV9EZkJzdm5XR1M3Q0pLeUxvcmNKbmVMbVJTZE45VjlPMmxqemdPZl9tMVVTMW4?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国NOAA",
+   "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOUXNTUW5uWU95OERkYjQwblZ1TGVsYUh5dnRhUThWZFRKUkI3S3M4bEtKZDBWb1RHc0o5ekFydDIxQmtSLXQtYUZTbXNwLW9TMmJqbVpsMHdidGdrSjlEdUFVVndnUXFFZjdmS1JSWnVMemd5SkFfdU02UmcteFd5MDlDNTVteElMdWQtMk9ZbXJQS0JKNTdJeDh6RWdkNHhDb2VF?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本资源能源厅",
+   "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOaGtnRUlucFV4Q0VMZzA4X0dxY1hfNFlocUlCd2NucTBOcXZuamhvOFp5VTl0cW1hbnNxT19nemlHZFNYR2Z4ZFZWRC1pNF9jSDVWVE5COW9TYUlmMUd6RFlzSnpaejRWRUdIQk1rNV9HbW5FRTNvSEktRjd6ZjlSVkpwdm9fVjZpM3JubVdkdzhBblp5WWpR?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 石油備蓄の状況 （推計値の速報） → 石油库存状况（初步估计数）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本资源能源厅",
+   "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOaGtnRUlucFV4Q0VMZzA4X0dxY1hfNFlocUlCd2NucTBOcXZuamhvOFp5VTl0cW1hbnNxT19nemlHZFNYR2Z4ZFZWRC1pNF9jSDVWVE5COW9TYUlmMUd6RFlzSnpaejRWRUdIQk1rNV9HbW5FRTNvSEktRjd6ZjlSVkpwdm9fVjZpM3JubVdkdzhBblp5WWpR?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNSHFDbTctZmNFMWtWYVE2WnZkNTFyWVFnZ1p6U2YtRmx1Q1gzNjhTS0pVWjJVRTh3N0JZZWt0VGgtZnprNzM3a3RQLWR2a0ROOElZcWZQanpjcWNDNVl2UjhNRy00S3NmdUV1cjdLejJSN0Uxc2l5WWIyWTlxSzNkWg?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 令和8年度「四国地域エネルギー・温暖化対策推進会議における支援プロジェクト」を採 → 通过了令和8年度“四国地区能源·温暖化对策推进会议的支援项目”"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNSHFDbTctZmNFMWtWYVE2WnZkNTFyWVFnZ1p6U2YtRmx1Q1gzNjhTS0pVWjJVRTh3N0JZZWt0VGgtZnprNzM3a3RQLWR2a0ROOElZcWZQanpjcWNDNVl2UjhNRy00S3NmdUV1cjdLejJSN0Uxc2l5WWIyWTlxSzNkWg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2089225459934412877",
+   "msg": "标题超长(268字): #AI, digital infrastructure & the industries of tomorrow increasingly drive ener…"
+  },
+  {
+   "level": "error",
+   "item": "B5",
+   "source": "X平台",
+   "url": "https://x.com/IRENA/status/2089225459934412877",
+   "msg": "摘要含 HTML 残留: #AI, digital infrastructure &amp; the industries of tomorrow…"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFB4NjlVb3ZBem96bVE4QTFyazZqMGNyYi13WTdqUzY3dC1jVDdMcUl4bGVaWlVzSmJyYW5nUGF4SlNWcHRUZXpVU0ZKSGhSYTFJalFkUWgxZTk?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 令和８年度「脱炭素×復興まちづくり」実証事業の公募について → 关于令和8财政年度“脱碳×重建城市建设”示范项目的公开招募"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFB4NjlVb3ZBem96bVE4QTFyazZqMGNyYi13WTdqUzY3dC1jVDdMcUl4bGVaWlVzSmJyYW5nUGF4SlNWcHRUZXpVU0ZKSGhSYTFJalFkUWgxZTk?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFBxc09vcmxEV0huMG9hR0hFaGxVTkpWZkVFbUQ1dThWMm11TEpoYTBJQ2M4M3ZjNy1wMzVYcXhHUkxRQ2NHekdXU3k5X0VtUExZZ3dLdWxhU1NTQ3c?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 「文理分断」からの脱却を！ 時代の変化に対応し、リードできる人材育成のあり方を文 → 让我们摆脱“文明分裂”吧!文部科学省局长谈如何应对时代变化，能够引领的人才培养"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFBxc09vcmxEV0huMG9hR0hFaGxVTkpWZkVFbUQ1dThWMm11TEpoYTBJQ2M4M3ZjNy1wMzVYcXhHUkxRQ2NHekdXU3k5X0VtUExZZ3dLdWxhU1NTQ3c?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "CleanTechnica",
+   "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPQVhsVXktTWxELTJEbzFQYmJodXlfakxQR1hUOXl6OXJ0WG13UnVTRXBMdUFXM2hwdGVOWEFfSnRDeFpETjFVRmtPdFh5a09iQzdHdHZFN21TWkFKanpiRGV2SWs5YnNmSnBjeUJ4aW1XdFd4U0xpb2xMbS02TERHRy1yNTNXenJVc1NlY0RKNlZDNVZxRzNnYTNubF9tMnIxc1B6MkdXM3JtVld4dGxyV0tkajNFMmJzRnZ5bE9tdTM?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE1Ydlc5aXJiV2xBaElCWkptemtRUWg3M0lUREgtZHlBTV9pM0VHTk9MaFRfUmJWM2RvaDNib3dQSUNlcTljQW5rSjZJV1JRVnFvaVE?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQQVJfcHJ1NVRzWTdTVkVFYVpsUG1wVVEzRDRGemk3cEUxVVMzdTZla3JoSnFCN2xHbFk1LThDMWM5WDBvZVVjQ2JfbHY0Z2pBdVFOZGF0TmZjNzUwN0dxbFdxYnQ0eTdMXzV2aS1rSEJzVFYzV2tlcDA4MzVEc2ZKa2hpR2RsN0V6V2Y4R3JnVQ?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 総合資源エネルギー調査会 資源・燃料分科会 脱炭素燃料政策小委員会（第２３回）  → 综合资源和能源调查会资源和燃料小组委员会脱碳燃料政策小组委员会（第23次）[参考"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQQVJfcHJ1NVRzWTdTVkVFYVpsUG1wVVEzRDRGemk3cEUxVVMzdTZla3JoSnFCN2xHbFk1LThDMWM5WDBvZVVjQ2JfbHY0Z2pBdVFOZGF0TmZjNzUwN0dxbFdxYnQ0eTdMXzV2aS1rSEJzVFYzV2tlcDA4MzVEc2ZKa2hpR2RsN0V6V2Y4R3JnVQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "财新",
+   "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5tVUFYeVVLY3IyZEhJR09WRmxYRFJxa09GM2pLVjJQNXB1V3VxUjJWV0pvWTJtRTY5anRHWWdhS21rUkM3a1dkajFtRTFyZ0k3Q0U2U0hOTjlSN0dxZXYyUS0wamI?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOdWJhYjZEejAzaW1jbi1HUVBaOC02b3ZrSUhDdlJSN1J2aEtmem03WFZydHZJYWtINVUwd25mcE9Kc2x3U1BSWVd4aHNDdVRQNXBPUnk1T1pNTGlCNFl5eFlrUHAzYVZOSHg5bDl1QVdBd3RrVFh5eXRMS1d3Q2FUV0JkZw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBqREZCOVduZnM3N0NCSHh1bjJ4UEhUanFYdDlkU2ZBU05pcHJlZ0o4MHIwOFdRMEdaanRTNUJXZ0M4cmhwd3ZsaUk2dkdNcy1wSDF1TFczdXY5WHpZc2plQVBwRUJTZW55Tzhfa0IyUWVwaVps?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 第23回 総合資源エネルギー調査会 資源・燃料分科会 脱炭素燃料政策小委員会（開 → 第23次综合资源能源调查会资源·燃料小组委员会脱碳燃料政策小组委员会（会议通知）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBqREZCOVduZnM3N0NCSHh1bjJ4UEhUanFYdDlkU2ZBU05pcHJlZ0o4MHIwOFdRMEdaanRTNUJXZ0M4cmhwd3ZsaUk2dkdNcy1wSDF1TFczdXY5WHpZc2plQVBwRUJTZW55Tzhfa0IyUWVwaVps?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Green Builder Media",
+   "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOYUJFNTRkaWRPcnk0TVVLX2RpcG1uMmZ6N1h2U0k2dUxtR2hkU25KY3NwS3F1QmVvWlluMmZYRmNFT1lZU19xa2xTRFZ1SVpTYVBqaUhNS1Jody1rZmJObWpUVWRUWWp3cWhkbloyTUtQTWRjajhWak5pQnYxcW5vTy1yVzhSdFJ1TXJoNG0zUldndUFqeWxMUVpYX2JRS1A4R18tZmE2cG1SXzNwWGdqZS1yYTV3bGJTVENwSzA3aFkwN3U3a1E?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "虎嗅",
+   "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE51QjY4V1ZTdDNLZUFLRXcxa3FUamMxcmxQSFhHUHpmLU8xeElVT0p6Tzl4TkZ3dFRkR1Q1TTBQWWhleml0OWdSYTRwekQ0OUtyMUpZMEVkbVM1NDg0T1FJdWxn?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "高盛",
+   "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNam1hakV6TkMxV281SmQ4bFk1UU5vT0NFR2VlZ2tNa0pIUzNSTXJyLUZnWmt5cmNISzQyZmdkREJESzdrSkFPNkFwTXpxbFl2dXRpM09lWXJiR1VVbkVER2ZSTWZrcko5emowcllqazFJeFFrSVh6bHBoal9HVnZmekJ4aVpjTTI1RlI4ang3Z1JDWFYxNWgydEtEWVhDakpNQXliUDd5ODdDX3BmV1RKVkpBRDlTRlFjY3NmSUN6VmhTYzB3ZFZzMDgwTWFfNUVNV1E?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE53U2hjeDdiTGhNNUZFanYzckt1eWk0QUs1S200ZEpOZDRON3lSbGxVOFBBSFN1dmdmZWVhckhhU05Ed1gyUjE0MmhrdkQzUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "36氪",
+   "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE5MSTh1NFNpLVpmTnhCVFZ1T3pkQ3R0S0p3Q2l0b0t6c3I3TFBHTG1QTkFZajZYSkZaNGpvQWZRaDhESzVLdG1QVW9aTkgzZw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "CleanTechnica",
+   "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPNjktcjFiaTRoQXN0aFJONXlTWlhfRkJlSF9RU3kyYWpjbmNjN1EwU0RyN0twOXRYc1R6QjRNcTd3U1N3b2t3d0pGbm5zVHdRTXZPeXlmWEg2eEdudWdZbXlsLWlRU0Q2TmNreTJKa1Q5Q2R5Qm1OSU8za3Z5ZTN3UXVIRjd5S0pPbVBNcFhn?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "澎湃新闻",
+   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFBUY2NhRkZuVi1XWFhvdnlrcjRRTGtSR2ltZlhVM3RjRUw2enN4ZEkxTUF5azVJTWJNN1QyelloRnpCRGo3X1VXNkdndVRRaGVQeHdlYk1ZQTlmaWJ4RHc?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTFBHbGQyTThjSENmQVpDbHc5LUplc2dsVXEyXzYzZDBCbEtjLWh3d3Y3dHZmY0pDSllWbmtPTzA3NXcxeTJCeVRtekY0eUp1c2lhMDhsbTdicXhZTmNnTGNGbkhQOU1PN1huZlpYWDBrMHlxd0lDTDlEWGNYV2s?oc=5",
+   "msg": "标题超长(125字): Harnessing the Power of the Sun: How VCF-SC Enabled Palnadu Solar Power Pvt. Ltd…"
+  },
+  {
+   "level": "warn",
+   "item": "C2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTFBHbGQyTThjSENmQVpDbHc5LUplc2dsVXEyXzYzZDBCbEtjLWh3d3Y3dHZmY0pDSllWbmtPTzA3NXcxeTJCeVRtekY0eUp1c2lhMDhsbTdicXhZTmNnTGNGbkhQOU1PN1huZlpYWDBrMHlxd0lDTDlEWGNYV2s?oc=5",
+   "msg": "title_zh 机翻残留英文: 利用太阳能：VCF-SC如何帮助Palnadu Solar Power Pvt. Ltd.推动清洁能源和农村发展"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTFBHbGQyTThjSENmQVpDbHc5LUplc2dsVXEyXzYzZDBCbEtjLWh3d3Y3dHZmY0pDSllWbmtPTzA3NXcxeTJCeVRtekY0eUp1c2lhMDhsbTdicXhZTmNnTGNGbkhQOU1PN1huZlpYWDBrMHlxd0lDTDlEWGNYV2s?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi2AJBVV95cUxNamh3akpmYjdKdVZMUi1VVXI1aFBwZkZ3VnVuVWV1V0RhZTEwRFJscEh4TjVQTnVSb2VldDNWR01EWUxCdGhXalJ5b2hHbk5lOUUxV0dmMENYTXZxaWVaSGdCNTVDNXAxcmVOTjJpcFRaZjVzbTJFQ3ZJOXhMbV9icXZxaFM4SlhjR0xnV2xyYkhhT3Y4SWkwQVV3WTZPbXpPMDMyc2pSdFJlSWtfeE9TT3BtMWdCVGt5Rk5DSHE0MGozUHBPejI1RWdmcmMzMkpQbjZfMndXbFFja1BOWHM3bzVFaE8yQzhMeUdZZHVNSjA2eF9Eckt0Mkx5aTZCQVRiRVlRejA2SnRwS1hSVFprQnNaVnVZeGRwQlJEZUVlWUhuSFJFVmVleEpVUGhyMmt3ejJUYlV3UkVndlF1MkFvTlpQVlNtRjJfR3R5c1RKU0QwWC1nQ1ZjSQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE9UNENXUHdMcTBqX1RBelhpZDhJdHY0SVp6dWpLRTJLdF9zTHNEbTRwR3I5a0RKRGZKTlZlR3g5end4ZVU4Wi1HeXFxNjI4cTZLdHhScG4xSGlXNmVjZVduSzBBRQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "澎湃新闻",
+   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE0wYW9IUi1mdVZDQWpOTnNmU3hkejA3SWRBcWFaTE9pMWNHZjVSUWl4MFJXR1k5MHZNZDFaMnE5TjNiVWlfVlFYSzh2Q2w2VkMyLU84QlBCSVVFaDEtbEE?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE9BRTJZYURSb2dqYkZIT1BhNFhrQlpkOXNWTFlob0NtUFZEd2N1UUU4Z3Z4NlItdlFGcENjRkFfVEw4NG00VW0wUExkNHJacU1ROGxYZnV1cmJBQ2g4eGhvaVR6VER2enRCSXE0SHhrR2owVGUwYk1ielo2U0E?oc=5",
+   "msg": "标题超长(145字): Agri-Renewable Energy Helping Farmers Access Reliable Power, Increase Productivi…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE9BRTJZYURSb2dqYkZIT1BhNFhrQlpkOXNWTFlob0NtUFZEd2N1UUU4Z3Z4NlItdlFGcENjRkFfVEw4NG00VW0wUExkNHJacU1ROGxYZnV1cmJBQ2g4eGhvaVR6VER2enRCSXE0SHhrR2owVGUwYk1ielo2U0E?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "环境规划院CAEP",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5uQ1RhemgzcS1SbkZ1YkxTLXZhY1dHOVE1R1hFbVEwUnNIUnczUU5IQzFteXo3WUd3SVBYMmFwQWlCV3dKQnZCWUFZVnpFU21aLTdNZW9UOXdPTWN5cmNjbEZqM0xkbFZIU3Y5dVV3aw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "环境规划院CAEP",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5UZUVnWDZuNTZidEN5aEd0ZFc3amNYczZvSVVHTTdmWDJ2azBQLUNXVVktNU93c1VOQXdDd2JUTVdUR3IzcTBhbjhIRlJ4cldIRkhCU1ZQMUVCVEtCa1UwaUhocjRhSzhfMjJGSUJyVQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1WV0YwOHk0OGcwdERucENXOXdKWVRxbHlTVjIwSmdtMGx3MjJUNEhOOUlxZWhSTDRoVkVNeDhzLXZVams4R1BpSHIxWERCWVNldE92dmxxQ3ZySkVocEtfOXNfdUdUUGFFal9FRDlROUs?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5LRUE2bHNNSUNnLXVCRGlSVk9zcmdiYUpiQnV5eGZEQndEa1VWWjk4cFpmS2l4S3paOFFneW9BS3ZCNGVKUEZfQ0I5VTdnbUQxMXdXN3ZTZ09QZ1FIcmFMdzV4NHNVNEY5?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5hekFCNnd3RERtRHFGXzRSQnU1VDcteVp6QmtkNGdGa1ptQkhhR3JadUkydmJZMUNmOUpLQWx2dkFRYTZGRGtGcXNPVnpRVTlLYnJvZzd6aGwwZzBXWWxUOU1uS3Fqa1cy?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE81WmNBa1Y5WWpCNWZLMEJNMzJpeDl4NEg2TzMxZkpWaVYwcmd1dkdiQ0E0ekd4VTR2SGhPakFVcWJCTzNHMjJQS3lOT2ozdkZVdkZCVXVmanNzYm8xam9iVE1qbzZBQV8xWENuZUsxSzM0T3F1NVUtTTZRZFg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081417014187625/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608141"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081410142217598/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608141"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026081411081241742/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260814110812"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081414193264304/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608141"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国NOAA",
+   "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1rN29faEZYcC1ja2E5ODJvYVY3em5VUUpzWFgzTWRaSER0YjVNWWRhelVYT01tLS1tT0x4aDc4am9HVnRGZWYtWlctUFBtdW1mUTBSRGFGdVA3S3NMV1JtWHNyVTM?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国NOAA",
+   "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9GZHNXRTB2cGF5eE5vZFFyUjZpbDE0OFEzckFnc3ZMWXM2cnROck9MOUo1UndzZWttSENiYjNLWHh6a2lDYnduOXpJRG43YWI5SDc0RjA4RXdCajJCdmVkZlVXVkNDazBjMTU5aVdYM2NSdG5v?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "warn",
+   "item": "C2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE12d1JoUUw3NEsyNHZPd3U4YzBhdDB1amd3ellZaTVOMzY0MENXQ1l3OTlxYS0wbWRXUG56SkV1SnRyMlRldDUwTTFYUUpTQkxjNHAxSDdJVmFUVWdCVTR5a0w3UlZPajNT?oc=5",
+   "msg": "title_zh 机翻残留英文: MoEFCC以大规模演唱国歌《Vande Mataram》庆祝“Har Ghar Tiranga 2026”活动"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE12d1JoUUw3NEsyNHZPd3U4YzBhdDB1amd3ellZaTVOMzY0MENXQ1l3OTlxYS0wbWRXUG56SkV1SnRyMlRldDUwTTFYUUpTQkxjNHAxSDdJVmFUVWdCVTR5a0w3UlZPajNT?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMimAJBVV95cUxPVTdEeEZhLW40bHZnX1otTjNOMVVyZGh6SHNGTXZ6X3F4M0k1QVUwN05Lc3pmNExZZmNiZEktbDZCcXdCLVM4Q29qbi1oTy1DVmVEM2p0YUpPenlFNkJraXU2aWMtMUM1OGhpcVZDanFVUGUyRkhLdXdHVm1LOU9EOUhLeWlmTW5tTWVONi11ZkxWXzVkTVB2OUQ4cks5VXJYT0FsOGhraFlmdWFxTUVhX3N4elRRd3BIeTN3djRyUFNGZUVLRVVQYnJXcjdiZnZiRVl6M09MQnFEcFBDZWFoN1EtSVZSY09kemFfdFlzOVJjUXBaM3B6Q0VIQXE2c3h3a182Y19CMEdDSDkyeGloQnV0djZIbWdw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxPTU10TE56OG1oVXJlSkU2MmFnblNJMDRITmNTN3lUSjNlQ21KOTlhOGhJRndad3RmajFpa0RFbkFmSk1aS2tvSnFSY3lVS2RqTFBDODlSYkN5RGNXMEJBeUxOaGQ1UFY1OEFDS2RKSUlrajdZU05rZjJpMlNkQXVoZFEtRU5YODM5TGtxcXNNOEw4SjdXUWNXaklLMnhfUTBLS0UwbmF2b3FNWWtDM2ozTDFoVU9XcE9DSDMtMVlOLXE1d2V3QkwzcjhWMXR6SWduR0NnSzJ5NVAycXJWTDZjRw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPb0tuSzlGYnp4LU9uSGVPbmc2cmlTcFBwa2RzWmcwRmdSWUxHbGV6aFhBVUMyTzBXbEJIRkNTREdVRGl2azhfYmE1c2Q1bnZ2N0tRU3ZvNi1GV25rQjdNUk9NNWplWVppZnJLWjlnUXVRSFotdnMyaDdZaUF6bXhEdldoUjBHLXZwaE9vZjlBT0NURV9UbmxqcjdjZmQxdVVreDZJ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBoOFNnMXZYRUsxX0p4cUdfYUtUUjV0c1AzOGhEWnlmR2xsZjYxUjhsNHA2Z2FTcnZvU1BKQW1RQTlGUXhBZnhCZUdZMjhTbDBwclJBaEc0bFlDMmwxemdSc3RweDdfZDIt?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081410062044799/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608141"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMiuwJBVV95cUxOUDRjVHNLUHBqUWY2QVhaNFpMUWNzSWlfalVoTjBCWnZhbnJuOUc3Wm5rS3VFS05ueXM1akY5QnotRDF5UWxPVmVPYWFaT05XemVsWVlxc3pTclVUM0dycHRIUkFiYnU0ZWVHd05lRFdxdURhejlJTGJ3TWhXa01Jc3ZRdTU1S3NzX096X1hOZ0V1SjM2clhDdzFmQnpFVU0yazcwcnY1UVZUQmR0ek5BeURZMno1SVU2Tjc2QzhEazFQMWp1aHpPMTZ3V1dkekdqNW51Rnhtd1dHTFl4V1NyUHJaZWZuNVZEWGJKdllkQUFOMEJ6U1pjN3dIUTk5X213OEI0X1RKTE9FVmFZZThjMzBNQTQtZG1CQ0k5WjJ4UUlpa0RHdHFsVjI3aDh2bS1LTUMzWHpENWNkelk?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxONW9pZFNCSDZjUkh1SU9FemdpdFBINDI0U3lFN21taDczdEdLTTJKajltajNjZi1JZm9KeWdNSXpFRTZpNy1xWGkzdGJHaHRpNEtuVWUzNW4xS1pIVFl4SVFYck5DMmI5NzllY2UyU3p5WTNJX0xZYS15Z3RveERtZzFoWnhlajAxUlUwZWw0RVdTdXVLTDRVYmp5NzRJaGdGQW9HRkpUVFdEa2hlTlNKdnFBOG9ZNDdITUh2b0doLWtEMk1sU09SM3QxUjV6ck95eEU2TS1vZmdlTmVrek9hYURZWnJLSDVQTjZ4OG1R?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi_gFBVV95cUxPbGI5dE4tdTFRNlVkX0RENFRKa3NNTUhzNkZYUXdKX2hNemY5LWotUlFuYjFiZElPR1V6cUo2OVcwM09KbFg2RS11MjlwelNubGQ5RUNkNVVQaGlwTlB2T0VUS0U0bU5kZ0l5bWQ1S2pDLTlmVXNmMjJTVnRZOFFUNkpGdHM5TFdSY0xtb2lMSXp0X0NOTWRvalZhWDJQOWxCb1pOWVViM2xzWXBubmhpQ3BJY2p3d2xIUzZaa1JFOXliV1lPWmhybkMxelI3SGNaTS1fdWFNQ2Ztcy1reXE5Q041WnRKRWEzOTd6dHYyTUtPN3djYTRnUUljMG5zUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNbHlBMmk5blNmM25rajMyQnlTVnhCVVVsLWVMclNhbFhRd2tCZ3lnT3NHeVBZUkJkWjVjdzhuVW4zcGRfUTVYUmR2OTkxSFJvMzdXNHV1UUdpdEdXRjdacTQ1Mk1IU0R5T1lEVHRzX3NTSnl1ZTdRT2ZZMlFGT25QZmJTZXdSc1h5RGVLbXJGYWU2Ukx5dVlQbVFMODM?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBKcHBGZ0lvbUNkbVNkSExPM1lBUUkzdHdITkVxVW5oYnlMSUZiaHBWZXVic0loX3NxNGwzem1URDlJOWRiV0pnUFQ3UUtxMXpRMFRsNHRtVDlBZDVkeXJxODA0RjFrb2ZpWVhv?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE41NmlfcXh5d2JzQ0dQVWxzM0JBTlBNYmFqM0dYOHduSlBfTDcxdmpfM0dHYk43TERvMzJtSVRvR042amE3TnhKcXltNUFBTURvZGRuQ3VjRHF6Y2RBUXc?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQa014eTZ2bEFmOXlEbFJmS0kyTFR5ZHJ2c1hnX3ljTG1LYXhJbEJGWVUzZG50bVZfUmsyelVMOFFvMkZRc09pZzRjVmhIcFlCaGhxc0dZQzNJdVhrVTh2UWRYNzJsNk14U3FTanRsYkN1UnJGbVpjTTdWQTl6RmhmeDQ4ejZDTnE1LXQ1SUhFdTA2Z3VFWmw5bGZjMGlqbXZVM1J2eDlaUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMickFVX3lxTE0wRE4taUc2WVJ3eG5ubDVoRWxsTFdBVXo0bEpJV1N3RG5yY3cyTm1jSjFnc0dVT29KYUQybVZlMDJzUkZoT2FpWnNTMGJNZ0hvSXJ3Zi1lMkcxVkd6akgxV3VFUmtmMkNMSGVmaTB3dXlOZw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTFB6TDE4WkZVbk1kOGVENDNwSHFkb3d1aFFJSzhqNko0b1dKQlgxcm4xLTYtVmUtQ0UteEVIdEpHYnNLdlZjUDJJbEFFeGQ4UVF3VGRPV1ZQWFJIdjVJeTVwSGFGcFAxOGF5SGJ5X3lLQXFWcldjbGRNTg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOd1Z5Wkk5UnpfbnFsdGxuVEU5RzBIc1ZvcWxCRklrdEFTXzZvWTcydTNUYWNfLUtIY3BRcVRjMkFWR25LdWtLZ19Dd2ZTOUVxMWpwMEJZVHkxUHFKY1JZenBOMXp4MV9SUHJCYnloUE9KQU5CS3otYWp5UHRqVDRjSUtqMlpmbXVrd2FFTkFGZUxHUG9jWFZvVGtEN1UzVU1sd3Z2VmUzMGRkNWtiOHFISUdUZDBtdw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxObm5XVHhzbkkzSXQzUXVlZl9IMjl2aUl5YU5ReUpKR1ozRzlfb3J1dEtFREVNRGJjRGdYdU0xNUFLbk5iY05RUkNvT1VpTmJhNzY2NW5pbTBmeVJfaUZfOEhwd2Z0ck1PVV9WS3h3ME9Jdy1Bc09FNE1CenYtb0F6TjBNOWVwY0pFa3c?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNa2pMeEt2TEl1QWRJSm5fdl92UVVZQ09nUjZXUGxhV3ludEFnVlQ2RWVPU0RfLTA3cUg1OUdncXhFd2pNWHVWeUVYYlJGbU1RS2hQNU1ZMGR0X2d4Tk5iNnlBWjN3ckcxMnIxVTdyY0ZkTnY0NTlyRVVaY3JFSXhlejBtSVBVcnJfZmZxT0wxem9iUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE00Ry1kZmE1MmdQTnlNVTMxaldQSWRTSEdrNlFnS3F2S1hrSTQ3VWpkV21HdS11ZWJlOVltNEFQX1Vnb0RfYzR4bUJLLTRxc0RmT1R5cFE1MWZLcWNMWnBTSWZn?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE50T3pmalFWdWVaRHRfc2htZjV4b2p0aGZKN21YN3VlcTVEOHNIZmRMTW85dnI4Y2VFUXM0NUM1TGpuVlVZaVNqU1FiOHpWTVJOUnlaUUdoeTZ4ZzZVQ0NXNWtWVWtnQkktOUJLNEpja0lzdms?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBmdG1hc1NNb3puWWh1cld1Y1R0M19FRFJ5S0MtQWdZcFhGY3FFY2prUzJOTUE1amJyMjEyZXBId0ZtbE4zUG40dllDdW5yT0N0b1JibHdsSDNMbHJ1RDZOQV9FZHlyUjRvUHpEQVVUVQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "美国DOE",
+   "url": "https://www.energy.gov/cmei/success-stories/articles/eere-success-story-massachusetts-investments-and-awareness-home",
+   "msg": "标题超长(153字): EERE Success Story - Massachusetts: Investments and Awareness in Home Energy Ass…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国DOE",
+   "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOM29NSEM3RE1LNXpBZk12NDRJdkNxaTYwamhkZmNqN2lqU2NKajVLOWwtMzVQSmFVeWZ4MGJSWFNVSHAweVpWQ0RDRUxqQWRYa0QzNkJPS19jUXRpdHVDcU53eUp5ZDNPeU1qbDNDS3JiazF5c0ZiTHY1Q1ZhLUZuRktXMGZZUXp0Ymd3SFd6T3VKZlJUaTlBdHVrdTVqZHlPdlNmR1I4ODY0NTZ3ZDA3MU54Mm5KUW9XYmc?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9YZWZEdF9PdEM2ZmZVNnAyaXJ5UkF5Qk9RT1hnN3o1cEMwNUVBZUhETXF0UklPaUFGNEdOVE1TNHZnc1poQVJaTE9sUUVmOVIxTGtiSXRGdXpCWTAxcmp0dmU0RUVIWFlCcjNLd1pPbnlpY1AzTWJsZ3ZYUWl1UQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxNUzZ2UkJBUU5UR0IyUFFuUU9Lbm9ucjhQUkRab0VwZ3ZYcUVUQkVuMFkyamhIeUxmQWdxV0hSUmdHU3d4aUVNcWEzQThmUUNtaGR5SjNUeEw4NXZTZzNCODBsc1h3eUtkeTNuWUt1MlltSmtTSnhSNFBORjFvVHBreGpGMUI2ejhUNVM1aTRobWZyVEY3ZHZhUDN6OXdEa3ZQY0J2bEdhaEZmNDVmbFVCYlFGNnBjekhmc2dwMGZjLTJtaDluNS1kMTY3TkNBVUpJcGVkcmpOcDFGQ1FFUzJDUXplelMyUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMigANBVV95cUxPVzBwT3pfdHdXTFFNOWpuZl9xeXZlek5GZGJqSmM0NFdYclZUUnB5b18zQkVlMnd1LXpJd0lyelNuRGFzRm8wWU9FcWVTMTlIYm1udHhSWk54UTdldjRFREVja1NGTDlGUjJLNHNjR3lkYy1uSThVeXBoU242cFozV0ZMQ3RkdGRVUEFZZnRCTE95R0lybGdZLXMtTEMzYkNZQ1I5RHRhaTU0c1Y5a0d6dk9kZ2hOVFY2T0FxN0tNR1ZoZ3M1c3ZrbjBjRHlIelI1cTVRb2RsNFpiNnJjMG55NDdTMEZRMEVrZXdvVkNmclZrT1dWVGY2MmpjVjNBRF81bHhRMEdtUW5nSDg2TGVoTzBuVGh2bE1kRWNMZXIzdlZPLXNpUTRvSGlkZ3JLeDJsQUxWNDFjS2EyQzBZSlNGd1lvM0FzaENETnlPWGxnUHF0WU4wZnR4V192MHVuWVJCZHo2cnBpd3ZZWTdZSnlsR0tNd2xDR1pfXzB0cHptdUE?oc=5",
+   "msg": "标题超长(124字): GUIDANCE DOCUMENT 4: CBAM CALCULATION OF THE FREE ALLOCATION ADJUSTMENT TO THE N…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMigANBVV95cUxPVzBwT3pfdHdXTFFNOWpuZl9xeXZlek5GZGJqSmM0NFdYclZUUnB5b18zQkVlMnd1LXpJd0lyelNuRGFzRm8wWU9FcWVTMTlIYm1udHhSWk54UTdldjRFREVja1NGTDlGUjJLNHNjR3lkYy1uSThVeXBoU242cFozV0ZMQ3RkdGRVUEFZZnRCTE95R0lybGdZLXMtTEMzYkNZQ1I5RHRhaTU0c1Y5a0d6dk9kZ2hOVFY2T0FxN0tNR1ZoZ3M1c3ZrbjBjRHlIelI1cTVRb2RsNFpiNnJjMG55NDdTMEZRMEVrZXdvVkNmclZrT1dWVGY2MmpjVjNBRF81bHhRMEdtUW5nSDg2TGVoTzBuVGh2bE1kRWNMZXIzdlZPLXNpUTRvSGlkZ3JLeDJsQUxWNDFjS2EyQzBZSlNGd1lvM0FzaENETnlPWGxnUHF0WU4wZnR4V192MHVuWVJCZHo2cnBpd3ZZWTdZSnlsR0tNd2xDR1pfXzB0cHptdUE?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5hVzNhd0lqYWU4UHgyQUxUS25hWm14SDVvbjl4bHE1U3lCMkZzVXBzRzNhVFoxbzN5UjRSVE1GYXpQMTZDM2JpV3FUdUdwandZeGZ5VXBnUFFuMXAxZzRTc19SZw?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 令和8年8月13日からの大雨に伴う災害に関して被災中小企業・小規模事業者支援措置 → 从2012年8月13日起，针对伴随暴雨而来的灾害，采取支援受灾中小企业、小企业经"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5hVzNhd0lqYWU4UHgyQUxUS25hWm14SDVvbjl4bHE1U3lCMkZzVXBzRzNhVFoxbzN5UjRSVE1GYXpQMTZDM2JpV3FUdUdwandZeGZ5VXBnUFFuMXAxZzRTc19SZw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQNm9jQ1JKSkZWbTdkX3RlUzlESUlXcjRFOWdwYmNKMHdqSkF6YTJSMFRSdFF3emVDeGJyQ1N1bGRYd3NLM1pzMHNJNktoTExXQ0pjbFQ4TnZUaXdOVHQ3UTVObzZTSmZTdUlNQ2VOcXZleVBMM3hlcDd0UmR3OFY3UExDa25icUtIZ0dHa2toLWdXTFNRMV9VaTY2NlZPSDgxODBjQw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "error",
+   "item": "B2",
+   "source": "上海环交所",
+   "url": "https://www.cneeex.com/c/2026-05-19/497602.shtml",
+   "msg": "摘要含垃圾词['注册']: 国家发展改革委 生态环境部关于碳排放权交易收费有关问题的通知  发布时间：2026-05-19  国家发展改革委 生态环…"
+  },
+  {
+   "level": "error",
+   "item": "B2",
+   "source": "上海环交所",
+   "url": "https://www.cneeex.com/c/2025-11-18/496895.shtml",
+   "msg": "摘要含垃圾词['注册']: 关于印发《2024、2025年度全国碳排放权交易市场钢铁、水泥、铝冶炼行业配额总量和分配方案》的通知  发布时间：202…"
+  },
+  {
+   "level": "error",
+   "item": "B2",
+   "source": "上海环交所",
+   "url": "https://www.cneeex.com/c/2026-06-01/497624.shtml",
+   "msg": "摘要含垃圾词['登录']: 上海环境能源交易所关于上海碳排放配额行政管理服务信托（2026年第一次）有偿竞价交易的通知  发布时间：2026-06-…"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "CNESA储能联盟",
+   "url": "http://www.cnesa.org/information/detail/?column_id=58&id=8431",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.cnesa.org/information/detail/?column_id=58&id=843"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "CNESA储能联盟",
+   "url": "http://www.cnesa.org/information/detail/?column_id=58&id=8390",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.cnesa.org/information/detail/?column_id=58&id=839"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "CNESA储能联盟",
+   "url": "http://www.cnesa.org/information/detail/?column_id=58&id=8319",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.cnesa.org/information/detail/?column_id=58&id=831"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "CNESA储能联盟",
+   "url": "http://www.cnesa.org/information/detail/?column_id=69&id=8304",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.cnesa.org/information/detail/?column_id=69&id=830"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "CNESA储能联盟",
+   "url": "http://www.cnesa.org/information/detail/?column_id=58&id=8261",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.cnesa.org/information/detail/?column_id=58&id=826"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国FERC",
+   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxObGREMTBwWFRMRldhTUJwU3FjMURGanBCYU9pYkJwWWpOY3lMRy0wUjIzQ1lVdVVjbmIwakZzUFptdzl2TVkxSHJzTktkcnc2SWVWSVVuZ2VUcUE5bkNZenN0dkVUNFJLM3VYMk03OUZhaUFEeHMxQVpoZGd5dlA1M2NUZWNOYURoQUw4STNtUVV2VElWVHNVbi1UQllFZVhETjZRY2ZLSFhpNFRjMWlWb2tLNmg4Y0o1YkJlSXA1UQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQd1FWbHQySk4yMHlacldwc2ROLVhPSXBzODhac3FCdEd4VzM4cFhDM01KeDdjNGQ4S09XbmZOMjVDdDZGLU5wcjFaMy1QUUFHa1RjVGh5MVM0QUlEYkctWk5KOFpZZ2U1VWgyTmxxU09zYUZmU1JMU2FtbV84RGRCSEdpeVdtZ00yN3hLdGZwaTFCUDJJUHN2MzBQR1VpRlFGNjNVRzJGbEd0Q1NHOUMtc09DVVdJUVdpZzVSVHllSElRWkJuWWE3VkNwT2FzS3E0LWZHMA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPakZNTElWNWtpdWRCY3owT0FIUEN0NmtuV0N5SmZ4eGJHSF9qVmREWnpmRktqaWVIZV9ITEVCdUYzS0RkS1RqS0Nfd1BOMHpPQTl4OUFMV0ZWRTJMTWppQWV3aDVWWnprN2lfemRqZkctalBIWGhDUXNLY2Z2WnN5QV9Paw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "欧盟委员会",
+   "url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxPak51YnhoMzhBV1RBLXhCVjRqU2hzVXNrVDJQZGRRSWJhLW5jcmZVWXlQN1hfZm1nMW9iOGVPRVdOZExtU0wwVF8wUXlRTzBvSm5ZaGp1ZERydm5BdDBvSktVWWZ4TDJQMmxkZ3JoZzAxTWZwdWRTbEJFWnRqYWJnMXBCb1pvVUhjUmVzSWpCUFRXeU5qbWxhamdmcUdSOURzMVlvbVpoTkh1clZKeXRsbTRiQ2txRko4ckx0ZGRsZXZfUlFGWlRVVU5wTkNrYmF6am85ZFpCdlFKaTdSZnhZVE05QS1sUURWTmc?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE9PZXl3enI5TXJOY2JXYXRVNTNzZi1FVHNzMGZZTTY4YVFZbHk1MWVCT0dCN2R0Vnd5YWVjN0wxbE1kc0lPeF9YdFBxUVlaUFBuWHhULXlLc1ZNSmRrMDNDVlVSMk9BVzJBWnVrNjFqTWw2QWNRQ1o1MEVvbw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE5yZkVPRWtXb2dkZWFha1M1SzVuaWRSb3puUnpCYktyN3NFZWRHamFVZVp0Y0pPYTNxdDlBVl9xVUI4Z1FjS1F3c3NDblhuOTUxa09XbHh0NmxDQXJMUklwSURNMDd6R1lGTFVqQTNjYWJIR01Ram5QaE5n?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE9vVHRhUWN5NXVnMGM4U2g0ajZMdFNzdHQta2t2dHNkVXRSWDUwenVZWlJSWXZVcTRJTW44UHVYb1IyM2FsME1sTVRxekdPck8xVHNuVTJuMmk4ZV9udktuYXlqR3p4THV0bVpTQ1hNVjBtYnVuVWFlR1Zn?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "印度PIB",
+   "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE50cEZkeGMtX1B1UVFTLU4zMmhfX3V4eVdEOXFfZVFIdDVVUFQ2b0NwQTFkMWtDRGlobWl1c0xldGhYd1N5S2ljX3hYa0lDcTR6YVpTa1FPMlFhVFpxekFIc0V2Vms4RFdTaHVwbUh1MWRLdGYyRHNaUFlR?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPMXd5M29MRDduSUN4LXVyUlZfT2JyZDJMUXFmME41WU52S0dHZzJVMF8xVFlybzhWSFdZNW43Y0gyRzlqaW9HMnVoZmpQNlA4bGtKWHhReFZEUEx5aEc3TThRTnB0Q3d3QlpfbXpqcno3aTJDNnAzbFlQNTB3c1hMUTZn?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国EPA",
+   "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE9iRmpSWEpHQlFRaGlBZVZLMC1ISExqSE1BQXBoNXptakozaEtaYXdaWThrTlB6ZmpkVkFDNzhCLVVYRGlIam9sZGVuVTAtQVBxVFVWbGp5OHVmanNtMHNEdm5pbkZpbUk?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9FVVpQSXRCS0xoTVdkOE9oZXNFWVF4YWpLZ0p6SldwaS10T2VieHVZaEZGQjRUeUN3SmVmcW1felg4bENtejU0NkVMZHNGWFBxUEpJd01NZ0FIbjhnNVRMSHBrT1hoTFpqRlhabHo2UTFZcWlvejJXaE5jMHExaHc?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 指定暑熱避難施設（クーリングシェルター）・リンク集 → 指定暑热避难设施（冷却避难所）·链接集"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本环境省",
+   "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9FVVpQSXRCS0xoTVdkOE9oZXNFWVF4YWpLZ0p6SldwaS10T2VieHVZaEZGQjRUeUN3SmVmcW1felg4bENtejU0NkVMZHNGWFBxUEpJd01NZ0FIbjhnNVRMSHBrT1hoTFpqRlhabHo2UTFZcWlvejJXaE5jMHExaHc?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "C3",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5QcEltVnpBdjhnMFJ4cV9vQzBUWWkyZlEyMmpESWs3UHJfcVhzd0hRQXhqLXhYQjhZVEhuZ3I1YnJ1b1JKa1ZmNHZWQzlyYkVDSl82VkU5NmU1OTZ2V1lTMHN6NA?oc=5",
+   "msg": "中文标题却有不同 title_zh（疑似误翻/回译）: 水素閣僚会議（第8回）及び水素・アンモニア国際官民シンポジウムを開催します → 氢部长级会议（第8次）及氢·氨国际公私研讨会召开"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "日本经产省",
+   "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE5QcEltVnpBdjhnMFJ4cV9vQzBUWWkyZlEyMmpESWs3UHJfcVhzd0hRQXhqLXhYQjhZVEhuZ3I1YnJ1b1JKa1ZmNHZWQzlyYkVDSl82VkU5NmU1OTZ2V1lTMHN6NA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "CAP",
+   "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQdy1zVDVrRGJJT0tUWVlpM0dyV2x0Q1BsczVPUFNMeW13ZGh5Ymhleno2dWRuS0FLSXpqdjdmRFFDUXBBeXFqeG9CLVFrNGRtYXVOdDA1RGNRNFlQZVh4SXJwWm1Od1kxQ1Z0ZXgyQ3hTNDFCdHk3eFIwcTZDWHYxYV9Wd20?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "美国FERC",
+   "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQbTZkOGZTX3lWdHk0VktCMHYyTEx4dzJBRDMtbVVtMUFLRUJYQk12RHQ1VzVVLUtWRHY0RUFqQTg4ZGZCc21KU1lObi1MZUZpd2JSbUh6RGxCNWVISWExN1lwMnJZQVZtSk1xVl84ZlotZVNEY2FEX2RUTVpmUVY3REtHcENIR1VKNy1tbXAySDM1Um9uN0ZBVlk4YnU1ZVBkUDY3VjNmeVBSNzFGY1FveVB1SFhDSFhXQjRmZg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "高盛",
+   "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxORGNteVdpeWhJR3p0ZFNYUTFzSWR1Sk5rTnB0Ty0wOXRqaS11MjJ2bjItZi1oQ2JycDFWWGREQUItN2RFVDlqbTNQVEg3bHlXckxjTTNGdXVzVzRXTVgzdGcwRllsTzQxNy1YaklBamJJVXJNRUZobGdtcXk5UXJaYUREWTQ1aFdsaXlPdnZQZzZjZkRrLUF3NEtkSzJQb0lRclVfRGpWTlhoU3AzWGszckU0dUJzckZUU0RkZkR0OVhVV0wyOU53?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081218065921908/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608121"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0812/120135.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0812/120135.html"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "绿色和平",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5RVWs1YVdkdVZ6OExOV1JMX2hlS3V1c2haWUxzb19WRWVYYlo2TlBFai1FVHRSYjgyaXdQXzlBMG82QTh5OGdVU2RaTWM2VHpuM0IzdDdsSzJOM2pMTXhWM0syZ1VJdTdTTHFBeWJhUQ?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "高盛",
+   "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5RQjZNNmpkWnRqbUwtRmxtZ3VRd3NqdlFxcks1TnY5MVlONGNRdl9semdrMlR0OU10THBpMWprb3lEcHFlV2ttWEVnOXAxODAyWTlvOEhuajlKOXY4TmZOZ0RjVldmYUpUdWNkNzlUYw?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081018132329141/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608101"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081015473613597/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608101"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026080708481628617/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608070"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0807/120017.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0807/120017.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026080614361480356/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608061"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "高盛",
+   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOakowTjA1Z05IMHZQZ0hoTXlvYzZ1WmJQWm4ybUxQeGVVM2MwM3BtVk9lNkJWUTZHOVpPczFZazdjVmxGajBLVUNXQ0ZoZ2dZYWR5WlloNUxzclpQcHliV1FOVW1xVDEzeTdzV0p5V3h4dmt1dlJkbnNxUXVWZVdFZTFtWmhVZ2V3XzZsRVR5N0NIYmNFV0lpS2hpMHpKTzlNcXNZaXpYVkRkMk5FcmRJemFB?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "高盛",
+   "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBvZ2JJbEJCSHVqaGFfdG55ZVNUSEJBbnU4eEtHc193SFVyWHZieEtLX1RYQ2VIUzdaN2RmMEJrTzJ2Y0UyMnB6a2VSYm5VMl9TdWRHZTZfaUVHOE5YV2dj?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "RAND",
+   "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE5PYkplTjhZOV9iY2c4ZENNbEgtNFlWTWR4Nk9oWWM2b1h1UzJ2SVRfWGRGOHRLRExhcy1Qb2U5VnV0cFlMcHFkbkdIdjdJUTdtbzU5Z2o1ZzN6eEJPSEVkRXc5bHg5dXZpcGtSdA?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026080209562668921/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608020"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026073110395678929/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202607311"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Carnegie",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxQa3BQZG80TWktTVM2R1BsUVRWQ0VHYkdkdGpVRlM5MGFxVTBEbTJzclRTdjFpTGozenhXT2M1WnZVSk5zYXUzRTlnd0NRU21rekVweTluSkxEa0NYS2JRNTk3RWlqeWVWbktnSDdtSDlPV2tXVFRETHItLUwwZG8tQjMybjZNWU9oTGE5cVhWeDZVSGtIVDc1WVhlRnZvcjY5bTZvMUQwanBRc2dxOHlTdWl2aUczUlE?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Chatham House",
+   "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPWG1rSm9QVk1OVXJqdFJPVTlLWE9OdUtZVE5wSGFtYmRFbVhoMWVSU2VGMzNPOFNqZ2V4cVBwV0wydk15dUxJV3dLX0xlT3VxRWdRT08taE1BaUNqQ01FZlp3UFdjb1hpZzNDXzBOYmE2YWNiMGwzNDVLbGpFNXdKUDFmdTcyamxLSWNvakhnNWl3LUxRdlZBTm56c1BLYTk3UFA4VTdLYVg?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "A3",
+   "source": "TERI·印度能源与资源所",
+   "url": "https://www.teriin.org/press-release/teri-releases-landmark-report-and-discussion-brief-sustainable-land-futures-utility",
+   "msg": "标题超长(125字): TERI Releases Landmark Report and Discussion Brief on Sustainable Land Futures f…"
+  },
+  {
+   "level": "info",
+   "item": "E2",
+   "source": "Brookings",
+   "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQejJIQkFqZ0xYSEFWMGRHSlVWY0t0X0NaSENjMG9TdDRpaXgwcGVVUVFmR1FETFI3UGdvVTZhZFRqM0sxOTlmMGEyajkyUjJfcHU4VmJnVDByMmVSRmxaSUZndXROZ0FlZEJHc09ZSllDLTN3Y2padmtRaURQWThuQkE1UUN5b04tOFdEdDcySU0?oc=5",
+   "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0721/119538.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0721/119538.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0716/119442.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0716/119442.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0710/119317.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0710/119317.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国碳交易网",
+   "url": "http://www.tanpaifang.com/tanguwen/2026/0707/119191.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0707/119191.html"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026062217004860278/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260622170048"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026043016462874303/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260430164628"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026042416471211132/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260424164712"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026041715444050196/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260417154440"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026041514283057907/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260415142830"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026041016520189316/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260410165201"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026040214493162846/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260402144931"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026032016195944841/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260320161959"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026031817003226287/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260318170032"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026022716464561760/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260227164645"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026022621052899567/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260226210528"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026020619591971323/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260206195919"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026012016220085069/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260120162200"
+  },
+  {
+   "level": "info",
+   "item": "E3",
+   "source": "中国人民银行",
+   "url": "http://www.pbc.gov.cn/tiaofasi/144941/3581332/2025123114405412342/index.html",
+   "msg": "http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20251231144054"
+  },
+  {
+   "level": "warn",
+   "item": "F2",
+   "source": "",
+   "url": "",
+   "msg": "最新24h无条目（可能正常低更新）: ['allnet', 'bjx', 'bruegel', 'csis', 'iea', 'irena', 'jiqizhixin', 'mee']"
+  }
+ ],
+ "by_category": {
+  "E3": 76,
+  "A3": 29,
+  "B5": 5,
+  "C2": 6,
+  "C1": 1,
+  "E2": 153,
+  "C3": 16,
+  "B4": 4,
+  "B2": 5,
+  "F2": 1
+ },
+ "source_counts": {
+  "pbc": 30,
+  "mongabay": 30,
+  "arxiv_ai": 30,
+  "chinaenergy": 29,
+  "aihot": 26,
+  "radarai": 24,
+  "tanpaifang": 21,
+  "x": 20,
+  "india_pib": 20,
+  "chinanecc": 20,
+  "cneeex": 20,
+  "us_doe": 19,
+  "eu_commission": 17,
+  "ccai": 12,
+  "huxiu": 11,
+  "openai": 11,
+  "cleantechnica": 10,
+  "36kr": 9,
+  "us_noaa": 9,
+  "ideacarbon": 8,
+  "therobotreport": 8,
+  "us_epa": 8,
+  "jp_moe": 8,
+  "goldman": 8,
+  "jp_meti": 8,
+  "teri": 7,
+  "thepaper": 6,
+  "artificialanalysis": 6,
+  "us_eia": 5,
+  "caixin": 5,
+  "nea": 5,
+  "cnesa": 5,
+  "carbonbrief": 4,
+  "caep": 4,
+  "miit": 4,
+  "us_ferc": 3,
+  "e3g": 3,
+  "rand": 3,
+  "jp_anre": 2,
+  "chatham": 2,
+  "carnegie": 2,
+  "spectrum": 2,
+  "greenbuilder": 2,
+  "venturebeat": 1,
+  "worldbank": 1,
+  "cenews": 1,
+  "euractiv": 1,
+  "cheaa": 1,
+  "ndrc": 1,
+  "americanprogress": 1,
+  "greenpeace": 1,
+  "piie": 1,
+  "agora": 1,
+  "brookings": 1
+ }
+}
