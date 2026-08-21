@@ -863,6 +863,25 @@ _NAV_JUNK_TITLE_RE = re.compile(
 )
 
 
+def _clean_summary(raw: str) -> str:
+    """统一清洗摘要（2026-08-21 QA 系统发现）：
+    1. html.unescape —— X 平台 SSR content 属性 / 部分 feed CDATA 的 &amp; &quot; 残留
+    2. 去除 {{...}} 模板变量 —— 中国环境报等 Google News 收录模板页（{{content.publishTime}}）
+    3. 清空标签序列（模板变量清掉后残留的"时间： 来源： 作者： "）与版权页脚
+    4. 压缩空白
+    保守清洗：只处理明确噪音，不动正文内容。
+    """
+    if not raw:
+        return ""
+    s = html.unescape(str(raw))
+    s = re.sub(r"\{\{[^}]*\}\}?", "", s)  # 模板变量（含未闭合的 {{item.publishTime.）
+    # 空标签序列：模板变量清掉后"时间： 来源： 作者： 编辑： "只剩标签+空白
+    s = re.sub(r"((?:时间|来源|作者|编辑|责编|责任编辑|监制|采写|记者|摄影)：(?:\s|$))+", "", s)
+    # 版权/页脚残留（中国环境报等：本作品…联系电话…，允许跨句号）
+    s = re.sub(r"本作品.*?(?:联系电话|版权)", "", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+
 def _is_nav_junk_title(title_clean: str) -> bool:
     """True if the cleaned title is a site navigation/landing-page title, not an article."""
     return bool(_NAV_JUNK_TITLE_RE.match(title_clean.strip()))
@@ -902,6 +921,9 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
                 # 去掉尾部 " - EPA (.gov)" 类来源标记
                 title_clean = _strip_rss_source_suffix(title, entry)
                 if len(title_clean) < 8:
+                    continue
+                # 纯日期标题（Google News 收录日期页/日历页：\"08/19/2026\" — QA 2026-08-21）
+                if re.fullmatch(r"\d{1,4}[/\-.]\d{1,2}[/\-.]\d{2,4}|[A-Za-z]{3,9}\.?\s+\d{1,2},?\s+\d{4}", title_clean):
                     continue
                 # 过滤纯导航/栏目页标题（Google News 把站点导航页也当文章收录）
                 if _is_nav_junk_title(title_clean):
@@ -2307,7 +2329,7 @@ def fetch_x(session: requests.Session, now: datetime) -> list[RawItem]:
             r = session.get(f"https://x.com/{handle}", timeout=20, headers=X_PAGE_HEADERS)
             r.raise_for_status()
             for t in parse_x_tweets(r.text, handle):
-                text = re.sub(r"\s+", " ", t["text"]).strip()
+                text = html.unescape(re.sub(r"\s+", " ", t["text"]).strip())  # SSR content 属性里 &amp; 等实体不解码 — 2026-08-21
                 if not text or not t["url"]:
                     continue
                 published = parse_iso(t["published_at"]) if t["published_at"] else None
@@ -3272,6 +3294,8 @@ def main() -> int:
         # 统一清理标题尾部源名后缀（" - EPA" / " - CleanTechnica" 等），
         # 覆盖各 fetch 函数未单独清理的 Google News RSS 源（2026-08-18）
         clean_title = _strip_title_suffix(raw.title)
+        # 统一清洗摘要：unescape + 去模板变量（QA 2026-08-21：X 平台 &amp;、中国环境报 {{content.*}}）
+        clean_summary = _clean_summary(raw.meta.get("summary", ""))
         record = {
             "id": tid,
             "site_id": raw.site_id,
@@ -3284,11 +3308,11 @@ def main() -> int:
             "published_at": iso(raw.published_at),
             "first_seen_at": iso(now),
             # 抓取器自带摘要（radarai 的 GitHub 项目中文描述等）→ 参与打分 + 前端摘要
-            "summary": raw.meta.get("summary", ""),
+            "summary": clean_summary,
         }
         all_items.append(record)
 
-        if is_policy_relevant(clean_title, raw.url, raw.site_id, raw.meta.get("summary", "")):
+        if is_policy_relevant(clean_title, raw.url, raw.site_id, clean_summary):
             green_items.append(record)
 
     # 24h window filter for web output

@@ -1,11 +1,11 @@
 {
- "generated_at": "2026-08-21T02:17:05.555837+00:00",
+ "generated_at": "2026-08-21T02:31:13.450662+00:00",
  "data_file": "latest-24h.json",
- "score": 72.5,
- "score_level": "C",
+ "score": 88.5,
+ "score_level": "B",
  "totals": {
   "items": 497,
-  "error": 11,
+  "error": 3,
   "warn": 11,
   "info": 274
  },
@@ -36,13 +36,6 @@
    "source": "X平台",
    "url": "https://x.com/CarbonBrief/status/2090114334328303937",
    "msg": "标题超长(245字): Q&A: What does China’s 15th ‘five-year plan’ for renewables mean for climate cha…"
-  },
-  {
-   "level": "error",
-   "item": "B5",
-   "source": "X平台",
-   "url": "https://x.com/CarbonBrief/status/2090114334328303937",
-   "msg": "摘要含 HTML 残留: Q&amp;A: What does China’s 15th ‘five-year plan’ for renewab…"
   },
   {
    "level": "warn",
@@ -92,13 +85,6 @@
    "source": "X平台",
    "url": "https://x.com/IRENA/status/2090085125245514128",
    "msg": "标题超长(274字): 📢 Don't miss out & submit your projects now! To help accelerate the region's ene…"
-  },
-  {
-   "level": "error",
-   "item": "B5",
-   "source": "X平台",
-   "url": "https://x.com/IRENA/status/2090085125245514128",
-   "msg": "摘要含 HTML 残留: 📢 Don't miss out &amp; submit your projects now! To help acc…"
   },
   {
    "level": "info",
@@ -378,7 +364,7 @@
    "item": "B2",
    "source": "国家节能中心",
    "url": "http://www.chinanecc.cn/website/News!view.shtml?id=339218",
-   "msg": "摘要含垃圾词['首页', '网站首页', '联系我们', '加入收藏', '打印本页', '关闭窗口', '返回顶端']: ● 打印本页 ●    ● 关闭窗口 ● << 返回顶端  网站首页 | 联系我们 | 加入收藏 | 网上调查 | 成绩…"
+   "msg": "摘要含垃圾词['首页', '网站首页', '联系我们', '加入收藏', '打印本页', '关闭窗口', '返回顶端']: ● 打印本页 ● ● 关闭窗口 ● << 返回顶端 网站首页 | 联系我们 | 加入收藏 | 网上调查 | 成绩查询 |…"
   },
   {
    "level": "info",
@@ -612,13 +598,6 @@
    "msg": "标题超长(277字): Renewables-based electrification will bring energy #TransitionPathways to a new …"
   },
   {
-   "level": "error",
-   "item": "B5",
-   "source": "X平台",
-   "url": "https://x.com/IRENA/status/2089717704013889846",
-   "msg": "摘要含 HTML 残留: Renewables-based electrification will bring energy #Transiti…"
-  },
-  {
    "level": "info",
    "item": "E3",
    "source": "中国碳交易网",
@@ -801,13 +780,6 @@
    "msg": "Google News base64 聚合链接（未抓详情页覆盖，属正常状态）"
   },
   {
-   "level": "error",
-   "item": "B2",
-   "source": "中国环境报",
-   "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFA1ZGxVNW10enZub295SnQxdzRNN1NQT0tmTzEtank3SWdBSHpaV1BfSkJ4ejdJcEVPYV8wd3REREl4U3VxYnRyWUlxcUlxa1BOeWdySGNkaHRseU0?oc=5",
-   "msg": "摘要含垃圾词['联系我们']: 时间：{{content.publishTime}} 来源：{{content.source}} 作者：{{conten…"
-  },
-  {
    "level": "info",
    "item": "E2",
    "source": "中国环境报",
@@ -827,13 +799,6 @@
    "source": "X平台",
    "url": "https://x.com/BloombergNEF/status/2089608236022255626",
    "msg": "摘要截断在非终止标点: …vernment of India 🔸Yashodhara Chaudhary,"
-  },
-  {
-   "level": "error",
-   "item": "B5",
-   "source": "X平台",
-   "url": "https://x.com/BloombergNEF/status/2089608236022255626",
-   "msg": "摘要含 HTML 残留: The #BNEFSummit New Delhi 2026 is right around the corner! 📢…"
   },
   {
    "level": "info",
@@ -1156,13 +1121,6 @@
    "source": "X平台",
    "url": "https://x.com/IRENA/status/2089225459934412877",
    "msg": "标题超长(268字): #AI, digital infrastructure & the industries of tomorrow increasingly drive ener…"
-  },
-  {
-   "level": "error",
-   "item": "B5",
-   "source": "X平台",
-   "url": "https://x.com/IRENA/status/2089225459934412877",
-   "msg": "摘要含 HTML 残留: #AI, digital infrastructure &amp; the industries of tomorrow…"
   },
   {
    "level": "info",
@@ -1658,22 +1616,8 @@
    "level": "error",
    "item": "B2",
    "source": "上海环交所",
-   "url": "https://www.cneeex.com/c/2026-05-19/497602.shtml",
-   "msg": "摘要含垃圾词['注册']: 国家发展改革委 生态环境部关于碳排放权交易收费有关问题的通知  发布时间：2026-05-19  国家发展改革委 生态环…"
-  },
-  {
-   "level": "error",
-   "item": "B2",
-   "source": "上海环交所",
-   "url": "https://www.cneeex.com/c/2025-11-18/496895.shtml",
-   "msg": "摘要含垃圾词['注册']: 关于印发《2024、2025年度全国碳排放权交易市场钢铁、水泥、铝冶炼行业配额总量和分配方案》的通知  发布时间：202…"
-  },
-  {
-   "level": "error",
-   "item": "B2",
-   "source": "上海环交所",
    "url": "https://www.cneeex.com/c/2026-06-01/497624.shtml",
-   "msg": "摘要含垃圾词['登录']: 上海环境能源交易所关于上海碳排放配额行政管理服务信托（2026年第一次）有偿竞价交易的通知  发布时间：2026-06-…"
+   "msg": "摘要含垃圾词['登录']: 上海环境能源交易所关于上海碳排放配额行政管理服务信托（2026年第一次）有偿竞价交易的通知 发布时间：2026-06-0…"
   },
   {
    "level": "info",
@@ -2092,13 +2036,12 @@
  "by_category": {
   "E3": 76,
   "A3": 29,
-  "B5": 5,
   "C2": 6,
   "C1": 1,
   "E2": 153,
   "C3": 16,
   "B4": 4,
-  "B2": 5,
+  "B2": 2,
   "F2": 1
  },
  "source_counts": {

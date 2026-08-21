@@ -1,35 +1,19 @@
 # 数据质量检查报告（QA）
-生成时间：2026-08-21T02:17:05.555837+00:00
+生成时间：2026-08-21T02:31:13.450662+00:00
 数据源：latest-24h.json（497 条）
 
-## 总评分：**72.5**（C 级）
-- 🔴 error：11 条  🟡 warn：11 条  🔵 info：274 条
+## 总评分：**88.5**（B 级）
+- 🔴 error：3 条  🟡 warn：11 条  🔵 info：274 条
 - ⚠️ 非中文标题缺翻译：1 条
 
 ## 问题清单（按严重级）
 
-### 🔴 ERROR（11）
-- [X平台] 摘要含 HTML 残留: Q&amp;A: What does China’s 15th ‘five-year plan’ for renewab…
-  → https://x.com/CarbonBrief/status/2090114334328303937
+### 🔴 ERROR（3）
 - [Mongabay] 非中文标题缺 title_zh: New Zealand opens marine reserves with groundbreaking Māori 
   → https://news.mongabay.com/2026/08/new-zealand-opens-marine-reserves-with-groundbreaking-maori-co-management-model/
-- [X平台] 摘要含 HTML 残留: 📢 Don't miss out &amp; submit your projects now! To help acc…
-  → https://x.com/IRENA/status/2090085125245514128
-- [国家节能中心] 摘要含垃圾词['首页', '网站首页', '联系我们', '加入收藏', '打印本页', '关闭窗口', '返回顶端']: ● 打印本页 ●    ● 关闭窗口 ● << 返回顶端  网站首页 | 联系我们 | 加入收藏 | 网上调查 | 成绩…
+- [国家节能中心] 摘要含垃圾词['首页', '网站首页', '联系我们', '加入收藏', '打印本页', '关闭窗口', '返回顶端']: ● 打印本页 ● ● 关闭窗口 ● << 返回顶端 网站首页 | 联系我们 | 加入收藏 | 网上调查 | 成绩查询 |…
   → http://www.chinanecc.cn/website/News!view.shtml?id=339218
-- [X平台] 摘要含 HTML 残留: Renewables-based electrification will bring energy #Transiti…
-  → https://x.com/IRENA/status/2089717704013889846
-- [中国环境报] 摘要含垃圾词['联系我们']: 时间：{{content.publishTime}} 来源：{{content.source}} 作者：{{conten…
-  → https://news.google.com/rss/articles/CBMiW0FVX3lxTFA1ZGxVNW10enZub295SnQxdzRNN1NQT0tmTzEtank3SWdBSHpaV1BfSkJ4ejdJcEVPYV8wd3REREl4U3VxYnRyWUlxcUlxa1BOeWdySGNkaHRseU0?oc=5
-- [X平台] 摘要含 HTML 残留: The #BNEFSummit New Delhi 2026 is right around the corner! 📢…
-  → https://x.com/BloombergNEF/status/2089608236022255626
-- [X平台] 摘要含 HTML 残留: #AI, digital infrastructure &amp; the industries of tomorrow…
-  → https://x.com/IRENA/status/2089225459934412877
-- [上海环交所] 摘要含垃圾词['注册']: 国家发展改革委 生态环境部关于碳排放权交易收费有关问题的通知  发布时间：2026-05-19  国家发展改革委 生态环…
-  → https://www.cneeex.com/c/2026-05-19/497602.shtml
-- [上海环交所] 摘要含垃圾词['注册']: 关于印发《2024、2025年度全国碳排放权交易市场钢铁、水泥、铝冶炼行业配额总量和分配方案》的通知  发布时间：202…
-  → https://www.cneeex.com/c/2025-11-18/496895.shtml
-- [上海环交所] 摘要含垃圾词['登录']: 上海环境能源交易所关于上海碳排放配额行政管理服务信托（2026年第一次）有偿竞价交易的通知  发布时间：2026-06-…
+- [上海环交所] 摘要含垃圾词['登录']: 上海环境能源交易所关于上海碳排放配额行政管理服务信托（2026年第一次）有偿竞价交易的通知 发布时间：2026-06-0…
   → https://www.cneeex.com/c/2026-06-01/497624.shtml
 
 ### 🟡 WARN（11）
