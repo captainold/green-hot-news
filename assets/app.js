@@ -669,6 +669,8 @@
   copyBtn.addEventListener("click", copyDigest);
   
   // 搜索框事件（2026-08-23 新增）
+  let searchDebounceTimer = null;
+  
   function handleSearch() {
     const query = searchInput.value.trim();
     searchQuery = query;
@@ -682,11 +684,35 @@
       searchClear.hidden = query.length === 0;
     }
     
+    // 搜索按钮激活状态
+    if (searchBtn) {
+      searchBtn.classList.toggle("active", query.length > 0);
+    }
+    
     render();
   }
   
+  function triggerSearch() {
+    handleSearch();
+    // 搜索后让输入框失焦（移动端友好）
+    if (searchInput && window.innerWidth < 768) {
+      searchInput.blur();
+    }
+  }
+  
   if (searchInput) {
-    searchInput.addEventListener("input", handleSearch);
+    // 输入时防抖触发（300ms 延迟，避免频繁刷新）
+    searchInput.addEventListener("input", () => {
+      clearTimeout(searchDebounceTimer);
+      const query = searchInput.value.trim();
+      if (query.length === 0) {
+        // 清空时立即触发
+        handleSearch();
+      } else {
+        // 有内容时防抖
+        searchDebounceTimer = setTimeout(handleSearch, 300);
+      }
+    });
     searchInput.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         searchInput.value = "";
@@ -698,8 +724,7 @@
     searchInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        handleSearch();
-        searchInput.blur();
+        triggerSearch();
       }
     });
   }
@@ -714,8 +739,7 @@
   
   if (searchBtn) {
     searchBtn.addEventListener("click", () => {
-      handleSearch();
-      searchInput.blur();
+      triggerSearch();
     });
   }
 

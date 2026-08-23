@@ -666,6 +666,7 @@ html[data-theme="dark"] .topic-chip {
   transition: all .12s;
 }
 .search-btn:hover { color: var(--cb-blue); background: rgba(0, 82, 255, .08); }
+.search-btn.active { color: var(--cb-blue); background: rgba(0, 82, 255, .15); }
 .search-clear {
   position: absolute; right: .5rem; top: 50%; transform: translateY(-50%);
   width: 1.3rem; height: 1.3rem; border: none; border-radius: 50%;
