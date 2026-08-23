@@ -2462,57 +2462,57 @@ def score_content_strength(sub_dimension: str, title: str, summary: str) -> int:
     return DEFAULT_STRENGTH
 
 
-# 2) 来源权威分（site_id → 0-25，v2.0 上限从 30 压缩）
+# 2) 来源权威分（site_id → 0-20，v4.0 从 25 分制压缩：匀 5 分给 TRL 第 6 维度）
 SOURCE_SCORE: dict[str, int] = {
-    # 部委官方
-    "ndrc": 25, "mee": 25, "nea": 25, "miit": 25,
+    # 部委官方（20 分）
+    "ndrc": 20, "mee": 20, "nea": 20, "miit": 20,
     # 国外主要国家政策源（2026-08-14 新增：官方部委档）
-    "us_epa": 25, "us_doe": 25, "eu_commission": 25,
-    "euractiv": 20, "india_pib": 25,
+    "us_epa": 20, "us_doe": 20, "eu_commission": 20,
+    "euractiv": 16, "india_pib": 20,
     # 美国/日本扩展官方源（2026-08-14 第二轮：部委/联邦机构档）
-    "us_noaa": 25, "us_eia": 25, "us_ferc": 25, "us_carb": 25,
-    "jp_moe": 25, "jp_meti": 25, "jp_anre": 25,
-    # 国际智库（2026-08-17 第三轮：专家解读/政策评论档，同碳道/CCAI）
-    "e3g": 18, "agora": 18, "teri": 18,
-    # 国际智库/投行（2026-08-19 第四轮：智库 18 / 投行研报 18——权威度同级）
-    "brookings": 18, "bruegel": 18, "piie": 18, "csis": 18, "chatham": 18,
-    "carnegie": 18, "rand": 18, "americanprogress": 18, "goldman": 18,
+    "us_noaa": 20, "us_eia": 20, "us_ferc": 20, "us_carb": 20,
+    "jp_moe": 20, "jp_meti": 20, "jp_anre": 20,
+    # 国际智库（2026-08-17 第三轮：专业媒体档）
+    "e3g": 14, "agora": 14, "teri": 14,
+    # 国际智库/投行（2026-08-19 第四轮：智库/投行研报同级 14）
+    "brookings": 14, "bruegel": 14, "piie": 14, "csis": 14, "chatham": 14,
+    "carnegie": 14, "rand": 14, "americanprogress": 14, "goldman": 14,
     # 中国 P0 扩容（2026-08-19 第四轮）
-    "caixin": 18,      # 财新（专业财经媒体，双碳/绿金报道权威）
-    "chinanecc": 22,   # 国家节能中心（官方机构档，略低于部委 25）
-    "thepaper": 16,    # 澎湃新闻（主流综合媒体，绿政公署栏目）
+    "caixin": 14,      # 财新（专业财经媒体档）
+    "chinanecc": 17,   # 国家节能中心（官方机构档，略低于部委 20）
+    "thepaper": 12,    # 澎湃新闻（绿色科技媒体档）
     # AI 维度扩容（2026-08-19 第四轮）
-    "artificialanalysis": 16,  # AI 模型评测（专业数据档）
-    "36kr": 13, "huxiu": 13,   # 综合科技商业媒体（行业媒体档）
+    "artificialanalysis": 12,  # AI 模型评测（绿色科技媒体档）
+    "36kr": 10, "huxiu": 10,   # 综合科技商业媒体（行业媒体档）
     # 中国 P0 第二批（2026-08-14：官方机构档）
-    "pbc": 25, "cneeex": 25, "ncsc": 25, "caep": 25,
-    "cenews": 16, "cnesa": 16,
+    "pbc": 20, "cneeex": 20, "ncsc": 20, "caep": 20,
+    "cenews": 12, "cnesa": 12,
     # 官方解读（部委网站发布的专家解读）
-    "mee_jiedu": 23,
+    "mee_jiedu": 18,
     # 国际组织
-    "iea": 22, "irena": 22, "unfccc": 22, "worldbank": 22,
+    "iea": 17, "irena": 17, "unfccc": 17, "worldbank": 17,
     # 专业政策/碳媒体 + AI×气候专业
-    "tanpaifang": 18, "ideacarbon": 18, "carbonbrief": 18, "ccai": 18,
+    "tanpaifang": 14, "ideacarbon": 14, "carbonbrief": 14, "ccai": 14,
     # 绿色科技媒体
-    "stdaily": 16, "cleantechnica": 16,
+    "stdaily": 12, "cleantechnica": 12,
     # AI 领域全链条源（2026-08-14 扩充）
-    "jiqizhixin": 18, "qbitai": 18, "openai": 20,
-    "venturebeat": 16, "arxiv_ai": 18, "aihot": 18,
+    "jiqizhixin": 14, "qbitai": 14, "openai": 16,
+    "venturebeat": 12, "arxiv_ai": 14, "aihot": 14,
     # 技术聚合（GitHub 开源项目趋势：无编辑自动榜单，略低于行业媒体）
-    "radarai": 12,
+    "radarai": 9,
     # 行业媒体
-    "chinaenergy": 13, "bjx": 13, "reuters": 13,
+    "chinaenergy": 10, "bjx": 10, "reuters": 10,
     # 人形机器人/智能家居/绿色生活（2026-08-19 新增）
-    "therobotreport": 16, "spectrum": 16,   # 机器人/科技权威媒体（专业媒体档）
-    "qianjia": 13, "cheaa": 13,             # 智能家居/家电行业媒体（行业媒体档）
-    "greenbuilder": 16,                     # 绿色建筑家居专业媒体
-    "greenpeace": 18, "mongabay": 18,       # 环保 NGO / 环境新闻专业媒体
+    "therobotreport": 12, "spectrum": 12,   # 机器人/科技权威媒体（绿色科技媒体档）
+    "qianjia": 10, "cheaa": 10,             # 智能家居/家电行业媒体（行业媒体档）
+    "greenbuilder": 12,                     # 绿色建筑家居专业媒体
+    "greenpeace": 14, "mongabay": 14,       # 环保 NGO / 环境新闻专业媒体
     # 全网热榜
-    "allnet": 8,
-    # X 平台快讯（2026-08-19：官方机构账号权威但推文是快讯短文本 → 专业媒体档）
-    "x": 16,
+    "allnet": 6,
+    # X 平台快讯（2026-08-19：官方机构账号权威但推文是快讯短文本 → 绿色科技媒体档）
+    "x": 12,
 }
-DEFAULT_SOURCE_SCORE = 10
+DEFAULT_SOURCE_SCORE = 8
 
 # 3) 主题相关分：标题+摘要命中关键词，分级取最高档
 CORE_TOPIC_KW = [  # 核心议题（25 分）
@@ -2592,17 +2592,19 @@ def score_freshness(published_at: str, now: datetime) -> int:
 
 
 def score_item(site_id: str, title: str, summary: str, people: list[str],
-               published_at: str, now: datetime, sub_dimension: str = "企业经营") -> dict[str, Any]:
-    """五维打分（v3.0）→ {'score': 0-100, 'score_level': S/A/B/C/D, 'strength': int, ...}
+               published_at: str, now: datetime, sub_dimension: str = "企业经营",
+               trl: str = "") -> dict[str, Any]:
+    """六维打分（v4.0）→ {'score': 0-100, 'score_level': S/A/B/C/D, 'strength': int, ...}
 
-    内容强度按细类（六细类）自适应，替代 v2.0 四维自适应。
+    内容强度按细类（六细类）自适应 + TRL 技术成熟度（第 6 维度，v4.0 新增）。
     """
     src = SOURCE_SCORE.get(site_id, DEFAULT_SOURCE_SCORE)
     tscore = score_content_strength(sub_dimension, title, summary)
     top = score_topic(title, summary)
     pscore = score_people(people)
     fscore = score_freshness(published_at, now)
-    total = min(100, src + tscore + top + pscore + fscore)
+    trl_score = score_trl(trl)
+    total = min(100, src + tscore + top + pscore + fscore + trl_score)
     if total >= 85:
         level = "S"
     elif total >= 70:
@@ -2618,7 +2620,7 @@ def score_item(site_id: str, title: str, summary: str, people: list[str],
         "score_level": level,
         "score_breakdown": {
             "source": src, "strength": tscore, "topic": top,
-            "people": pscore, "freshness": fscore,
+            "people": pscore, "freshness": fscore, "trl": trl_score,
         },
     }
 
@@ -2978,6 +2980,98 @@ def classify_ipc(title: str, summary: str) -> str:
         if any(kw.lower() in text for kw in kws):
             return tag
     return ""
+
+
+# ── 维度三 + layer + TRL（2026-08-23 新增） ─────────────────────────────────
+# 完整标签词典见 docs/本体与标签词典.md
+
+# dimension（中文）→ layer（国际化 Layer 1/2/3）
+DIM_TO_LAYER: dict[str, str] = {
+    "绿色政策": "Layer 1",
+    "绿色产业": "Layer 2",
+    "科技创新": "Layer 3",
+}
+
+# 交叉技术标签（Enabling Technologies，多对多：一条信息可同时命中多个）
+ENABLING_TECH_RULES: list[tuple[str, list[str]]] = [
+    ("AI", [
+        "人工智能", "机器学习", "大模型", "算法", "深度学习", "神经网络",
+        "智能体", "agent", "数据科学", "计算机视觉", "自然语言处理", "生成式",
+        "强化学习", "大语言模型", "多模态", "算力",
+        "artificial intelligence", "machine learning", "deep learning",
+        "neural network", "llm", "agent", "computer vision", "nlp",
+    ]),
+    ("生物科技", [
+        "合成生物学", "基因", "微生物", "酶", "发酵", "生物制造", "生物质转化",
+        "细胞", "基因编辑", "菌种", "生物燃料",
+        "synthetic biology", "gene", "microbe", "enzyme", "fermentation",
+        "biomanufacturing",
+    ]),
+    ("能源", [
+        "新能源", "储能", "氢能", "核能", "光伏", "风电", "电力", "电池",
+        "燃料电池", "生物质", "水电", "光热", "绿氢",
+        "renewable", "storage", "hydrogen", "nuclear", "solar", "wind",
+        "battery", "fuel cell",
+    ]),
+    ("环境", [
+        "碳捕集", "ccus", "污染防治", "生态", "废弃物", "循环", "水处理",
+        "大气", "碳足迹", "碳普惠", "环保",
+        "carbon capture", "pollution", "ecosystem", "waste", "circular",
+        "water treatment",
+    ]),
+]
+
+
+def classify_enabling_tech(title: str, summary: str) -> list[str]:
+    """交叉技术标签（多对多，2026-08-23）。返回命中的所有赋能标签（可能多个）。"""
+    text = f"{title or ''} {summary or ''}".lower()
+    found: list[str] = []
+    for tag, kws in ENABLING_TECH_RULES:
+        if any(kw.lower() in text for kw in kws):
+            found.append(tag)
+    return found
+
+
+# TRL 技术成熟度档位（顺序即优先级：7-9 商业化最高放最前）
+TRL_RULES: list[tuple[str, list[str]]] = [
+    ("7-9", [
+        "投产", "并网", "交付", "量产", "商业化", "部署", "融资", "落地", "建成",
+        "运营", "商业运营", "装机", "上市", "出口",
+        "commercial", "deployment", "operation", "production", "launch",
+    ]),
+    ("4-6", [
+        "样机", "原型", "中试", "专利", "benchmark", "方法学", "实验室验证",
+        "试验", "试点", "示范", "研发",
+        "prototype", "pilot", "patent", "benchmark", "demonstration",
+    ]),
+    ("1-3", [
+        "原理", "机理", "理论", "概念", "发现", "论文", "实验", "机制", "方法",
+        "principle", "mechanism", "theory", "paper", "discovery", "experiment",
+    ]),
+]
+
+
+def classify_trl(title: str, summary: str) -> str:
+    """TRL 技术成熟度档判定（2026-08-23）。返回 '7-9'/'4-6'/'1-3'/''（空=无技术信号）。"""
+    text = f"{title or ''} {summary or ''}".lower()
+    for tag, kws in TRL_RULES:
+        if any(kw.lower() in text for kw in kws):
+            return tag
+    return ""
+
+
+def score_trl(trl: str) -> int:
+    """TRL 技术成熟度打分（第 6 维度，0-5 分，2026-08-23）。
+
+    7-9 工程化/商业化 → 5；4-6 技术开发 → 5；1-3 基础原理 → 4；空（无技术信号）→ 3（中性）。
+    """
+    if trl == "7-9":
+        return 5
+    if trl == "4-6":
+        return 5
+    if trl == "1-3":
+        return 4
+    return 3  # 空（政策类或无技术信号）→ 中性 3 分
 
 
 # ── Policy relevance filter ──────────────────────────────────────────────────
@@ -3655,6 +3749,8 @@ def main() -> int:
         )
         rec["dimension"] = dimension
         rec["sub_dimension"] = sub_dimension
+        # layer 国际化字段（2026-08-23 新增）：Layer 1/2/3
+        rec["layer"] = DIM_TO_LAYER.get(dimension, "Layer 2")
         # 国际标准分类法（2026-08-23 新增）：EU Taxonomy / ISIC / GICS / IPC
         rec["taxonomy"] = {
             "eu_taxonomy": classify_eu_taxonomy(rec.get("title", ""), rec.get("summary", "")),
@@ -3662,12 +3758,15 @@ def main() -> int:
             "gics": classify_gics(rec.get("title", ""), rec.get("summary", "")),
             "ipc": classify_ipc(rec.get("title", ""), rec.get("summary", "")),
         }
+        # 交叉技术标签 + TRL（2026-08-23 新增）
+        rec["enabling_tech"] = classify_enabling_tech(rec.get("title", ""), rec.get("summary", ""))
+        rec["trl"] = classify_trl(rec.get("title", ""), rec.get("summary", ""))
         # 区域字段（2026-08-17）：前端排行榜/时间线「国内/国际」切换依赖
         rec["region"] = detect_region(rec.get("site_id", ""), rec.get("title", ""))
         # 主题标签（2026-08-19）：仅主题标签（TOPIC_RULES），供前端「关系图谱」
         # 展示主题标签共现；地域/政策类型等数据库管理标签不导出、前端不显示
         rec["topics"] = extract_topic_tags(rec.get("title", ""))
-        # 打分体系 v3.0（2026-08-23）：内容强度按细类自适应
+        # 打分体系 v4.0（2026-08-23）：内容强度按细类 + TRL 第 6 维度
         people = extract_people(rec.get("title", ""), rec.get("summary", ""), "")
         scoring = score_item(
             rec.get("site_id", ""),
@@ -3677,6 +3776,7 @@ def main() -> int:
             rec.get("published_at", ""),
             now,
             sub_dimension,
+            rec["trl"],
         )
         rec.update(scoring)
         if people:

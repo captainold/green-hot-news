@@ -55,6 +55,8 @@ def migrate_file(path: Path) -> int:
         )
         it["dimension"] = dim
         it["sub_dimension"] = sub
+        # layer 国际化字段（2026-08-23 新增）
+        it["layer"] = un.DIM_TO_LAYER.get(dim, "Layer 2")
         # 国际标准分类法（2026-08-23 新增）：EU Taxonomy / ISIC / GICS / IPC
         it["taxonomy"] = {
             "eu_taxonomy": un.classify_eu_taxonomy(it.get("title", ""), it.get("summary", "")),
@@ -62,7 +64,10 @@ def migrate_file(path: Path) -> int:
             "gics": un.classify_gics(it.get("title", ""), it.get("summary", "")),
             "ipc": un.classify_ipc(it.get("title", ""), it.get("summary", "")),
         }
-        # 重打分：内容强度按细类 key；people 重提取（打分依赖）
+        # 交叉技术标签 + TRL（2026-08-23 新增）
+        it["enabling_tech"] = un.classify_enabling_tech(it.get("title", ""), it.get("summary", ""))
+        it["trl"] = un.classify_trl(it.get("title", ""), it.get("summary", ""))
+        # 重打分：内容强度按细类 key + TRL 第 6 维度；people 重提取（打分依赖）
         people = it.get("people") or un.extract_people(it.get("title", ""), it.get("summary", ""), "")
         scoring = un.score_item(
             it.get("site_id", ""),
@@ -72,6 +77,7 @@ def migrate_file(path: Path) -> int:
             it.get("published_at", ""),
             NOW,
             sub,
+            it["trl"],
         )
         it.update(scoring)
         if people:
