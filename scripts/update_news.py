@@ -175,10 +175,18 @@ def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_
                     pass
 
             source = entry.get("author", "") or site_name
+            # 摘要：RSS/Atom 的 summary/description 字段（Google News 源等，2026-08-23 补）
+            summary = None
+            for _k in ("summary", "description"):
+                _v = entry.get(_k)
+                if _v:
+                    summary = _clean_summary(_v)
+                    break
             items.append(RawItem(
                 site_id=site_id, site_name=site_name,
                 source=source, title=title, url=link,
                 published_at=published,
+                summary=summary if summary else None,
                 meta={"feed_url": feed_url},
             ))
     else:
