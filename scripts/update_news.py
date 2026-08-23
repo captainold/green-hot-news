@@ -57,6 +57,7 @@ class RawItem:
     title: str = ""
     url: str = ""
     published_at: datetime | None = None
+    summary: str | None = None
     meta: dict[str, Any] = field(default_factory=dict)
 
 
@@ -934,9 +935,14 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
                         published = datetime(*entry.published_parsed[:6], tzinfo=UTC)
                     except Exception:
                         pass
+                # 摘要：Google News RSS 的 description 字段（部分站点有，如虎嗅）
+                summary = None
+                if hasattr(entry, "description") and entry.description:
+                    summary = _clean_summary(entry.description)
                 items.append(RawItem(
                     site_id=site_id, site_name=site_name,
                     title=title_clean, url=link, published_at=published,
+                    summary=summary if summary else None,
                 ))
         except Exception:
             continue
