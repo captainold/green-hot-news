@@ -44,7 +44,11 @@ PROMPT_TEMPLATE = """你是绿色低碳科技领域的技术情报分析师。�
 _last_call_ts: float = 0.0
 _MIN_INTERVAL: float = 0.2  # 200ms → QPS=5，与腾讯云 TMT 同级
 
-_SERVICE_DISABLED: bool = False  # 连续失败后熔断，本轮不再调用
+_SERVICE_DISABLED: bool = False  # 熔断后本轮不再调用
+_fail_count: int = 0  # 连续失败计数，≥3 次熔断
+
+# 致命错误状态码（余额不足/认证失败/限流）→ 立即熔断，不再重试
+_FATAL_STATUS = {401, 402, 403, 429}
 
 
 def _load_key() -> str:
@@ -69,7 +73,7 @@ def extract_tech_feature(title: str, summary: str, _retry: int = 0) -> str:
 
     返回：技术特征描述（一句 ≤50 字），或「无」，或空串（LLM 不可用）。
     """
-    global _SERVICE_DISABLED, _last_call_ts
+    global _SERVICE_DISABLED, _last_call_ts, _fail_count
     if _SERVICE_DISABLED:
         return ""
     key = _load_key()
@@ -102,8 +106,13 @@ def extract_tech_feature(title: str, summary: str, _retry: int = 0) -> str:
             },
             timeout=(15, 60),
         )
+        # 致命错误（余额不足/认证失败/限流）→ 立即熔断，不再重试
+        if r.status_code in _FATAL_STATUS:
+            _SERVICE_DISABLED = True
+            return ""
         r.raise_for_status()
         content = r.json()["choices"][0]["message"].get("content", "").strip()
+        _fail_count = 0  # 成功，重置失败计数
         if content:
             return content
         # 空 content（reasoning 被截断）→ 退避重试一次
@@ -112,7 +121,8 @@ def extract_tech_feature(title: str, summary: str, _retry: int = 0) -> str:
             return extract_tech_feature(title, summary, _retry + 1)
         return ""
     except Exception:
-        # 静默降级：连续失败熔断，本轮不再调用
-        if _retry >= 1:
+        # 静默降级：连续 3 次失败熔断，本轮不再调用
+        _fail_count += 1
+        if _fail_count >= 3:
             _SERVICE_DISABLED = True
         return ""
