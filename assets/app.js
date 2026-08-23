@@ -439,37 +439,33 @@
   }
 
   function buildDigestText(items) {
-    const periodLabel = currentPeriod === "日" ? "近24小时" : currentPeriod === "周" ? "近一周" : "近一月";
-    const head = [
-      "🌿 绿色低碳动态雷达 · 精选概要",
-      `主题：${currentDim}　｜　时间段：${periodLabel}　｜　区域：${currentRegion}`,
-      `更新时间：${updatedAt.textContent}`,
-      "━━━━━━━━━━━━━━━━━━━━",
-      "",
-    ].join("\n");
+      const periodLabel = currentPeriod === "日" ? "近 24 小时" : currentPeriod === "周" ? "近一周" : "近一月";
+      const head = [
+        "🌿 绿色低碳动态雷达 · 精选概要",
+        `主题：${currentDim}  ｜  时间段：${periodLabel}  ｜  区域：${currentRegion}`,
+        `更新时间：${updatedAt.textContent}`,
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+      ].join("\n");
 
-    const body = items.slice(0, 20).map((it, idx) => {
-      const score = it.score || 0;
-      const title = it.title_zh || it.title || "";
-      const site = it.site_name || "";
-      const dim = it.dimension || "";
-      const line1 = `${idx + 1}. 【${score}分】${title}`;
-      const line2 = `${site} · ${dim}`;
-      const sum = cleanSummary(it.summary);
-      return `${line1}\n　　${line2}${sum ? "\n　　" + sum : ""}`;
-    }).join("\n\n");
+      const body = items.slice(0, 20).map((it, idx) => {
+        const title = it.title_zh || it.title || "";
+        const site = it.site_name || "";
+        const dim = it.dimension || "";
+        return `${idx + 1}. ${title}（${site} · ${dim}）`;
+      }).join("\n");
 
-    const promo = [
-      "",
-      "━━━━━━━━━━━━━━━━━━━━",
-      "📡 绿色低碳动态雷达 · ywm.life",
-      "　 四维覆盖：政府 · 行业 · 金融 · AI",
-      "　 聚合 60+ 权威源，每日自动更新",
-      "　 👉 https://ywm.life",
-    ].join("\n");
+      const promo = [
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "📡 绿色低碳动态雷达 · ywm.life",
+        " 四维覆盖：政策 · 产业 · 市场信号 · AI",
+        " 聚合 60+ 权威源，每日自动更新",
+        " 👉 https://ywm.life",
+      ].join("\n");
 
-    return head + "\n" + (body || "（该范围内暂无动态）") + promo;
-  }
+      return head + "\n" + (body || "（该范围内暂无动态）") + promo;
+    }
 
   async function copyDigest() {
     const filtered = sortItems(filterItems()); // 重要性排序取前 20
