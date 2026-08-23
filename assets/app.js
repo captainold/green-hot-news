@@ -25,6 +25,9 @@
       active: false,      // 是否有有效搜索
       terms: [],          // 解析后的搜索词 [{op:'AND'|'OR'|'NOT', type:'tag'|'path'|'source'|'text', value, exact?}]
     };
+    // 源状态（2026-08-23 新增：更新时间显示"从 N 源更新 M 条"）
+    let sourceCount = 0;   // 成功抓取的源数量
+    let greenCount = 0;    // 绿色过滤后的新闻条数
 
   // 四大主题 = 四维（政策/产业/市场信号/AI，四个观察窗口而非互斥分类：
   // 政策=部委发文动向、产业=企业进展兜底、市场信号=碳市场/绿色资本、AI=AI×绿色落地）；
@@ -134,6 +137,30 @@
 
   // ── Load data ──────────────────────────────────────────────────────────────
   const cb = `?t=${Date.now()}`;
+
+  // 刷新"更新时间"显示（2026-08-23：时间 + 从 N 源更新 M 条）
+  function refreshUpdatedAt(generatedAt) {
+    const timeText = formatTime(generatedAt);
+    if (sourceCount > 0) {
+      updatedAt.textContent = `${timeText} · 从 ${sourceCount} 源更新 ${greenCount} 条`;
+    } else {
+      updatedAt.textContent = timeText;
+    }
+  }
+
+  // 加载源状态（source-status.json：successful 源数 + total_green_items 条数）
+  async function loadSourceStatus() {
+    try {
+      const r = await fetch(`./data/source-status.json${cb}`);
+      if (!r.ok) return;
+      const s = await r.json();
+      // 源数量：successful 优先，兜底 sites 数组长度
+      sourceCount = s.successful || (Array.isArray(s.sites) ? s.sites.length : 0) || 0;
+      // 新闻条数：total_green_items 优先，兜底 total_items
+      greenCount = s.total_green_items || s.total_items || 0;
+    } catch (e) { /* ignore */ }
+  }
+
   async function loadData() {
     try {
       let d = null;
@@ -146,7 +173,10 @@
         d = await r.json();
       }
       historyItems = d.items || [];
-      if (d.generated_at) updatedAt.textContent = formatTime(d.generated_at);
+      if (d.generated_at) {
+        await loadSourceStatus();
+        refreshUpdatedAt(d.generated_at);
+      }
       render();
     } catch (err) {
       console.error("Failed to load data:", err);
@@ -658,7 +688,10 @@
       const fresh = latest.filter(i => !known.has((i.title || "").trim()));
       if (fresh.length === 0) return;
       historyItems = fresh.concat(historyItems);
-      if (d.generated_at) updatedAt.textContent = formatTime(d.generated_at);
+      if (d.generated_at) {
+        await loadSourceStatus();
+        refreshUpdatedAt(d.generated_at);
+      }
       render();
     } catch (e) { /* ignore */ }
   }
