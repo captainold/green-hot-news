@@ -23,9 +23,21 @@ un = importlib.util.module_from_spec(spec)
 sys.modules["un"] = un
 spec.loader.exec_module(un)
 
+# 技术特征提取模块（2026-08-23 新增）
+import tech_feature as tf  # noqa: E402
+
 from datetime import datetime  # noqa: E402
 
 NOW = datetime.now().astimezone()
+
+# 技术特征缓存（url → tech_feature，避免重复调用 LLM）
+_TF_CACHE_PATH = ROOT / "data" / "tech-feature-index.json"
+tf_cache: dict[str, str] = {}
+if _TF_CACHE_PATH.exists():
+    try:
+        tf_cache = json.loads(_TF_CACHE_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        tf_cache = {}
 
 
 def migrate_file(path: Path) -> int:
@@ -67,6 +79,17 @@ def migrate_file(path: Path) -> int:
         # 交叉技术标签 + TRL（2026-08-23 新增）
         it["enabling_tech"] = un.classify_enabling_tech(it.get("title", ""), it.get("summary", ""))
         it["trl"] = un.classify_trl(it.get("title", ""), it.get("summary", ""))
+        # 技术特征提取（2026-08-23 新增）：仅 Layer 2/3，用缓存避免重复调用 LLM
+        if "tech_feature" not in it:
+            it["tech_feature"] = ""
+        if dim != "绿色政策" and not it.get("tech_feature"):
+            _tf_url = it.get("url", "")
+            _tf = tf_cache.get(_tf_url, "")
+            if not _tf:
+                _tf = tf.extract_tech_feature(it.get("title", ""), it.get("summary", ""))
+            if _tf and _tf != "无":
+                it["tech_feature"] = _tf
+                tf_cache[_tf_url] = _tf
         # 重打分：内容强度按细类 key + TRL 第 6 维度；people 重提取（打分依赖）
         people = it.get("people") or un.extract_people(it.get("title", ""), it.get("summary", ""), "")
         scoring = un.score_item(
@@ -97,11 +120,14 @@ def migrate_file(path: Path) -> int:
 
 
 def main() -> int:
-    print("三层分类迁移（2026-08-23：绿色政策/绿色产业/科技创新 + 六细类）")
+    print("三层分类迁移（2026-08-23：绿色政策/绿色产业/科技创新 + 六细类 + 技术特征）")
     total = 0
     for fn in ("history.json", "latest-24h.json", "latest-24h-all.json"):
         total += migrate_file(ROOT / "data" / fn)
-    print(f"完成，共 {total} 条维度变化")
+    # 保存技术特征缓存
+    if tf_cache:
+        _TF_CACHE_PATH.write_text(json.dumps(tf_cache, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"完成，共 {total} 条维度变化，技术特征缓存 {len(tf_cache)} 条")
     return 0
 
 

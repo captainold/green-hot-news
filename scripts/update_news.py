@@ -36,6 +36,12 @@ except ImportError:  # running as a plain script
     import translator
 
 try:
+    from . import tech_feature
+except ImportError:  # running as a plain script
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import tech_feature
+
+try:
     import feedparser
 except ModuleNotFoundError:
     feedparser = None
@@ -3676,6 +3682,7 @@ def main() -> int:
     archived_pub: dict[str, str] = {}
     archived_titles: dict[str, str] = {}
     archived_summaries: dict[str, str] = {}
+    archived_tech_features: dict[str, str] = {}  # 技术特征缓存（2026-08-23 新增）
     if args.obsidian_dir:
         archived_pub = load_archived_published(args.obsidian_dir)
         archived_titles = load_archived_titles(args.obsidian_dir)
@@ -3699,6 +3706,14 @@ def main() -> int:
                 archived_summaries = json.loads(summary_index_path.read_text(encoding="utf-8"))
             except Exception:
                 archived_summaries = {}
+
+    # 技术特征缓存（url → tech_feature，统一从 output_dir 加载，两个分支都适用）
+    tech_feature_path = output_dir / "tech-feature-index.json"
+    if tech_feature_path.exists():
+        try:
+            archived_tech_features = json.loads(tech_feature_path.read_text(encoding="utf-8"))
+        except Exception:
+            archived_tech_features = {}
 
     def _archived_to_iso(pub: str) -> str:
         if " " in pub:
@@ -3761,6 +3776,17 @@ def main() -> int:
         # 交叉技术标签 + TRL（2026-08-23 新增）
         rec["enabling_tech"] = classify_enabling_tech(rec.get("title", ""), rec.get("summary", ""))
         rec["trl"] = classify_trl(rec.get("title", ""), rec.get("summary", ""))
+        # 技术特征提取（2026-08-23 新增，护城河字段）：仅 Layer 2/3 提取，Layer 1 政策类跳过
+        rec["tech_feature"] = ""
+        if dimension != "绿色政策":
+            _tf_url = rec.get("url", "")
+            if _tf_url in archived_tech_features:
+                rec["tech_feature"] = archived_tech_features[_tf_url]
+            else:
+                _tf = tech_feature.extract_tech_feature(rec.get("title", ""), rec.get("summary", ""))
+                if _tf and _tf != "无":
+                    rec["tech_feature"] = _tf
+                    archived_tech_features[_tf_url] = _tf
         # 区域字段（2026-08-17）：前端排行榜/时间线「国内/国际」切换依赖
         rec["region"] = detect_region(rec.get("site_id", ""), rec.get("title", ""))
         # 主题标签（2026-08-19）：仅主题标签（TOPIC_RULES），供前端「关系图谱」
@@ -3797,6 +3823,11 @@ def main() -> int:
     if archived_summaries:
         (output_dir / "summary-index.json").write_text(
             json.dumps(archived_summaries, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    # Persist the url→tech_feature map so CI runs can skip re-extraction (2026-08-23)
+    if archived_tech_features:
+        (output_dir / "tech-feature-index.json").write_text(
+            json.dumps(archived_tech_features, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # Backfilled times change sort order — re-sort newest first
     all_items_24h.sort(key=sort_key, reverse=True)
