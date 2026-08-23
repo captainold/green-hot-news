@@ -2803,6 +2803,183 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     return "绿色产业", "企业经营"  # 兜底：媒体库行业动态归产业·企业经营
 
 
+# ── 维度二：国际标准分类法（Domain Taxonomy，2026-08-23 新增） ──────────────
+# 不自造词典，映射四大国际权威分类法的高层级：
+#   EU Taxonomy 六大环境目标（绿色低碳专用）/ ISIC 门类 / GICS 部门 / WIPO IPC 部
+# 完整标签词典见 docs/本体与标签词典.md
+
+# EU Taxonomy 六大环境目标（顺序即优先级：减缓最宽放最前）
+EU_TAXONOMY_RULES: list[tuple[str, list[str]]] = [
+    ("气候变化减缓", [
+        "新能源", "光伏", "风电", "储能", "氢能", "核能", "生物质", "水电",
+        "节能", "能效", "减排", "降碳", "碳市场", "碳交易", "碳价", "碳配额",
+        "CCUS", "碳捕集", "电动车", "零碳", "绿色制造", "碳中和", "碳达峰", "双碳",
+        "碳足迹", "碳普惠", "绿电", "绿色低碳", "碳关税", "碳排放", "温室气体", "低碳",
+        "renewable", "solar", "wind", "hydrogen", "nuclear", "biomass",
+        "energy efficiency", "decarboni", "carbon capture", "ccus",
+        "ev", "electric vehicle", "zero carbon", "carbon neutral", "net zero",
+        "carbon price", "carbon market", "emission trading", "cbam",
+        "carbon emission", "greenhouse gas",
+    ]),
+    ("污染防治", [
+        "污染", "空气质量", "水污染", "土壤污染", "pm2.5", "挥发性有机物",
+        "氮氧化物", "固废", "大气治理", "蓝天保卫战", "环境治理",
+        "pollution", "air quality", "nox", "emission control",
+    ]),
+    ("循环经济", [
+        "循环经济", "资源循环", "废弃物", "回收", "再利用", "再生材料",
+        "废电池回收", "再生塑料", "废钢", "资源化", "以旧换新",
+        "circular economy", "recycling", "reuse", "remanufactur", "waste",
+    ]),
+    ("气候变化适应", [
+        "气候适应", "韧性", "防洪", "抗旱", "极端天气", "海平面", "气候风险", "热浪",
+        "climate adaptation", "resilience", "flood", "drought",
+        "extreme weather", "heatwave", "sea level",
+    ]),
+    ("水资源", [
+        "水资源", "水处理", "节水", "污水处理", "海水淡化", "水循环", "再生水",
+        "water", "wastewater", "desalination", "water treatment", "water reuse",
+    ]),
+    ("生物多样性", [
+        "生物多样性", "自然保护", "栖息地", "物种", "森林", "湿地", "海洋保护", "红树林",
+        "生态保护", "biodiversity", "ecosystem", "conservation", "habitat",
+        "species", "forest", "wetland",
+    ]),
+]
+
+# ISIC 门类（产业分类，重点绿色低碳相关门类；顺序即优先级）
+ISIC_RULES: list[tuple[str, list[str]]] = [
+    ("K 金融保险", [
+        "金融", "银行", "证券", "保险", "基金", "投资", "债券", "碳资产", "期货",
+        "融资", "并购", "ipo", "esg", "绿色金融", "碳金融", "私募", "股权",
+        "finance", "bank", "investment", "fund", "bond", "insurance", "green bond",
+    ]),
+    ("J 信息通信", [
+        "信息", "通信", "软件", "互联网", "数据中心", "算力", "人工智能", "芯片",
+        "大模型", "智能体", "算法", "数字化",
+        "information", "software", "internet", "data center", "chip", "algorithm",
+    ]),
+    ("D 电力燃气", [
+        "电力", "发电", "电网", "供电", "燃气", "热力", "热电", "电价", "新型电力系统",
+        "electricity", "power grid", "power generation", "utilities",
+    ]),
+    ("C 制造", [
+        "制造", "工厂", "设备", "光伏组件", "电池制造", "汽车", "装备", "冶炼",
+        "产能", "生产线", "manufacturing", "factory", "plant", "gigafactory",
+    ]),
+    ("B 采矿", [
+        "采矿", "矿产", "稀土", "锂矿", "煤炭开采", "矿山", "勘探",
+        "mining", "mineral", "lithium", "rare earth", "coal mine",
+    ]),
+    ("E 供水废物", [
+        "供水", "污水", "废物管理", "回收", "环卫", "垃圾处理", "水处理",
+        "wastewater", "waste management", "recycling", "water treatment",
+    ]),
+    ("F 建筑", [
+        "建筑", "施工", "绿色建筑", "建材", "基建", "房地产",
+        "construction", "building", "green building",
+    ]),
+    ("H 运输仓储", [
+        "运输", "物流", "航运", "铁路", "仓储", "港口", "航空", "充电桩",
+        "transport", "logistics", "shipping", "railway", "port", "aviation",
+    ]),
+    ("A 农业林业", [
+        "农业", "林业", "渔业", "种植", "畜牧", "农田", "森林",
+        "agriculture", "forestry", "fishing", "farming",
+    ]),
+    ("M 专业科技活动", [
+        "科研", "研发", "咨询", "技术服务", "实验室", "检测", "学术", "论文",
+        "research", "laboratory", "consulting", "technical service",
+    ]),
+    ("O 公共行政", [
+        "政府", "行政", "监管", "部委", "政策", "条例", "法规",
+        "government", "policy", "regulation", "ministry",
+    ]),
+]
+
+# GICS 部门（金融投资视角，11 部门；顺序即优先级）
+GICS_RULES: list[tuple[str, list[str]]] = [
+    ("公用事业", ["公用事业", "电力", "燃气", "水务", "发电", "电网", "utilities", "power grid"]),
+    ("能源", ["石油", "天然气", "煤炭", "油气", "能源设备", "oil", "natural gas", "coal", "petroleum"]),
+    ("原材料", ["材料", "化工", "钢铁", "有色", "稀土", "锂", "铜", "materials", "chemical", "steel", "lithium", "copper"]),
+    ("工业", ["工业", "制造", "机械", "装备", "航天", "军工", "电气设备", "industrial", "manufacturing", "machinery", "equipment"]),
+    ("信息技术", ["信息技术", "软件", "硬件", "半导体", "互联网", "芯片", "software", "semiconductor", "internet", "chip"]),
+    ("金融", ["银行", "保险", "证券", "资管", "基金", "碳资产", "金融", "bank", "insurance", "fund", "finance"]),
+    ("通信服务", ["通信", "电信", "媒体", "telecom", "communication", "media"]),
+    ("非必需消费品", ["汽车", "家电", "零售", "纺织", "电动车", "automotive", "consumer", "retail", "ev"]),
+    ("医疗保健", ["医疗", "制药", "生物", "healthcare", "pharma", "biotech"]),
+    ("房地产", ["房地产", "物业", "reits", "real estate", "property"]),
+    ("必需消费品", ["食品", "饮料", "日化", "consumer staples", "food", "beverage"]),
+]
+
+# WIPO IPC 部（技术专利视角，8 部；顺序即优先级）
+IPC_RULES: list[tuple[str, list[str]]] = [
+    ("H 电学", ["电学", "电子", "通信", "电力", "半导体", "电路", "电池", "electric", "electronic", "semiconductor", "circuit", "battery"]),
+    ("C 化学冶金", ["化学", "材料", "冶金", "催化剂", "电解", "碳材料", "化工", "chemistry", "chemical", "metallurgy", "catalyst", "electrolysis"]),
+    ("G 物理", ["物理", "光学", "测量", "计算", "控制", "physics", "optical", "measurement", "computing", "control"]),
+    ("F 机械工程", ["机械", "发动机", "照明", "供热", "燃烧", "mechanical", "engine", "heating", "combustion"]),
+    ("B 作业运输", ["运输", "物流", "机械加工", "分离", "transport", "conveying", "separation"]),
+    ("E 固定建筑", ["建筑", "土木", "施工", "building", "construction", "civil engineering"]),
+    ("A 人类生活需要", ["农业", "食品", "医疗", "体育", "agriculture", "food", "medical"]),
+    ("D 纺织造纸", ["纺织", "造纸", "textile", "paper"]),
+]
+
+# ISIC 源映射（仅明确门类的源；媒体源内容混合，靠关键词判定）
+SOURCE_ISIC: dict[str, str] = {
+    "pbc": "K 金融保险", "cneeex": "K 金融保险", "goldman": "K 金融保险",
+    "caixin": "K 金融保险", "worldbank": "K 金融保险",
+    "jiqizhixin": "J 信息通信", "qbitai": "J 信息通信", "openai": "J 信息通信",
+    "arxiv_ai": "J 信息通信", "aihot": "J 信息通信", "artificialanalysis": "J 信息通信",
+    "36kr": "J 信息通信", "huxiu": "J 信息通信", "radarai": "J 信息通信",
+    "ndrc": "O 公共行政", "mee": "O 公共行政", "nea": "O 公共行政", "miit": "O 公共行政",
+    "us_epa": "O 公共行政", "us_doe": "O 公共行政", "eu_commission": "O 公共行政",
+    "india_pib": "O 公共行政", "jp_moe": "O 公共行政", "jp_meti": "O 公共行政",
+    "jp_anre": "O 公共行政", "ncsc": "O 公共行政", "caep": "O 公共行政",
+    "chinanecc": "O 公共行政", "unfccc": "O 公共行政",
+    "iea": "M 专业科技活动", "irena": "M 专业科技活动", "e3g": "M 专业科技活动",
+    "agora": "M 专业科技活动", "teri": "M 专业科技活动", "carbonbrief": "M 专业科技活动",
+    "ccai": "M 专业科技活动",
+}
+
+
+def classify_eu_taxonomy(title: str, summary: str) -> str:
+    """EU Taxonomy 六大环境目标分类（2026-08-23）。返回目标中文名，无匹配返回空串。"""
+    text = f"{title or ''} {summary or ''}".lower()
+    for tag, kws in EU_TAXONOMY_RULES:
+        if any(kw.lower() in text for kw in kws):
+            return tag
+    return ""
+
+
+def classify_isic(site_id: str, title: str, summary: str) -> str:
+    """ISIC 门类分类（2026-08-23）。源映射优先，再按关键词。返回门类名，无匹配返回空串。"""
+    if site_id in SOURCE_ISIC:
+        return SOURCE_ISIC[site_id]
+    text = f"{title or ''} {summary or ''}".lower()
+    for tag, kws in ISIC_RULES:
+        if any(kw.lower() in text for kw in kws):
+            return tag
+    return ""
+
+
+def classify_gics(title: str, summary: str) -> str:
+    """GICS 部门分类（2026-08-23）。返回部门名，无匹配返回空串。"""
+    text = f"{title or ''} {summary or ''}".lower()
+    for tag, kws in GICS_RULES:
+        if any(kw.lower() in text for kw in kws):
+            return tag
+    return ""
+
+
+def classify_ipc(title: str, summary: str) -> str:
+    """WIPO IPC 部分类（2026-08-23）。返回部名，无匹配返回空串。"""
+    text = f"{title or ''} {summary or ''}".lower()
+    for tag, kws in IPC_RULES:
+        if any(kw.lower() in text for kw in kws):
+            return tag
+    return ""
+
+
 # ── Policy relevance filter ──────────────────────────────────────────────────
 POLICY_KEYWORDS = [
     # Chinese
@@ -3478,6 +3655,13 @@ def main() -> int:
         )
         rec["dimension"] = dimension
         rec["sub_dimension"] = sub_dimension
+        # 国际标准分类法（2026-08-23 新增）：EU Taxonomy / ISIC / GICS / IPC
+        rec["taxonomy"] = {
+            "eu_taxonomy": classify_eu_taxonomy(rec.get("title", ""), rec.get("summary", "")),
+            "isic": classify_isic(rec.get("site_id", ""), rec.get("title", ""), rec.get("summary", "")),
+            "gics": classify_gics(rec.get("title", ""), rec.get("summary", "")),
+            "ipc": classify_ipc(rec.get("title", ""), rec.get("summary", "")),
+        }
         # 区域字段（2026-08-17）：前端排行榜/时间线「国内/国际」切换依赖
         rec["region"] = detect_region(rec.get("site_id", ""), rec.get("title", ""))
         # 主题标签（2026-08-19）：仅主题标签（TOPIC_RULES），供前端「关系图谱」

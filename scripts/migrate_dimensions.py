@@ -55,6 +55,13 @@ def migrate_file(path: Path) -> int:
         )
         it["dimension"] = dim
         it["sub_dimension"] = sub
+        # 国际标准分类法（2026-08-23 新增）：EU Taxonomy / ISIC / GICS / IPC
+        it["taxonomy"] = {
+            "eu_taxonomy": un.classify_eu_taxonomy(it.get("title", ""), it.get("summary", "")),
+            "isic": un.classify_isic(it.get("site_id", ""), it.get("title", ""), it.get("summary", "")),
+            "gics": un.classify_gics(it.get("title", ""), it.get("summary", "")),
+            "ipc": un.classify_ipc(it.get("title", ""), it.get("summary", "")),
+        }
         # 重打分：内容强度按细类 key；people 重提取（打分依赖）
         people = it.get("people") or un.extract_people(it.get("title", ""), it.get("summary", ""), "")
         scoring = un.score_item(
