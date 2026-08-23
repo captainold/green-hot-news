@@ -210,6 +210,8 @@ def translate_text(text: str, source: str = "auto",
                 return translate_text(text, source, target, _retry + 1)
             return None
         out = resp.get("TargetText", "").strip()
+        # 清理作者署名残留（X平台推文翻译后残留 "✍️ Written by @xxx" 等，2026-08-23）
+        out = re.sub(r"\s*[✍️🖊️✒️]?\s*Written by\s+@?\S+.*$", "", out).strip()
         return out or None
     except Exception:
         if _retry < 1:
