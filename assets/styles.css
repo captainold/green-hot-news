@@ -657,6 +657,15 @@ html[data-theme="dark"] .topic-chip {
   outline: none;
 }
 .search-input::placeholder { color: var(--text-dim); }
+.search-btn {
+  position: absolute; right: 2.2rem; top: 50%; transform: translateY(-50%);
+  width: 1.5rem; height: 1.5rem; border: none; border-radius: 50%;
+  background: transparent; color: var(--text-muted);
+  font-size: .9rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.search-btn:hover { color: var(--cb-blue); background: rgba(0, 82, 255, .08); }
 .search-clear {
   position: absolute; right: .5rem; top: 50%; transform: translateY(-50%);
   width: 1.3rem; height: 1.3rem; border: none; border-radius: 50%;

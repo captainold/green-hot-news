@@ -68,6 +68,7 @@
   // 搜索框（2026-08-23 新增）
   const searchInput = $("#searchInput");
   const searchClear = $("#searchClear");
+  const searchBtn = $("#searchBtn");
 
   // ── 日/夜主题切换（2026-08-19）：整页联动 + localStorage 记忆，默认白天 ──
   function applyTheme(dark) {
@@ -693,6 +694,14 @@
         searchInput.blur();
       }
     });
+    // 支持回车键触发搜索
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSearch();
+        searchInput.blur();
+      }
+    });
   }
   
   if (searchClear) {
@@ -700,6 +709,13 @@
       searchInput.value = "";
       handleSearch();
       searchInput.focus();
+    });
+  }
+  
+  if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+      handleSearch();
+      searchInput.blur();
     });
   }
 
