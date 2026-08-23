@@ -20,6 +20,11 @@
     let graphChart = null;        // ECharts 关系图谱实例（须在 initTheme 前声明，避免 TDZ）
     let graphResizeBound = false; // resize 监听只挂一次（dispose/re-init 不重复挂）
     let searchQuery = "";         // Obsidian 语法搜索 query（2026-08-23 新增）
+    // 搜索状态（2026-08-23 新增，务必与 parseObsidianQuery 配合使用）
+    const searchState = {
+      active: false,      // 是否有有效搜索
+      terms: [],          // 解析后的搜索词 [{op:'AND'|'OR'|'NOT', type:'tag'|'path'|'source'|'text', value, exact?}]
+    };
 
   // 四大主题 = 四维（政策/产业/市场信号/AI，四个观察窗口而非互斥分类：
   // 政策=部委发文动向、产业=企业进展兜底、市场信号=碳市场/绿色资本、AI=AI×绿色落地）；
