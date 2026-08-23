@@ -280,10 +280,12 @@ def fetch_jiqizhixin(session: requests.Session, now: datetime) -> list[RawItem]:
     → 用 Google News RSS 搜 site:jiqizhixin.com，取最新条目。
     """
     items: list[RawItem] = []
+    # 2026-08-23 修复：单主题词 + when:30d（AGENTS.md 铁律：括号 OR 语法返回
+    # 全站混合内容——原查询返回 2022-2024 旧文，62 天窗口滤空）
     queries = [
-        '"jiqizhixin.com" 大模型 OR 模型 OR AI',
-        '"jiqizhixin.com" 芯片 OR 算力 OR 机器人',
-        '"jiqizhixin.com" 智能体 OR 自动驾驶 OR 融资',
+        '"jiqizhixin.com" 大模型 when:30d',
+        '"jiqizhixin.com" 芯片 when:30d',
+        '"jiqizhixin.com" 智能体 when:30d',
     ]
     for q in queries:
         try:
@@ -2055,29 +2057,45 @@ def fetch_worldbank_climate(session: requests.Session, now: datetime) -> list[Ra
 
 
 def fetch_bjx(session: requests.Session, now: datetime) -> list[RawItem]:
-    """北极星电力网 — via Google News (direct site blocked by Alibaba WAF)."""
+    """北极星电力网 — via Google News (direct site blocked by Alibaba WAF).
+
+    2026-08-23 修复：北极星本站 Google News 收录极少（30 天内仅 0-10 条且多为
+    转载），单查询"北极星电力网 新能源…"返回 2025 旧文 → 改为多单主题词查询
+    （AGENTS.md 铁律：单主题词 + when:30d，括号 OR 语法勿用），
+    泛"北极星 储能"查询返回 8 月行业新闻（招标/装机/采购，有信息价值）。
+    """
     import feedparser as fp
     items: list[RawItem] = []
-    try:
-        r = session.get(
-            "https://news.google.com/rss/search",
-            params={"q": "北极星电力网 新能源 电力 储能 光伏 风电", "hl": "zh-CN", "gl": "CN", "ceid": "CN:zh-Hans"},
-            timeout=30,
-        )
-        r.raise_for_status()
-        feed = fp.parse(r.content)
-        for entry in feed.entries[:20]:
-            title = (entry.get("title") or "").strip()
-            link = (entry.get("link") or "").strip()
-            if not title or not link:
-                continue
-            items.append(RawItem(
-                site_id="bjx", site_name="北极星电力网",
-                title=title, url=link,
-                published_at=_entry_published(entry),
-            ))
-    except Exception:
-        pass
+    queries = [
+        "北极星电力网 when:30d",
+        "北极星 储能 when:30d",
+    ]
+    seen: set[tuple[str, str]] = set()
+    for q in queries:
+        try:
+            r = session.get(
+                "https://news.google.com/rss/search",
+                params={"q": q, "hl": "zh-CN", "gl": "CN", "ceid": "CN:zh-Hans"},
+                timeout=30,
+            )
+            r.raise_for_status()
+            feed = fp.parse(r.content)
+            for entry in feed.entries[:15]:
+                title = (entry.get("title") or "").strip()
+                link = (entry.get("link") or "").strip()
+                if not title or not link:
+                    continue
+                key = (title, link)
+                if key in seen:
+                    continue
+                seen.add(key)
+                items.append(RawItem(
+                    site_id="bjx", site_name="北极星电力网",
+                    title=title, url=link,
+                    published_at=_entry_published(entry),
+                ))
+        except Exception:
+            continue
     return items
 
 
@@ -3146,6 +3164,9 @@ FOREIGN_GOV_SITES = {
     "eu_commission", "euractiv", "india_pib",
     "jp_moe", "jp_meti", "jp_anre",
     "ncsc", "caep",
+    # 国际能源机构（2026-08-23 补：IEA/IRENA 周更~双周更，24h 窗口会整源滤空，
+    # 62 天 0 条即此因；与国外官方源同级 7 天宽窗口）
+    "iea", "irena", "unfccc", "worldbank",
 }
 
 # 超低频源（2026-08-17）：国际智库更新周级~双周级（Agora 最新条目可超 14 天），
@@ -3514,15 +3535,30 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
     items = [it for it in seen.values() if (_item_time(it) or now) >= cutoff]
     # 统一清理历史条目的标题尾部源名后缀，并回填缺失的 title_zh（非中文才翻译，
     # 带缓存；历史条目的旧标题可能残留 " - EPA" 等后缀 — 2026-08-18）
+    # 2026-08-23：回填翻译改为并发 3（原串行几百条 × TMT 限流会拖死 merge，
+    # 实测 update_news.py 卡在 merge_history 数分钟——62 天 0 条断源根因之一）
     for it in items:
         _t = _strip_title_suffix(it.get("title", "") or "")
         if _t != it.get("title", ""):
             it["title"] = _t
         it.setdefault("title_zh", "")
-        if translator.needs_translation(it.get("title", "")) and not (it.get("title_zh") or "").strip():
-            _zh = translator.translate_title(it.get("title", ""))
-            if _zh:
-                it["title_zh"] = _zh
+        # 历史条目摘要统一清洗（2026-08-23：国家节能中心/上海环交所等旧条目
+        # summary 残留页脚垃圾词——清洗逻辑后来增强过，旧数据未重洗）
+        if it.get("summary"):
+            _s = _clean_summary(it["summary"])
+            if _s != it["summary"]:
+                it["summary"] = _s
+    _missing_zh = [it for it in items
+                   if translator.needs_translation(it.get("title", "")) and not (it.get("title_zh") or "").strip()]
+    if _missing_zh:
+        from concurrent.futures import ThreadPoolExecutor as _TPE, as_completed as _AC
+        with _TPE(max_workers=3) as _ex:
+            _futs = {_ex.submit(translator.translate_title, it["title"]): it for it in _missing_zh}
+            for _fut in _AC(_futs):
+                _zh = _fut.result()
+                if _zh:
+                    _futs[_fut]["title_zh"] = _zh
+    for it in items:
         # 回填地域（2026-08-19 修复）：旧条目首次收录时 region 可能为空（早期逻辑
         # 未算）或按 site 误标（中国站转载国际新闻被标「中国」）——每次 merge
         # 用最新 detect_region 重算，前端国内/国际筛选依赖此字段
@@ -3555,6 +3591,7 @@ def main() -> int:
 
     now = utc_now()
     session = create_session()
+    _t0 = time.monotonic()
 
     # ── Fetch all sources ───────────────────────────────────────────────────
     raw_items: list[RawItem] = []
@@ -3601,6 +3638,7 @@ def main() -> int:
     # ── Dedup (no time window) for Obsidian export ──────────────────────────
     seen_ids: set[str] = set()
     seen_items: set[str] = set()  # 2026-08-19: 统一按规范化标题去重（见下）
+    print(f"  抓取完成: {len(raw_items)} 条 raw（{sum(1 for s in source_statuses if s['ok'])}/{len(source_statuses)} 源 ok，耗时 {time.monotonic()-_t0:.0f}s）", flush=True)
 
     all_items: list[dict[str, Any]] = []
     green_items: list[dict[str, Any]] = []
@@ -3613,6 +3651,7 @@ def main() -> int:
         _t = _strip_title_suffix(raw.title)
         if translator.needs_translation(_t):
             _titles_to_translate.add(_t)
+    print(f"  翻译开始: {len(_titles_to_translate)} 条非中文标题（QPS=5 限流，可能耗时数分钟，t+{time.monotonic()-_t0:.0f}s）", flush=True)
     title_zh_map: dict[str, str] = {}
     if _titles_to_translate:
         # 并发 3：TMT 免费版默认 QPS=5，6 并发会触发 RequestLimitExceeded 限流
@@ -3628,6 +3667,7 @@ def main() -> int:
                     _zh = None
                 if _zh:
                     title_zh_map[_t] = _zh
+    print(f"  翻译完成: {len(title_zh_map)} 条已译（t+{time.monotonic()-_t0:.0f}s）", flush=True)
 
     for raw in raw_items:
         tid = make_item_id(raw.site_id, raw.title, raw.url)
@@ -3638,7 +3678,9 @@ def main() -> int:
         # 去重（2026-08-19）：统一按规范化标题——Google News 聚合 URL 是 base64
         # 且每次抓取不同，按 url 去重会漏（实测日本环境省一条新闻 x8 重复）。
         # seen_ids（url 维度）仍保留作快速通道；真正防重复靠 title_key。
-        title_key = _title_dedup_key(raw.title)
+        # 2026-08-23：key 用 strip 后缀后的标题（raw.title 带 " - 36氪" 等源名
+        # 后缀时 key 不同 → 跨源同新闻不去重，QA F1 实测 36kr/jiqizhixin 重复）
+        title_key = _title_dedup_key(_strip_title_suffix(raw.title))
         if title_key in seen_items:
             continue
         seen_items.add(title_key)
@@ -3725,12 +3767,42 @@ def main() -> int:
                 archived_summaries = {}
 
     # 技术特征缓存（url → tech_feature，统一从 output_dir 加载，两个分支都适用）
+    # 2026-08-23 修复：缓存 key 改用规范化标题（Google News 聚合 URL 每次抓取都变，
+    # 按 URL 缓存永不命中 → 每次抓取对全部 Layer 2/3 条目重复调 LLM，实测卡 8+ 分钟）。
+    # 旧 URL-key 缓存通过 history.json 的 url→title 映射自动转为标题 key。
     tech_feature_path = output_dir / "tech-feature-index.json"
+    archived_tech_features: dict[str, str] = {}
     if tech_feature_path.exists():
         try:
-            archived_tech_features = json.loads(tech_feature_path.read_text(encoding="utf-8"))
+            _tf_raw = json.loads(tech_feature_path.read_text(encoding="utf-8"))
         except Exception:
-            archived_tech_features = {}
+            _tf_raw = {}
+        # URL key → 标题 key 迁移（幂等：标题 key 已存在则跳过）
+        _hist: list = []
+        _url_to_title: dict = {}
+        try:
+            _hist = (json.loads((output_dir / "history.json").read_text(encoding="utf-8")) or {}).get("items", []) or []
+            _url_to_title = {it.get("url", ""): it.get("title", "") for it in _hist if it.get("url")}
+        except Exception:
+            pass
+        for _k, _v in _tf_raw.items():
+            if "://" in _k and _k in _url_to_title:  # 旧 URL key
+                _tk = _title_dedup_key(_url_to_title[_k])
+                if _tk:
+                    archived_tech_features[_tk] = _v
+            else:
+                archived_tech_features[_k] = _v  # 已是标题 key 或新格式
+        # 预填充：history.json 全部非政策条目（标题 key → tech_feature 或"无"），
+        # 最大化命中率——raw 与 history 标题重叠度高（2026-08-23）
+        try:
+            for _it in (_hist or []):
+                if not isinstance(_it, dict) or _it.get("dimension") == "绿色政策":
+                    continue
+                _tk = _title_dedup_key(_it.get("title", ""))
+                if _tk and _tk not in archived_tech_features:
+                    archived_tech_features[_tk] = _it.get("tech_feature") or "无"
+        except Exception:
+            pass
 
     def _archived_to_iso(pub: str) -> str:
         if " " in pub:
@@ -3740,7 +3812,16 @@ def main() -> int:
     # NOTE: green_items shares the same dict objects as all_items, so this
     # single pass covers both lists (do not loop green_items again — it would
     # overwrite time_source).
-    for rec in all_items:
+    # 2026-08-23 修复：只在窗口内条目（前端展示的）上做回填/打分/技术特征提取——
+    # 原对全量 all_items（含窗口外 Google News 旧文）提取，667 条未命中 × 3-10s
+    # LLM 调用 = 主流程卡死 8+ 分钟（62 天 0 条断源根因）。
+    # ⚠️ 遍历集 = all_items_24h ∪ green_items_24h（green 用 7/21 天宽窗口，
+    # 包含 96h 窗口外的条目——漏掉它们会缺 score/dimension/region 等字段）
+    _to_process: dict[int, dict] = {id(r): r for r in all_items_24h}
+    for _r in green_items_24h:
+        _to_process.setdefault(id(_r), _r)
+    _tf_missing: list[tuple[dict, str]] = []  # 技术特征未命中的 (rec, key)，循环后并发提取
+    for rec in _to_process.values():
         # 完整标题回填：笔记里的标题已用详情页标题修正，列表页截断标题
         # （如碳交易网 "…现状与未"）会被覆盖为完整版（2026-08-11）。
         # 回填时同样清理尾部源名后缀（title-index.json 里可能存了旧带后缀标题）。
@@ -3761,7 +3842,9 @@ def main() -> int:
         if not rec.get("summary"):
             summary = archived_summaries.get(rec.get("url", ""))
             if summary:
-                rec["summary"] = summary
+                # 2026-08-23：回填摘要也要过 _clean_summary（历史存的旧摘要
+                # 可能残留"打印本页/关闭窗口"等页脚垃圾词——QA B2 实测）
+                rec["summary"] = _clean_summary(summary)
         if not rec.get("published_at"):
             if rec.get("url") in archived_pub:
                 rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
@@ -3796,14 +3879,11 @@ def main() -> int:
         # 技术特征提取（2026-08-23 新增，护城河字段）：仅 Layer 2/3 提取，Layer 1 政策类跳过
         rec["tech_feature"] = ""
         if dimension != "绿色政策":
-            _tf_url = rec.get("url", "")
-            if _tf_url in archived_tech_features:
-                rec["tech_feature"] = archived_tech_features[_tf_url]
+            _tf_key = _title_dedup_key(rec.get("title", "")) or rec.get("url", "")
+            if _tf_key in archived_tech_features:
+                rec["tech_feature"] = archived_tech_features[_tf_key]
             else:
-                _tf = tech_feature.extract_tech_feature(rec.get("title", ""), rec.get("summary", ""))
-                if _tf and _tf != "无":
-                    rec["tech_feature"] = _tf
-                    archived_tech_features[_tf_url] = _tf
+                _tf_missing.append((rec, _tf_key))  # 循环后统一并发提取（2026-08-23）
         # 区域字段（2026-08-17）：前端排行榜/时间线「国内/国际」切换依赖
         rec["region"] = detect_region(rec.get("site_id", ""), rec.get("title", ""))
         # 主题标签（2026-08-19）：仅主题标签（TOPIC_RULES），供前端「关系图谱」
@@ -3825,7 +3905,26 @@ def main() -> int:
         if people:
             rec["people"] = people
 
-    # Persist the url→published map so CI runs can reuse it
+    # 技术特征未命中项并发提取（2026-08-23：原串行，1200+ 条 × 3-10s = 卡死主流程；
+    # SiliconFlow QPS=5，4 并发安全）。"无"也缓存（避免重复调 LLM）。
+    if _tf_missing:
+        print(f"  技术特征提取: {len(_tf_missing)} 条未命中缓存，并发 4 提取中（t+{time.monotonic()-_t0:.0f}s）", flush=True)
+        from concurrent.futures import ThreadPoolExecutor as _TPE2, as_completed as _AC2
+        with _TPE2(max_workers=4) as _ex:
+            _futs = {_ex.submit(tech_feature.extract_tech_feature,
+                                rec.get("title", ""), rec.get("summary", "")): (rec, k)
+                     for rec, k in _tf_missing}
+            for _fut in _AC2(_futs):
+                rec, k = _futs[_fut]
+                try:
+                    _tf = _fut.result()
+                except Exception:
+                    _tf = ""
+                if _tf:
+                    if _tf != "无":
+                        rec["tech_feature"] = _tf
+                    archived_tech_features[k] = _tf  # "无"也缓存，避免重复调 LLM（2026-08-23）
+        print(f"  技术特征提取完成（t+{time.monotonic()-_t0:.0f}s）", flush=True)
     if archived_pub:
         (output_dir / "published-index.json").write_text(
             json.dumps(archived_pub, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -3887,12 +3986,15 @@ def main() -> int:
 
     (output_dir / "latest-24h.json").write_text(
         json.dumps(green_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"  ✅ 写文件: latest-24h {len(green_items_24h)} 条 → {output_dir}", flush=True)
     (output_dir / "latest-24h-all.json").write_text(
         json.dumps(all_payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (output_dir / "source-status.json").write_text(
         json.dumps(status_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     # 历史累积（2026-08-17）：日/周/月排行榜数据源，每次抓取合并新条目
+    print(f"  merge_history 开始（{len(green_items_24h)} 条 24h 窗口）", flush=True)
     merge_history(output_dir, green_items_24h, now)
+    print("  merge_history 完成", flush=True)
 
     print(f"✅ Green Policy Radar done.")
     print(f"   Green items: {len(green_items_24h)}")

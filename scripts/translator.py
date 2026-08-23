@@ -43,6 +43,41 @@ _CJK_RE = re.compile(r"[\u4e00-\u9fff]")
 # 拉丁字母
 _LATIN_RE = re.compile(r"[A-Za-z]")
 
+# ── 翻译前预处理（2026-08-23 补：X 平台 emoji 标题翻译残留/失败根因）────
+# emoji/符号区间：TMT 对 emoji 处理差，混在标题里会导致翻译失败或译文残留
+_EMOJI_RE = re.compile(
+    "["
+    "\U0001F300-\U0001FAFF"  # 杂项符号和象形文字
+    "\U0001F000-\U0001F0FF"  # 麻将/扑克
+    "\U0001F900-\U0001F9FF"  # 补充符号
+    "\U0001F1E6-\U0001F1FF"  # 国旗
+    "\U00002600-\U000027BF"  # 杂项符号
+    "\U00002B00-\U00002BFF"  # 箭头/杂项
+    "\U0000FE0F\U0000FE00"   # 变体选择符
+    "\U00002190-\U000021FF"  # 箭头
+    "]+",
+    re.UNICODE,
+)
+# URL（t.co 短链 / 完整 URL）：TMT 会把 URL 原样混进中文译文，翻译前剥离
+_URL_RE = re.compile(r"https?://\S+|t\.co/\S+", re.IGNORECASE)
+# @用户名：TMT 保留 @xxx 原样，混在中文里成噪音
+_AT_RE = re.compile(r"@[\w_.]+")
+# 翻译后仍残留的 URL/@（TMT 偶发把未剥离 token 拼进译文，二次清理）
+_POST_RESIDUE_RE = re.compile(r"https?://\S+|t\.co/\S+|@[\w_.]+")
+
+
+def preprocess_title(title: str) -> str:
+    """翻译前预处理：剥离 emoji / URL / @用户名，压缩空白。
+
+    保留 #hashtag（如 #CBarchive 有信息量，TMT 通常原样保留）。
+    """
+    t = (title or "").strip()
+    t = _EMOJI_RE.sub(" ", t)
+    t = _URL_RE.sub(" ", t)
+    t = _AT_RE.sub(" ", t)
+    t = re.sub(r"\s+", " ", t).strip()
+    return t
+
 
 def needs_translation(title: str) -> bool:
     """判断标题是否非中文（需要翻译成中文）。
@@ -212,6 +247,9 @@ def translate_text(text: str, source: str = "auto",
         out = resp.get("TargetText", "").strip()
         # 清理作者署名残留（X平台推文翻译后残留 "✍️ Written by @xxx" 等，2026-08-23）
         out = re.sub(r"\s*[✍️🖊️✒️]?\s*Written by\s+@?\S+.*$", "", out).strip()
+        # 二次清理 URL/@ 残留（TMT 偶发把未剥离 token 拼进译文，2026-08-23）
+        out = _POST_RESIDUE_RE.sub(" ", out)
+        out = re.sub(r"\s+", " ", out).strip()
         return out or None
     except Exception:
         if _retry < 1:
@@ -247,15 +285,22 @@ def _save_cache() -> None:
 
 
 def translate_title(title: str, use_cache: bool = True) -> Optional[str]:
-    """翻译标题；非中文才翻译，失败/已中文返回 None。"""
+    """翻译标题；非中文才翻译，失败/已中文返回 None。
+
+    翻译前剥离 emoji/URL/@用户名（X 平台推文标题，2026-08-23）——
+    TMT 对 emoji 处理差，混入会翻译失败或译文残留英文。
+    """
     t = (title or "").strip()
     if not t or not needs_translation(t):
         return None
+    clean = preprocess_title(t)
+    if not clean:
+        return None  # 剥离后无有效文本（纯 emoji 推文），不翻译
     if use_cache:
         cache = _load_cache()
         if t in cache:
             return cache[t]
-    out = translate_text(t)
+    out = translate_text(clean)
     if out:
         _cache[t] = out
         if use_cache:

@@ -76,12 +76,21 @@ def _prefill_cache_from_history() -> int:
             continue
         if it.get("dimension") == "绿色政策":
             continue
-        url = it.get("url", "")
-        if not url or url in tf_cache:
+        # 缓存 key 统一用规范化标题（2026-08-23：Google News 聚合 URL 每次抓取不同，
+        # 按 URL 缓存永不命中；与 update_news.py 的 key 规则一致）
+        _tk = _title_key(it.get("title", "")) or it.get("url", "")
+        if not _tk or _tk in tf_cache:
             continue
-        tf_cache[url] = it.get("tech_feature") or "无"
+        tf_cache[_tk] = it.get("tech_feature") or "无"
         added += 1
     return added
+
+
+def _title_key(title: str) -> str:
+    """与 update_news.py 的 _title_dedup_key 同规则（去空白/标点/小写，前 120 字符）。"""
+    import re as _re
+    t = _re.sub(r"[\s\u3000\-_—–()（）【】\[\]「」『』・,，.。:：;；/\\|]", "", (title or "").lower())
+    return t[:120]
 
 
 def migrate_file(path: Path) -> int:
@@ -130,11 +139,12 @@ def migrate_file(path: Path) -> int:
                 it["tech_feature"] = ""
             if dim != "绿色政策" and not it.get("tech_feature"):
                 _tf_url = it.get("url", "")
-                if _tf_url in tf_cache:
-                    _tf = tf_cache[_tf_url]  # 命中（含"无"），不再调 LLM
+                _tf_key = _title_key(it.get("title", "")) or _tf_url
+                if _tf_key in tf_cache:
+                    _tf = tf_cache[_tf_key]  # 命中（含"无"），不再调 LLM
                 else:
                     _tf = tf.extract_tech_feature(it.get("title", ""), it.get("summary", ""))
-                    tf_cache[_tf_url] = _tf or "无"  # 空串也缓存为"无"，避免重复调用
+                    tf_cache[_tf_key] = _tf or "无"  # 空串也缓存为"无"，避免重复调用
                     save_tf_cache()
                 if _tf and _tf != "无":
                     it["tech_feature"] = _tf

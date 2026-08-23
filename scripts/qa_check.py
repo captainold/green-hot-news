@@ -70,11 +70,12 @@ _NAV_JUNK_RE = re.compile(
 # 中文导航/站名/垃圾标题与摘要词（历史踩坑：8-19「文章来源」+「我的位置」导航垃圾、8-20 站名当标题）
 _ZH_JUNK_WORDS = [
     "文章来源", "我的位置", "首页", "网站首页", "导航", "网站地图", "sitemap",
-    "登录", "关于我们", "联系我们", "隐私政策", "版权声明",
+    "关于我们", "联系我们", "隐私政策", "版权声明",
     "免责声明", "页面不存在", "无法访问", "访问异常", "系统繁忙", "确认跳转",
     "正在跳转", "跳转提示", "您正在访问", "敬请期待", "开通会员", "阅读全文",
     "查看原文", "扫码下载", "加入收藏", "打印本页", "关闭窗口", "返回顶端",
-]  # 注：不含"注册"（财经语境太常见：注册资本，2026-08-21 误报过中国能源报）
+]  # 注：不含"注册"（财经语境太常见：注册资本，2026-08-21 误报过中国能源报）、
+# 不含"登录"（交易/系统语境太常见："竞买人须登录XX系统"，2026-08-23 误报上海环交所）
 _ZH_JUNK_TITLE_RE = re.compile(r"(^(%s)(\s*[-|—·:：])?)|(([-|—·:：]\s*)?(%s)$)" % (
     "|".join(_ZH_JUNK_WORDS), "|".join(_ZH_JUNK_WORDS)), re.IGNORECASE)
 
@@ -135,7 +136,10 @@ class QaReport:
         if len(s) < 10:
             self.add(WARN, "B3", f"摘要过短({len(s)}字): {s}", it.get("site_name", ""), it.get("url", ""))
         if s[-1] in "，、；：,—-":
-            self.add(WARN, "B4", f"摘要截断在非终止标点: …{s[-40:]}", it.get("site_name", ""), it.get("url", ""))
+            # 2026-08-23：仅长度 ≥480（接近 text[:500] 截断阈值）才报 warn——
+            # X 平台推文/Google News 预览的短摘要自然结尾（人名/hashtag）不是截断
+            if len(s) >= 480:
+                self.add(WARN, "B4", f"摘要截断在非终止标点: …{s[-40:]}", it.get("site_name", ""), it.get("url", ""))
         if _HTML_ENTITY_RE.search(s):
             self.add(ERR, "B5", f"摘要含 HTML 残留: {s[:60]}…", it.get("site_name", ""), it.get("url", ""))
 
@@ -261,9 +265,11 @@ def build_report(items, now, source_status):
     # 汇总类告警（逐条报会刷屏，按占比只报一条）
     n = len(items)
     empty_ratio = rep.stats.get("empty_summary", 0) / n if n else 0
-    if empty_ratio > 0.5:
+    # 2026-08-23：阈值放宽——Google News RSS 源（gov/智库）不带 description 是源特性，
+    # 空摘要占比 50-65% 属正常（8/21 的 47% 也报 warn，61% 报 error 误伤）
+    if empty_ratio > 0.65:
         rep.add(ERR, "B1", f"摘要为空占比过高: {rep.stats['empty_summary']}/{n} ({empty_ratio:.0%})，抓取链路可能整体缺摘要")
-    elif empty_ratio > 0.25:
+    elif empty_ratio > 0.35:
         rep.add(WARN, "B1", f"摘要为空占比偏高: {rep.stats['empty_summary']}/{n} ({empty_ratio:.0%})")
     if rep.stats.get("no_title_zh", 0) > 10:
         rep.add(WARN, "C1", f"非中文标题缺 title_zh 达 {rep.stats['no_title_zh']} 条，翻译链路可能故障（检查 QPS/密钥）")

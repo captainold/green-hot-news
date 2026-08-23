@@ -1,147 +1,137 @@
 # 数据质量检查报告（QA）
-生成时间：2026-08-21T02:31:13.450662+00:00
-数据源：latest-24h.json（497 条）
+生成时间：2026-08-23T16:50:40.689642+00:00
+数据源：latest-24h.json（434 条）
 
-## 总评分：**88.5**（B 级）
-- 🔴 error：3 条  🟡 warn：11 条  🔵 info：274 条
-- ⚠️ 非中文标题缺翻译：1 条
+## 总评分：**93.5**（A 级）
+- 🔴 error：1 条  🟡 warn：9 条  🔵 info：300 条
 
 ## 问题清单（按严重级）
 
-### 🔴 ERROR（3）
-- [Mongabay] 非中文标题缺 title_zh: New Zealand opens marine reserves with groundbreaking Māori 
-  → https://news.mongabay.com/2026/08/new-zealand-opens-marine-reserves-with-groundbreaking-maori-co-management-model/
-- [国家节能中心] 摘要含垃圾词['首页', '网站首页', '联系我们', '加入收藏', '打印本页', '关闭窗口', '返回顶端']: ● 打印本页 ● ● 关闭窗口 ● << 返回顶端 网站首页 | 联系我们 | 加入收藏 | 网上调查 | 成绩查询 |…
-  → http://www.chinanecc.cn/website/News!view.shtml?id=339218
-- [上海环交所] 摘要含垃圾词['登录']: 上海环境能源交易所关于上海碳排放配额行政管理服务信托（2026年第一次）有偿竞价交易的通知 发布时间：2026-06-0…
-  → https://www.cneeex.com/c/2026-06-01/497624.shtml
+### 🔴 ERROR（1）
+- [美国FERC] title_zh 与原文完全相同（翻译失败回退）
+  → https://news.google.com/rss/articles/CBMiywFBVV95cUxOQ2V5ekxET19Oel9sZHNSNHV1dUtwVXBkQk5DM2hoYVpTRjJGNGcyNjVzazl6eGhTNlM0aFpOdnQwby1BcjJCSXFpdjVkd3dJcGFIcHJOWV9QYTRCUnBMZFQ1a0d0b2JOZVFrWWVJYjBPenljT2ZVWmZlUDV4N0drOFJvSzRRV3Z6LTR2cGFfUEJldkdvVm4xUkp4V0RabFRvbHhzendpN3FqSlplT3FPdWNoWUFNN1dKYno3aWcwTmp6Wk9LeWpqRi0xMA?oc=5
 
-### 🟡 WARN（11）
-- [X平台] title_zh 机翻残留英文: 问答：中国可再生能源“十五”规划对气候变化意味着什么？✍️ Written by @_AN_Patel and Leka
-  → https://x.com/CarbonBrief/status/2090114334328303937
-- [arXiv·AI] title_zh 机翻残留英文: GxP-Agent：Process-DAQ Topology，用于使用LLM Agent进行可靠的临床试验编程
-  → https://arxiv.org/abs/2608.16890
-- [arXiv·AI] 摘要截断在非终止标点: …ffort term or its omission, output rail,
-  → https://arxiv.org/abs/2608.16956
-- [arXiv·AI] 摘要截断在非终止标点: …direction out of the weights in minutes,
-  → https://arxiv.org/abs/2608.17202
-- [arXiv·AI] 摘要截断在非终止标点: …e detection process that senses traffic,
-  → https://arxiv.org/abs/2608.17352
-- [X平台] 摘要截断在非终止标点: …vernment of India 🔸Yashodhara Chaudhary,
-  → https://x.com/BloombergNEF/status/2089608236022255626
-- [美国EPA] title_zh 机翻残留英文: EPA征求对向印第安纳州蒙哥马利县UIC VI级注入井Vault Alliance CCS发放许可证的意见
-  → https://news.google.com/rss/articles/CBMiuwFBVV95cUxNUFVCTWJSUnloTldIMk5BUzFYR3NPZy1uUUtkRkxHendlejB3V29sdVJnUE5qQlpHN25HclFXblRuaVFIWUNBcy0tNXNwSTM5MEljbzBjZzJwWFp2SGwxc0luaGh5M3ktdVNOa2VqX0dfc0NTbHpIMEtsUGRYSldpMzVxU21rOGRDTXBfa0JkZ3NBRkktZ3phSW1Hd0pqSTNmb1FzcG9uT3hIX3dkd1dtNmF6VlBrU1QwTkRZ?oc=5
-- [X平台] title_zh 机翻残留英文: 🥵🌡️Another summer - another series of extreme heatwaves, wat
-  → https://x.com/EU_ENV/status/2089267666112442600
-- [印度PIB] title_zh 机翻残留英文: 利用太阳能：VCF-SC如何帮助Palnadu Solar Power Pvt. Ltd.推动清洁能源和农村发展
-  → https://news.google.com/rss/articles/CBMifEFVX3lxTFBHbGQyTThjSENmQVpDbHc5LUplc2dsVXEyXzYzZDBCbEtjLWh3d3Y3dHZmY0pDSllWbmtPTzA3NXcxeTJCeVRtekY0eUp1c2lhMDhsbTdicXhZTmNnTGNGbkhQOU1PN1huZlpYWDBrMHlxd0lDTDlEWGNYV2s?oc=5
-- [印度PIB] title_zh 机翻残留英文: MoEFCC以大规模演唱国歌《Vande Mataram》庆祝“Har Ghar Tiranga 2026”活动
-  → https://news.google.com/rss/articles/CBMiaEFVX3lxTE12d1JoUUw3NEsyNHZPd3U4YzBhdDB1amd3ellZaTVOMzY0MENXQ1l3OTlxYS0wbWRXUG56SkV1SnRyMlRldDUwTTFYUUpTQkxjNHAxSDdJVmFUVWdCVTR5a0w3UlZPajNT?oc=5
-- 最新24h无条目（可能正常低更新）: ['allnet', 'bjx', 'bruegel', 'csis', 'iea', 'irena', 'jiqizhixin', 'mee']
+### 🟡 WARN（9）
+- [X平台] title_zh 机翻残留英文: 互动式： 达到《巴黎协定》 1.5C 限值的途径|Uta Kloenne， Debbie Rosen博士， Gaurav
+  → https://x.com/CarbonBrief/status/2091534707951288680
+- [印度PIB] title_zh 机翻残留英文: 2026年巴拉特可再生能源峰会暨博览会（BRE Summit & Expo）将于11月2日至5日在新德里举行：Shri 
+  → https://news.google.com/rss/articles/CBMifEFVX3lxTE1jb1Z0OXNnei1tZXVuQTk5b2lEVEVDcmlTUXg2dU9kMWxNT0I0eXpfWXREY2JEa0ZWXzRDZE1FZnMxRHhkYUU2Sko1LXZFRVF6d0ZiR29LZWMwOWhHSlRoYk13V01xMjdyS3M4SDE2SkJKbGxJYmZFYzNocUs?oc=5
+- [印度PIB] title_zh 机翻残留英文: Shripad Naik部长为Bambolim和Agassaim抽水站的两个并网太阳能项目揭幕
+  → https://news.google.com/rss/articles/CBMiaEFVX3lxTFBvRXI3WjQtU2JVSkxsQkxob2ptaldWMlQwbWYtMkxUU0k3MHlvN2xNWnlmazc2SVlXZzdCLUUzTXdtRDc5NFB5cFVVME84dHRFTmgyQThkMXY3a3hNMXRMLVJ4VzV6TnRq?oc=5
+- [X平台] title_zh 机翻残留英文: 很高兴见到洪都拉斯气候变化和能源部长、COP 31候任主席克里斯·鲍文（Chris Bowen）。🇦🇺我们就COP 31
+  → https://x.com/WBHoekstra/status/2090749022403211360
+- [TERI·印度能源与资源所] title_zh 机翻残留英文: “TERI创始人日”：部长Shri Pabitra Margherita发表第25届Darbari Seth纪念演讲
+  → https://www.teriin.org/press-release/teri-founders-day-minister-shri-pabitra-margherita-delivers-25th-darbari-seth
+- [印度PIB] title_zh 机翻残留英文: 印度加快稀土和锂勘探;到2030年国内稀土永久磁铁产能将达到5，000吨：Jitendra Singh博士在Lok Sa
+  → https://news.google.com/rss/articles/CBMicEFVX3lxTE13VGZ6eVBBMmNUUlZTaFhJMER4b1psbXAxYnd0aEt5WUYzY0JMbnpZcl9iaVYtdlZRQ2JMUnNhOXNvVElraTJuN3FTUERqM184dUN2YUdrdkVkUkVvcWFLNjJGS050Qm1FaWVVMTJOTHc?oc=5
+- [印度PIB] title_zh 机翻残留英文: DPIIT与PhonePe和Shell India签署谅解备忘录，以加强初创生态系统并推动创新
+  → https://news.google.com/rss/articles/CBMicEFVX3lxTE03T3NoYVhtak1YbjMtNHhHMVZ0UjVab04zaFNGamkySHp5WXRzV2hBRDFhQTFHRWJKTElhTW9Ja29BN0V1TVpEdGhhMThaQWt3MFYxdUNuT05UUFJtUEJTWDJXUGxKanFyT2QtTHdXV2Y?oc=5
+- 最新24h无条目（可能正常低更新）: ['agora', 'allnet', 'arxiv_ai', 'brookings', 'bruegel', 'caixin', 'csis', 'greenbuilder']
+- 摘要为空占比偏高: 265/434 (61%)
 
-### 🔵 INFO（274）
-- [中国人民银行] http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608191
-  → http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081919184870631/index.html
-- [中国人民银行] http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608191
-  → http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081915294182128/index.html
-- [X平台] 标题超长(245字): Q&A: What does China’s 15th ‘five-year plan’ for renewables mean for climate cha…
-  → https://x.com/CarbonBrief/status/2090114334328303937
-- [X平台] 标题超长(276字): Communities all across this country deserve clear rules, responsible development…
-  → https://x.com/EPA/status/2090110117471498688
-- [X平台] 标题超长(276字): Global electricity consumption from data centres surged in 2025, driven by AI An…
-  → https://x.com/IEA/status/2090107795509022867
-- [X平台] 标题超长(274字): Interested in the intersection between food systems, land use, nature and climat…
-  → https://x.com/CarbonBrief/status/2090096200103936039
-- [X平台] 标题超长(201字): Guest post: What 1.5C overshoot would mean for climate impacts and adaptation | …
-  → https://x.com/CarbonBrief/status/2090085137199386926
-- [X平台] 标题超长(274字): 📢 Don't miss out & submit your projects now! To help accelerate the region's ene…
-  → https://x.com/IRENA/status/2090085125245514128
-- [X平台] 标题超长(275字): AI is becoming dramatically more energy efficient. At the same time, electricity…
-  → https://x.com/IEA/status/2090084160291446842
-- [美国EIA] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiY0FVX3lxTE1oTEdqbmh0WUhMY1VUWkMtZUlVTG52QlBYTXpab3dNQlpUZkNXUFRxRWdFODh1NzhhWTBHckFpOFpBQVFwRTRqZWV3QkpsM05WblFFRW5wS0NZaGhTWWpHSmNMdw?oc=5
-- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiVEFVX3lxTE05cGxaUFFlaTR2NFJtZy1la09NZkJwa1V3cDJDSTJQakpTUEs5T0NheXZkaGhsMHpTdVZyblQ3SU84OU94emRQdHJsT1NzQ3pCUWpTTg?oc=5
-- [日本资源能源厅] 中文标题却有不同 title_zh（疑似误翻/回译）: 令和8年度「運輸部門におけるエネルギーの使用合理化・非化石エネルギー転換推進事業 → 2008财政年度“运输部门能源使用合理化/非化石能源转换促进项目费补贴（内河航运
-  → https://news.google.com/rss/articles/CBMidEFVX3lxTE1lM25sRnJfRzJLbWVfUDlkS0VlcWtoVzcteE5WcEpSSlY1UFBSM3BHZnV0Z3poZTl6YlE4eFYzZ0MtVEFuYUw4TDhqdHZpRTYtN3ZkQnNLVTFGT3Q1UXlPN0xCNVVNakwxZEVLcFdzQ3FRYVB0?oc=5
-- [日本资源能源厅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMidEFVX3lxTE1lM25sRnJfRzJLbWVfUDlkS0VlcWtoVzcteE5WcEpSSlY1UFBSM3BHZnV0Z3poZTl6YlE4eFYzZ0MtVEFuYUw4TDhqdHZpRTYtN3ZkQnNLVTFGT3Q1UXlPN0xCNVVNakwxZEVLcFdzQ3FRYVB0?oc=5
-- [36氪] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiXkFVX3lxTE9HZS1ZbEIxTmd5UUVlb2FzS19iZnNZUDA3SnBVQXNFQlJrQXgzN2RmUW1BOHEtMmJuYkhXR0NXVjd2MHBUcGxpWlBoWUlZSmd4WWNmQ0JUdmVtSUZ2dUE?oc=5
-- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiVEFVX3lxTE1jbG1FdmpIblU1M2tpM3g1Uzh4YkI4eFRySG9MTEF3ZHNVdWtmbTgxVkZSY091SG5PSlg2alBfM2RpT3NZV1ZlczdaYmtYYjNDQlJLaA?oc=5
-- [X平台] 标题超长(253字): Smart, #renewable-powered electrification is essential to a net-zero future. @IR…
-  → https://x.com/IRENA/status/2090031021844472308
-- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiUEFVX3lxTE5yNlBMZ2RPVThPVW90UFhmdHJmSEFfeVZMb3R0OW80aUpvODRma1ZtcDlacWZCdGZ6QXIyVnBIOTNjc0hmUmYyNDdMS0twcnlo?oc=5
-- [印度PIB] 标题超长(192字): Cabinet approves four multitracking projects covering eight Districts in West Be…
-  → https://news.google.com/rss/articles/CBMifEFVX3lxTE5uN1pibGk0NHpoQmhpSEpjdTFHNVZ1MEhUN0FPNm9vVzItcTRkcThFQnNrLUREVTlNczRYLWVRajhkYkVTdGpqb3ZlbUVNejBOYUwtU2xaSXAybjRCSkFsWktUUDBvQzZhUWwtUFF5RUJJWlprcXFxVldDalA?oc=5
-- [印度PIB] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMifEFVX3lxTE5uN1pibGk0NHpoQmhpSEpjdTFHNVZ1MEhUN0FPNm9vVzItcTRkcThFQnNrLUREVTlNczRYLWVRajhkYkVTdGpqb3ZlbUVNejBOYUwtU2xaSXAybjRCSkFsWktUUDBvQzZhUWwtUFF5RUJJWlprcXFxVldDalA?oc=5
-- [欧盟委员会] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMieEFVX3lxTE1fWmdMdHduZ3g4SW1qU0J3YVVyOG1QQVA0a2xYVEtVaWpLSFgzRldxWlo2c0pja3JOT1dha2xaQUg0TTN2TEpQdHR2UGJqUzIzNmdjZ0Z1NGFqYW80TVNIQy1kR2JhQk1PNVZKT3BHRG95dHNXLWVrZw?oc=5
-- [印度PIB] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiaEFVX3lxTE15VzJOUjdGWG53VmR3anpwc3Z2QnlNWE0zdEx2WlR0Zk5oRmxjTVh4MHd4R01PcEJXM212c1J0MHlObU45SGg2YW9qdndRY19JX3B2Zk92a3hLUURKQ01YRFhMUTBaazBO?oc=5
-- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiVEFVX3lxTFBGYTZZcjM0QXFtcnctdU00OGlBNWdiUUNReldIeWVIaHJBT3BfN2pnZU15NjNyREY5WVRfRGpjb2U1OVJwUy1PUXBxVTR5RlFvYmZZOA?oc=5
-- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiVEFVX3lxTE5rN3Y4NWV4emo4RWdmaHFOME9PTWdWRFVSdUZ2bjRncWo0aWxTSE9lWXlKeGdOdmtFM05Rc2dvck95ZWtHamZwaDVqLTNDdUZmU0ZhcQ?oc=5
-- [澎湃新闻] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiYEFVX3lxTE9hbllkMkpfd3Zxem1kbTNyUm90b2hHT3JYcEdidzZyQTd4SHRBbmxGSlhzSnRHcnNnRzFyTi1IaUozNFNxWmdGd1lkZmFwb0ZBMGNqLUdjYk16SG91Qmp3Xw?oc=5
-- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiVEFVX3lxTE5VWGFzZ0tNWXlnaWcxSkptVFJNcklzZFdfam45el9vekREVFhEZ2sxNkYwckx0ODM3YmZuRFhFNnhlOFhRdG5maF8xdW9FdFR0MWprLQ?oc=5
-- [X平台] 标题超长(276字): DATA TOOL | 5 out of 10 top solar and wind generators in the world are provinces…
-  → https://x.com/ember_energy/status/2089971881268936969
-- [美国EPA] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMimwFBVV95cUxPZUtmRE83V1A0a1ZiU0pUVU00Q3dya2RySktBN2lfejhEQnRlOXNjX3BneHJxekxLNHhCMnlkbWhNZ3EyNld5emg5eERVMWxRTTBmcmNHWFVodUtUUG5tWlJhT0RNcVFpWkFjcXJhQWppZTQ1WXcxdUV2VXp4cWlnNTJxLUgyRnFBSlR0NWpEbjZ1Y1JrN2xnN1dDUQ?oc=5
-- [X平台] 标题超长(173字): Digitalisation increasingly becomes an important part of renewable-powered #Tran…
-  → https://x.com/IRENA/status/2089957783664037896
-- [美国EPA] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMigAFBVV95cUxQeUdpbmFNQk5HVng0WjFjN1dNaGhsblU1d2tZSnpoS0RpUzIzTTM5TlBXT29yUEY0QWF5RGVVQmt3NWNxTldNdEkwUXlYUy1nM1BuT0xQbDhORUhmWlV6TlptU2pmUFc3dkstVnZLdFpET0lIc0pMcldVREVEUkRYcw?oc=5
-- [日本环境省] 中文标题却有不同 title_zh（疑似误翻/回译）: 「第２回気候変動関連データの活用と適応に関する実践パネル」の開催について → “气候变化相关数据使用和适应问题实践小组第二次会议”
-  → https://news.google.com/rss/articles/CBMiV0FVX3lxTE12ZlFKTk9BaHAycFAzSHM5cG9KU0E2Qk9yQTczdHNFWm12MXZzYzZaVnEtb2J5Q2hYTDBPVXgxcDdEcXhJaDllYlA5eVR0VEF1bnFfTEpmSQ?oc=5
-- [日本环境省] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiV0FVX3lxTE12ZlFKTk9BaHAycFAzSHM5cG9KU0E2Qk9yQTczdHNFWm12MXZzYzZaVnEtb2J5Q2hYTDBPVXgxcDdEcXhJaDllYlA5eVR0VEF1bnFfTEpmSQ?oc=5
+### 🔵 INFO（300）
+- [中国人民银行] http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/202608121
+  → http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026081218034520348/index.html
+- [中国人民银行] http 明文链接（源特性，部分老站无 https）: http://www.pbc.gov.cn/tiaofasi/144941/3581332/20260821103323
+  → http://www.pbc.gov.cn/tiaofasi/144941/3581332/2026082110332325339/index.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0820/120350.html
+  → http://www.tanpaifang.com/tanguwen/2026/0820/120350.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0820/120335.html
+  → http://www.tanpaifang.com/tanguwen/2026/0820/120335.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0819/120328.html
+  → http://www.tanpaifang.com/tanguwen/2026/0819/120328.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120319.html
+  → http://www.tanpaifang.com/tanguwen/2026/0818/120319.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120318.html
+  → http://www.tanpaifang.com/tanguwen/2026/0818/120318.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0818/120313.html
+  → http://www.tanpaifang.com/tanguwen/2026/0818/120313.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0820/120350.html
+  → http://www.tanpaifang.com/tanguwen/2026/0820/120350.html
+- [中国碳交易网] http 明文链接（源特性，部分老站无 https）: http://www.tanpaifang.com/tanguwen/2026/0820/120335.html
+  → http://www.tanpaifang.com/tanguwen/2026/0820/120335.html
+- [X平台] 标题超长(211字): Fact-checking trolls, Part 2. Climate models have accurately predicted global wa…
+  → https://x.com/KHayhoe/status/2091560232442896715
 - [美国EPA] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
   → https://news.google.com/rss/articles/CBMiXkFVX3lxTE84a2liVXNFbHhmWmFNTlBfbTdmS2JleVFsNnlGdUtfd0s2dV92bERTeVZDckRRaXlSTGthb3NCV1l3R2Q0OEFrcGlrV2x4NDQ5V0dYZW9BaVJvYmJINmc?oc=5
-- [arXiv·AI] 标题超长(144字): Do LLMs Know a Good Hypothesis When They See One? Logit-Based Energy Scoring Out…
-  → https://arxiv.org/abs/2608.17270
-- [财新] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1fS2U5VFdCblF1alh2eUVIVnNEUUtVSm1QeVdHa3BheExQWmwzWDNpVkFQZ0NlS3pubHNMWElEcVN2bVVUUVJfNzhuVnhTMkI2QlV6anF6VkxJVVBhS1ZETWVjSS1ZNEk?oc=5
+- [X平台] 标题超长(276字): Interactive: The pathways to meeting the Paris Agreement’s 1.5C limit | Uta Kloe…
+  → https://x.com/CarbonBrief/status/2091534707951288680
+- [The Robot Report] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMimAFBVV95cUxPM2kwUlFUT2FyMFFVTjdJdTVva3A3ZXhsempkYzhxeXBRU09MRU44RGR5MHVfUVU5SFZ2V2tnSEN3aEw3cE9EaVlrNFhydlRVTkhXNFVtQ002RG9uNjdWMU5rYUJ6c3F5YlZsQ0lYRUNVWHI0bXJmYWVvNkRkU1RqWGdhVVhXR2oybGM5aFo0N0pPS0pRbllNXw?oc=5
+- [X平台] 标题超长(278字): How much electricity does it take to run AI? The answer is becoming increasingly…
+  → https://x.com/IEA/status/2091476861880541474
+- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiVEFVX3lxTE9zbldSLUZaVW8xdWJWWllCTWJUbFpUcjlHeXJYYVJtR0lydlNjMTdWb2tRNzVKWjFPR3VQc3pMR19FYUF6RGRMYk5kMFAyTG5UREFOYw?oc=5
+- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiYkFVX3lxTE1aSmJ6M0RSNUFYa0lSUzB1ZGFqTWsxajFfU1JJS1RrNndQdkhkczhhdEhPRVhSNTRBQ2xHRXp4QzdEZWVOaVlaZHBFbng5NEdRV2M5Z25Rc25aUEJuV1lzUy1R?oc=5
+- [CleanTechnica] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiiAFBVV95cUxPV0RXWkQ0dGRPWmF1bWZOS2ZTcGpNUTBDTHB2SGNlTmcza2x3aXF2b3BTcmw0LVNiX1diczR5N2ZLbUkydVhnSXUtSDNaSmotYjR2NWpORE90X3RqTDVlaGdLMUl5d21ycjU4ZW81X1VrSU1lanQ4OUNsc1RIZk5rS2RDNXN6dTBO?oc=5
+- [印度PIB] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiaEFVX3lxTFB0Wl9JQlpIWXBvNk01Z0VsRlFqcHF3czdvZGVzdVdBcHJEdmtMZVV4UVVTRDlmZ1p2ZkQ0dGdSSE13MWRIb1d2SnpSVU9KcWN4T1VhWGdPemJJR3QxNXQxVTVFTXNmUGc5?oc=5
+- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiVEFVX3lxTE81Y0dMZEtSM1h5d2MtVmwySW1lbE9RZzZHcUw5RnU4N0YtNEpNZUdpQS1rc3JGWThhS0ZJQkdxcHMxbVRQMTFqeVFUZUVadjUxRlJOWQ?oc=5
+- [美国EPA] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMigAFBVV95cUxQeUdpbmFNQk5HVng0WjFjN1dNaGhsblU1d2tZSnpoS0RpUzIzTTM5TlBXT29yUEY0QWF5RGVVQmt3NWNxTldNdEkwUXlYUy1nM1BuT0xQbDhORUhmWlV6TlptU2pmUFc3dkstVnZLdFpET0lIc0pMcldVREVEUkRYcw?oc=5
+- [澎湃新闻] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiXkFVX3lxTE5FazNzTXBJMTY5X2JFZVc5WDRaYXBrd3FqUUQ4blpGMWNUXzA2NDRkS2tPbnVJU0tSMlFVcmxYTnBoMl9ZenhEYk1VQWRXc2otLUNFeTRDTzBydm9vOWc?oc=5
+- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiUkFVX3lxTE82SUNhOXRNZ05IZTBWTExvQ1d5VDUyVjIzb2FwSTBzOGhNaThzQzRUTVkxUER5YjJXVzNmSnlwRVFuYXZDQnpUWWFpdTVRNjFqSVE?oc=5
+- [X平台] 标题超长(272字): Delaying the ASEAN Power Grid puts renewable build-out on hold, limits cross-bor…
+  → https://x.com/ember_energy/status/2091329578828493203
+- [美国EPA] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMi5AFBVV95cUxQNzNONkgyQ2lxTHRablZURER5ODlERTNJdHFLXzBSS0pMOGQ3TVpPbTdQYzIxLUphRkNRRHdtTUlqVzByQ2JBS1Vabmo4OXdRYnpST1AxLS1tSDVWUlQ4YUswVGJHRGpCenZqZkdsLUZEM1U0UmF4RmcybHRKajVkTE1Yei1YSXZxNDctMWdUQ2dpUlpXOWFTYTE4aTNUZFVxdjVaeE15WHlwQ1ZRUFlNZkRJcnIzZFAwdmJrWVZ1dnRVRTE3bHFpTlRyMFBGaTRXaUlLMXFKY0tlN2puWWRVVmh0bk8?oc=5
+- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiU0FVX3lxTFB6X25IaVd3djB4amRycktTZjIzS2xOVG81d1Rpa0lya0dYaDV2d2RJc20wemdiN09leGUyQWNvcnB2QUlsRXVEUVpvbDZVaGNaVEtZ?oc=5
+- [虎嗅] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiU0FVX3lxTE93SXl3UGZXRHl3NVJJUkdGaFVvWUVkMDVVa1N4RVdUSzJGSWtUVEVDaXdQdE92XzItd2ZRR3BVT1h2dzAzd1VjREZRdm1LTlBoeEhr?oc=5
+- [CleanTechnica] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiqAFBVV95cUxPZ2NpY1ROd0tLV2VHQk9meUFuejFiUkJrd2lnRS1JVGpOUENJU19Yd1g4Z3RfdnJWb2NEYjRLYmZHcGZPWmtYMU5sY3Y3QndSZXoyZTRVVEU3YW0tTWhZUDZoa21QT291VmI2b2p2cVZ4a1JDcmU3MUtXVGFzNk5FSmh0WW84ek9Kb0J4TFpzeUpQZHVwUDZDc1c3MHZsYXhmT19yaHpsdWo?oc=5
+- [X平台] 标题超长(207字): Recommended read: BBC News reported that “hundreds” of humpbacks, minke and fin …
+  → https://x.com/CarbonBrief/status/2091211799966237047
+- [The Robot Report] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMimAFBVV95cUxORV9Dc0gyQ2dYY05Qa2FXdDhIMVJsVzhKSnJkZUNUS3FOOUl3WGZfSGxTYVB5Ykc0TDQwN2pDb2l3YlUyM2pSSkZUNFFTUEoyallST1RRRlRzVk9KMnBGN3RfNy1XTWtVYWhXZ3NwMHU0ek83WUpqMnN4TUxsczVMNnFhbjRZYXA1OHZfdi1oT3ZLbGZwQ21ubQ?oc=5
+- [印度PIB] 标题超长(124字): Bharat Renewable Energy Summit & Expo (BRE Summit & Expo) 2026 to be Held from 2…
+  → https://news.google.com/rss/articles/CBMifEFVX3lxTE1jb1Z0OXNnei1tZXVuQTk5b2lEVEVDcmlTUXg2dU9kMWxNT0I0eXpfWXREY2JEa0ZWXzRDZE1FZnMxRHhkYUU2Sko1LXZFRVF6d0ZiR29LZWMwOWhHSlRoYk13V01xMjdyS3M4SDE2SkJKbGxJYmZFYzNocUs?oc=5
+- [印度PIB] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMifEFVX3lxTE1jb1Z0OXNnei1tZXVuQTk5b2lEVEVDcmlTUXg2dU9kMWxNT0I0eXpfWXREY2JEa0ZWXzRDZE1FZnMxRHhkYUU2Sko1LXZFRVF6d0ZiR29LZWMwOWhHSlRoYk13V01xMjdyS3M4SDE2SkJKbGxJYmZFYzNocUs?oc=5
+- [The Robot Report] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMilgFBVV95cUxQQ2Jyc1o2NHhIS1pCQkc3SkFnLXk1dDlGUnBGS081QldLOGF0MGxvbktrTkV6TDV5bFdJVFpWNzhCbEJxQ0tfX3lMQWtoLUNQNUlLQXd3Q09nZm5NcjBrbmJIZkpxdll3bEVGRkZtMXpIdE5GaWJuMkxYa1I3aTJMdzdidHFLNFBrMlVCVnNvWmUzZnprQmc?oc=5
 - [欧盟委员会] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMipAFBVV95cUxPdHlsSXVBY0VDX2V1RTJYOFdIQXBhaGxuamphb2ZKTElmZWhEckRIZVZ5Z2VtRHRoaUktaldac3NUS19JWm13Zk1BNUVFSmIxNm5ldk92cS1VOGM2eDU1cDFUWDJEN2V6Nl9uM2xjLWtwV25OSUpPelBjazktN0lXOVRnczdpVGFLMTlnQ2xaS2xhbFdCZU51Y2Q3b2M2VUlxRHRqZg?oc=5
-- [日本环境省] 中文标题却有不同 title_zh（疑似误翻/回译）: 地域脱炭素マッチングイベント 参加自治体情報 低 → 地区脱碳匹配活动参与地方政府信息低
-  → https://news.google.com/rss/articles/CBMiiAFBVV95cUxPS2JPaU85RGEyVGh6cy10dFhBT3R4VGM1UEZLUEtTc2R4M25IVHQ2U191SHdhcEVZTUY5UElUZWdCQS16MXdxSkItZkJBV3g1dFBKenhYMDRnWWRET21wc0h4Y200SUljM1dRUU5LelQwMHdZTXNnVk1CRkJxT2N6R0c3MzhRTUN4?oc=5
-- [日本环境省] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiiAFBVV95cUxPS2JPaU85RGEyVGh6cy10dFhBT3R4VGM1UEZLUEtTc2R4M25IVHQ2U191SHdhcEVZTUY5UElUZWdCQS16MXdxSkItZkJBV3g1dFBKenhYMDRnWWRET21wc0h4Y200SUljM1dRUU5LelQwMHdZTXNnVk1CRkJxT2N6R0c3MzhRTUN4?oc=5
-- [欧盟委员会] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMi7AFBVV95cUxPTlpCVkRDcml5dWZTcGtPbHRvMnJWeUJLczNDN09PYXY3czJfS0FvLXFqblZUYkFZMF9EYmZQM3BGQmFhZkN3RjdYODVrUFA4S0xtbmlXbnByQy1uTDU2X3BlbWFFZ25ON2ZDeG9XalNjaTBSR0R6YkZ4bzkxZ2xQVTFWQ3Uzdkt2OFF6YmdFa1N3ZGxSRFdiSHNwYkJSbmJ3QmQ0WDM5LW40ODYyMmFPaGxlQjd1WVA2d1JELV9rQ1VwRGZSV1hoN1hwNUJjVjRjNHdGbEUwbDNQeC1oRzg4X0RDSnpRd2w3Q0ZCWA?oc=5
-- [日本环境省] 中文标题却有不同 title_zh（疑似误翻/回译）: 子どもパークレンジャー事業 ―島のお宝さがしin似島―（広島地区）の開催について → 关于儿童公园管理员事业-寻找岛上的宝藏in似岛-（广岛地区）的举办
-  → https://news.google.com/rss/articles/CBMiZEFVX3lxTE4wX1JuU2syeUZsSjNmWW9ZNnBva0JKQ3JrcER6VGdXTVdjV2JVcXc2djBSUlo3Vlk3VEVJU1MtTFhSY0ZWVm1YemtfejhRbThvZkpValZfbUtobFFKd0RneDZJbXM?oc=5
-- [日本环境省] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
-  → https://news.google.com/rss/articles/CBMiZEFVX3lxTE4wX1JuU2syeUZsSjNmWW9ZNnBva0JKQ3JrcER6VGdXTVdjV2JVcXc2djBSUlo3Vlk3VEVJU1MtTFhSY0ZWVm1YemtfejhRbThvZkpValZfbUtobFFKd0RneDZJbXM?oc=5
-- …共 274 条，详见 JSON
+  → https://news.google.com/rss/articles/CBMiswJBVV95cUxPaUVzX0ZIc0Z3em9sQms0eTdEaDQ3WElITUVVeW5reWMtOXVFdjRSNWFpTDZFNmZsN2dmS2FfelBPRjdqTWItRUM3RHZFVGlORDhwZXNkT3FBQV9XbEhmcUxCX1NYT082emE2b1JvcWxKRU1YZ09aQmh0NFVDcW5SU0VSRWdYNzdwMEltN0VqdGFGNVJER0w3YlZKMjBPNzUtaE5qcGo5Tm83RFhaVEY1REtudXhJS2VhSlB3TTYxcWM1Ni03b2tka1NJelE5emc2cVU2NkR4cDVYNU9QZFM1eGZvWHJ2TjBMb0lyRDhhOG96c0c2Qko1YnU3WWN6OGo5aktrUzNoeFRHa2lmcE1zZVBUb0JTTlE0TGhGRWtkV0JBc1U3dXVPVUZTWGU5dW81LUE0?oc=5
+- [36氪] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiTkFVX3lxTE1aUXN2TXgzT3hrUzQzUFZoc1JtamkteU82SXhxZXpFN1kwb2w1X1BRWUgxejdXNXhsUEV5ZmNUUFRTZUhYcV83NGZWSWtyQQ?oc=5
+- [X平台] 标题超长(213字): Shandong, Hebei and Inner Mongolia are China’s three largest solar producers ☀️ …
+  → https://x.com/ember_energy/status/2091118196627542271
+- [美国FERC] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMivwFBVV95cUxObGREMTBwWFRMRldhTUJwU3FjMURGanBCYU9pYkJwWWpOY3lMRy0wUjIzQ1lVdVVjbmIwakZzUFptdzl2TVkxSHJzTktkcnc2SWVWSVVuZ2VUcUE5bkNZenN0dkVUNFJLM3VYMk03OUZhaUFEeHMxQVpoZGd5dlA1M2NUZWNOYURoQUw4STNtUVV2VElWVHNVbi1UQllFZVhETjZRY2ZLSFhpNFRjMWlWb2tLNmg4Y0o1YkJlSXA1UQ?oc=5
+- [印度PIB] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMiY0FVX3lxTFBrVjdJMEJxVUpaUC1PWGVOVU54WWRvYk1sY1Zpa0piQ2VtRjBwTS1peldkQlVKblNfYURhTmpMcnlXdzdjaWtuY1dKNHk0NVRFVFlSVEhFTkNEQ29RaFVGbnUzVQ?oc=5
+- [环境规划院CAEP] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMib0FVX3lxTE1uZnhldXViTHFJekphT21mblBFVXU3QlBHa3I4RmxqU3BNcEd2djVPYkJZdE5wbDFkTFE5UGY4S3F3NHYtUjBzWUJXMUExMEZSakVTOVJXczV4Rm95eVRCVV95U016OVJZVEhGWHFPYw?oc=5
+- [环境规划院CAEP] Google News base64 聚合链接（未抓详情页覆盖，属正常状态）
+  → https://news.google.com/rss/articles/CBMib0FVX3lxTE9NLWlIbzUxZllTQUttaXlRRXJQeGExUmlwVWc0dmFGZW1jcE1WRG1RWTFFYmF6SnlQSGFMbzFPMHJtY1lpZHhlRjEzYVBnZU9WbklSNTRTNWVXVTlETUIwTWwzYkpaTUVxRjdoay11RQ?oc=5
+- …共 300 条，详见 JSON
 
 ## 各源条目数（Top 20）
 - pbc: 30
-- mongabay: 30
-- arxiv_ai: 30
-- chinaenergy: 29
-- aihot: 26
-- radarai: 24
-- tanpaifang: 21
-- x: 20
+- chinaenergy: 30
+- radarai: 26
+- mongabay: 24
 - india_pib: 20
-- chinanecc: 20
 - cneeex: 20
-- us_doe: 19
-- eu_commission: 17
+- chinanecc: 20
+- aihot: 18
+- eu_commission: 18
+- tanpaifang: 17
+- x: 14
+- jp_moe: 13
+- us_doe: 12
 - ccai: 12
-- huxiu: 11
-- openai: 11
+- us_epa: 11
+- therobotreport: 11
 - cleantechnica: 10
-- 36kr: 9
-- us_noaa: 9
-- ideacarbon: 8
+- us_noaa: 10
+- jp_meti: 10
+- ideacarbon: 9
 
 > 本报告由 qa_check.py 自动生成，只报告不修复。问题处置由人工/agent 决定。
