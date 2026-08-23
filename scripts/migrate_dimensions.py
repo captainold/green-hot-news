@@ -1,10 +1,10 @@
 #!/usr/bin/env python3.11
-"""四维迁移（2026-08-19 主体化：政策→政府、技术→行业、AI科技→AI；
-2026-08-20 观察窗口化复用：政府→政策、行业→产业、金融→市场信号）。
+"""三层分类迁移（2026-08-23 重构：四维「政策/产业/市场信号/AI」→
+三层「绿色政策/绿色产业/科技创新」+ 六细类「政策法规/国际动态/企业经营/金融资本/技术研发/基础研究」）。
 
-- 重算 history.json 所有条目的 dimension（用新 categorize_dimension）
-- 重打分（score_item 内容强度按新维度 key 计算——CONTENT_STRENGTH_RULES 的 key 变了）
-- 同时迁移 latest-24h.json / latest-24h-all.json 的 dimension 字段
+- 重算 history.json 所有条目的 dimension + sub_dimension（用新 categorize_dimension）
+- 重打分（score_item 内容强度按细类 key 计算——CONTENT_STRENGTH_RULES 的 key 变了）
+- 同时迁移 latest-24h.json / latest-24h-all.json 的 dimension/sub_dimension 字段
 - 幂等：可重复运行；不改 url/标题等原始字段
 
 用法：python3.11 scripts/migrate_dimensions.py
@@ -47,14 +47,15 @@ def migrate_file(path: Path) -> int:
                 removed += 1
                 continue
         old = it.get("dimension")
-        new = un.categorize_dimension(
+        dim, sub = un.categorize_dimension(
             it.get("site_id", ""),
             it.get("title", ""),
             it.get("summary", ""),
             it.get("library", "media"),
         )
-        it["dimension"] = new
-        # 重打分：内容强度按新维度 key；people 重提取（打分依赖）
+        it["dimension"] = dim
+        it["sub_dimension"] = sub
+        # 重打分：内容强度按细类 key；people 重提取（打分依赖）
         people = it.get("people") or un.extract_people(it.get("title", ""), it.get("summary", ""), "")
         scoring = un.score_item(
             it.get("site_id", ""),
@@ -63,12 +64,12 @@ def migrate_file(path: Path) -> int:
             people,
             it.get("published_at", ""),
             NOW,
-            new,
+            sub,
         )
         it.update(scoring)
         if people:
             it["people"] = people
-        if old != new:
+        if old != dim:
             changed += 1
         kept.append(it)
     if isinstance(data, dict) and "items" in data:
@@ -83,7 +84,7 @@ def migrate_file(path: Path) -> int:
 
 
 def main() -> int:
-    print("四维迁移（2026-08-20 观察窗口化：政策/产业/市场信号/AI）")
+    print("三层分类迁移（2026-08-23：绿色政策/绿色产业/科技创新 + 六细类）")
     total = 0
     for fn in ("history.json", "latest-24h.json", "latest-24h-all.json"):
         total += migrate_file(ROOT / "data" / fn)

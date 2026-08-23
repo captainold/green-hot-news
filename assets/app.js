@@ -10,7 +10,8 @@
 
   // ── State ──────────────────────────────────────────────────────────────────
   let historyItems = [];        // history.json（62 天累积，主数据源）
-    let currentDim = "全部";      // 四大主题（四维）：全部 | 政府 | 行业 | 金融 | AI
+    let currentDim = "全部";      // 三层主分类：全部 | 绿色政策 | 绿色产业 | 科技创新
+    let currentSubDim = "";      // 六细类过滤（空=不过滤）：政策法规/国际动态/企业经营/金融资本/技术研发/基础研究
     let currentPeriod = "周";     // 日 | 周 | 月
     let currentRegion = "国际";   // 国内 | 国际（互斥：国内=region 中国，国际=非中国，2026-08-19）
     let sortMode = "重要性";      // 重要性 | 新到旧
@@ -29,17 +30,17 @@
     let sourceCount = 0;   // 成功抓取的源数量
     let greenCount = 0;    // 绿色过滤后的新闻条数
 
-  // 四大主题 = 四维（政策/产业/市场信号/AI，四个观察窗口而非互斥分类：
-  // 政策=部委发文动向、产业=企业进展兜底、市场信号=碳市场/绿色资本、AI=AI×绿色落地）；
+  // 三层主分类（2026-08-23 重构：绿色政策/绿色产业/科技创新，六细类见 SUB_DIMS）
   // 关系图谱节点用的是「主题标签」（碳市场/新能源…），见 TOPIC_COLORS
-  const DIMS = ["全部", "政策", "产业", "市场信号", "AI"];
-  // 四维 tab 副标题（2026-08-20）：消除「金融⊂行业」式层级误解
+  const DIMS = ["全部", "绿色政策", "绿色产业", "科技创新"];
+  // 三层 tab 副标题（2026-08-23）：政策=政府发文·国际动态 / 产业=企业经营·金融资本 / 科技=技术研发·基础研究
   const DIM_SUBS = {
-    "政策": "部委文件·官方信号",
-    "产业": "企业进展·行业动态",
-    "市场信号": "碳市场·绿色资本",
-    "AI": "AI×绿色落地",
+    "绿色政策": "政府发文·国际动态",
+    "绿色产业": "企业经营·金融资本",
+    "科技创新": "技术研发·基础研究",
   };
+  // 六细类（sub_dimension，卡片次级标签 + 可点击过滤）
+  const SUB_DIMS = ["政策法规", "国际动态", "企业经营", "金融资本", "技术研发", "基础研究"];
   const PERIODS = ["日", "周", "月"];
   const REGIONS = ["国内", "国际"];
   const SORTS = ["重要性", "新到旧"];
@@ -249,10 +250,11 @@
     if (term.type === "tag") {
       return (item.topics || []).some(t => t.includes(term.value));
     } else if (term.type === "path") {
-      // path 匹配 dimension 或 library
+      // path 匹配 dimension / sub_dimension / library
       const dim = item.dimension || "";
+      const sub = item.sub_dimension || "";
       const lib = item.library || "";
-      return dim.includes(term.value) || lib.includes(term.value);
+      return dim.includes(term.value) || sub.includes(term.value) || lib.includes(term.value);
     } else if (term.type === "source") {
       const site = item.site_name || item.site_id || "";
       return site.includes(term.value);
@@ -317,7 +319,11 @@
   function filterItems() {
     let items = [...historyItems];
     if (currentDim !== "全部") {
-      items = items.filter(i => (i.dimension || "政策") === currentDim);
+      items = items.filter(i => (i.dimension || "绿色产业") === currentDim);
+    }
+    // 六细类过滤（2026-08-23 新增：点击卡片细类标签过滤）
+    if (currentSubDim) {
+      items = items.filter(i => (i.sub_dimension || "") === currentSubDim);
     }
     if (currentRegion === "国内") {
       items = items.filter(i => (i.region || "") === "中国");
@@ -358,7 +364,8 @@
 
       // 副标题（2026-08-23 新增搜索时显示搜索结果计数）
       const periodLabel = currentPeriod === "日" ? "近 24 小时" : currentPeriod === "周" ? "近一周" : "近一月";
-      let subText = `${currentDim} · ${currentRegion} · ${periodLabel} · ${filtered.length} 条`;
+      const dimLabel = currentDim + (currentSubDim ? ` · ${currentSubDim}` : "");
+      let subText = `${dimLabel} · ${currentRegion} · ${periodLabel} · ${filtered.length} 条`;
       if (searchState.active && searchQuery) {
         subText += ` · 搜索"${searchQuery}"`;
       }
@@ -409,11 +416,27 @@
         ? `综合 ${score} 分\n来源权威 ${bd.source} + 内容强度 ${bd.strength} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
         : "暂无评分";
 
-      // 四维标签（政策/产业/市场信号/AI）
+      // 三层标签（绿色政策/绿色产业/科技创新）
       const dimTag = card.querySelector(".dim-tag");
-      const dim = item.dimension || "政策";
+      const dim = item.dimension || "绿色产业";
       dimTag.textContent = dim;
       dimTag.classList.add(`dim-${dim}`);
+
+      // 六细类次级标签（sub_dimension，可点击过滤）
+      const subTag = card.querySelector(".sub-dim-tag");
+      const sub = item.sub_dimension || "";
+      if (sub) {
+        subTag.textContent = sub;
+        subTag.classList.toggle("active", sub === currentSubDim);
+        subTag.addEventListener("click", () => {
+          // 点击细类标签：切换过滤（再次点击取消）
+          currentSubDim = (currentSubDim === sub) ? "" : sub;
+          page = 1;
+          render();
+        });
+      } else {
+        subTag.hidden = true;
+      }
 
       // 站点 + 时间
       card.querySelector(".site").textContent = item.site_name || item.site_id;

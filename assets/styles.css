@@ -484,25 +484,34 @@ html[data-theme="dark"] .news-card .title:hover { color: var(--cb-blue-hover); }
 }
 .news-card .summary.expanded { -webkit-line-clamp: unset; }
 
-/* 四维标签（功能性区分色：白天浅底 / 夜晚深底，2026-08-20 观察窗口化） */
+/* 三层标签（功能性区分色：白天浅底 / 夜晚深底，2026-08-23 三层重构） */
 .dim-tag {
   flex-shrink: 0; font-size: .65rem; font-weight: 600;
   padding: .05rem .4rem; border-radius: 4px;
   background: var(--bg-surface); color: var(--text-muted);
   border: 1px solid var(--border-light);
 }
-.dim-tag.dim-政策 { color: #15803d; border-color: #86efac; background: #f0fdf4; }
-.dim-tag.dim-产业 { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
-.dim-tag.dim-市场信号 { color: #b45309; border-color: #fcd34d; background: #fffbeb; }
-.dim-tag.dim-AI { color: #7e22ce; border-color: #d8b4fe; background: #faf5ff; }
+.dim-tag.dim-绿色政策 { color: #15803d; border-color: #86efac; background: #f0fdf4; }
+.dim-tag.dim-绿色产业 { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
+.dim-tag.dim-科技创新 { color: #7e22ce; border-color: #d8b4fe; background: #faf5ff; }
 html[data-theme="dark"] .dim-tag {
   background: rgba(245, 246, 247, .06); color: var(--text-muted);
   border-color: var(--border);
 }
-html[data-theme="dark"] .dim-tag.dim-政策 { color: #86efac; border-color: rgba(134, 239, 172, .4); background: transparent; }
-html[data-theme="dark"] .dim-tag.dim-产业 { color: #93c5fd; border-color: rgba(147, 197, 253, .4); background: transparent; }
-html[data-theme="dark"] .dim-tag.dim-市场信号 { color: #fcd34d; border-color: rgba(252, 211, 77, .4); background: transparent; }
-html[data-theme="dark"] .dim-tag.dim-AI { color: #d8b4fe; border-color: rgba(216, 180, 254, .4); background: transparent; }
+html[data-theme="dark"] .dim-tag.dim-绿色政策 { color: #86efac; border-color: rgba(134, 239, 172, .4); background: transparent; }
+html[data-theme="dark"] .dim-tag.dim-绿色产业 { color: #93c5fd; border-color: rgba(147, 197, 253, .4); background: transparent; }
+html[data-theme="dark"] .dim-tag.dim-科技创新 { color: #d8b4fe; border-color: rgba(216, 180, 254, .4); background: transparent; }
+
+/* 六细类次级标签（2026-08-23 新增：sub_dimension，可点击过滤） */
+.sub-dim-tag {
+  flex-shrink: 0; font-size: .62rem; font-weight: 500;
+  padding: .04rem .38rem; border-radius: 4px;
+  background: var(--bg-surface); color: var(--text-dim);
+  border: 1px dashed var(--border-light);
+  cursor: pointer; transition: all .12s;
+}
+.sub-dim-tag:hover { color: var(--cb-blue); border-color: var(--cb-blue); }
+.sub-dim-tag.active { color: var(--cb-blue); border-color: var(--cb-blue); background: rgba(0, 82, 255, .08); }
 
 /* ── 时间线容器：独立滚动 ───────────────────────────── */
 .board-timeline .board-body {
