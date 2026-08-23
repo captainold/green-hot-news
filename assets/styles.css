@@ -639,6 +639,40 @@ html[data-theme="dark"] .topic-chip {
   border-color: rgba(87, 139, 250, .25);
 }
 
+/* 搜索框（Obsidian 语法） */
+.field-search { min-width: 280px; flex: 1 1 300px; }
+.search-box {
+  position: relative; display: flex; align-items: center;
+}
+.search-input {
+  width: 100%; padding: .45rem 2.2rem .45rem .7rem;
+  font-size: .8rem; border: 1px solid var(--border);
+  border-radius: var(--radius-pill); background: var(--bg);
+  color: var(--text); font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+.search-input:focus {
+  border-color: var(--cb-blue);
+  box-shadow: 0 0 0 3px rgba(0, 82, 255, .08);
+  outline: none;
+}
+.search-input::placeholder { color: var(--text-dim); }
+.search-clear {
+  position: absolute; right: .5rem; top: 50%; transform: translateY(-50%);
+  width: 1.3rem; height: 1.3rem; border: none; border-radius: 50%;
+  background: var(--bg-surface); color: var(--text-muted);
+  font-size: .75rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.search-clear:hover { background: var(--cb-blue); color: #fff; }
+/* 搜索结果显示计数 */
+.search-result-info {
+  font-size: .72rem; color: var(--text-muted);
+  padding: .2rem .6rem; background: var(--bg-surface);
+  border-radius: var(--radius-pill); margin-left: .4rem;
+}
+
 /* ── 底部关系图谱 ───────────────────────────────────── */
 .board-graph .board-head { border-left: 3px solid #16a34a; }
 .board-graph .board-body { padding: .4rem .6rem .6rem; }

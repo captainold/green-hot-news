@@ -10,15 +10,16 @@
 
   // ── State ──────────────────────────────────────────────────────────────────
   let historyItems = [];        // history.json（62 天累积，主数据源）
-  let currentDim = "全部";      // 四大主题（四维）：全部 | 政府 | 行业 | 金融 | AI
-  let currentPeriod = "周";     // 日 | 周 | 月
-  let currentRegion = "国际";   // 国内 | 国际（互斥：国内=region中国，国际=非中国，2026-08-19）
-  let sortMode = "重要性";      // 重要性 | 新到旧
-  let pageSize = 20;
-  let page = 1;
-  let lastFiltered = [];        // 最近一次筛选结果（供日/夜主题切换时重绘图谱）
-  let graphChart = null;        // ECharts 关系图谱实例（须在 initTheme 前声明，避免 TDZ）
-  let graphResizeBound = false; // resize 监听只挂一次（dispose/re-init 不重复挂）
+    let currentDim = "全部";      // 四大主题（四维）：全部 | 政府 | 行业 | 金融 | AI
+    let currentPeriod = "周";     // 日 | 周 | 月
+    let currentRegion = "国际";   // 国内 | 国际（互斥：国内=region 中国，国际=非中国，2026-08-19）
+    let sortMode = "重要性";      // 重要性 | 新到旧
+    let pageSize = 20;
+    let page = 1;
+    let lastFiltered = [];        // 最近一次筛选结果（供日/夜主题切换时重绘图谱）
+    let graphChart = null;        // ECharts 关系图谱实例（须在 initTheme 前声明，避免 TDZ）
+    let graphResizeBound = false; // resize 监听只挂一次（dispose/re-init 不重复挂）
+    let searchQuery = "";         // Obsidian 语法搜索 query（2026-08-23 新增）
 
   // 四大主题 = 四维（政策/产业/市场信号/AI，四个观察窗口而非互斥分类：
   // 政策=部委发文动向、产业=企业进展兜底、市场信号=碳市场/绿色资本、AI=AI×绿色落地）；
@@ -64,6 +65,9 @@
   const updatedAt = $("#updatedAt");
   const itemTpl = $("#itemTpl");
   const themeToggle = $("#themeToggle");
+  // 搜索框（2026-08-23 新增）
+  const searchInput = $("#searchInput");
+  const searchClear = $("#searchClear");
 
   // ── 日/夜主题切换（2026-08-19）：整页联动 + localStorage 记忆，默认白天 ──
   function applyTheme(dark) {
@@ -155,6 +159,125 @@
     return Date.now() - h * HOUR;
   }
 
+  // ── Obsidian 语法解析（2026-08-23 新增）────────────────────────────────────
+  // 支持：tag:储能 path:产业 source:虎嗅 "精确匹配" 空格=AND OR -排除
+  function parseObsidianQuery(query) {
+    if (!query || !query.trim()) return { active: false, terms: [] };
+
+    const terms = [];
+    let currentOp = "AND"; // 默认 AND
+    const text = query.trim();
+
+    // 分割 OR（先处理 OR，再处理每个组内的 AND/NOT）
+    const orGroups = text.split(/\s+OR\s+/i);
+    
+    orGroups.forEach((group, groupIdx) => {
+      const groupOp = groupIdx > 0 ? "OR" : currentOp;
+      // 在组内处理 - 前缀（NOT）和tag:/path:等
+      const tokens = group.trim().split(/\s+/).filter(t => t.length > 0);
+      
+      tokens.forEach(token => {
+        if (token.startsWith("-")) {
+          // NOT 排除
+          const value = token.slice(1);
+          if (value.startsWith("tag:")) {
+            terms.push({ op: "NOT", type: "tag", value: value.slice(4) });
+          } else if (value.startsWith("path:")) {
+            terms.push({ op: "NOT", type: "path", value: value.slice(5) });
+          } else if (value.startsWith("source:")) {
+            terms.push({ op: "NOT", type: "source", value: value.slice(7) });
+          } else {
+            terms.push({ op: "NOT", type: "text", value });
+          }
+        } else if (token.startsWith("tag:")) {
+          terms.push({ op: groupOp, type: "tag", value: token.slice(4) });
+        } else if (token.startsWith("path:")) {
+          terms.push({ op: groupOp, type: "path", value: token.slice(5) });
+        } else if (token.startsWith("source:")) {
+          terms.push({ op: groupOp, type: "source", value: token.slice(7) });
+        } else if (token.startsWith('"') && token.endsWith('"')) {
+          // 精确匹配（去引号）
+          terms.push({ op: groupOp, type: "text", value: token.slice(1, -1), exact: true });
+        } else {
+          // 普通全文搜索
+          terms.push({ op: groupOp, type: "text", value: token });
+        }
+      });
+    });
+
+    return { active: terms.length > 0, terms };
+  }
+
+  function matchItem(item, term) {
+    // 根据术语类型匹配条目
+    if (term.type === "tag") {
+      return (item.topics || []).some(t => t.includes(term.value));
+    } else if (term.type === "path") {
+      // path 匹配 dimension 或 library
+      const dim = item.dimension || "";
+      const lib = item.library || "";
+      return dim.includes(term.value) || lib.includes(term.value);
+    } else if (term.type === "source") {
+      const site = item.site_name || item.site_id || "";
+      return site.includes(term.value);
+    } else if (term.type === "text") {
+      // 全文搜索：标题 + 摘要
+      const title = item.title_zh || item.title || "";
+      const summary = item.summary || "";
+      const searchTarget = (title + " " + summary).toLowerCase();
+      if (term.exact) {
+        return searchTarget.includes(term.value.toLowerCase());
+      }
+      // 分词匹配（支持部分匹配）
+      return term.value.split("").every(char => searchTarget.includes(char.toLowerCase()));
+    }
+    return false;
+  }
+
+  function filterBySearch(items) {
+    if (!searchState.active || searchState.terms.length === 0) return items;
+
+    const { terms } = searchState;
+    
+    // 分组处理：OR 组之间是或的关系，组内是 AND + NOT
+    const orGroups = [];
+    let currentGroup = [];
+    
+    terms.forEach(term => {
+      if (term.op === "OR") {
+        if (currentGroup.length > 0) orGroups.push(currentGroup);
+        currentGroup = [term];
+      } else {
+        currentGroup.push(term);
+      }
+    });
+    if (currentGroup.length > 0) orGroups.push(currentGroup);
+
+    // 过滤：匹配任意 OR 组
+    return items.filter(item => {
+      return orGroups.some(group => {
+        let andResult = true;
+        
+        for (const term of group) {
+          const matches = matchItem(item, term);
+          if (term.op === "NOT") {
+            if (matches) {
+              andResult = false;
+              break;
+            }
+          } else { // AND
+            if (!matches) {
+              andResult = false;
+              break;
+            }
+          }
+        }
+        
+        return andResult;
+      });
+    });
+  }
+
   function filterItems() {
     let items = [...historyItems];
     if (currentDim !== "全部") {
@@ -163,8 +286,7 @@
     if (currentRegion === "国内") {
       items = items.filter(i => (i.region || "") === "中国");
     } else if (currentRegion === "国际") {
-      // 2026-08-19：国际=排除中国（原「全部含国内」被老温否掉——
-      // 选国际却出现工信部/国家节能中心等国内新闻）
+      // 2026-08-19：国际=排除中国（原「全部含国内」被老温否掉——\n      // 选国际却出现工信部/国家节能中心等国内新闻）
       items = items.filter(i => (i.region || "") !== "中国");
     }
     const start = periodStart();
@@ -172,6 +294,8 @@
       const t = Date.parse(itemTime(i));
       return isNaN(t) || t >= start; // 无时间的条目保留
     });
+    // 应用搜索过滤（2026-08-23 新增）
+    items = filterBySearch(items);
     return items;
   }
 
@@ -190,15 +314,19 @@
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
-  function render() {
-    const filtered = sortItems(filterItems());
-    lastFiltered = filtered;
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-    if (page > totalPages) page = totalPages;
+    function render() {
+      const filtered = sortItems(filterItems());
+      lastFiltered = filtered;
+      const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+      if (page > totalPages) page = totalPages;
 
-    // 副标题
-    const periodLabel = currentPeriod === "日" ? "近24小时" : currentPeriod === "周" ? "近一周" : "近一月";
-    listSub.textContent = `${currentDim} · ${currentRegion} · ${periodLabel} · ${filtered.length} 条`;
+      // 副标题（2026-08-23 新增搜索时显示搜索结果计数）
+      const periodLabel = currentPeriod === "日" ? "近 24 小时" : currentPeriod === "周" ? "近一周" : "近一月";
+      let subText = `${currentDim} · ${currentRegion} · ${periodLabel} · ${filtered.length} 条`;
+      if (searchState.active && searchQuery) {
+        subText += ` · 搜索"${searchQuery}"`;
+      }
+      listSub.textContent = subText;
 
     // 列表（分页切片）
     const start = (page - 1) * pageSize;
@@ -538,6 +666,42 @@
   prevPage.addEventListener("click", () => { if (page > 1) { page--; render(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
   nextPage.addEventListener("click", () => { page++; render(); window.scrollTo({ top: 0, behavior: "smooth" }); });
   copyBtn.addEventListener("click", copyDigest);
+  
+  // 搜索框事件（2026-08-23 新增）
+  function handleSearch() {
+    const query = searchInput.value.trim();
+    searchQuery = query;
+    const parsed = parseObsidianQuery(query);
+    searchState.active = parsed.active;
+    searchState.terms = parsed.terms;
+    page = 1; // 重置页码
+    
+    // 清除按钮显示逻辑
+    if (searchClear) {
+      searchClear.hidden = query.length === 0;
+    }
+    
+    render();
+  }
+  
+  if (searchInput) {
+    searchInput.addEventListener("input", handleSearch);
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchInput.value = "";
+        handleSearch();
+        searchInput.blur();
+      }
+    });
+  }
+  
+  if (searchClear) {
+    searchClear.addEventListener("click", () => {
+      searchInput.value = "";
+      handleSearch();
+      searchInput.focus();
+    });
+  }
 
   // ── Init ───────────────────────────────────────────────────────────────────
   loadData();
