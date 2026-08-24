@@ -257,7 +257,7 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 - [x] 三 agent 审查完成（docs/agent-check-*）：转换管线可靠，问题在提取层
 
 **遗留待办（P0/P1）**：
-- [ ] 去重治理：19.6% 重复 URL（Google News 动态 token 使精确去重失效）→ 规范化 URL + 标题相似度
+- [x] **去重治理（2026-08-24 完成）**：真实重复 = 标题变体 38 条（截断/标点/源名后缀/微调，同 URL + 标题相似），非 agent-check 的"19.6%"（那是 normalize_url 去 query 把 cnesa/chinanecc 文章 ID、微博热搜误判为同 URL 的错误口径）。修复：`dedup_similar.py` 清理存量 + `update_news.py` 加 `_titles_similar` 标题相似度去重（防增量）。history URL 重复 45组→10组（剩的为微博热搜/GitHub 双标题等"同 URL 不同文"合理情况）。⚠️ 后续可选：GitHub/aihot 的"同 URL 双标题"需 URL 精确去重 + 白名单（微博热搜豁免）
 - [ ] 多维标签回填：tech_feature 5.5% / trl 16.4% 基本空置 → LLM 批量补
 - [ ] 图片防盗链攻坚：中国能源报 272 张外链（Referer 处理）
 - [ ] arxiv 类面包屑/页脚混入（trafilatura 后处理清理）
