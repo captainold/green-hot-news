@@ -496,6 +496,38 @@ def _is_informative_image(alt: str, src: str) -> bool:
     return False
 
 
+# arxiv 页面 trafilatura 提取后混入的头部垃圾（面包屑/重复标题/导航按钮）
+_ARXIV_HEAD_JUNK_RE = re.compile(
+    r'^#\s*(Computer Science|Physics|Mathematics|Statistics|Electrical|Economics|Quantitative)[^\n]*>|'
+    r'^#\s*Title:|'
+    r'^View\s+PDF(\s+HTML[^\n]*)?$',
+    re.I,
+)
+# arxiv 页脚开始标记（从这里截断，后面全是 Bibliographic/Citation/arXivLabs 垃圾）
+_ARXIV_FOOT_RE = re.compile(
+    r'^#{1,4}\s*(Bookmark|Current browse context|Bibliographic and Citation Tools|'
+    r'Code, Data and Media|Demos|Recommenders and Search Tools|arXivLabs)',
+    re.I,
+)
+
+
+def _clean_arxiv_junk(markdown: str) -> str:
+    """清理 arxiv 页面 trafilatura 混入的面包屑/导航/页脚（2026-08-24）。
+
+    保留 Abstract 摘要；截断 `### Bookmark` / `# Bibliographic and Citation
+    Tools` 之后的页脚；去掉 `# Computer Science >` 面包屑、`# Title:` 重复
+    标题、`View PDF` 导航按钮。
+    """
+    out: list[str] = []
+    for line in markdown.split("\n"):
+        if _ARXIV_FOOT_RE.search(line):
+            break  # 页脚开始，截断
+        if _ARXIV_HEAD_JUNK_RE.search(line):
+            continue  # 头部垃圾跳过
+        out.append(line)
+    return "\n".join(out).strip()
+
+
 def _filter_md_images(markdown: str) -> str:
     """只保留有信息量的图片，其余从 Markdown 移除（2026-08-24 老温需求）。
 
@@ -917,6 +949,9 @@ def _rich_extract(resp, url: str) -> str:
             md = re.sub(
                 r'!\[([^\]]*)\]\((/(?:upload|uploads|images|img|static|content|resources|wp-content|files|assets|picture|2026|2025)/[^)]+)\)',
                 lambda m: f"![{m.group(1)}]({base}{m.group(2)})", md)
+        # arxiv 面包屑/页脚清理（2026-08-24：trafilatura 会混入面包屑/导航/arXivLabs 页脚）
+        if "arxiv.org" in (url or ""):
+            md = _clean_arxiv_junk(md)
         # 有信息量图片过滤（2026-08-24 老温需求）：只提图表/示意/架构图，跳过新闻配图
         md = _filter_md_images(md)
         return md
