@@ -523,11 +523,12 @@ def _resolve_img_src(img) -> Optional[str]:
 
 
 def download_images(markdown: str, att_dir: Path, session: Optional[requests.Session] = None,
-                    timeout: tuple[int, int] = (10, 20)) -> tuple[str, int]:
+                    timeout: tuple[int, int] = (10, 20), referer: str = "") -> tuple[str, int]:
     """下载 Markdown 中的图片到 att_dir，重写为相对路径引用（qmd 数据库附件）。
 
     返回 (new_markdown, 下载成功数)。失败图片保留原 URL（浏览器可加载），
     不阻断正文。图片命名 = md5(url)[:12] + 扩展名（防重名 + 幂等）。
+    referer：防盗链 Referer 头（原页面 URL）；403 时 fallback 空 Referer 重试一次。
     """
     import hashlib as _hl
     att_dir = Path(att_dir)
@@ -554,7 +555,12 @@ def download_images(markdown: str, att_dir: Path, session: Optional[requests.Ses
             dest = att_dir / fname
             if not dest.exists():
                 try:
-                    r = sess.get(src, timeout=timeout, stream=True)
+                    # 防盗链（2026-08-24）：先带 Referer（原页面 URL），403/401 时
+                    # fallback 空 Referer 重试（部分站点要求空 Referer 才放行）
+                    _hdrs = {"Referer": referer} if referer else {}
+                    r = sess.get(src, timeout=timeout, stream=True, headers=_hdrs)
+                    if r.status_code in (401, 403) and referer:
+                        r = sess.get(src, timeout=timeout, stream=True, headers={"Referer": ""})
                     r.raise_for_status()
                     data = r.content
                     if data and len(data) > 100:

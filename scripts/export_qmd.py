@@ -152,8 +152,8 @@ def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
     content: str = res["content"] or ""
     if len(content) < _MIN_BODY_CHARS:
         return "", 0
-    # 下载正文图片 → attachments/（相对路径引用）
-    content, n_img = article_content.download_images(content, att_dir, session=session)
+    # 下载正文图片 → attachments/（相对路径引用；referer=原页面 URL 解决防盗链）
+    content, n_img = article_content.download_images(content, att_dir, session=session, referer=url)
     return content, n_img
 
 
@@ -272,8 +272,11 @@ def backfill_images(output_dir: Path, md_copy: bool = False) -> int:
         m = re.search(r"^## 正文\s*$", text, re.M)
         if not m:
             return 0
+        # 从 frontmatter 读 url 作为 Referer（防盗链）
+        m_url = re.search(r'^url:\s*"?([^"\n]+)"?\s*$', text, re.M)
+        referer = m_url.group(1).strip() if m_url else ""
         body = text[m.end():]
-        new_body, n = article_content.download_images(body, att_dir, session=session)
+        new_body, n = article_content.download_images(body, att_dir, session=session, referer=referer)
         if n == 0:
             return 0
         new_text = text[:m.end()] + new_body
