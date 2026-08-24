@@ -259,6 +259,6 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 **遗留待办（P0/P1）**：
 - [x] **去重治理（2026-08-24 完成）**：真实重复 = 标题变体 38 条（截断/标点/源名后缀/微调，同 URL + 标题相似），非 agent-check 的"19.6%"（那是 normalize_url 去 query 把 cnesa/chinanecc 文章 ID、微博热搜误判为同 URL 的错误口径）。修复：`dedup_similar.py` 清理存量 + `update_news.py` 加 `_titles_similar` 标题相似度去重（防增量）。history URL 重复 45组→10组（剩的为微博热搜/GitHub 双标题等"同 URL 不同文"合理情况）。⚠️ 后续可选：GitHub/aihot 的"同 URL 双标题"需 URL 精确去重 + 白名单（微博热搜豁免）
 - [x] **多维标签回填（2026-08-24 完成）**：① TRL 关键词扩展（机组/电站/电芯/中标/通过评价/首例/首创/成套技术等，13%→14%，修复 49 条"有 tf 但 trl 空"的技术新闻漏判）；② tech_feature 正文提取——`extract_tech_feature` 加正文参数 + 提示词改稿（老温批准），`backfill_tech_feature.py` 批量重提取 650 条（正文 trafilatura 富文本），填充率 6%→17%（194 条），`clean_tech_feature.py` 清理 LLM"刹不住"的输出（归一化"无"长解释 + 超长截断 43→4 条）。核实结论：空置 80% 是合理的（资本/市场/政策类无技术参数），只有 ~20% 该填。
-- [ ] 图片防盗链攻坚：中国能源报 272 张外链（Referer 处理）
+- [x] **图片有信息量过滤 + 防盗链（2026-08-24 完成）**：老温明确范围——只提"有信息量"的图（数据图表/示意/架构图），跳过新闻配图（风景/人物照/装饰）。① `article_content._is_informative_image` 白名单判定（Fig/图N/示意/架构/流程/数据/趋势/chart/diagram），集成 trafilatura + fallback 两路径；② `download_images` 加 Referer 防盗链（403 fallback 空 Referer）；③ `clean_images.py` 存量清理：移除 1976 张垃圾图、删 861 个垃圾附件（97%），保留 94 张图表，0 broken 引用。顺带修复相对路径拼接 group(2) 未捕获的潜伏 bug。
 - [ ] arxiv 类面包屑/页脚混入（trafilatura 后处理清理）
 - [ ] us_doe/openai 正文抓取（JS 渲染方案）
