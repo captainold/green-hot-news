@@ -654,7 +654,9 @@ def fetch_qjem(session: requests.Session, now: datetime) -> list[RawItem]:
     # 单次 try 静默吞掉会整源 item_count=0，导致 qjem 漏抓）
     for _attempt in range(3):
         try:
-            r = session.get(list_url, timeout=30)
+            # PITFALL(2026-08-24 生产实测)：qjem.cn 是中国站，走 mihomo 家宽代理
+            # （夏威夷出口）访问失败返回空 → 单次请求显式禁用代理直连
+            r = session.get(list_url, timeout=30, proxies={"http": None, "https": None})
             r.raise_for_status()
             soup = BeautifulSoup(r.text, "html.parser")
             for block in soup.select(".article-l.article-w"):
