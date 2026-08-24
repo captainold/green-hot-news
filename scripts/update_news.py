@@ -210,8 +210,7 @@ def fetch_rss_feed(session: requests.Session, feed_url: str, site_id: str, site_
                 site_id=site_id, site_name=site_name,
                 source=source, title=title, url=link,
                 published_at=published,
-                summary=summary if summary else None,
-                meta={"feed_url": feed_url},
+                meta={"feed_url": feed_url, "summary": summary if summary else ""},
             ))
     else:
         # Fallback: basic XML parsing
@@ -1040,7 +1039,7 @@ def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, si
                 items.append(RawItem(
                     site_id=site_id, site_name=site_name,
                     title=title_clean, url=link, published_at=published,
-                    summary=summary if summary else None,
+                    meta={"summary": summary} if summary else {},
                 ))
         except Exception:
             continue
