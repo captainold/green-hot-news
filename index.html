@@ -66,7 +66,7 @@
           <div class="field field-search">
             <span class="filter-label">搜索</span>
             <div class="search-box">
-              <input type="text" id="searchInput" class="search-input" placeholder="tag:储能 path:产业" autocomplete="off" />
+              <input type="text" id="searchInput" class="search-input" placeholder="tag:储能 path:产业 taxonomy:ISIC tech:效率 trl:7-9 layer:Layer2" autocomplete="off" />
               <button type="button" id="searchBtn" class="search-btn" title="搜索">🔍</button>
               <button type="button" id="searchClear" class="search-clear" hidden>✕</button>
             </div>
@@ -106,13 +106,17 @@
         </div>
       </section>
 
-      <!-- 区域三：底部趋势（关系图谱——主题标签共现） -->
+      <!-- 区域三：底部趋势（关系图谱——主题标签/多维共现） -->
       <section class="board board-graph">
         <div class="board-head">
           <div class="board-title">
             <span class="board-icon">🕸️</span>
-            <h2>主题关系图谱</h2>
+            <h2>关系图谱</h2>
             <span class="board-sub" id="graphSub"></span>
+          </div>
+          <div class="graph-dim-switch">
+            <span class="filter-label">维度</span>
+            <div class="mode-switch" id="graphDimSwitch"></div>
           </div>
           <span class="board-count" id="graphCount"></span>
         </div>
@@ -136,9 +140,11 @@
         </div>
         <a class="title" target="_blank" rel="noopener noreferrer"></a>
         <span class="title-orig" hidden></span>
+        <div class="meta-chips"></div>
         <div class="topic-chips"></div>
         <button class="summary-toggle" type="button" hidden>展开摘要</button>
         <p class="summary" hidden></p>
+        <p class="tech-feature" hidden></p>
       </article>
     </template>
 

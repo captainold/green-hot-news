@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import quote, urlparse
 
@@ -448,6 +449,217 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
     return body, page_title
 
 
+# ── 富文本提取（2026-08-24 阶段6：qmd 富文本优势——全文 + 图片 + 表格）──────
+# 把正文容器转成 Markdown：保留段落/标题/列表/链接/表格/图片，供 qmd 数据库使用。
+_IMG_EXTS = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp")
+
+
+def _resolve_img_src(img) -> Optional[str]:
+    """图片地址：data-src → src → srcset 首项，相对路径由调用方拼接 base。"""
+    for attr in ("data-src", "data-original", "src"):
+        v = img.get(attr)
+        if v:
+            return v.strip()
+    srcset = img.get("srcset")
+    if srcset:
+        first = srcset.split(",")[0].strip().split(" ")[0]
+        if first:
+            return first
+    return None
+
+
+def download_images(markdown: str, att_dir: Path, session: Optional[requests.Session] = None,
+                    timeout: tuple[int, int] = (10, 20)) -> tuple[str, int]:
+    """下载 Markdown 中的图片到 att_dir，重写为相对路径引用（qmd 数据库附件）。
+
+    返回 (new_markdown, 下载成功数)。失败图片保留原 URL（浏览器可加载），
+    不阻断正文。图片命名 = md5(url)[:12] + 扩展名（防重名 + 幂等）。
+    """
+    import hashlib as _hl
+    att_dir = Path(att_dir)
+    att_dir.mkdir(parents=True, exist_ok=True)
+    own = session is None
+    sess = session
+    try:
+        if sess is None:
+            sess = requests.Session()
+            sess.headers.update({"User-Agent": BROWSER_UA})
+        downloaded = 0
+
+        def _swap(m: "re.Match[str]") -> str:
+            nonlocal downloaded
+            src = m.group(1).strip()
+            if not src or src.startswith("data:"):
+                return m.group(0)  # base64 图不动
+            ext = Path(src.split("?")[0]).suffix.lower() or ".jpg"
+            if ext not in _IMG_EXTS:
+                ext = ".jpg"
+            fname = _hl.md5(src.encode("utf-8")).hexdigest()[:12] + ext
+            dest = att_dir / fname
+            if not dest.exists():
+                try:
+                    r = sess.get(src, timeout=timeout, stream=True)
+                    r.raise_for_status()
+                    data = r.content
+                    if data and len(data) > 100:
+                        dest.write_bytes(data)
+                    else:
+                        return m.group(0)
+                except Exception:
+                    return m.group(0)  # 失败保留原 URL
+            downloaded += 1
+            return f"![{m.group(2)}](attachments/{fname})"
+
+        new_md = re.sub(r"!\[([^\]]*)\]\((\S+)\)", _swap, markdown)
+        return new_md, downloaded
+    finally:
+        if own and sess is not None:
+            try:
+                sess.close()
+            except Exception:
+                pass
+
+
+def _table_to_markdown(table) -> str:
+    """<table> → GitHub Markdown 表格（简单表格；colspan/rowspan 降级为文本）。"""
+    rows = []
+    for tr in table.find_all("tr"):
+        cells = [td.get_text(" ", strip=True) for td in tr.find_all(["td", "th"])]
+        if cells:
+            rows.append(cells)
+    if not rows:
+        return ""
+    # 统一列数
+    ncols = max(len(r) for r in rows)
+    rows = [r + [""] * (ncols - len(r)) for r in rows]
+    lines = ["| " + " | ".join(r) + " |" for r in rows]
+    lines.insert(1, "| " + " | ".join(["---"] * ncols) + " |")
+    return "\n".join(lines)
+
+
+def _node_to_markdown(el, base_url: str, out: list[str]) -> None:
+    """递归把正文节点转 Markdown 片段。"""
+    name = getattr(el, "name", None)
+    if name is None:  # NavigableString
+        t = str(el).strip()
+        if t:
+            out.append(t)
+        return
+    if name in ("script", "style", "nav", "noscript", "iframe", "form"):
+        return
+    if name == "img":
+        src = _resolve_img_src(el)
+        if src:
+            # 图标/Logo/占位图过滤（2026-08-24：ico-article.png 等列表页图标混入正文）
+            if re.search(r"(ico-|icon|logo|avatar|placeholder|loading|spinner)", src.lower()):
+                return
+            if src.startswith("//"):
+                src = "https:" + src
+            elif src.startswith("/"):
+                src = (base_url or "").rstrip("/") + src
+            alt = (el.get("alt") or "").strip()
+            out.append(f"![{alt}]({src})")
+        return
+    if name == "table":
+        md = _table_to_markdown(el)
+        if md:
+            out.append("\n" + md + "\n")
+        return
+    if name == "br":
+        out.append("\n")
+        return
+    if name == "hr":
+        out.append("\n---\n")
+        return
+    if name in ("h1", "h2", "h3", "h4", "h5", "h6"):
+        txt = el.get_text(" ", strip=True)
+        if txt:
+            out.append("\n" + "#" * int(name[1]) + " " + txt + "\n")
+        return
+    if name == "li":
+        txt = el.get_text(" ", strip=True)
+        if txt:
+            out.append("- " + txt)
+        return
+    if name == "blockquote":
+        txt = el.get_text(" ", strip=True)
+        if txt:
+            out.append("\n> " + txt + "\n")
+        return
+    if name == "p":
+        # 段落：先递归子节点（保留图/表/链接），再补段落分隔
+        sub: list[str] = []
+        for child in el.children:
+            _node_to_markdown(child, base_url, sub)
+        txt = "".join(sub).strip()
+        if txt:
+            out.append(txt + "\n\n")
+        return
+    if name == "a":
+        href = el.get("href") or ""
+        txt = el.get_text(" ", strip=True).strip()
+        if txt:
+            if href.startswith(("http://", "https://")):
+                out.append(f"[{txt}]({href})")
+            else:
+                out.append(txt)
+        return
+    # 其他标签：递归子节点
+    for child in el.children:
+        _node_to_markdown(child, base_url, out)
+
+
+def extract_rich(html: str, soup: Optional[BeautifulSoup] = None,
+                 base_url: str = "") -> tuple[str, Optional[str]]:
+    """富文本正文提取（qmd 用）：返回 (markdown_body, page_title)。
+
+    与 extract_readable 同容器选择逻辑，但保留表格/图片/标题/列表结构，
+    输出 GitHub 风格 Markdown（图片为 ![](绝对地址)，由调用方下载转存）。
+    """
+    if soup is None:
+        soup = BeautifulSoup(html, "html.parser")
+    page_title = _first_article_heading(soup, ("h1", "h2"))
+    if not page_title:
+        title_el = soup.find("title")
+        if title_el is not None:
+            t = _clean_title(title_el.get_text())
+            if t and not _is_generic_site_title(t):
+                page_title = t
+
+    for el in soup.select(GARBAGE_SELECTORS):
+        el.decompose()
+
+    # 容器选择（与 extract_readable 相同逻辑）
+    for sel in ("[class*='TRS_Editor']", "[class*='Custom_UnionStyle']", "[class*='wysiwyg']"):
+        cands = soup.select(sel)
+        if cands:
+            text = cands[0].get_text(" ", strip=True)
+            if len(text) >= 100:
+                container = cands[0]
+                break
+    else:
+        best: Any = None
+        best_len = 0
+        for sel in CONTAINER_SELECTORS:
+            for cand in soup.select(sel):
+                text = cand.get_text(" ", strip=True)
+                if len(text) > best_len:
+                    best, best_len = cand, len(text)
+        if best is not None and best_len >= 200:
+            container = best
+        else:
+            container = soup.body or soup
+
+    out: list[str] = []
+    for child in container.children:
+        _node_to_markdown(child, base_url, out)
+
+    body = "\n".join(out)
+    # 压缩连续空行
+    body = re.sub(r"\n{3,}", "\n\n", body).strip()
+    return body, page_title
+
+
 def extract_source_org(soup: BeautifulSoup) -> Optional[str]:
     """Extract 发文单位/文章来源 (作者属性) from detail page.
 
@@ -599,15 +811,41 @@ def _clean_summary_meta(s: str) -> str:
     return s.strip()
 
 
+def _clean_rich_body(s: str, title: str = "") -> str:
+    """富文本正文清洗（2026-08-24 qmd 数据库：content 不截断，需独立清洗）。
+
+    _clean_summary_meta 面向摘要（^ 锚定开头），富文本 content 开头常有
+    标题重复行，作者行/摘要行出现在中段 → 用全局正则。
+    """
+    s = (s or "").strip()
+    # 作者行（任意位置）：<名>小编/编辑 · YYYY-MM-DD HH:MM · 阅读量 · N
+    s = re.sub(
+        r"[^\n]{0,60}?(小编|編輯|编辑)\s*[·.]\s*\d{4}-\d{2}-\d{2}.*?阅读量\s*[·:：]?\s*\d+\s*",
+        "", s)
+    # 「摘要：xxx」行（详情页把摘要渲染在正文前；可能在标题重复行之后 → MULTILINE）
+    s = re.sub(r"^摘要[:：][^\n]*\n?", "", s, flags=re.M)
+    # 标题重复行：正文首行 == 页面标题时删除（只有匹配标题才删，防误删真实短段落）
+    if title:
+        first_line = s.split("\n", 1)[0].strip()
+        if first_line and (first_line == title.strip() or first_line.startswith(title.strip()[:20])):
+            s = s.split("\n", 1)[1] if "\n" in s else ""
+    # 压缩连续空行
+    s = re.sub(r"\n{3,}", "\n\n", s)
+    return s.strip()
+
+
 def fetch_article(url: str, session: Optional[requests.Session] = None,
                   timeout: tuple[int, int] = (10, 20),
-                  retries: int = 2) -> Optional[dict[str, Optional[str]]]:
+                  retries: int = 2,
+                  rich: bool = False) -> Optional[dict[str, Optional[str]]]:
     """Fetch article page, extract summary + body.
 
     Returns {"summary": str, "content": str, "title": str|None}
     or None on any failure / non-HTML.
     Google News redirect URLs are decoded to their real source URL first
     (否则国外政府源摘要永远为空 — 2026-08-17)。
+    rich=True（2026-08-24 qmd 数据库）：正文用 extract_rich 保留图片/表格，
+    content 为完整 Markdown（不截断）。
     """
     url = (url or "").strip()
     if not url:
@@ -655,16 +893,25 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
         if resp.encoding is None or resp.encoding.lower() in ("iso-8859-1", "ascii"):
             resp.encoding = resp.apparent_encoding or "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
-        body, page_title = extract_readable(resp.text, soup)
+        if rich:
+            # 富文本模式（qmd 数据库用）：保留图片/表格/标题结构 → Markdown
+            body, page_title = extract_rich(resp.text, soup, base_url=url)
+        else:
+            body, page_title = extract_readable(resp.text, soup)
         head = body[:120]
         # 404/错误页检测（2026-08-19 大小写不敏感——CARB 404 页 "Page not found"
         # 曾被当正常文章抓取，素材 H1 变成站名）
         if (not page_title and not body) or len(body) < MIN_PARAGRAPH_CHARS or \
                 any(m.lower() in head.lower() for m in ERROR_PAGE_MARKERS):
             return None
-        summary = _cut_at_sentence(body, MAX_SUMMARY_CHARS)
+        if rich:
+            content = body  # 富文本不截断（qmd 全量保存；由调用方控制）
+            content = _clean_rich_body(content, page_title or "")  # 作者行/摘要/标题重复清洗（2026-08-24）
+            summary = _cut_at_sentence(extract_readable(resp.text, soup)[0], MAX_SUMMARY_CHARS)
+        else:
+            summary = _cut_at_sentence(body, MAX_SUMMARY_CHARS)
+            content = _cut_at_sentence(body, MAX_BODY_CHARS)
         summary = _clean_summary_meta(summary)  # 作者行/摘要前缀清洗（2026-08-19 碳道）
-        content = _cut_at_sentence(body, MAX_BODY_CHARS)
         published = extract_published_at(soup)
         source_org = extract_source_org(soup)
         if published:

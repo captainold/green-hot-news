@@ -648,6 +648,43 @@ html[data-theme="dark"] .topic-chip {
   border-color: rgba(87, 139, 250, .25);
 }
 
+/* ── 多维标签 chip（2026-08-23 阶段6：交叉技术/TRL/国际分类法）── */
+.meta-chips { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .45rem; }
+.meta-chip {
+  font-size: .62rem; font-weight: 600; padding: .05rem .45rem;
+  border-radius: .3rem; white-space: nowrap;
+}
+.meta-tech {
+  background: rgba(168, 85, 247, .08); color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, .22);
+}
+.meta-trl {
+  background: rgba(14, 165, 233, .08); color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, .22);
+}
+.meta-tax {
+  background: rgba(22, 163, 74, .07); color: #15803d;
+  border: 1px solid rgba(22, 163, 74, .2);
+}
+html[data-theme="dark"] .meta-tech { color: #c084fc; background: rgba(168, 85, 247, .14); border-color: rgba(168, 85, 247, .3); }
+html[data-theme="dark"] .meta-trl { color: #38bdf8; background: rgba(14, 165, 233, .14); border-color: rgba(14, 165, 233, .3); }
+html[data-theme="dark"] .meta-tax { color: #4ade80; background: rgba(22, 163, 74, .12); border-color: rgba(22, 163, 74, .28); }
+
+/* 技术特征（护城河字段，2026-08-23 阶段6） */
+.tech-feature {
+  margin: .45rem 0 0; padding: .4rem .6rem;
+  font-size: .72rem; line-height: 1.55; color: var(--text);
+  background: rgba(16, 185, 129, .06);
+  border-left: 3px solid #10b981;
+  border-radius: 0 .35rem .35rem 0;
+}
+html[data-theme="dark"] .tech-feature { background: rgba(16, 185, 129, .1); }
+
+/* 关系图谱维度切换（2026-08-23 阶段6） */
+.graph-dim-switch { display: flex; align-items: center; gap: .4rem; margin-left: auto; }
+.graph-dim-switch .filter-label { font-size: .68rem; }
+.graph-dim-switch .mode-switch { margin-left: .2rem; }
+
 /* 搜索框（Obsidian 语法） */
 .field-search { min-width: 280px; flex: 1 1 300px; }
 .search-box {

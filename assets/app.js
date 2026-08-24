@@ -44,6 +44,9 @@
   const PERIODS = ["日", "周", "月"];
   const REGIONS = ["国内", "国际"];
   const SORTS = ["重要性", "新到旧"];
+  // 关系图谱维度切换（2026-08-23 阶段6）：主题标签 / 生命周期 Layer / 国际分类法 / 交叉技术
+  const GRAPH_DIMS = ["主题", "Layer", "国际分类", "交叉技术"];
+  let graphDim = "主题";
   const HOUR = 3600 * 1000;
   const POLL_MS = 60 * 1000;
 
@@ -71,6 +74,7 @@
   const nextPage = $("#nextPage");
   const graphSub = $("#graphSub");
   const graphCount = $("#graphCount");
+  const graphDimSwitch = $("#graphDimSwitch");
   const updatedAt = $("#updatedAt");
   const itemTpl = $("#itemTpl");
   const themeToggle = $("#themeToggle");
@@ -196,8 +200,9 @@
     return Date.now() - h * HOUR;
   }
 
-  // ── Obsidian 语法解析（2026-08-23 新增）────────────────────────────────────
-  // 支持：tag:储能 path:产业 source:虎嗅 "精确匹配" 空格=AND OR -排除
+  // ── Obsidian 语法解析（2026-08-23 新增多维：taxonomy:/tech:/trl:/layer:）──
+  // 支持：tag:储能 path:产业 source:虎嗅 taxonomy:ISIC tech:效率 trl:7-9 layer:Layer2
+  //       "精确匹配" 空格=AND OR -排除
   function parseObsidianQuery(query) {
     if (!query || !query.trim()) return { active: false, terms: [] };
 
@@ -210,34 +215,36 @@
     
     orGroups.forEach((group, groupIdx) => {
       const groupOp = groupIdx > 0 ? "OR" : currentOp;
-      // 在组内处理 - 前缀（NOT）和tag:/path:等
-      const tokens = group.trim().split(/\s+/).filter(t => t.length > 0);
-      
+      // 2026-08-24：支持引号包裹的带空格前缀值（taxonomy:"J 信息通信"），
+      // 用正则一次性切 token——裸 "taxonomy:J 信息通信" 仍会按空格拆（需引号）
+      const tokenRe = /(-?(?:tag|path|source|taxonomy|tech|trl|layer):"[^"]*"|-?(?:tag|path|source|taxonomy|tech|trl|layer):\S+|"[^"]+"|\S+)/g;
+      const tokens = (group.trim().match(tokenRe) || []).filter(t => t.length > 0);
+
       tokens.forEach(token => {
+        // 前缀类型表（含 2026-08-23 新增的多维检索）
+        const PREFIXES = ["tag:", "path:", "source:", "taxonomy:", "tech:", "trl:", "layer:"];
+        const findPrefix = (s) => PREFIXES.find(p => s.startsWith(p));
+        const stripQuotes = (s) => s.length >= 2 && s.startsWith('"') && s.endsWith('"') ? s.slice(1, -1) : s;
         if (token.startsWith("-")) {
           // NOT 排除
           const value = token.slice(1);
-          if (value.startsWith("tag:")) {
-            terms.push({ op: "NOT", type: "tag", value: value.slice(4) });
-          } else if (value.startsWith("path:")) {
-            terms.push({ op: "NOT", type: "path", value: value.slice(5) });
-          } else if (value.startsWith("source:")) {
-            terms.push({ op: "NOT", type: "source", value: value.slice(7) });
+          const pref = findPrefix(value);
+          if (pref) {
+            terms.push({ op: "NOT", type: pref.slice(0, -1), value: stripQuotes(value.slice(pref.length)) });
           } else {
-            terms.push({ op: "NOT", type: "text", value });
+            terms.push({ op: "NOT", type: "text", value: stripQuotes(value) });
           }
-        } else if (token.startsWith("tag:")) {
-          terms.push({ op: groupOp, type: "tag", value: token.slice(4) });
-        } else if (token.startsWith("path:")) {
-          terms.push({ op: groupOp, type: "path", value: token.slice(5) });
-        } else if (token.startsWith("source:")) {
-          terms.push({ op: groupOp, type: "source", value: token.slice(7) });
-        } else if (token.startsWith('"') && token.endsWith('"')) {
-          // 精确匹配（去引号）
-          terms.push({ op: groupOp, type: "text", value: token.slice(1, -1), exact: true });
         } else {
-          // 普通全文搜索
-          terms.push({ op: groupOp, type: "text", value: token });
+          const pref = findPrefix(token);
+          if (pref) {
+            terms.push({ op: groupOp, type: pref.slice(0, -1), value: stripQuotes(token.slice(pref.length)) });
+          } else if (token.startsWith('"') && token.endsWith('"')) {
+            // 精确匹配（去引号）
+            terms.push({ op: groupOp, type: "text", value: token.slice(1, -1), exact: true });
+          } else {
+            // 普通全文搜索
+            terms.push({ op: groupOp, type: "text", value: token });
+          }
         }
       });
     });
@@ -258,11 +265,28 @@
     } else if (term.type === "source") {
       const site = item.site_name || item.site_id || "";
       return site.includes(term.value);
+    } else if (term.type === "taxonomy") {
+      // 国际标准分类法：EU Taxonomy / ISIC / GICS / IPC 四字段任中即命中
+      const tax = item.taxonomy || {};
+      const vals = [tax.eu_taxonomy, tax.isic, tax.gics, tax.ipc].filter(Boolean);
+      return vals.some(v => v.includes(term.value));
+    } else if (term.type === "tech") {
+      // 技术特征（护城河）：tech_feature 字段
+      return (item.tech_feature || "").includes(term.value);
+    } else if (term.type === "layer") {
+      // 生命周期 Layer（Layer 1/2/3，国际化双字段）；去空格匹配（"Layer 3" ↔ "Layer3"）
+      const layerVal = (item.layer || "").replace(/\s+/g, "");
+      const layerQ = term.value.replace(/\s+/g, "");
+      return layerVal.includes(layerQ);
+    } else if (term.type === "trl") {
+      // TRL 技术成熟度档位（1-3 / 4-6 / 7-9 / 空）
+      return (item.trl || "").includes(term.value);
     } else if (term.type === "text") {
-      // 全文搜索：标题 + 摘要
+      // 全文搜索：标题 + 摘要 + 技术特征
       const title = item.title_zh || item.title || "";
       const summary = item.summary || "";
-      const searchTarget = (title + " " + summary).toLowerCase();
+      const tech = item.tech_feature || "";
+      const searchTarget = (title + " " + summary + " " + tech).toLowerCase();
       if (term.exact) {
         return searchTarget.includes(term.value.toLowerCase());
       }
@@ -472,6 +496,39 @@
         chips.appendChild(c);
       });
 
+      // 多维标签 chips（2026-08-23 阶段6）：交叉技术 + TRL + 国际分类法
+      const metaChips = card.querySelector(".meta-chips");
+      const appendChip = (cls, text, title) => {
+        if (!text) return;
+        const c = document.createElement("span");
+        c.className = cls;
+        c.textContent = text;
+        c.title = title || text;
+        metaChips.appendChild(c);
+      };
+      // 交叉技术（AI/生物/能源/环境，多对多）
+      (item.enabling_tech || []).forEach(t => appendChip("meta-chip meta-tech", t, "交叉技术"));
+      // TRL 档位
+      if (item.trl) appendChip("meta-chip meta-trl", `TRL ${item.trl}`, "技术成熟度 TRL");
+      // 国际分类法（EU Taxonomy / ISIC / GICS / IPC）
+      const tax = item.taxonomy || {};
+      const taxMap = [
+        ["EU", tax.eu_taxonomy], ["ISIC", tax.isic],
+        ["GICS", tax.gics], ["IPC", tax.ipc],
+      ];
+      taxMap.forEach(([label, val]) => {
+        if (val) appendChip("meta-chip meta-tax", `${label}·${val}`, `${label} 国际分类`);
+      });
+      if (metaChips.children.length === 0) metaChips.hidden = true;
+
+      // 技术特征（护城河，2026-08-23 阶段6 展示）
+      const tfEl = card.querySelector(".tech-feature");
+      const tf = item.tech_feature || "";
+      if (tf && tf !== "无") {
+        tfEl.textContent = `🔬 ${tf}`;
+        tfEl.hidden = false;
+      }
+
       // 摘要（含评分，点开展开）
       const summary = item.summary || "";
       const sumEl = card.querySelector(".summary");
@@ -494,20 +551,33 @@
     container.appendChild(frag);
   }
 
-  // ── 关系图谱（2026-08-19）：主题标签共现 ──────────────────────────────────
+  // ── 关系图谱（2026-08-19）：主题标签共现；2026-08-23 阶段6 支持维度切换 ──
+  // 维度：主题(topics) / Layer(layer) / 国际分类(taxonomy 4 字段) / 交叉技术(enabling_tech)
+  function graphTagsOf(it) {
+    if (graphDim === "Layer") {
+      return it.layer ? [it.layer] : [];
+    } else if (graphDim === "国际分类") {
+      const tax = it.taxonomy || {};
+      return [tax.eu_taxonomy, tax.isic, tax.gics, tax.ipc].filter(Boolean);
+    } else if (graphDim === "交叉技术") {
+      return it.enabling_tech || [];
+    }
+    return it.topics || [];
+  }
+
   function renderGraph(filtered) {
     const el = document.getElementById("graphChart");
     if (!el || typeof echarts === "undefined") return;
 
-    // 聚合：主题标签节点（按出现次数）+ 共现边（同一篇新闻内两个标签）
+    // 聚合：维度标签节点（按出现次数）+ 共现边（同一篇新闻内两个标签）
     const nodeCount = {};
     const edgeWeight = {};
     let taggedItems = 0;
     for (const it of filtered) {
-      const topics = it.topics || [];
-      if (topics.length === 0) continue;
+      const tags = graphTagsOf(it);
+      if (tags.length === 0) continue;
       taggedItems += 1;
-      const uniq = [...new Set(topics)];
+      const uniq = [...new Set(tags)];
       uniq.forEach(t => { nodeCount[t] = (nodeCount[t] || 0) + 1; });
       for (let a = 0; a < uniq.length; a++) {
         for (let b = a + 1; b < uniq.length; b++) {
@@ -524,7 +594,7 @@
     const edgeColor = dark ? "rgba(245,246,247,.28)" : "rgba(91,97,110,.32)";
 
     graphSub.textContent =
-      `${currentDim === "全部" ? "全部维度" : currentDim} · ${tags.length} 个相关主题标签 · ${taggedItems} 条带标签动态`;
+      `${currentDim === "全部" ? "全部维度" : currentDim} · ${graphDim}维度 ${tags.length} 个标签 · ${taggedItems} 条带标签动态`;
     graphCount.textContent = `${tags.length} 个标签`;
 
     if (tags.length === 0) {
@@ -724,6 +794,13 @@
   buildSwitch(periodSwitch, PERIODS, currentPeriod, (v) => { currentPeriod = v; page = 1; render(); });
   buildSwitch(regionSwitch, REGIONS, currentRegion, (v) => { currentRegion = v; page = 1; render(); });
   buildSwitch(sortSwitch, SORTS, sortMode, (v) => { sortMode = v; page = 1; render(); });
+  // 关系图谱维度切换（2026-08-23 阶段6：主题/Layer/国际分类/交叉技术）
+  if (graphDimSwitch) {
+    buildSwitch(graphDimSwitch, GRAPH_DIMS, graphDim, (v) => {
+      graphDim = v;
+      if (graphChart) renderGraph(lastFiltered);
+    });
+  }
   pageSizeSelect.addEventListener("change", () => { pageSize = Number(pageSizeSelect.value); page = 1; render(); });
   prevPage.addEventListener("click", () => { if (page > 1) { page--; render(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
   nextPage.addEventListener("click", () => { page++; render(); window.scrollTo({ top: 0, behavior: "smooth" }); });
