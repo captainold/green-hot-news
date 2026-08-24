@@ -262,7 +262,7 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 - [x] **图片有信息量过滤 + 防盗链（2026-08-24 完成）**：老温明确范围——只提"有信息量"的图（数据图表/示意/架构图），跳过新闻配图（风景/人物照/装饰）。① `article_content._is_informative_image` 白名单判定（Fig/图N/示意/架构/流程/数据/趋势/chart/diagram），集成 trafilatura + fallback 两路径；② `download_images` 加 Referer 防盗链（403 fallback 空 Referer）；③ `clean_images.py` 存量清理：移除 1976 张垃圾图、删 861 个垃圾附件（97%），保留 94 张图表，0 broken 引用。顺带修复相对路径拼接 group(2) 未捕获的潜伏 bug。
 - [x] **arxiv 面包屑/页脚混入 + 高分论文 PDF 全文（2026-08-24 完成）**：① `article_content._clean_arxiv_junk` 截断 `### Bookmark` 之后的页脚（Bibliographic/Citation/arXivLabs），去面包屑/重复标题/View PDF，保留 Abstract；② score>=55（B 级，老温定）抓 PDF 全文替代 abs 摘要——`fetch_arxiv_pdf` 主路径换 **MinerU 3.4.5**（老温指定专用工具，版面分析+OCR+LaTeX公式+HTML表格，PyMuPDF 降级 fallback），`_extract_page_text` 用块 x 中心聚类分栏（修复单栏窄块误判双栏 bug）；③ 存量清理：`clean_arxiv.py` 清 118 个 qmd 面包屑 + `backfill_arxiv_pdf.py` 回填 22 条 B 级全文。环境修复：mineru 2.0.6→3.4.5、torchvision 0.20.1+cu121→0.23.0+cu128（原与 torch 2.8.0 不匹配报 nms 不存在）。效果：World models 论文 PyMuPDF 2443字→MinerU 106584字。
 - [ ] us_doe/openai 正文抓取（JS 渲染方案）
-- [ ] 《经济管理学刊》，也要添加进来。 
+- [x] **《经济管理学刊》（QJEM）接入（2026-08-24 完成）**：北大光华+机械工业信息研究院主办经管综合学术期刊，官网 www.qjem.cn（仅 http，首页 302 → /CN/home）。`fetch_qjem` 抓目录页（.article-l.article-w 块：标题/作者/摘要，无需进详情页），SOURCE_SCORE 14、isic "M 专业科技活动"、`ACADEMIC_JOURNAL_SITES` 全量直通（老温指定：全部抓取+参与评分，不过滤绿色低碳关键词）。当期 9 篇入库（宏观/金融/养老/IPO/数字资产，41-63 分）。⚠️ 顺带修复两个 summary 丢字段 bug：① fetch_qjem ② fetch_rss_feed/Google News——主流程读 `raw.meta.get("summary")` 而非 `raw.summary` 字段，导致 qjem/RSS 源摘要长期丢失。
 
 
 
