@@ -123,6 +123,30 @@ def _title_dedup_key(title: str) -> str:
     return t[:120]
 
 
+def _titles_similar(a: str, b: str) -> bool:
+    """标题相似度判定（2026-08-24 去重治理 P0）——标题变体判重。
+
+    merge_history 原只用 _title_dedup_key 精确匹配，但同一新闻被抓多次时标题
+    常有变体：截断（"明确2030年前" vs "明确2"）、标点差异（，vs ,）、源名后缀
+    （"…研讨会召开" vs "…研讨会召开-上海环境能源交易所"）、措辞微调（"部分" vs "多家"）
+    ——精确 key 不同而漏去重。此函数补相似度 + 前缀截断判定。
+    """
+    import difflib
+    a, b = (a or "").strip(), (b or "").strip()
+    if len(a) < 8 or len(b) < 8:
+        return False
+    if difflib.SequenceMatcher(None, a, b).ratio() >= 0.80:
+        return True
+    # 前缀截断：短标题是长标题的前缀（列表页抓取截断）
+    shorter, longer = (a, b) if len(a) <= len(b) else (b, a)
+    return longer.startswith(shorter) and len(longer) - len(shorter) >= 3
+
+
+def _title_prefix_key(title: str) -> str:
+    """标题去重前缀桶（前 30 字符），用于相似度去重的候选缩小（性能）。"""
+    return _title_dedup_key(title)[:30]
+
+
 def create_session() -> requests.Session:
     session = requests.Session()
     session.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"})
@@ -3507,6 +3531,7 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
         except Exception:
             existing = []
     seen: dict[str, dict] = {}
+    seen_prefix: dict[str, list[str]] = {}  # 2026-08-24: 前缀桶 → 已见标题（相似度去重候选）
     for it in existing:
         u = it.get("url") or ""
         # 2026-08-19：按规范化标题去重（Google News 聚合 URL 每次抓取不同，
@@ -3514,6 +3539,9 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
         k = _title_dedup_key(it.get("title", ""))
         if k and k not in seen:
             seen[k] = it
+            _t = it.get("title", "") or ""
+            _pfx = _title_prefix_key(_t)
+            seen_prefix.setdefault(_pfx, []).append(_t)
         elif u and not k:
             seen[u] = it
     added = 0
@@ -3521,7 +3549,13 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
         u = it.get("url") or ""
         k = _title_dedup_key(it.get("title", ""))
         if k and k not in seen:
+            # 标题相似度去重（2026-08-24 去重治理 P0）：截断/标点/源名后缀/微调判重
+            _t = it.get("title", "") or ""
+            _pfx = _title_prefix_key(_t)
+            if any(_titles_similar(_t, _cand) for _cand in seen_prefix.get(_pfx, [])):
+                continue
             seen[k] = it
+            seen_prefix.setdefault(_pfx, []).append(_t)
             added += 1
         elif u and not k and u not in seen:
             seen[u] = it
@@ -3638,6 +3672,7 @@ def main() -> int:
     # ── Dedup (no time window) for Obsidian export ──────────────────────────
     seen_ids: set[str] = set()
     seen_items: set[str] = set()  # 2026-08-19: 统一按规范化标题去重（见下）
+    seen_title_prefix: dict[str, list[str]] = {}  # 2026-08-24: 前缀桶 → 已见标题（相似度去重候选）
     print(f"  抓取完成: {len(raw_items)} 条 raw（{sum(1 for s in source_statuses if s['ok'])}/{len(source_statuses)} 源 ok，耗时 {time.monotonic()-_t0:.0f}s）", flush=True)
 
     all_items: list[dict[str, Any]] = []
@@ -3683,7 +3718,13 @@ def main() -> int:
         title_key = _title_dedup_key(_strip_title_suffix(raw.title))
         if title_key in seen_items:
             continue
+        # 标题相似度去重（2026-08-24 去重治理 P0）：截断/标点/源名后缀/微调判重
+        _clean_t = _strip_title_suffix(raw.title)
+        _pfx = _title_prefix_key(_clean_t)
+        if any(_titles_similar(_clean_t, _cand) for _cand in seen_title_prefix.get(_pfx, [])):
+            continue
         seen_items.add(title_key)
+        seen_title_prefix.setdefault(_pfx, []).append(_clean_t)
 
         # 统一清理标题尾部源名后缀（" - EPA" / " - CleanTechnica" 等），
         # 覆盖各 fetch 函数未单独清理的 Google News RSS 源（2026-08-18）
