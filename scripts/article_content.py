@@ -514,33 +514,76 @@ _ARXIV_FOOT_RE = re.compile(
 def _extract_page_text(page) -> str:
     """单页 PDF 文本提取（2026-08-24）：双栏论文按 x 坐标分栏重组，避免左右栏交错。
 
-    用 get_text("blocks") 拿到带坐标的文本块；判断左右两栏都有内容时分别
-    按 y 排序拼接（左栏 → 右栏），单栏则直接按 y 排序。
+    用 get_text("blocks") 拿带坐标的文本块；用块 x 中心聚类判断双栏（左右两簇
+    各 >= 2 块才视为双栏，避免单栏论文的窄块落在中间带被误判）；双栏按 x 中心
+    0.5w 分左右分别按 y 排序，单栏直接按 y 排序。
     """
     blocks = [b for b in page.get_text("blocks") if b[4].strip()]
     if not blocks:
         return ""
     w = page.rect.width
-    has_left = any(b[2] < w * 0.55 for b in blocks)
-    has_right = any(b[0] > w * 0.45 for b in blocks)
-    if has_left and has_right:
-        left = sorted((b[1], b[4].strip()) for b in blocks if b[2] < w * 0.55)
-        right = sorted((b[1], b[4].strip()) for b in blocks if b[0] > w * 0.45)
+    cxs = [(b[0] + b[2]) / 2 for b in blocks]
+    left_cluster = sum(1 for cx in cxs if cx < w * 0.45)
+    right_cluster = sum(1 for cx in cxs if cx > w * 0.55)
+    if left_cluster >= 2 and right_cluster >= 2:
+        left = sorted((b[1], b[4].strip()) for b in blocks if (b[0] + b[2]) / 2 < w * 0.5)
+        right = sorted((b[1], b[4].strip()) for b in blocks if (b[0] + b[2]) / 2 >= w * 0.5)
         return "\n".join(t for _, t in left) + "\n" + "\n".join(t for _, t in right)
     blocks.sort(key=lambda b: (b[1], b[0]))
     return "\n".join(b[4].strip() for b in blocks)
 
 
+def _fetch_arxiv_pdf_mineru(pdf_bytes: bytes) -> str:
+    """用 MinerU 提取 PDF 全文 markdown（2026-08-24 老温指定专用工具）。
+
+    MinerU 做版面分析 + OCR + 公式(LaTeX) + 表格(HTML) + 图片，质量远超
+    PyMuPDF 纯文本。图片引用去掉（MinerU 输出的是本地 images/ 相对路径，
+    qmd 里会 broken）。失败返回空串。
+    """
+    import glob as _glob
+    import os as _os
+    import shutil as _shutil
+    import subprocess as _sp
+    import tempfile as _tf
+
+    tmp_pdf = ""
+    out_dir = ""
+    try:
+        with _tf.NamedTemporaryFile(suffix=".pdf", delete=False) as _f:
+            _f.write(pdf_bytes)
+            tmp_pdf = _f.name
+        out_dir = _tf.mkdtemp(prefix="mineru_")
+        _proc = _sp.run(
+            ["mineru", "-p", tmp_pdf, "-o", out_dir, "-m", "auto", "-b", "pipeline", "-l", "en"],
+            capture_output=True, timeout=240,
+        )
+        if _proc.returncode != 0:
+            return ""
+        _md_files = _glob.glob(_os.path.join(out_dir, "*", "auto", "*.md"))
+        if not _md_files:
+            return ""
+        md = Path(_md_files[0]).read_text(encoding="utf-8")
+        # 去掉 MinerU 本地图片引用（images/ 相对路径，qmd 会 broken）
+        md = re.sub(r"!\[[^\]]*\]\(images/[^)]+\)\s*", "", md)
+        return md.strip()
+    except Exception:
+        return ""
+    finally:
+        if tmp_pdf:
+            try:
+                _os.unlink(tmp_pdf)
+            except Exception:
+                pass
+        if out_dir:
+            _shutil.rmtree(out_dir, ignore_errors=True)
+
+
 def fetch_arxiv_pdf(abs_url: str, session=None, timeout: tuple[int, int] = (15, 60)) -> str:
     """抓 arxiv PDF 全文（2026-08-24 老温需求：score >= 55 的论文抓全文替代 abs 摘要）。
 
-    abs_url（arxiv.org/abs/xxx）→ pdf_url（arxiv.org/pdf/xxx）→ PyMuPDF 提取
-    全文文本 → 清理版权声明/页脚噪音。失败返回空串（静默降级，不阻断导出）。
+    主路径 MinerU（版面分析+OCR+公式+表格，markdown 输出）；失败 fallback
+    PyMuPDF 纯文本提取。失败返回空串（静默降级，不阻断导出）。
     """
-    try:
-        import fitz  # PyMuPDF
-    except ImportError:
-        return ""
     pdf_url = (abs_url or "").replace("/abs/", "/pdf/")
     if not pdf_url.startswith("https://arxiv.org/pdf/"):
         return ""
@@ -555,11 +598,17 @@ def fetch_arxiv_pdf(abs_url: str, session=None, timeout: tuple[int, int] = (15, 
         r.raise_for_status()
         if len(r.content) < 1000 or r.headers.get("Content-Type", "").startswith("text/html"):
             return ""  # 不是 PDF（可能重定向到 abs 页）
-        doc = fitz.open(stream=r.content, filetype="pdf")
+        pdf_bytes = r.content
+        # MinerU 主路径
+        md = _fetch_arxiv_pdf_mineru(pdf_bytes)
+        if md and len(md) > 500:
+            return md
+        # fallback PyMuPDF
+        import fitz
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         parts = [_extract_page_text(page) for page in doc]
         doc.close()
-        text = "\n\n".join(parts)
-        return _clean_pdf_text(text)
+        return _clean_pdf_text("\n\n".join(parts))
     except Exception:
         return ""
     finally:
