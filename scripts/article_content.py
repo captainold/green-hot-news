@@ -836,6 +836,33 @@ def _clean_rich_body(s: str, title: str = "") -> str:
     return s.strip()
 
 
+def _rich_extract(resp, url: str) -> str:
+    """富文本正文提取（2026-08-24 换 trafilatura——学术界标准，F1 0.93）。
+
+    - trafilatura.extract(output_format='markdown', include_images=True)
+    - 图片相对路径（/upload/... 等）拼接 base_url（trafilatura 不自动拼）
+    - trafilatura 未安装 → fallback 自研 extract_rich（保留，不阻断）
+    """
+    try:
+        import trafilatura
+        # 编码修正：requests.text 的 encoding 判断对 GBK 站不可靠，用 apparent_encoding
+        html_str = resp.content.decode(resp.apparent_encoding or "utf-8", errors="ignore")
+        md = trafilatura.extract(html_str, output_format="markdown", include_links=False,
+                                 include_images=True, favor_precision=True) or ""
+        if md and url:
+            # 图片相对路径拼接（/upload/ /images/ /static/ /wp-content/ 等常见静态目录）
+            base = url.split("?")[0]
+            base = base[: base.rfind("/")] if "/" in base else url
+            md = re.sub(
+                r'!\[([^\]]*)\]\((/(?:upload|uploads|images|img|static|content|resources|wp-content|files|assets|picture|2026|2025)/[^)]+)\)',
+                lambda m: f"![{m.group(1)}]({base}{m.group(2)})", md)
+        return md
+    except ImportError:
+        soup = BeautifulSoup(resp.text, "html.parser")
+        body, _ = extract_rich(resp.text, soup, base_url=url)
+        return body
+
+
 def fetch_article(url: str, session: Optional[requests.Session] = None,
                   timeout: tuple[int, int] = (10, 20),
                   retries: int = 2,
@@ -896,8 +923,17 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
             resp.encoding = resp.apparent_encoding or "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
         if rich:
-            # 富文本模式（qmd 数据库用）：保留图片/表格/标题结构 → Markdown
-            body, page_title = extract_rich(resp.text, soup, base_url=url)
+            # 富文本模式（qmd 数据库用）：正文 → Markdown
+            # 2026-08-24 底层换 trafilatura（学术界标准正文提取，F1 0.93）——
+            # 自研 extract_rich 保留为 fallback（trafilatura 未安装时）。
+            body = _rich_extract(resp, url)
+            page_title = _first_article_heading(soup, ("h1", "h2"))
+            if not page_title:
+                title_el = soup.find("title")
+                if title_el is not None:
+                    t = _clean_title(title_el.get_text())
+                    if t and not _is_generic_site_title(t):
+                        page_title = t
         else:
             body, page_title = extract_readable(resp.text, soup)
         head = body[:120]
