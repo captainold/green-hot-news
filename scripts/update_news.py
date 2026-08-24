@@ -674,7 +674,8 @@ def fetch_qjem(session: requests.Session, now: datetime) -> list[RawItem]:
                 summary = ab.get_text(" ", strip=True)
             items.append(RawItem(
                 site_id="qjem", site_name="经济管理学刊",
-                title=title, url=full, summary=summary or None,
+                title=title, url=full,
+                meta={"summary": summary},
             ))
     except Exception:
         pass
