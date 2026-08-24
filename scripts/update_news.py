@@ -641,6 +641,54 @@ def fetch_ccai(session: requests.Session, now: datetime) -> list[RawItem]:
     return out[:12]
 
 
+def fetch_qjem(session: requests.Session, now: datetime) -> list[RawItem]:
+    """经济管理学刊（QJEM）— 当期目录（2026-08-24 接入，老温指定全部抓取+参与评分）。
+
+    机械工业信息研究院 + 北京大学光华管理学院主办（主编刘俏），经管综合学术
+    期刊（宏观/金融/产业/养老/IPO/数字资产等）。目录页 /CN/home 直接含标题+
+    作者+摘要（无需进详情页）。文章 URL = /CN/Y{年}/V{卷}/I{期}/{页码}。
+    PITFALL: 官网仅 http（https 连接失败），且首页 302 → /CN/home。
+    """
+    items: list[RawItem] = []
+    list_url = "http://www.qjem.cn/CN/home"
+    try:
+        r = session.get(list_url, timeout=30)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        for block in soup.select(".article-l.article-w"):
+            a = block.select_one(".j-title-1 a")
+            if not a:
+                continue
+            title = a.get_text(strip=True)
+            href = (a.get("href") or "").strip()
+            if not title or not href:
+                continue
+            full = urljoin("http://www.qjem.cn", href)
+            author = ""
+            au = block.select_one(".j-author")
+            if au:
+                author = au.get_text(strip=True)
+            summary = ""
+            ab = block.select_one(".j-abstract")
+            if ab:
+                summary = ab.get_text(" ", strip=True)
+            items.append(RawItem(
+                site_id="qjem", site_name="经济管理学刊",
+                title=title, url=full, summary=summary or None,
+            ))
+    except Exception:
+        pass
+    # 去重（同 URL 只保留一次）
+    seen: set[str] = set()
+    out: list[RawItem] = []
+    for it in items:
+        if it.url in seen:
+            continue
+        seen.add(it.url)
+        out.append(it)
+    return out
+
+
 def fetch_stdaily_green(session: requests.Session, now: datetime) -> list[RawItem]:
     """中国科技网（科技日报）— 绿色低碳/AI 动态。
 
@@ -2558,6 +2606,8 @@ SOURCE_SCORE: dict[str, int] = {
     "iea": 17, "irena": 17, "unfccc": 17, "worldbank": 17,
     # 专业政策/碳媒体 + AI×气候专业
     "tanpaifang": 14, "ideacarbon": 14, "carbonbrief": 14, "ccai": 14,
+    # 经济管理学刊（2026-08-24 接入：北大光华+机械工业信息研究院学术期刊，专业媒体档）
+    "qjem": 14,
     # 绿色科技媒体
     "stdaily": 12, "cleantechnica": 12,
     # AI 领域全链条源（2026-08-14 扩充）
@@ -3006,6 +3056,7 @@ SOURCE_ISIC: dict[str, str] = {
     "iea": "M 专业科技活动", "irena": "M 专业科技活动", "e3g": "M 专业科技活动",
     "agora": "M 专业科技活动", "teri": "M 专业科技活动", "carbonbrief": "M 专业科技活动",
     "ccai": "M 专业科技活动",
+    "qjem": "M 专业科技活动",  # 经济管理学刊（2026-08-24 学术期刊）
 }
 
 
@@ -3236,6 +3287,13 @@ AI_MEDIA_SITES = {
     "huxiu",  # 虎嗅（AI/新能源报道）
 }
 
+# 经管学术期刊（2026-08-24 接入：经济管理学刊）——老温指定全部抓取+参与评分，
+# 全量直通（不过滤绿色低碳关键词）。经济管理综合期刊，内容为宏观/金融/产业/
+# 养老/IPO/数字资产等，与绿色低碳关联度低，但作为"市场信号/产业"维度参考。
+ACADEMIC_JOURNAL_SITES = {
+    "qjem",  # 经济管理学刊（Quarterly Journal of Economics and Management）
+}
+
 # 技术全链条源（2026-08-14）：GitHub 开源项目趋势，全量直通（同 AI_SITES 逻辑）。
 # 维度（2026-08-17 调整）：非 AI 项目落回「技术」（媒体库兜底）；AI 项目在
 # categorize_dimension 中按关键词（标题+摘要）归 AI科技榜——技术榜只放绿色低碳技术
@@ -3283,6 +3341,9 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "", summary: st
         return False
     # 机器人/具身智能全链条源（2026-08-19）：人形机器人/工业机器人直通
     if site_id in ROBOT_SITES:
+        return True
+    # 经管学术期刊（2026-08-24）：经济管理学刊——老温指定全部抓取，全量直通
+    if site_id in ACADEMIC_JOURNAL_SITES:
         return True
     # AI 综合媒体（2026-08-19）：36氪/虎嗅是科技商业媒体——命中绿色词或 AI 词
     # 才入库（与 TECH_SITES 同逻辑，过滤无关科技商业噪音）
@@ -3378,6 +3439,8 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     # 绿色科技/AI（2026-08-14 主题定位升级新增）
     (fetch_ccai, "ccai", "Climate Change AI"),
     (fetch_stdaily_green, "stdaily", "中国科技网"),
+    # 经济管理学刊（2026-08-24 接入：经管综合学术期刊，老温指定全部抓取+参与评分）
+    (fetch_qjem, "qjem", "经济管理学刊"),
     # International orgs
     (fetch_iea, "iea", "IEA"),
     (fetch_irena, "irena", "IRENA"),
