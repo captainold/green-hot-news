@@ -249,7 +249,7 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 - [x] AIHOT就直接用就行了。（2026-08-14：aihot.virxact.com 接入——精选 RSS feed.xml 每 30 分钟抓取，AI_SITES 白名单直通 AI科技 维度，25 源）
 - [x] 要有一个源一览表，分门别类放好。（2026-08-14：docs/信息收集目标列表.md v1.0——中美欧日印×8类机构+国际组织，★已接入/●P0/○P1/△P2 分级，附接入路线与维护规则）
 
-## 2026-08-25（服务器网络 + 数据库收尾）
+## 2026-08-24（服务器网络 + 数据库收尾）
 
 - [x] **服务器代理落地**：mihomo（Clash.Meta）+ 夏威夷家宽 SS 节点（nat.qq.pw:35102）——服务器出口变住宅 IP（147.81.120.142），Cloudflare 反爬源恢复正文（mongabay/cleantechnica/spectrum ✓；us_doe/openai 需 JS 渲染，后续）
 - [x] **正文提取换 trafilatura**（学术界标准，消灭重复造轮子）：WAF 污染 44→0、无正文 18.3%→14.3%、图片 338→804 张
@@ -260,5 +260,7 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 - [x] **去重治理（2026-08-24 完成）**：真实重复 = 标题变体 38 条（截断/标点/源名后缀/微调，同 URL + 标题相似），非 agent-check 的"19.6%"（那是 normalize_url 去 query 把 cnesa/chinanecc 文章 ID、微博热搜误判为同 URL 的错误口径）。修复：`dedup_similar.py` 清理存量 + `update_news.py` 加 `_titles_similar` 标题相似度去重（防增量）。history URL 重复 45组→10组（剩的为微博热搜/GitHub 双标题等"同 URL 不同文"合理情况）。⚠️ 后续可选：GitHub/aihot 的"同 URL 双标题"需 URL 精确去重 + 白名单（微博热搜豁免）
 - [x] **多维标签回填（2026-08-24 完成）**：① TRL 关键词扩展（机组/电站/电芯/中标/通过评价/首例/首创/成套技术等，13%→14%，修复 49 条"有 tf 但 trl 空"的技术新闻漏判）；② tech_feature 正文提取——`extract_tech_feature` 加正文参数 + 提示词改稿（老温批准），`backfill_tech_feature.py` 批量重提取 650 条（正文 trafilatura 富文本），填充率 6%→17%（194 条），`clean_tech_feature.py` 清理 LLM"刹不住"的输出（归一化"无"长解释 + 超长截断 43→4 条）。核实结论：空置 80% 是合理的（资本/市场/政策类无技术参数），只有 ~20% 该填。
 - [x] **图片有信息量过滤 + 防盗链（2026-08-24 完成）**：老温明确范围——只提"有信息量"的图（数据图表/示意/架构图），跳过新闻配图（风景/人物照/装饰）。① `article_content._is_informative_image` 白名单判定（Fig/图N/示意/架构/流程/数据/趋势/chart/diagram），集成 trafilatura + fallback 两路径；② `download_images` 加 Referer 防盗链（403 fallback 空 Referer）；③ `clean_images.py` 存量清理：移除 1976 张垃圾图、删 861 个垃圾附件（97%），保留 94 张图表，0 broken 引用。顺带修复相对路径拼接 group(2) 未捕获的潜伏 bug。
-- [ ] arxiv 类面包屑/页脚混入（trafilatura 后处理清理）
+- [x] **arxiv 面包屑/页脚混入（2026-08-24 完成）**：`article_content._clean_arxiv_junk` 截断 `### Bookmark` 之后的页脚（Bibliographic/Citation/arXivLabs），去面包屑（`# Computer Science >`）、重复标题（`# Title:`）、View PDF 导航，保留 Abstract；`_rich_extract` 对 arxiv.org URL 自动清理；`clean_arxiv.py` 存量清理 118 个 qmd、移除 3540 行垃圾。注意：arxiv abs 页只有摘要，完整正文在 PDF（正文抓取深度是另一问题）。
 - [ ] us_doe/openai 正文抓取（JS 渲染方案）
+
+
