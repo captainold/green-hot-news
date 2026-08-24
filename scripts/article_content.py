@@ -488,7 +488,9 @@ def download_images(markdown: str, att_dir: Path, session: Optional[requests.Ses
 
         def _swap(m: "re.Match[str]") -> str:
             nonlocal downloaded
-            src = m.group(1).strip()
+            # PITFALL(2026-08-24): 正则 !\[([^\]]*)\]\((\S+)\) 的 group(1)=alt 文本、
+            # group(2)=URL——之前误用 group(1) 当 src，alt 为空 → 全部图片 0 下载！
+            src = m.group(2).strip()
             if not src or src.startswith("data:"):
                 return m.group(0)  # base64 图不动
             ext = Path(src.split("?")[0]).suffix.lower() or ".jpg"
@@ -508,7 +510,7 @@ def download_images(markdown: str, att_dir: Path, session: Optional[requests.Ses
                 except Exception:
                     return m.group(0)  # 失败保留原 URL
             downloaded += 1
-            return f"![{m.group(2)}](attachments/{fname})"
+            return f"![{m.group(1)}](attachments/{fname})"
 
         new_md = re.sub(r"!\[([^\]]*)\]\((\S+)\)", _swap, markdown)
         return new_md, downloaded

@@ -238,15 +238,70 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
     return written
 
 
+def backfill_images(output_dir: Path) -> int:
+    """补图模式（2026-08-24）：对已有正文的 qmd 只做图片下载补全。
+
+    首次全量导出时部分源站图 404/超时失败（保留原 URL）——重跑正文浪费，
+    此模式只提取正文中的 http 图片 → 下载到 attachments/ → 重写 qmd+md。
+    404 死链自动保留原 URL（Obsidian 点击可打开）。
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    import requests as _req
+
+    output_dir = Path(output_dir)
+    att_dir = output_dir / "attachments"
+    files = [f for f in output_dir.glob("*.qmd")
+             if re.search(r"!\[[^\]]*\]\(https?://", f.read_text(encoding="utf-8", errors="ignore"))]
+    if not files:
+        print("  无待补图 qmd（正文无 http 图片引用）")
+        return 0
+    print(f"  {len(files)} 个 qmd 待补图 → {att_dir}")
+
+    session = _req.Session()
+    session.headers.update({"User-Agent": article_content.BROWSER_UA})
+
+    def _work(f: Path) -> int:
+        text = f.read_text(encoding="utf-8", errors="ignore")
+        m = re.search(r"^## 正文\s*$", text, re.M)
+        if not m:
+            return 0
+        body = text[m.end():]
+        new_body, n = article_content.download_images(body, att_dir, session=session)
+        if n == 0:
+            return 0
+        new_text = text[:m.end()] + new_body
+        f.write_text(new_text, encoding="utf-8")
+        md = f.with_suffix(".md")
+        if md.exists():
+            md.write_text(new_text, encoding="utf-8")
+        return n
+
+    total = 0
+    with ThreadPoolExecutor(max_workers=_FETCH_WORKERS) as ex:
+        futs = {ex.submit(_work, f): f for f in files}
+        for fut in as_completed(futs):
+            total += fut.result()
+    print(f"  补图完成：{total} 张（404 死链自动保留原 URL）")
+    return total
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="qmd 数据库导出器（qmd 主 + md 副本 + 富文本全文）")
     ap.add_argument("--input", default=str(ROOT / "data" / "latest-24h.json"))
     ap.add_argument("--output", default=str(ROOT / "Notes" / "数据库"))
     ap.add_argument("--force", action="store_true", help="重新抓取正文（覆盖已有）")
     ap.add_argument("--limit", type=int, default=0, help="只导出前 N 条（小批验证用）")
+    ap.add_argument("--backfill-images", action="store_true",
+                    help="补图模式：只对已有正文的 qmd 下载图片（不重抓正文）")
     args = ap.parse_args()
 
-    total = export(Path(args.input), Path(args.output), args.force, args.limit)
+    out = Path(args.output)
+    if args.backfill_images:
+        total = backfill_images(out)
+        print(f"完成，共补图 {total} 张")
+        return 0
+    total = export(Path(args.input), out, args.force, args.limit)
     print(f"完成，共写入 {total} 条 qmd（含 md 副本）")
     return 0
 
