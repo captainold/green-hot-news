@@ -20,8 +20,8 @@ import requests
 _SF_BASE = "https://api.siliconflow.cn/v1"
 _SF_MODEL = "deepseek-ai/DeepSeek-V4-Pro"
 
-# 提示词模板（2026-08-23 与老温核定 + 评测集验证，勿擅改）
-PROMPT_TEMPLATE = """你是绿色低碳科技领域的技术情报分析师。从下面新闻的标题和摘要中，提取该新闻涉及的"技术特征"——即具体的技术参数、技术路线、工艺方法或性能指标。
+# 提示词模板（2026-08-23 与老温核定 + 评测集验证；2026-08-24 加正文输入，老温批准）
+PROMPT_TEMPLATE = """你是绿色低碳科技领域的技术情报分析师。从下面新闻的标题、摘要和正文中，提取该新闻涉及的"技术特征"——即具体的技术参数、技术路线、工艺方法或性能指标。
 
 技术特征包括（但不限于）：
 1. 降本曲线（成本下降，如"度电成本下降40%"）
@@ -33,10 +33,12 @@ PROMPT_TEMPLATE = """你是绿色低碳科技领域的技术情报分析师。�
 规则：
 - 只输出一句技术特征描述，不超过 50 字
 - 新闻完全不涉及任何技术参数/指标/路线时，才输出「无」
+- 优先从正文提取（正文含完整技术细节）；正文缺失或空时才用标题+摘要
 - 直接给结论，不要解释、不要前缀
 
 标题：{title}
 摘要：{summary}
+正文：{content}
 
 技术特征："""
 
@@ -68,10 +70,11 @@ def _load_key() -> str:
     return ""
 
 
-def extract_tech_feature(title: str, summary: str, _retry: int = 0) -> str:
+def extract_tech_feature(title: str, summary: str, content: str = "", _retry: int = 0) -> str:
     """提取技术特征，失败返回空串（静默降级，不抛异常）。
 
     返回：技术特征描述（一句 ≤50 字），或「无」，或空串（LLM 不可用）。
+    content：正文（可选，2026-08-24 新增——正文含完整技术细节，优先提取）。
     """
     global _SERVICE_DISABLED, _last_call_ts, _fail_count
     if _SERVICE_DISABLED:
@@ -83,6 +86,7 @@ def extract_tech_feature(title: str, summary: str, _retry: int = 0) -> str:
 
     title = (title or "").strip()
     summary = (summary or "").strip()[:500]
+    content = (content or "").strip()[:2000]
     if not title:
         return ""
 
@@ -91,7 +95,7 @@ def extract_tech_feature(title: str, summary: str, _retry: int = 0) -> str:
     if elapsed < _MIN_INTERVAL:
         time.sleep(_MIN_INTERVAL - elapsed)
 
-    prompt = PROMPT_TEMPLATE.format(title=title, summary=summary)
+    prompt = PROMPT_TEMPLATE.format(title=title, summary=summary, content=content)
     try:
         _last_call_ts = time.monotonic()
         r = requests.post(
@@ -111,14 +115,14 @@ def extract_tech_feature(title: str, summary: str, _retry: int = 0) -> str:
             _SERVICE_DISABLED = True
             return ""
         r.raise_for_status()
-        content = r.json()["choices"][0]["message"].get("content", "").strip()
+        content_out = r.json()["choices"][0]["message"].get("content", "").strip()
         _fail_count = 0  # 成功，重置失败计数
-        if content:
-            return content
+        if content_out:
+            return content_out
         # 空 content（reasoning 被截断）→ 退避重试一次
         if _retry < 1:
             time.sleep(1.0)
-            return extract_tech_feature(title, summary, _retry + 1)
+            return extract_tech_feature(title, summary, content, _retry + 1)
         return ""
     except Exception:
         # 静默降级：连续 3 次失败熔断，本轮不再调用
