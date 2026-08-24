@@ -453,6 +453,60 @@ def extract_readable(html: str, soup: Optional[BeautifulSoup] = None) -> tuple[s
 # 把正文容器转成 Markdown：保留段落/标题/列表/链接/表格/图片，供 qmd 数据库使用。
 _IMG_EXTS = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp")
 
+# 有信息量图片判定（2026-08-24 老温需求：只提图表/示意/架构图，跳过新闻配图
+# ——风景/人物照/装饰图。策略=白名单：默认跳过，仅保留有明确"信息量信号"的图）
+_INFO_IMG_ALT_RE = re.compile(
+    r'fig\.?|figure|图\s*[0-9一二三四五六七八九十]|图[0-9一二三四五六七八九十]|'
+    r'示意|架构|流程|原理|结构|数据|趋势|曲线|走势|对比|统计|分布|占比|图解|'
+    r'chart|diagram|graph|schematic|architecture|flowchart|infographic|table',
+    re.I,
+)
+_INFO_IMG_SRC_RE = re.compile(
+    r'chart|diagram|graph|figure|infographic|schematic|_data|data-',
+    re.I,
+)
+# 垃圾/配图黑名单（社交图标、文件图标、二维码、头像、封面）
+_JUNK_IMG_RE = re.compile(
+    r'icon|logo|avatar|profile|photo|portrait|placeholder|loading|spinner|'
+    r'qr|二维码|pdf|word|文件|リンク|social|share|banner|封面|头图|视频|'
+    r'user|default|site\s*ad|ad\b',
+    re.I,
+)
+
+
+def _is_informative_image(alt: str, src: str) -> bool:
+    """图片是否有信息量（数据图表/技术示意/架构图），而非新闻配图。
+
+    白名单策略：默认跳过，仅保留 alt 或 url 命中"信息量信号"且非垃圾的图。
+    alt 为空时只靠 url 信号（保守：无信号即跳过）。
+    """
+    alt = (alt or "").strip()
+    src = (src or "").strip()
+    if not alt and not src:
+        return False
+    # 黑名单：垃圾/配图 → 跳过
+    if _JUNK_IMG_RE.search(alt + " " + src):
+        return False
+    # 白名单：alt 有信息量信号
+    if alt and _INFO_IMG_ALT_RE.search(alt):
+        return True
+    # 白名单：url 有信息量信号（空 alt 时也靠这个）
+    if _INFO_IMG_SRC_RE.search(src):
+        return True
+    return False
+
+
+def _filter_md_images(markdown: str) -> str:
+    """只保留有信息量的图片，其余从 Markdown 移除（2026-08-24 老温需求）。
+
+    用于 trafilatura 路径（它 include_images 会带出所有正文图，含新闻配图）。
+    """
+    def _keep(m: "re.Match[str]") -> str:
+        alt, src = m.group(1), m.group(2)
+        return m.group(0) if _is_informative_image(alt, src) else ""
+
+    return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", _keep, markdown)
+
 
 def _resolve_img_src(img) -> Optional[str]:
     """图片地址：data-src → src → srcset 首项，相对路径由调用方拼接 base。"""
@@ -552,14 +606,15 @@ def _node_to_markdown(el, base_url: str, out: list[str]) -> None:
     if name == "img":
         src = _resolve_img_src(el)
         if src:
-            # 图标/Logo/占位图过滤（2026-08-24：ico-article.png 等列表页图标混入正文）
-            if re.search(r"(ico-|icon|logo|avatar|placeholder|loading|spinner)", src.lower()):
-                return
             if src.startswith("//"):
                 src = "https:" + src
             elif src.startswith("/"):
                 src = (base_url or "").rstrip("/") + src
             alt = (el.get("alt") or "").strip()
+            # 有信息量判定（2026-08-24 老温需求）：只提图表/示意/架构图，
+            # 跳过新闻配图（风景/人物照/装饰）+ 图标/Logo/二维码等垃圾图
+            if not _is_informative_image(alt, src):
+                return
             out.append(f"![{alt}]({src})")
         return
     if name == "table":
@@ -856,6 +911,8 @@ def _rich_extract(resp, url: str) -> str:
             md = re.sub(
                 r'!\[([^\]]*)\]\((/(?:upload|uploads|images|img|static|content|resources|wp-content|files|assets|picture|2026|2025)/[^)]+)\)',
                 lambda m: f"![{m.group(1)}]({base}{m.group(2)})", md)
+        # 有信息量图片过滤（2026-08-24 老温需求）：只提图表/示意/架构图，跳过新闻配图
+        md = _filter_md_images(md)
         return md
     except ImportError:
         soup = BeautifulSoup(resp.text, "html.parser")
