@@ -698,7 +698,7 @@
   function buildDigestText(items) {
       const periodLabel = currentPeriod === "日" ? "近 24 小时" : currentPeriod === "周" ? "近一周" : "近一月";
       const head = [
-        "🌿 绿色低碳先进技术动态雷达 · 精选概要",
+        "🌿 绿色低碳创新动态雷达 · 精选概要",
         `主题：${currentDim}  ｜  时间段：${periodLabel}  ｜  区域：${currentRegion}`,
         `更新时间：${updatedAt.textContent}`,
         "━━━━━━━━━━━━━━━━━━━━",
@@ -715,7 +715,7 @@
       const promo = [
         "",
         "━━━━━━━━━━━━━━━━━━━━",
-        "📡 绿色低碳先进技术动态雷达 · ywm.life",
+        "📡 绿色低碳创新动态雷达 · ywm.life",
         " 聚合 60+ 权威源，每日自动更新",
         " 👉 https://ywm.life",
       ].join("\n");
