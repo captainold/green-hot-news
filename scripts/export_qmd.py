@@ -146,6 +146,11 @@ def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
     url = item.get("url", "")
     if not url:
         return "", 0
+    # arxiv 高分论文（score >= 55）抓 PDF 全文替代 abs 页摘要（2026-08-24 老温定）
+    if "arxiv.org/abs" in url and (item.get("score") or 0) >= 55:
+        pdf_text = article_content.fetch_arxiv_pdf(url, session=session)
+        if pdf_text:
+            return pdf_text, 0  # PDF 全文纯文本，无图片附件
     res = article_content.fetch_article(url, session=session, rich=True)
     if not res or not res.get("content"):
         return "", 0

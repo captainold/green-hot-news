@@ -511,6 +511,84 @@ _ARXIV_FOOT_RE = re.compile(
 )
 
 
+def _extract_page_text(page) -> str:
+    """单页 PDF 文本提取（2026-08-24）：双栏论文按 x 坐标分栏重组，避免左右栏交错。
+
+    用 get_text("blocks") 拿到带坐标的文本块；判断左右两栏都有内容时分别
+    按 y 排序拼接（左栏 → 右栏），单栏则直接按 y 排序。
+    """
+    blocks = [b for b in page.get_text("blocks") if b[4].strip()]
+    if not blocks:
+        return ""
+    w = page.rect.width
+    has_left = any(b[2] < w * 0.55 for b in blocks)
+    has_right = any(b[0] > w * 0.45 for b in blocks)
+    if has_left and has_right:
+        left = sorted((b[1], b[4].strip()) for b in blocks if b[2] < w * 0.55)
+        right = sorted((b[1], b[4].strip()) for b in blocks if b[0] > w * 0.45)
+        return "\n".join(t for _, t in left) + "\n" + "\n".join(t for _, t in right)
+    blocks.sort(key=lambda b: (b[1], b[0]))
+    return "\n".join(b[4].strip() for b in blocks)
+
+
+def fetch_arxiv_pdf(abs_url: str, session=None, timeout: tuple[int, int] = (15, 60)) -> str:
+    """抓 arxiv PDF 全文（2026-08-24 老温需求：score >= 55 的论文抓全文替代 abs 摘要）。
+
+    abs_url（arxiv.org/abs/xxx）→ pdf_url（arxiv.org/pdf/xxx）→ PyMuPDF 提取
+    全文文本 → 清理版权声明/页脚噪音。失败返回空串（静默降级，不阻断导出）。
+    """
+    try:
+        import fitz  # PyMuPDF
+    except ImportError:
+        return ""
+    pdf_url = (abs_url or "").replace("/abs/", "/pdf/")
+    if not pdf_url.startswith("https://arxiv.org/pdf/"):
+        return ""
+    own = session is None
+    sess = session
+    try:
+        if sess is None:
+            import requests as _rq
+            sess = _rq.Session()
+            sess.headers.update({"User-Agent": BROWSER_UA})
+        r = sess.get(pdf_url, timeout=timeout, stream=True)
+        r.raise_for_status()
+        if len(r.content) < 1000 or r.headers.get("Content-Type", "").startswith("text/html"):
+            return ""  # 不是 PDF（可能重定向到 abs 页）
+        doc = fitz.open(stream=r.content, filetype="pdf")
+        parts = [_extract_page_text(page) for page in doc]
+        doc.close()
+        text = "\n\n".join(parts)
+        return _clean_pdf_text(text)
+    except Exception:
+        return ""
+    finally:
+        if own and sess is not None:
+            try:
+                sess.close()
+            except Exception:
+                pass
+
+
+def _clean_pdf_text(text: str) -> str:
+    """PDF 文本清理：去 ACM/IEEE 版权声明段 + 去多余空行。"""
+    # 去版权声明段（ACM "Permission to make digital or hard copies" 模板）
+    text = re.sub(
+        r"Permission to make digital or hard copies[\s\S]{0,600}?(?=\n\s*(Abstract|1\s|Introduction|arXiv:))",
+        "", text, count=1)
+    # 去页脚页码（孤立的数字行）
+    lines = [ln.rstrip() for ln in text.split("\n")]
+    out = []
+    for ln in lines:
+        if re.fullmatch(r"\s*\d{1,3}\s*", ln):  # 孤立页码
+            continue
+        out.append(ln)
+    text = "\n".join(out)
+    # 压掉连续空行
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
 def _clean_arxiv_junk(markdown: str) -> str:
     """清理 arxiv 页面 trafilatura 混入的面包屑/导航/页脚（2026-08-24）。
 
