@@ -158,8 +158,13 @@ def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
 
 
 def export(input_path: Path, output_dir: Path, force: bool = False,
-           limit: int = 0) -> int:
-    """导出条目为 qmd（+ md 副本），返回写入的文件数。"""
+           limit: int = 0, md_copy: bool = False) -> int:
+    """导出条目为 qmd（qmd 主格式），返回写入的文件数。
+
+    md_copy=True（2026-08-24 起默认关闭）：额外写一份 .md 副本。
+    老温定稿「qmd 为主格式」——Obsidian Quarto 插件已可用，md 副本
+    会在 Obsidian 文件浏览器造成同名双文件干扰，默认不再生成。
+    """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     import requests as _req
@@ -226,19 +231,20 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
             fname = f"{_date_of(it)} {_safe_filename(it.get('title', ''))}.qmd"
             qmd_text = build_qmd(it, content)
             (output_dir / fname).write_text(qmd_text, encoding="utf-8")
-            # md 副本（2026-08-24 老温定稿：qmd 主 + md 副本，两种格式都有）
-            (output_dir / fname.replace(".qmd", ".md")).write_text(qmd_text, encoding="utf-8")
+            if md_copy:
+                # md 副本（默认关闭——Obsidian 同名双文件干扰，见 export docstring）
+                (output_dir / fname.replace(".qmd", ".md")).write_text(qmd_text, encoding="utf-8")
             if it.get("url"):
                 existing_urls.add(it["url"])
             written += 1
             if written % 20 == 0:
                 print(f"    进度 {written}/{len(pending)}（无正文 {no_body}）", flush=True)
 
-    print(f"  {input_path.name}: 写入 {written} 条 qmd+md（{no_body} 条无正文），图片附件 → {att_dir}")
+    print(f"  {input_path.name}: 写入 {written} 条 qmd（{no_body} 条无正文），图片附件 → {att_dir}")
     return written
 
 
-def backfill_images(output_dir: Path) -> int:
+def backfill_images(output_dir: Path, md_copy: bool = False) -> int:
     """补图模式（2026-08-24）：对已有正文的 qmd 只做图片下载补全。
 
     首次全量导出时部分源站图 404/超时失败（保留原 URL）——重跑正文浪费，
@@ -272,9 +278,10 @@ def backfill_images(output_dir: Path) -> int:
             return 0
         new_text = text[:m.end()] + new_body
         f.write_text(new_text, encoding="utf-8")
-        md = f.with_suffix(".md")
-        if md.exists():
-            md.write_text(new_text, encoding="utf-8")
+        if md_copy:
+            md = f.with_suffix(".md")
+            if md.exists():
+                md.write_text(new_text, encoding="utf-8")
         return n
 
     total = 0
@@ -294,15 +301,17 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0, help="只导出前 N 条（小批验证用）")
     ap.add_argument("--backfill-images", action="store_true",
                     help="补图模式：只对已有正文的 qmd 下载图片（不重抓正文）")
+    ap.add_argument("--md-copy", action="store_true",
+                    help="额外写 .md 副本（默认关闭——Obsidian 同名双文件干扰）")
     args = ap.parse_args()
 
     out = Path(args.output)
     if args.backfill_images:
-        total = backfill_images(out)
+        total = backfill_images(out, md_copy=args.md_copy)
         print(f"完成，共补图 {total} 张")
         return 0
-    total = export(Path(args.input), out, args.force, args.limit)
-    print(f"完成，共写入 {total} 条 qmd（含 md 副本）")
+    total = export(Path(args.input), out, args.force, args.limit, args.md_copy)
+    print(f"完成，共写入 {total} 条 qmd")
     return 0
 
 

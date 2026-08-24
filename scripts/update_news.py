@@ -3996,6 +3996,18 @@ def main() -> int:
     merge_history(output_dir, green_items_24h, now)
     print("  merge_history 完成", flush=True)
 
+    # ── qmd 数据库增量导出（2026-08-24 一体式：抓取完成直接产出 qmd 富文本）──
+    # 架构：JSON 是网站数据源（单一事实源），qmd 是 Obsidian 数据库层——
+    # 同一步产出，无需独立脚本步骤。已存在正文的条目自动跳过（增量）。
+    try:
+        import export_qmd  # 同目录模块（sys.path[0]=scripts）
+        qmd_out = Path(__file__).resolve().parent.parent / "Notes" / "数据库"
+        qmd_n = export_qmd.export(Path(output_dir) / "latest-24h.json", qmd_out)
+        if qmd_n:
+            print(f"  ✅ qmd 增量导出: {qmd_n} 条 → {qmd_out}", flush=True)
+    except Exception as _e:
+        print(f"  ⚠️ qmd 导出失败（不阻断主流程）: {_e}", flush=True)
+
     print(f"✅ Green Policy Radar done.")
     print(f"   Green items: {len(green_items_24h)}")
     print(f"   All items:   {len(all_items_24h)}")
