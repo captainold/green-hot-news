@@ -650,34 +650,40 @@ def fetch_qjem(session: requests.Session, now: datetime) -> list[RawItem]:
     """
     items: list[RawItem] = []
     list_url = "http://www.qjem.cn/CN/home"
-    try:
-        r = session.get(list_url, timeout=30)
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        for block in soup.select(".article-l.article-w"):
-            a = block.select_one(".j-title-1 a")
-            if not a:
-                continue
-            title = a.get_text(strip=True)
-            href = (a.get("href") or "").strip()
-            if not title or not href:
-                continue
-            full = urljoin("http://www.qjem.cn", href)
-            author = ""
-            au = block.select_one(".j-author")
-            if au:
-                author = au.get_text(strip=True)
-            summary = ""
-            ab = block.select_one(".j-abstract")
-            if ab:
-                summary = ab.get_text(" ", strip=True)
-            items.append(RawItem(
-                site_id="qjem", site_name="经济管理学刊",
-                title=title, url=full,
-                meta={"summary": summary},
-            ))
-    except Exception:
-        pass
+    # 重试 3 次（2026-08-24 生产实测：新加坡→中国 http 站偶发网络失败，
+    # 单次 try 静默吞掉会整源 item_count=0，导致 qjem 漏抓）
+    for _attempt in range(3):
+        try:
+            r = session.get(list_url, timeout=30)
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, "html.parser")
+            for block in soup.select(".article-l.article-w"):
+                a = block.select_one(".j-title-1 a")
+                if not a:
+                    continue
+                title = a.get_text(strip=True)
+                href = (a.get("href") or "").strip()
+                if not title or not href:
+                    continue
+                full = urljoin("http://www.qjem.cn", href)
+                author = ""
+                au = block.select_one(".j-author")
+                if au:
+                    author = au.get_text(strip=True)
+                summary = ""
+                ab = block.select_one(".j-abstract")
+                if ab:
+                    summary = ab.get_text(" ", strip=True)
+                items.append(RawItem(
+                    site_id="qjem", site_name="经济管理学刊",
+                    title=title, url=full,
+                    meta={"summary": summary},
+                ))
+            break  # 成功，跳出重试
+        except Exception:
+            if _attempt < 2:
+                time.sleep(1.0)
+            # 最后一次失败 → items 保持空，静默降级
     # 去重（同 URL 只保留一次）
     seen: set[str] = set()
     out: list[RawItem] = []
