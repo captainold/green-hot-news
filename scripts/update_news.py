@@ -2933,6 +2933,26 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
 #   EU Taxonomy 六大环境目标（绿色低碳专用）/ ISIC 门类 / GICS 部门 / WIPO IPC 部
 # 完整标签词典见 docs/本体与标签词典.md
 
+# ── 关键词匹配工具（2026-08-25：修复英文短词子串误匹配） ──────────────
+# 背景：纯子串匹配下，GICS "ev" 命中 every/level/review（62 条）、EU "ev"
+# 虚增减缓（64 条）、生物科技 "gene" 命中 energy/generation（29/30 条）、
+# "media" 命中 immediate。修复：ASCII 完整词用「左边界 + 词干 + 常见后缀 +
+# 右边界」正则，防止嵌入更长无关单词；中文/含空格短语/故意前缀词保持子串。
+_ASCII_ONLY_RE = re.compile(r"^[a-z0-9.]+$")
+# 故意前缀匹配的关键词（需命中更长单词：decarbonization / remanufacturing）
+_PREFIX_KWS = {"decarboni", "remanufactur"}
+
+
+def _kw_hit(text: str, kw: str) -> bool:
+    """关键词命中：ASCII 完整词走词边界（防 ev→level 类误匹配），其余子串。"""
+    if not _ASCII_ONLY_RE.match(kw) or kw in _PREFIX_KWS:
+        return kw in text
+    # 词干 + 常见后缀（s/es/ing/ed/d 覆盖复数与动词变形），左右不允许字母数字
+    return re.search(
+        r"(?<![a-z0-9])" + re.escape(kw) + r"(?:s|es|ing|ed|d)?(?![a-z0-9])", text
+    ) is not None
+
+
 # EU Taxonomy 六大环境目标（顺序即优先级：减缓最宽放最前）
 EU_TAXONOMY_RULES: list[tuple[str, list[str]]] = [
     ("气候变化减缓", [
@@ -2944,7 +2964,7 @@ EU_TAXONOMY_RULES: list[tuple[str, list[str]]] = [
         "energy efficiency", "decarboni", "carbon capture", "ccus",
         "ev", "electric vehicle", "zero carbon", "carbon neutral", "net zero",
         "carbon price", "carbon market", "emission trading", "cbam",
-        "carbon emission", "greenhouse gas",
+        "carbon emission", "greenhouse gas", "ets",
     ]),
     ("污染防治", [
         "污染", "空气质量", "水污染", "土壤污染", "pm2.5", "挥发性有机物",
@@ -3027,7 +3047,7 @@ GICS_RULES: list[tuple[str, list[str]]] = [
     ("公用事业", ["公用事业", "电力", "燃气", "水务", "发电", "电网", "utilities", "power grid"]),
     ("能源", ["石油", "天然气", "煤炭", "油气", "能源设备", "oil", "natural gas", "coal", "petroleum"]),
     ("原材料", ["材料", "化工", "钢铁", "有色", "稀土", "锂", "铜", "materials", "chemical", "steel", "lithium", "copper"]),
-    ("工业", ["工业", "制造", "机械", "装备", "航天", "军工", "电气设备", "industrial", "manufacturing", "machinery", "equipment"]),
+    ("工业", ["工业", "制造", "机械", "装备", "航天", "军工", "电气设备", "工厂", "industrial", "manufacturing", "machinery", "equipment"]),
     ("信息技术", ["信息技术", "软件", "硬件", "半导体", "互联网", "芯片", "software", "semiconductor", "internet", "chip"]),
     ("金融", ["银行", "保险", "证券", "资管", "基金", "碳资产", "金融", "bank", "insurance", "fund", "finance"]),
     ("通信服务", ["通信", "电信", "媒体", "telecom", "communication", "media"]),
@@ -3039,7 +3059,7 @@ GICS_RULES: list[tuple[str, list[str]]] = [
 
 # WIPO IPC 部（技术专利视角，8 部；顺序即优先级）
 IPC_RULES: list[tuple[str, list[str]]] = [
-    ("H 电学", ["电学", "电子", "通信", "电力", "半导体", "电路", "电池", "electric", "electronic", "semiconductor", "circuit", "battery"]),
+    ("H 电学", ["电学", "电子", "通信", "电力", "半导体", "电路", "电池", "electric", "electronic", "semiconductor", "circuit", "battery", "batteries"]),
     ("C 化学冶金", ["化学", "材料", "冶金", "催化剂", "电解", "碳材料", "化工", "chemistry", "chemical", "metallurgy", "catalyst", "electrolysis"]),
     ("G 物理", ["物理", "光学", "测量", "计算", "控制", "physics", "optical", "measurement", "computing", "control"]),
     ("F 机械工程", ["机械", "发动机", "照明", "供热", "燃烧", "mechanical", "engine", "heating", "combustion"]),
@@ -3072,7 +3092,7 @@ def classify_eu_taxonomy(title: str, summary: str) -> str:
     """EU Taxonomy 六大环境目标分类（2026-08-23）。返回目标中文名，无匹配返回空串。"""
     text = f"{title or ''} {summary or ''}".lower()
     for tag, kws in EU_TAXONOMY_RULES:
-        if any(kw.lower() in text for kw in kws):
+        if any(_kw_hit(text, kw) for kw in kws):
             return tag
     return ""
 
@@ -3083,7 +3103,7 @@ def classify_isic(site_id: str, title: str, summary: str) -> str:
         return SOURCE_ISIC[site_id]
     text = f"{title or ''} {summary or ''}".lower()
     for tag, kws in ISIC_RULES:
-        if any(kw.lower() in text for kw in kws):
+        if any(_kw_hit(text, kw) for kw in kws):
             return tag
     return ""
 
@@ -3092,7 +3112,7 @@ def classify_gics(title: str, summary: str) -> str:
     """GICS 部门分类（2026-08-23）。返回部门名，无匹配返回空串。"""
     text = f"{title or ''} {summary or ''}".lower()
     for tag, kws in GICS_RULES:
-        if any(kw.lower() in text for kw in kws):
+        if any(_kw_hit(text, kw) for kw in kws):
             return tag
     return ""
 
@@ -3101,7 +3121,7 @@ def classify_ipc(title: str, summary: str) -> str:
     """WIPO IPC 部分类（2026-08-23）。返回部名，无匹配返回空串。"""
     text = f"{title or ''} {summary or ''}".lower()
     for tag, kws in IPC_RULES:
-        if any(kw.lower() in text for kw in kws):
+        if any(_kw_hit(text, kw) for kw in kws):
             return tag
     return ""
 
@@ -3128,14 +3148,14 @@ ENABLING_TECH_RULES: list[tuple[str, list[str]]] = [
     ("生物科技", [
         "合成生物学", "基因", "微生物", "酶", "发酵", "生物制造", "生物质转化",
         "细胞", "基因编辑", "菌种", "生物燃料",
-        "synthetic biology", "gene", "microbe", "enzyme", "fermentation",
-        "biomanufacturing",
+        "synthetic biology", "gene", "genes", "genetic", "genome", "genomic",
+        "microbe", "enzyme", "fermentation", "biomanufacturing",
     ]),
     ("能源", [
         "新能源", "储能", "氢能", "核能", "光伏", "风电", "电力", "电池",
-        "燃料电池", "生物质", "水电", "光热", "绿氢",
+        "燃料电池", "生物质", "水电", "光热", "绿氢", "锂电池",
         "renewable", "storage", "hydrogen", "nuclear", "solar", "wind",
-        "battery", "fuel cell",
+        "battery", "batteries", "fuel cell",
     ]),
     ("环境", [
         "碳捕集", "ccus", "污染防治", "生态", "废弃物", "循环", "水处理",
@@ -3151,7 +3171,7 @@ def classify_enabling_tech(title: str, summary: str) -> list[str]:
     text = f"{title or ''} {summary or ''}".lower()
     found: list[str] = []
     for tag, kws in ENABLING_TECH_RULES:
-        if any(kw.lower() in text for kw in kws):
+        if any(_kw_hit(text, kw) for kw in kws):
             found.append(tag)
     return found
 

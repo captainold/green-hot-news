@@ -12,7 +12,7 @@ docs/底层数据库构建方法 260823.qmd —— 放弃"树状文件夹"，改
 
 -[x] 都改成qmd存储
 -[ ] 重构分类之后
-	-[ ] 核查国际分类 Taxonomy（EU Taxonomy / ISIC / GICS / IPC）技术分类是否准确。
+	-[x] 核查国际分类 Taxonomy（EU Taxonomy / ISIC / GICS / IPC）技术分类是否准确。（2026-08-25 完成：修复英文短词子串误匹配——`_kw_hit` 词边界匹配。GICS 非必需消费品 ev 误匹配 62 条（every/level/review）、EU 减缓 ev 虚增 64 条、生物科技 gene 误匹配 29/30 条（energy/generation）、GICS 通信 media 2 条（immediate）、ISIC 运输 port 23 条（report/support）。分布修正：非必需消费品 121→16、减缓 316→202、生物科技 30→1、运输 32→9。补词：ets/工厂/genes/genetic/genome/genomic/batteries。遗留发现：日文源（jp_moe/jp_meti）用原始日文标题分类致 EU Taxonomy 漏判，建议后续改 title_zh+title 联合分类）
 -[x] 开始构建qmd数据库
 -[ ] 关系图谱内联，实现本地obsidian查看
 
