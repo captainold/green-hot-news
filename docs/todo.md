@@ -268,3 +268,8 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 
 
 
+
+## 2026-08-25（分类修复 + qmd frontmatter 刷新）
+
+- [x] **分类器英文关键词词边界修复**（见上方核查 Taxonomy 项）：`_kw_hit` 修复 ev/gene/media/port 子串误匹配，data JSON 已重算（history taxonomy 167 条变化）
+- [x] **qmd frontmatter 全量刷新**：export_qmd.py 新增 `--refresh-frontmatter` 模式（按 url 重建 YAML 多维标签、正文保留不重抓，本地+服务器均安全）；history/latest-24h-all/latest-24h 三输入跑完，共刷新 ~973 个 qmd；全量校验 1388 个 qmd 与 JSON 分类字段 0 不一致。遗留：236 个孤儿 qmd（url 已不在任何 JSON 的历史条目，Obsidian 中仍可见旧标签，建议后续清理）

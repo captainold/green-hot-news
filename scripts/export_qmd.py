@@ -10,6 +10,7 @@
     python3.11 scripts/export_qmd.py --input data/history.json --output Notes/数据库
     python3.11 scripts/export_qmd.py --limit 10          # 小批验证（先看质量再全量）
     python3.11 scripts/export_qmd.py --force             # 重新抓取正文（覆盖已有）
+    python3.11 scripts/export_qmd.py --refresh-frontmatter  # 只重建 YAML 多维标签（正文保留，不重抓——分类规则/打分规则改后的历史刷新）
 
 幂等：已有正文的 qmd 跳过（除非 --force）；图片附件 md5 命名天然去重。
 """
@@ -301,6 +302,60 @@ def backfill_images(output_dir: Path, md_copy: bool = False) -> int:
     return total
 
 
+def refresh_frontmatter(input_path: Path, output_dir: Path) -> int:
+    """仅刷新 frontmatter 模式（2026-08-25）：不重抓正文，只重建 YAML 头部多维标签。
+
+    用途：分类规则/打分规则改进后，历史 qmd 的 frontmatter 标签过时——
+    全量重导会重抓正文（浪费 + 服务器禁 --force），此模式按 url 匹配
+    已存在的 qmd，用最新 JSON 重建 frontmatter，正文部分原样保留。
+
+    返回刷新的文件数；新条目（JSON 有、磁盘无）跳过，留待主流程增量导出。
+    """
+    if not input_path.exists():
+        print(f"  输入不存在: {input_path}")
+        return 0
+    data = json.loads(input_path.read_text(encoding="utf-8"))
+    items = data.get("items", data) if isinstance(data, dict) else data
+    # url → item（同 url 取最后一条）
+    by_url: dict[str, dict] = {}
+    for it in items:
+        if isinstance(it, dict) and it.get("url"):
+            by_url[it["url"]] = it
+
+    refreshed = 0
+    skipped_no_fm = 0
+    fm_re = re.compile(r"^---\n.*?\n---\n", re.DOTALL | re.MULTILINE)
+    for f in sorted(output_dir.glob("*.qmd")):
+        try:
+            text = f.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        m_url = re.search(r'^url:\s*"([^"]+)"', text, re.MULTILINE)
+        if not m_url:
+            skipped_no_fm += 1
+            continue
+        item = by_url.get(m_url.group(1))
+        if not item:
+            continue  # 该 url 不在本次输入 JSON（可能是其他输入文件导出的），跳过
+        new_fm = build_frontmatter(item)
+        lines = ["---"]
+        for k, v in new_fm.items():
+            lines.append(f"{k}: {_yaml_scalar(v)}")
+        lines.append("---")
+        new_head = "\n".join(lines) + "\n"
+        m = fm_re.match(text)
+        if not m:
+            skipped_no_fm += 1
+            continue
+        if m.group(0) == new_head:
+            continue  # frontmatter 未变化，跳过写盘
+        f.write_text(new_head + text[m.end():], encoding="utf-8")
+        refreshed += 1
+    print(f"  {input_path.name}: 刷新 {refreshed} 个 qmd frontmatter"
+          f"（无 frontmatter/格式异常 {skipped_no_fm}，新条目待主流程增量导出）")
+    return refreshed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="qmd 数据库导出器（qmd 主 + md 副本 + 富文本全文）")
     ap.add_argument("--input", default=str(ROOT / "data" / "latest-24h.json"))
@@ -309,6 +364,8 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0, help="只导出前 N 条（小批验证用）")
     ap.add_argument("--backfill-images", action="store_true",
                     help="补图模式：只对已有正文的 qmd 下载图片（不重抓正文）")
+    ap.add_argument("--refresh-frontmatter", action="store_true",
+                    help="仅刷新 frontmatter：按 url 重建 YAML 多维标签，正文保留（不重抓）")
     ap.add_argument("--md-copy", action="store_true",
                     help="额外写 .md 副本（默认关闭——Obsidian 同名双文件干扰）")
     args = ap.parse_args()
@@ -317,6 +374,10 @@ def main() -> int:
     if args.backfill_images:
         total = backfill_images(out, md_copy=args.md_copy)
         print(f"完成，共补图 {total} 张")
+        return 0
+    if args.refresh_frontmatter:
+        total = refresh_frontmatter(Path(args.input), out)
+        print(f"完成，共刷新 {total} 个 qmd frontmatter")
         return 0
     total = export(Path(args.input), out, args.force, args.limit, args.md_copy)
     print(f"完成，共写入 {total} 条 qmd")
