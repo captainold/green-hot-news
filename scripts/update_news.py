@@ -962,16 +962,25 @@ _NAV_JUNK_TITLE_RE = re.compile(
 
 def _clean_summary(raw: str) -> str:
     """统一清洗摘要（2026-08-21 QA 系统发现）：
+    0. Google News RSS description 判空 —— <a href="news.google.com/rss/articles/…">标题</a>
+       <font>源名</font> 无真实摘要，标题/源名均冗余（标题存 title、源名存 site_name），直接判空
     1. html.unescape —— X 平台 SSR content 属性 / 部分 feed CDATA 的 &amp; &quot; 残留
-    2. 去除 {{...}} 模板变量 —— 中国环境报等 Google News 收录模板页（{{content.publishTime}}）
-    3. 清空标签序列（模板变量清掉后残留的"时间： 来源： 作者： "）与版权页脚
-    4. 压缩空白
+    2. 剥离 HTML 标签 —— 其他源描述里混入的 <a>/<font>/<br> 等（QA B5 实测 138 条残留）
+    3. 去除 {{...}} 模板变量 —— 中国环境报等 Google News 收录模板页（{{content.publishTime}}）
+    4. 清空标签序列（模板变量清掉后残留的"时间： 来源： 作者： "）与版权页脚
+    5. 压缩空白
     保守清洗：只处理明确噪音，不动正文内容。
     """
     if not raw:
         return ""
     s = html.unescape(str(raw))
-    s = re.sub(r"\{\{[^}]*\}\}?", "", s)  # 模板变量（含未闭合的 {{item.publishTime.）
+    # 2026-08-26：Google News RSS description 判空——无真实摘要，标题+源名均冗余
+    if "news.google.com/rss/articles" in s:
+        return ""
+    # 2026-08-26：剥离 HTML 标签——其他源 description 混入的 <a>/<font>/<br> 等，
+    # QA B5 实测 138 条残留。只匹配 < 后紧跟字母或 / 的真标签，避免误伤 "A < B" 数学式。
+    s = re.sub(r"</?[a-zA-Z][^>]*>", " ", s)
+    s = re.sub(r"\{\{[^}]*\}?\}", "", s)  # 模板变量（含未闭合的 {{item.publishTime.）
     # 空标签序列：模板变量清掉后"时间： 来源： 作者： 编辑： "只剩标签+空白
     s = re.sub(r"((?:时间|来源|作者|编辑|责编|责任编辑|监制|采写|记者|摄影)：(?:\s|$))+", "", s)
     # 版权/页脚残留（中国环境报等：本作品…联系电话…，允许跨句号）
@@ -2522,13 +2531,11 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
               "答记者问", "政策文件", "发布", "国务院", "管理办法", "新规"]),
         (25, ["解读", "一图读懂", "新闻发布会", "吹风会"]),
         (20, ["报告", "数据", "统计", "年报", "季报"]),
-        (10, []),
     ],
     "国际动态": [
         (30, ["协议", "峰会", "联合声明", "承诺", "达成", "签署", "宣言",
               "缔约方", "气候大会", "公报", "框架公约", "cop"]),
         (20, ["报告", "展望", "评估", "合作", "倡议", "声明"]),
-        (10, []),
     ],
     "企业经营": [
         (30, ["投产", "并网", "交付", "建成", "签约", "中标", "突破", "首次",
@@ -2536,14 +2543,12 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
         (20, ["进展", "上线", "落地", "试点", "示范", "应用", "试验", "扩产",
               "产量", "订单", "营收", "合作", "建厂", "出口", "报告", "发布",
               "数据", "recycle", "yield", "output", "test", "upgrade"]),
-        (10, []),
     ],
     "金融资本": [
         (30, ["扩围", "大涨", "突破", "新高", "首次", "创纪录", "启动", "成交",
               "破", "亿元", "覆盖", "并购", "收购"]),
         (20, ["价格", "指数", "报告", "数据", "融资", "投资", "交易", "配额",
               "基金", "债券"]),
-        (8, []),
     ],
     "技术研发": [
         (30, ["突破", "首发", "首次", "世界首个", "全球首个", "里程碑", "发布",
@@ -2559,7 +2564,6 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
               "样机", "中试", "工艺", "材料", "方法", "评估", "预测",
               "adaptation", "response", "pathway", "framework", "system",
               "tool", "dataset", "workshop", "grant"]),
-        (8, []),
     ],
     "基础研究": [
         (30, ["突破性进展", "新模型", "新方法", "发表", "首次", "世界首个",
@@ -2567,10 +2571,16 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
         (20, ["研究", "论文", "算法", "理论", "模型", "方法学", "实验",
               "benchmark", "数据集", "机理", "机制", "paper", "research",
               "study"]),
-        (8, []),
     ],
 }
-DEFAULT_STRENGTH = 8
+# 内容强度兜底默认分（2026-08-26 老温裁决：按文档原设计分细类）
+# 政策法规/国际动态/企业经营=10（政策/产业基础分量，无关键词也不低于产业普通动态），
+# 金融资本/技术研发/基础研究=8
+DEFAULT_STRENGTH_BY_SUB: dict[str, int] = {
+    "政策法规": 10, "国际动态": 10, "企业经营": 10,
+    "金融资本": 8, "技术研发": 8, "基础研究": 8,
+}
+DEFAULT_STRENGTH = 8  # 未知细类兜底
 
 
 def score_content_strength(sub_dimension: str, title: str, summary: str) -> int:
@@ -2580,7 +2590,7 @@ def score_content_strength(sub_dimension: str, title: str, summary: str) -> int:
     for score, kws in rules:
         if any(kw.lower() in text for kw in kws):
             return score
-    return DEFAULT_STRENGTH
+    return DEFAULT_STRENGTH_BY_SUB.get(sub_dimension, DEFAULT_STRENGTH)
 
 
 # 2) 来源权威分（site_id → 0-20，v4.0 从 25 分制压缩：匀 5 分给 TRL 第 6 维度）
@@ -2931,7 +2941,7 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
 # ── 维度二：国际标准分类法（Domain Taxonomy，2026-08-23 新增） ──────────────
 # 不自造词典，映射四大国际权威分类法的高层级：
 #   EU Taxonomy 六大环境目标（绿色低碳专用）/ ISIC 门类 / GICS 部门 / WIPO IPC 部
-# 完整标签词典见 docs/本体与标签词典.md
+# 完整标签词典见 docs/标准文档/本体与标签词典.md
 
 # ── 关键词匹配工具（2026-08-25：修复英文短词子串误匹配） ──────────────
 # 背景：纯子串匹配下，GICS "ev" 命中 every/level/review（62 条）、EU "ev"
@@ -3127,7 +3137,7 @@ def classify_ipc(title: str, summary: str) -> str:
 
 
 # ── 维度三 + layer + TRL（2026-08-23 新增） ─────────────────────────────────
-# 完整标签词典见 docs/本体与标签词典.md
+# 完整标签词典见 docs/标准文档/本体与标签词典.md
 
 # dimension（中文）→ layer（国际化 Layer 1/2/3）
 DIM_TO_LAYER: dict[str, str] = {

@@ -187,7 +187,7 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 	- [x] 政策库按照国家、部委部门来分，这里也要包含从部委网站上发布的专家解读。（2026-08-14：新增生态环境部·解读栏目 zcwj/zcjd/，一图读懂/专家解读/答记者问入库政策库）
 	- [x] 媒体库，指的是除了政府网站上其他的媒体和专家的评论解读。 
 	- [x] 还应该增加一个人名标签，这个怎么反映到wiki里面呢？（2026-08-14：people 字段 + 人物白名单 PERSON_RULES + 政策wiki/人物 板块聚合，backfill_people.py 回填历史笔记）
-- [x] 建立打分筛选机制，打分体系。这个是我的核心卖点，代表我的品味。现在的tags效果还不好。（2026-08-14：**v2.0 五维打分**——内容强度30（按四维自适应）+来源权威25+主题相关25+人物10+时效10，S/A/B/C/D 等级；前端综合榜+四维榜、分数徽章+悬停五维分解。规则见 docs/打分体系标准.md）
+- [x] 建立打分筛选机制，打分体系。这个是我的核心卖点，代表我的品味。现在的tags效果还不好。（2026-08-14：**v2.0 五维打分**——内容强度30（按四维自适应）+来源权威25+主题相关25+人物10+时效10，S/A/B/C/D 等级；前端综合榜+四维榜、分数徽章+悬停五维分解。规则见 docs/标准文档/打分体系标准.md）
 - [x] 当日高分浓缩版，供我转发到群里和朋友圈，还有自媒体。（依赖打分体系：score>=70 即 A 级以上条目，可自动生成）（2026-08-17：**scripts/daily_digest.py** 生成 data/daily-digest.md——四维分组 + 摘要清洗 + 每源配额防刷屏 + 7 天新鲜度过滤；前端 hero 区「📋 当日浓缩」弹窗一键复制；服务器 sync.sh 每次抓取后自动生成）
 	- [x] green-hot-news 
 	- [x] allnet.hot
@@ -272,4 +272,48 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 ## 2026-08-25（分类修复 + qmd frontmatter 刷新）
 
 - [x] **分类器英文关键词词边界修复**（见上方核查 Taxonomy 项）：`_kw_hit` 修复 ev/gene/media/port 子串误匹配，data JSON 已重算（history taxonomy 167 条变化）
-- [x] **qmd frontmatter 全量刷新**：export_qmd.py 新增 `--refresh-frontmatter` 模式（按 url 重建 YAML 多维标签、正文保留不重抓，本地+服务器均安全）；history/latest-24h-all/latest-24h 三输入跑完，共刷新 ~973 个 qmd；全量校验 1388 个 qmd 与 JSON 分类字段 0 不一致。遗留：236 个孤儿 qmd（url 已不在任何 JSON 的历史条目，Obsidian 中仍可见旧标签，建议后续清理）
+- [x] **qmd frontmatter 全量刷新**：export_qmd.py 新增 `--refresh-frontmatter` 模式（按 url 重建 YAML 多维标签、正文保留不重抓，本地+服务器均安全）；history/latest-24h-all/latest-24h 三输入跑完，共刷新 ~973 个 qmd；全量校验 1388 个 qmd 与 JSON 分类字段 0 不一致。
+- [x] **qmd 孤儿 + 冗余清理（2026-08-25）**：git rm 482 个（commit a669f13d2）——孤儿 236（url 已不在任何 JSON 的历史残留）+ 同 url 冗余 246（backfill_pubtimes 修日期后旧文件未删，每组保留 body 最全 1 份）。清理后 1143 个 qmd、0 重复 url。⚠️ 发现：Google News base64 url 每次抓取漂移 → 同新闻旧 qmd 会被误判孤儿（内容不丢，新 url 重新入库导出）；128 个 JSON url 无 qmd 覆盖 = 9 个 url 漂移 + 119 个新条目/过滤条目。
+- [ ] **allnet 源娱乐八卦入库（2026-08-25 发现）**：latest-24h 混入「梁洁刺棠女二」「郭二娃行贿」「孙颖莎女单世排」等 59 条娱乐/社会八卦——is_policy_relevant 未拦住，前端时间线会显示。建议加过滤词（娱乐/明星/八卦/行贿/世排等）或 allnet 子源白名单。另：液冷/AI电源等 08-25 条目无 qmd（待下轮抓取导出）。
+
+## 2026-08-26（docs 归档 + 体系一致性核查 + 打分裁决落地）
+
+- [x] **docs 分目录归档（老温定稿）**：`docs/标准文档/`（打分体系标准/本体与标签词典/标签体系标准三件套）+ `docs/todo/`（todo.md + 每日 todolist + 核查报告）；全仓库引用同步（AGENTS.md/脚本注释/项目计划/agent-check/技能库 SKILL.md+9 references/.hermes/plans/Notes wiki），0 残留；规则写入 AGENTS.md「📁 docs 目录规则」段 + Hermes memory
+- [x] **体系一致性核查（2026-08-26 一致性核查报告.md）**：三层六细类/六维打分/TRL/双字段/taxonomy/词边界全链路一致 ✅；发现 5+1 项不一致（A1 词典LLM选型错/A2 政策法规解读档位分叉/A3 默认强度分叉/A4 TRL词表漏同步/A5 frontmatter示例矛盾/B1 AGENTS.md内容过时）
+- [x] **A2 裁决落地**：解读/一图读懂/新闻发布会/吹风会 = **25 分档**（老温确认；代码本就正确，打分文档表格加 25 分档列对齐）
+- [x] **A3 裁决落地**：内容强度兜底默认**按细类区分**（政策法规/国际动态/企业经营=10，金融资本/技术研发/基础研究=8；老温确认"政策文件本身有分量"）——代码 `DEFAULT_STRENGTH_BY_SUB` + 清理 6 处死空档 + 单测 13 例通过 + migrate_dimensions 全量重算验证（政策法规 256×10/解读 5×25/国际动态 16×10/经营 277×10/金融 28×8/技术研发 227×8/基础研究 1×8）
+- [ ] **A1 待修**：词典 5.3/9.3 LLM 选型改 SiliconFlow DeepSeek-V4-Pro（代码 tech_feature.py 实为 SiliconFlow，词典写 new-api flash 是初稿残留）
+- [ ] **A4 待修**：TRL 词表 08-24 扩展补进词典 2.3 + 打分文档（代码 7-9/4-6/1-3 三档均有新增词）
+- [ ] **A5 待修**：词典 6.2 qmd frontmatter 示例重写（dimension 中文 + layer 独立字段 + taxonomy 展平 4 字段）
+- [ ] **B1 待修**：AGENTS.md 内容过时（v2.2 五维→v4.0 六维、四维→三层六细类）
+
+---
+
+## 📋 当前待办监控清单（2026-08-26 建，老温监控用）
+
+> 汇总**全部未完成任务**，完成一项勾一项；细节见各自历史段落/报告。优先级 P0=先做 / P1=一致性收尾+数据治理 / P2=源扩充 / P3=产品功能。
+
+### P0（先做）
+- [x] **QA 摘要 HTML 残留修复**：138 条 error（Google News 源 summary 带 `<a href>` 未剥离）——`_clean_summary` 加标签剥离 + 回填存量 + 重跑 QA【发现 08-26】（2026-08-26 完成：`_clean_summary` ① Google News RSS description（`<a href="news.google.com/rss/articles/…">标题</a> <font>源名</font>`，无真实摘要，标题/源名均冗余）直接判空；② 其他源 description 的 HTML 标签剥离 `</?[a-zA-Z][^>]*>`（只匹配 < 后紧跟字母或 / 的真标签，不误伤 "A < B" 数学式）。新增 scripts/backfill_clean_summary.py：JSON 按 url 判 Google News 清空 summary（history 12 + latest-24h 135 + latest-24h-all 73）+ qmd 删「## 摘要」段 87 个。QA 46.5(D)→94.0(A)，剩 1 条 C1 title_zh 翻译失败（无关）+ B1 空摘要占比 52% warn（Google News 源特性，50-65% 属正常）。⚠️ 待 scp 部署服务器）
+- [ ] **git 归档**：push 37 commits + 提交工作区文件（上会话产物：agent-check×3/tmp_stats_qmd×3/临时.md 等）
+- [ ] **A1 词典 LLM 选型修正**：词典 5.3/9.3 的 new-api flash → SiliconFlow DeepSeek-V4-Pro（以代码为准）
+
+### P1（一致性收尾 + 数据治理）
+- [ ] **A4 TRL 词表补文档**：08-24 扩展词补进词典 2.3 + 打分文档 TRL 表（代码 7-9/4-6/1-3 三档均有新增）
+- [ ] **A5 词典 frontmatter 示例重写**：6.2 节改 dimension 中文 + layer 独立字段 + taxonomy 展平 4 字段
+- [ ] **B1 AGENTS.md 内容过时修正**：v2.2 五维→v4.0 六维、四维观察窗口→三层六细类描述
+- [ ] **allnet 娱乐八卦过滤**：59 条混入（梁洁刺棠/郭二娃行贿/孙颖莎世排等）——is_policy_relevant 加过滤词或 allnet 子源白名单【发现 08-25】
+- [ ] **us_doe/openai 正文抓取**：JS 渲染方案（服务器已有 mihomo 家宽代理，仍需渲染器）【P1 遗留 08-24】
+
+### P2（源扩充）
+- [ ] **中央网信办《促进网信企业高质量发展行动计划（2026-2030年）》**：从官方网站抓取，添加官网为源
+- [ ] **微信公众号源接入**（老温 web 收藏/微信关注的持续 update）
+- [ ] **信息源自动收集**
+
+### P3（产品功能）
+- [ ] **关系图谱内联**，实现本地 Obsidian 查看
+- [ ] **当日高分浓缩版精细化**
+- [ ] **agent 接口（MCP）**：给项目接上 agent 接口
+- [ ] **用户订阅 / 新闻缩减版 / 注册用户 / 论坛生态**
+- [ ] **AI 互打双链接**：用 AI 给库里条目互相打双链接
+- [ ] **Obsidian 插件识别 .qmd**（老温侧装 Quarto 插件）

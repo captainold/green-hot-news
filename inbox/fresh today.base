@@ -1,0 +1,12 @@
+views:
+  - type: table
+    name: 表格
+    filters:
+      and:
+        - file.ctime >= "2026-08-22"
+        - file.ext == "qmd"
+    order:
+      - file.name
+      - file.ctime
+    columnSize:
+      file.name: 531

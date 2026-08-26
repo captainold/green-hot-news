@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型智力 × 价格综合看板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+  body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; margin: 0; background: #f8fafc; color: #0f172a; }
+  header { background: #0f172a; color: #fff; padding: 28px 40px; }
+  header h1 { margin: 0; font-size: 22px; font-weight: 600; }
+  header p { margin: 6px 0 0; color: #94a3b8; font-size: 13px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 20px; }
+  #chart { width: 100%; height: 640px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+  th { background: #f1f5f9; font-weight: 600; color: #475569; position: sticky; top: 0; }
+  tr:hover td { background: #f8fafc; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .num { font-variant-numeric: tabular-nums; text-align: right; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .legend span { font-size: 12px; display: flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🤖 模型智力 × 价格综合看板</h1>
+  <p>数据源：Artificial Analysis Intelligence Index v4.1.1（智力指数） × new-api 网关倍率（实际价格 $/1M 输入）· 生成于 2026-08-23</p>
+</header>
+<div class="wrap">
+  <div class="card">
+    <div class="legend" id="legend"></div>
+    <div id="chart"></div>
+  </div>
+  <div class="card">
+    <table id="table">
+      <thead><tr>
+        <th>模型</th><th class="num">智力指数</th><th class="num">官方价 $/1M</th><th class="num">new-api 价 $/1M</th><th class="num">折扣</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+<script>
+const vendors = ["Anthropic", "OpenAI", "xAI", "Kimi", "Z.ai", "Alibaba", "Google", "DeepSeek", "MiniMax", "Mistral", "NVIDIA", "ThinkingMachines", "其他"];
+const colors = {"Anthropic": "#cc785c", "OpenAI": "#1f1f1f", "xAI": "#6b7280", "Kimi": "#22c55e", "Z.ai": "#8b5cf6", "Alibaba": "#f97316", "Google": "#4285f4", "DeepSeek": "#3b82f6", "MiniMax": "#ef4444", "Mistral": "#eab308", "NVIDIA": "#76b900", "ThinkingMachines": "#06b6d4", "其他": "#94a3b8"};
+const rows = [{"aa_name": "Claude Opus 5 (Adaptive Reasoning, Max Effort)", "intelligence": 63.0532452071291, "official_in": 5.0, "official_out": 25.0, "na_name": "anthropic/claude-opus-5", "na_in": 5.0, "na_out": 25.0}, {"aa_name": "Claude Opus 5 (Adaptive Reasoning, Xhigh Effort)", "intelligence": 62.52047429879, "official_in": 5.0, "official_out": 25.0, "na_name": "anthropic/claude-opus-5", "na_in": 5.0, "na_out": 25.0}, {"aa_name": "Claude Fable 5 (Adaptive Reasoning, Max Effort, Opus 4.8 Fallback)", "intelligence": 62.0726622017462, "official_in": 10.0, "official_out": 50.0, "na_name": "anthropic/claude-fable-5", "na_in": 10.0, "na_out": 50.0}, {"aa_name": "Claude Opus 5 (Adaptive Reasoning, High Effort)", "intelligence": 61.4751191473465, "official_in": 5.0, "official_out": 25.0, "na_name": "anthropic/claude-opus-5", "na_in": 5.0, "na_out": 25.0}, {"aa_name": "GPT-5.6 Sol (max)", "intelligence": 60.9298701329203, "official_in": 5.0, "official_out": 30.0, "na_name": "gpt-5.6-sol", "na_in": 1.25, "na_out": 10.0}, {"aa_name": "Grok 4.6 (high)", "intelligence": 60.92297113115, "official_in": 2.0, "official_out": 6.0, "na_name": "x-ai/grok-4.6", "na_in": 2.0, "na_out": 6.0}, {"aa_name": "Kimi K3 (max)", "intelligence": 59.6994671342592, "official_in": 3.0, "official_out": 15.0, "na_name": "NVIDIA/kimi-k3", "na_in": 0.35, "na_out": 1.75}, {"aa_name": "GLM-5.3 (max)", "intelligence": 59.5134408119521, "official_in": 1.4, "official_out": 4.4, "na_name": "z-ai/glm-5.3", "na_in": 1.4, "na_out": 4.400199999999999}, {"aa_name": "Qwen3.8 2.4T A95B", "intelligence": 57.7043243271128, "official_in": 2.0, "official_out": 6.0, "na_name": "qwen/qwen3.8-2.4t-a95b", "na_in": 2.0, "na_out": 6.0}, {"aa_name": "GPT-5.6 Terra (max)", "intelligence": 56.5755675890213, "official_in": 2.0, "official_out": 12.0, "na_name": "gpt-5.6-terra", "na_in": 1.25, "na_out": 10.0}, {"aa_name": "Gemini 3.7 Flash (high)", "intelligence": 56.0301180773699, "official_in": 0.75, "official_out": 3.75, "na_name": "google/gemini-3.7-flash", "na_in": 0.375, "na_out": 1.875}, {"aa_name": "DeepSeek V4 Pro 0813 (Reasoning, Max Effort)", "intelligence": 53.1976849297815, "official_in": 1.32, "official_out": 3.96, "na_name": "deepseek/deepseek-v4-pro-0813", "na_in": 1.1880000000000002, "na_out": 3.5640000000000005}, {"aa_name": "GPT-5.6 Luna (max)", "intelligence": 52.3180827840984, "official_in": 0.2, "official_out": 1.2, "na_name": "openai/gpt-5.6-luna-pro", "na_in": 0.19999999999999998, "na_out": 1.2}, {"aa_name": "Qwen3.8 27B (xhigh)", "intelligence": 52.0246606497206, "official_in": 0.5, "official_out": 3.0, "na_name": "qwen/qwen3.8-27b", "na_in": 0.44999999999999996, "na_out": 3.1999999999999993}, {"aa_name": "MiniMax-M3", "intelligence": 45.3968506399702, "official_in": 0.3, "official_out": 1.2, "na_name": "MiniMaxAI/MiniMax-M3", "na_in": 0.3, "na_out": 1.2}, {"aa_name": "Inkling (xhigh)", "intelligence": 42.2947721285326, "official_in": 1.0, "official_out": 4.05, "na_name": "thinkingmachines/inkling-small", "na_in": 0.44999999999999996, "na_out": 1.1999999999999997}, {"aa_name": "Nemotron 3 Ultra 550B A55B (Reasoning)", "intelligence": 38.3185469149774, "official_in": 0.6, "official_out": 2.75, "na_name": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4", "na_in": 0.6, "na_out": 3.5999999999999996}, {"aa_name": "Gemini 3.5 Flash-Lite", "intelligence": 37.4387063722681, "official_in": 0.3, "official_out": 2.5, "na_name": "google/gemini-3.5-flash-lite", "na_in": 0.3, "na_out": 2.5}, {"aa_name": "Mistral Medium 3.5", "intelligence": 30.3922256057425, "official_in": 1.5, "official_out": 7.5, "na_name": "mistralai/mistral-medium-3.1", "na_in": 0.39999999999999997, "na_out": 1.9999999999999998}, {"aa_name": "Claude 4.5 Haiku (Reasoning)", "intelligence": 29.8919353345764, "official_in": 1.0, "official_out": 5.0, "na_name": "claude-haiku-4-5", "na_in": 0.5, "na_out": 2.5}, {"aa_name": "Nemotron 3 Super 120B A12B (Reasoning)", "intelligence": 25.6684845978586, "official_in": 0.2, "official_out": 0.8, "na_name": "nvidia/nemotron-3-super-120b-a12b", "na_in": 0.08499999999999999, "na_out": 0.39999999999999997}, {"aa_name": "gpt-oss-120b (high)", "intelligence": 24.126439151808, "official_in": 0.15, "official_out": 0.6, "na_name": "openai/gpt-oss-120b", "na_in": 0.05, "na_out": 0.25}, {"aa_name": "Nemotron 3.5 Lightning", "intelligence": 23.632637599256, "official_in": 0.07, "official_out": 0.22, "na_name": "nvidia/nemotron-3.5-lightning", "na_in": 0.08, "na_out": 0.2}, {"aa_name": "Command A+", "intelligence": 22.7702225702102, "official_in": 0.0, "official_out": 0.0, "na_name": "cohere/command-a", "na_in": 2.5, "na_out": 10.0}];
+
+// 图例
+const legend = document.getElementById('legend');
+Object.keys(colors).forEach(v => {
+  const span = document.createElement('span');
+  span.innerHTML = '<span class="dot" style="background:' + colors[v] + '"></span>' + v;
+  legend.appendChild(span);
+});
+
+// 散点图
+const chart = echarts.init(document.getElementById('chart'));
+chart.setOption({
+  tooltip: {
+    formatter: function(p) {
+      const d = p.data;
+      const name = d[3];
+      return '<b>' + name + '</b><br>' +
+        '智力指数: <b>' + d[1].toFixed(1) + '</b><br>' +
+        '官方价: $' + d[2].toFixed(2) + '/1M<br>' +
+        'new-api 价: $' + d[0].toFixed(3) + '/1M 输入<br>' +
+        'new-api 输出: $' + d[4].toFixed(3) + '/1M';
+    }
+  },
+  legend: { show: false },
+  grid: { left: 70, right: 40, top: 30, bottom: 60 },
+  xAxis: {
+    type: 'log',
+    name: 'new-api 价格（$/1M 输入，对数轴）',
+    nameLocation: 'middle',
+    nameGap: 35,
+    axisLabel: { formatter: v => '$' + v }
+  },
+  yAxis: {
+    type: 'value',
+    name: '智力指数（Intelligence Index）',
+    nameLocation: 'middle',
+    nameGap: 45,
+    min: 20, max: 70
+  },
+  series: [{"name": "Anthropic", "type": "scatter", "data": [[5.0, 63.0532452071291, 5.0, "Claude Opus 5 (Adaptive Reasoning, Max Effort)", 25.0], [5.0, 62.52047429879, 5.0, "Claude Opus 5 (Adaptive Reasoning, Xhigh Effort)", 25.0], [10.0, 62.0726622017462, 10.0, "Claude Fable 5 (Adaptive Reasoning, Max Effort, Opus 4.8 Fallback)", 50.0], [5.0, 61.4751191473465, 5.0, "Claude Opus 5 (Adaptive Reasoning, High Effort)", 25.0], [0.5, 29.8919353345764, 1.0, "Claude 4.5 Haiku (Reasoning)", 2.5]], "symbolSize": 16, "itemStyle": {"color": "#cc785c", "opacity": 0.85}}, {"name": "OpenAI", "type": "scatter", "data": [[1.25, 60.9298701329203, 5.0, "GPT-5.6 Sol (max)", 10.0], [1.25, 56.5755675890213, 2.0, "GPT-5.6 Terra (max)", 10.0], [0.19999999999999998, 52.3180827840984, 0.2, "GPT-5.6 Luna (max)", 1.2], [0.05, 24.126439151808, 0.15, "gpt-oss-120b (high)", 0.25]], "symbolSize": 16, "itemStyle": {"color": "#1f1f1f", "opacity": 0.85}}, {"name": "xAI", "type": "scatter", "data": [[2.0, 60.92297113115, 2.0, "Grok 4.6 (high)", 6.0]], "symbolSize": 16, "itemStyle": {"color": "#6b7280", "opacity": 0.85}}, {"name": "Kimi", "type": "scatter", "data": [[0.35, 59.6994671342592, 3.0, "Kimi K3 (max)", 1.75]], "symbolSize": 16, "itemStyle": {"color": "#22c55e", "opacity": 0.85}}, {"name": "Z.ai", "type": "scatter", "data": [[1.4, 59.5134408119521, 1.4, "GLM-5.3 (max)", 4.400199999999999]], "symbolSize": 16, "itemStyle": {"color": "#8b5cf6", "opacity": 0.85}}, {"name": "Alibaba", "type": "scatter", "data": [[2.0, 57.7043243271128, 2.0, "Qwen3.8 2.4T A95B", 6.0], [0.44999999999999996, 52.0246606497206, 0.5, "Qwen3.8 27B (xhigh)", 3.1999999999999993]], "symbolSize": 16, "itemStyle": {"color": "#f97316", "opacity": 0.85}}, {"name": "Google", "type": "scatter", "data": [[0.375, 56.0301180773699, 0.75, "Gemini 3.7 Flash (high)", 1.875], [0.3, 37.4387063722681, 0.3, "Gemini 3.5 Flash-Lite", 2.5]], "symbolSize": 16, "itemStyle": {"color": "#4285f4", "opacity": 0.85}}, {"name": "DeepSeek", "type": "scatter", "data": [[1.1880000000000002, 53.1976849297815, 1.32, "DeepSeek V4 Pro 0813 (Reasoning, Max Effort)", 3.5640000000000005]], "symbolSize": 16, "itemStyle": {"color": "#3b82f6", "opacity": 0.85}}, {"name": "MiniMax", "type": "scatter", "data": [[0.3, 45.3968506399702, 0.3, "MiniMax-M3", 1.2]], "symbolSize": 16, "itemStyle": {"color": "#ef4444", "opacity": 0.85}}, {"name": "ThinkingMachines", "type": "scatter", "data": [[0.44999999999999996, 42.2947721285326, 1.0, "Inkling (xhigh)", 1.1999999999999997]], "symbolSize": 16, "itemStyle": {"color": "#06b6d4", "opacity": 0.85}}, {"name": "NVIDIA", "type": "scatter", "data": [[0.6, 38.3185469149774, 0.6, "Nemotron 3 Ultra 550B A55B (Reasoning)", 3.5999999999999996], [0.08499999999999999, 25.6684845978586, 0.2, "Nemotron 3 Super 120B A12B (Reasoning)", 0.39999999999999997], [0.08, 23.632637599256, 0.07, "Nemotron 3.5 Lightning", 0.2]], "symbolSize": 16, "itemStyle": {"color": "#76b900", "opacity": 0.85}}, {"name": "Mistral", "type": "scatter", "data": [[0.39999999999999997, 30.3922256057425, 1.5, "Mistral Medium 3.5", 1.9999999999999998]], "symbolSize": 16, "itemStyle": {"color": "#eab308", "opacity": 0.85}}, {"name": "其他", "type": "scatter", "data": [[2.5, 22.7702225702102, 0.0, "Command A+", 10.0]], "symbolSize": 16, "itemStyle": {"color": "#94a3b8", "opacity": 0.85}}]
+});
+
+// 表格
+const tbody = document.getElementById('tbody');
+const sorted = [...rows].sort((a,b) => b.intelligence - a.intelligence);
+sorted.forEach(r => {
+  const disc = r.na_in && r.official_in ? (r.na_in / r.official_in * 100) : null;
+  const tr = document.createElement('tr');
+  const vend = vendorName(r.aa_name);
+  const color = colors[vend] || '#94a3b8';
+  let discHtml = '—';
+  if (disc !== null) {
+    const cls = disc < 50 ? 'background:#16a34a;color:#fff' : disc < 90 ? 'background:#eab308;color:#fff' : 'background:#94a3b8;color:#fff';
+    discHtml = '<span class="badge" style="' + cls + '">' + disc.toFixed(0) + '%</span>';
+  }
+  tr.innerHTML = '<td><span class="dot" style="background:' + color + '"></span> ' + r.aa_name + '</td>' +
+    '<td class="num">' + r.intelligence.toFixed(1) + '</td>' +
+    '<td class="num">$' + (r.official_in != null ? r.official_in.toFixed(2) : '—') + '</td>' +
+    '<td class="num">$' + (r.na_in != null ? r.na_in.toFixed(3) : '—') + '</td>' +
+    '<td class="num">' + discHtml + '</td>';
+  tbody.appendChild(tr);
+});
+
+function vendorName(n) {
+  const s = n.toLowerCase();
+  if (s.includes('claude') || s.includes('anthropic')) return 'Anthropic';
+  if (s.includes('gpt') || s.includes('openai')) return 'OpenAI';
+  if (s.includes('grok')) return 'xAI';
+  if (s.includes('kimi') || s.includes('moonshot')) return 'Kimi';
+  if (s.includes('glm')) return 'Z.ai';
+  if (s.includes('qwen')) return 'Alibaba';
+  if (s.includes('gemini') || s.includes('google')) return 'Google';
+  if (s.includes('deepseek')) return 'DeepSeek';
+  if (s.includes('minimax')) return 'MiniMax';
+  if (s.includes('mistral')) return 'Mistral';
+  if (s.includes('nemotron') || s.includes('nvidia')) return 'NVIDIA';
+  if (s.includes('inkling')) return 'ThinkingMachines';
+  return '其他';
+}
+</script>
+</body>
+</html>
