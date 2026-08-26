@@ -294,8 +294,8 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 > 汇总**全部未完成任务**，完成一项勾一项；细节见各自历史段落/报告。优先级 P0=先做 / P1=一致性收尾+数据治理 / P2=源扩充 / P3=产品功能。
 
 ### P0（先做）
-- [x] **QA 摘要 HTML 残留修复**：138 条 error（Google News 源 summary 带 `<a href>` 未剥离）——`_clean_summary` 加标签剥离 + 回填存量 + 重跑 QA【发现 08-26】（2026-08-26 完成：`_clean_summary` ① Google News RSS description（`<a href="news.google.com/rss/articles/…">标题</a> <font>源名</font>`，无真实摘要，标题/源名均冗余）直接判空；② 其他源 description 的 HTML 标签剥离 `</?[a-zA-Z][^>]*>`（只匹配 < 后紧跟字母或 / 的真标签，不误伤 "A < B" 数学式）。新增 scripts/backfill_clean_summary.py：JSON 按 url 判 Google News 清空 summary（history 12 + latest-24h 135 + latest-24h-all 73）+ qmd 删「## 摘要」段 87 个。QA 46.5(D)→94.0(A)，剩 1 条 C1 title_zh 翻译失败（无关）+ B1 空摘要占比 52% warn（Google News 源特性，50-65% 属正常）。⚠️ 待 scp 部署服务器）
-- [ ] **git 归档**：push 37 commits + 提交工作区文件（上会话产物：agent-check×3/tmp_stats_qmd×3/临时.md 等）
+- [x] **QA 摘要 HTML 残留修复**：138 条 error（Google News 源 summary 带 `<a href>` 未剥离）——`_clean_summary` 加标签剥离 + 回填存量 + 重跑 QA【发现 08-26】（2026-08-26 完成：`_clean_summary` ① Google News RSS description（`<a href="news.google.com/rss/articles/…">标题</a> <font>源名</font>`，无真实摘要，标题/源名均冗余）直接判空；② 其他源 description 的 HTML 标签剥离 `</?[a-zA-Z][^>]*>`（只匹配 < 后紧跟字母或 / 的真标签，不误伤 "A < B" 数学式）。新增 scripts/backfill_clean_summary.py：JSON 按 url 判 Google News 清空 summary（history 12 + latest-24h 135 + latest-24h-all 73）+ qmd 删「## 摘要」段 87 个。QA 46.5(D)→94.0(A)，剩 1 条 C1 title_zh 翻译失败（无关）+ B1 空摘要占比 52% warn（Google News 源特性，50-65% 属正常）。已 scp 部署服务器：update_news.py + backfill_clean_summary.py md5 一致 + py_compile 通过 + 服务器回填 history 177/latest-24h 178/latest-24h-all 198/qmd 279 + 服务器 QA 92.5(A)）
+- [x] **git 归档**：push 37 commits + 提交工作区文件（上会话产物：agent-check×3/tmp_stats_qmd×3/临时.md 等）（2026-08-26 完成：push 37 commits（1692489..250b11d）+ 新 commit 04cba31（含 QA 摘要修复 + docs 分目录 + A3 裁决 + 上会话产物归档，32 files）+ push 04cba31；.gitignore 新增 .hermes/ 忽略 Hermes 内部计划文件；主仓工作区已干净。Notes 子仓 281 处改动由 Obsidian Git 插件自动同步）
 - [ ] **A1 词典 LLM 选型修正**：词典 5.3/9.3 的 new-api flash → SiliconFlow DeepSeek-V4-Pro（以代码为准）
 
 ### P1（一致性收尾 + 数据治理）
