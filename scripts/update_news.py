@@ -1976,6 +1976,58 @@ def fetch_miit(session: requests.Session, now: datetime) -> list[RawItem]:
     return items[:30]
 
 
+def fetch_natsustain(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Nature Sustainability — 可持续科学顶级学术期刊（2026-08-26 接入：
+    社会创新/可持续消费/生活方式学术源，直通创新·基础研究/社会创新）。"""
+    return fetch_rss_feed(
+        session, "https://www.nature.com/natsustain.rss",
+        "natsustain", "Nature Sustainability", now, limit=30,
+    )
+
+
+def fetch_hotorcool(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Hot or Cool Institute — 柏林 1.5°C 生活方式研究智库（2026-08-26 接入：
+    可持续生活方式/消费行为/社会创新严肃讨论源，WordPress news 卡片 data-href 抓取）。"""
+    items: list[RawItem] = []
+    seen: set[str] = set()
+    try:
+        r = session.get(
+            "https://hotorcool.org/news/", timeout=30,
+            headers={"Accept": "text/html", "Accept-Language": "en-US,en;q=0.9"},
+        )
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        # 卡片结构：<article class="card ... js-linked-card" data-href="..."> <h3>标题</h3>
+        for card in soup.select("article[data-href]"):
+            href = (card.get("data-href") or "").strip()
+            h3 = card.select_one("h3")
+            text = h3.get_text(strip=True) if h3 else card.get_text(strip=True)
+            if not text or not href or len(text) < 10:
+                continue
+            if not href.startswith("http"):
+                href = urljoin("https://hotorcool.org", href)
+            if text in seen:
+                continue
+            seen.add(text)
+            items.append(RawItem(
+                site_id="hotorcool", site_name="Hot or Cool Institute",
+                source="Hot or Cool", title=text, url=href,
+                published_at=None, meta={},
+            ))
+    except Exception:
+        pass
+    return items[:20]
+
+
+def fetch_unep(session: requests.Session, now: datetime) -> list[RawItem]:
+    """UNEP 联合国环境署 — 全站 RSS（2026-08-26 接入：可持续消费/生活方式/
+    资源效率国际权威源，policy 库·国际组织；社会创新词命中 → 创新·社会创新）。"""
+    return fetch_rss_feed(
+        session, "https://www.unep.org/rss.xml",
+        "unep", "UNEP", now, limit=40,
+    )
+
+
 def fetch_iea(session: requests.Session, now: datetime) -> list[RawItem]:
     """IEA — news page HTML scraping."""
     items: list[RawItem] = []
@@ -2627,6 +2679,10 @@ SOURCE_SCORE: dict[str, int] = {
     "mee_jiedu": 18,
     # 国际组织
     "iea": 17, "irena": 17, "unfccc": 17, "worldbank": 17,
+    # 社会创新/可持续消费学术严肃源（2026-08-26 接入）
+    "natsustain": 18,  # Nature 子刊（学术顶刊，专业媒体高档）
+    "hotorcool": 14,   # 生活方式研究智库（同 E3G/Agora 智库档）
+    "unep": 17,        # 联合国环境署（国际组织档）
     # 专业政策/碳媒体 + AI×气候专业
     "tanpaifang": 14, "ideacarbon": 14, "carbonbrief": 14, "ccai": 14,
     # 经济管理学刊（2026-08-24 接入：北大光华+机械工业信息研究院学术期刊，专业媒体档）
@@ -2894,10 +2950,16 @@ AI_PRODUCT_KW = [
 # 社会创新词（v5.0 新增，2026-08-26）→ 创新·社会创新：制度/机制/模式/消费/行为等
 # 尚未产业化的创新。注意：不放「社区/共享/试点/机制」等泛词（误抢产业落地）；
 # 碳普惠/碳账户按老温决策归产业（DUAL_CARBON 的碳普惠 + ENTERPRISE_KW 的碳账户/碳普惠）
+# 英文词（2026-08-26 晚补）：服务 natsustain/hotorcool/unep 等国际学术/智库源
 SOCIAL_INNOVATION_KW = [
     "社会创新", "制度创新", "机制创新", "创新机制", "模式创新", "商业模式",
     "绿色消费", "低碳消费", "绿色生活", "低碳生活", "公众参与",
     "行为改变", "生活方式", "垃圾分类", "无废城市", "循环消费", "新业态",
+    # English（2026-08-26：可持续生活方式/消费/行为研究——国际源社会创新判定）
+    "sustainable lifestyle", "sustainable consumption", "consumer behaviour",
+    "consumer behavior", "behavior change", "behaviour change",
+    "social innovation", "sufficiency", "degrowth", "wellbeing economy",
+    "sharing economy", "food waste", "green consumption", "lifestyle",
 ]
 # 政策弱词（2026-08-19）：兜底前的政府信号（GOV_STRONG_KW 之外的剩余原政策词）
 POLICY_WEAK_KW = [
@@ -2947,6 +3009,17 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     # AI 源（AIHOT/机器之心等标题未必含 AI 关键词）→ 按技术阶段分流（v5.0）
     if site_id in AI_SITES:
         return _ai_stage_sub(text)
+    # 学术期刊源直通（v5.0 晚补，2026-08-26）：Nature Sustainability 等——研究论文
+    # 载体归创新；社会创新词命中（可持续消费/生活方式/行为研究）→ 创新·社会创新
+    if site_id in ACADEMIC_SITES:
+        for kw in SOCIAL_INNOVATION_KW:
+            if kw.lower() in text:
+                return "创新", "社会创新"
+        return "创新", "基础研究"
+    # 社会创新智库直通（v5.0 晚补，2026-08-26）：Hot or Cool 等生活方式研究所——
+    # 全部产出均为可持续生活/消费/社会转型主题 → 创新·社会创新
+    if site_id in SOCIAL_THINKTANK_SITES:
+        return "创新", "社会创新"
     # GitHub 开源趋势（TECH_SITES/radarai）：仓库名常不含 AI 关键词，摘要可参与
     # AI 判定；开源项目属研发阶段 → 创新·技术研发（v5.0 保持）
     if site_id in TECH_SITES:
@@ -3151,6 +3224,9 @@ SOURCE_ISIC: dict[str, str] = {
     "iea": "M 专业科技活动", "irena": "M 专业科技活动", "e3g": "M 专业科技活动",
     "agora": "M 专业科技活动", "teri": "M 专业科技活动", "carbonbrief": "M 专业科技活动",
     "ccai": "M 专业科技活动",
+    # 社会创新/学术源（2026-08-26 接入）
+    "natsustain": "M 专业科技活动", "hotorcool": "M 专业科技活动",
+    "unep": "O 公共行政",
     "qjem": "M 专业科技活动",  # 经济管理学刊（2026-08-24 学术期刊）
 }
 
@@ -3328,6 +3404,8 @@ GREEN_SITES = {
     # 人形机器人/智能家居/绿色生活（2026-08-19 新增：全站绿色主题直通；
     # greenbuilder 是绿色建筑+地产混合媒体 → 走关键词过滤不进直通）
     "greenpeace", "mongabay",
+    # 社会创新/可持续消费学术严肃源（2026-08-26 接入：填补社会创新维度）
+    "natsustain", "hotorcool", "unep",
     # 国家节能中心（2026-08-19 接入：发改委下属事业单位，全站节能降碳官方解读）
     "chinanecc",
 }
@@ -3353,6 +3431,8 @@ LOW_FREQ_SITES = {
     # Carnegie/RAND/CAP/高盛——智库周级~双周级更新，同 E3G/Agora 21 天宽窗口）
     "brookings", "bruegel", "piie", "csis", "chatham",
     "carnegie", "rand", "americanprogress", "goldman",
+    # 社会创新/学术源（2026-08-26 接入：期刊周更/智库月更，21 天宽窗口）
+    "natsustain", "hotorcool",
     # 国家节能中心（官方解读周级更新，2026-08-19 接入）
     "chinanecc",
 }
@@ -3394,6 +3474,18 @@ ACADEMIC_JOURNAL_SITES = {
 # categorize_dimension 中按关键词（标题+摘要）归 AI科技榜——技术榜只放绿色低碳技术
 TECH_SITES = {
     "radarai",      # RadarAI·GitHub趋势（开源项目热度追踪）
+}
+
+# 学术期刊源（2026-08-26 晚补）：研究论文载体 → 创新·基础研究；
+# 社会创新词命中（可持续消费/生活方式/行为研究）→ 创新·社会创新
+ACADEMIC_SITES = {
+    "natsustain",   # Nature Sustainability（可持续科学顶级期刊）
+}
+
+# 社会创新智库源（2026-08-26 晚补）：整源直通 创新·社会创新——
+# Hot or Cool（柏林 1.5°C 生活方式研究所）全部产出均为可持续生活/消费/社会转型主题
+SOCIAL_THINKTANK_SITES = {
+    "hotorcool",
 }
 
 # 机器人/具身智能全链条源（2026-08-19）：人形机器人/工业机器人/无人机。
@@ -3543,6 +3635,10 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_unfccc, "unfccc", "UNFCCC"),
     (fetch_worldbank_climate, "worldbank", "World Bank Climate"),
     (fetch_reuters_energy, "reuters", "Reuters Energy"),
+    # 社会创新/可持续消费学术严肃源（2026-08-26 接入：填补社会创新维度空桶）
+    (fetch_natsustain, "natsustain", "Nature Sustainability"),
+    (fetch_hotorcool, "hotorcool", "Hot or Cool Institute"),
+    (fetch_unep, "unep", "UNEP"),
     # Chinese industry
     (fetch_bjx, "bjx", "北极星电力网"),
     (fetch_tanpaifang, "tanpaifang", "中国碳交易网"),
@@ -3636,6 +3732,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "irena":      ("policy", "国际组织"),
     "unfccc":     ("policy", "国际组织"),
     "worldbank":  ("policy", "国际组织"),
+    "unep":       ("policy", "国际组织"),  # 联合国环境署（2026-08-26 接入）
     # 媒体库
     "carbonbrief": ("media", ""),
     "reuters":     ("media", ""),
