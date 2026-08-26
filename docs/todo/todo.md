@@ -337,6 +337,12 @@ ai对reddit的应用权重越来越高。今后ai时代，用户个人的比重�
 - [ ] **AI 互打双链接**：用 AI 给库里条目互相打双链接
 - [ ] **Obsidian 插件识别 .qmd**（老温侧装 Quarto 插件）
 
+### 🔬 长期观察（系统重要升级点，2026-08-26 老温定）
+- [x] **打分双轨观察机制建立**：`scripts/score_diff_monitor.py` 随机抽样对比「关键词 vs LLM（DeepSeek-V4-Pro few-shot）」差距，累积 `data/score-diff-history.json`（首次跑 seed=7、40 条）
+- [x] **提示词 few-shot 锚定 v2**：实验发现 LLM 系统性低估「产业/资本里程碑」（光伏破亿/长江存储IPO/碳市场平台 → 误给 8 分），`PROMPT_EXAMPLES` 补 10 例锚定后纠正（8→25/30）
+- [ ] **持续优化 LLM 提示词**：`PROMPT_EXAMPLES` 是优化入口，发现系统偏差就补/改例子
+- [ ] **定期观察差距趋势**：每周/每次改打分后跑一次 monitor；若 LLM few-shot 稳定优于关键词再评估切换（现阶段：关键词暂用、勿接入主流程——Flash 太弱、Pro 延迟超 30min timer）
+
 
 test
 
