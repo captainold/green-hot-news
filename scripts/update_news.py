@@ -2572,19 +2572,24 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
               "benchmark", "数据集", "机理", "机制", "paper", "research",
               "study"]),
     ],
+    "社会创新": [  # v5.0 新增（2026-08-26）：制度/机制/模式/消费/行为等创新
+        (30, ["机制创新", "制度创新", "模式创新"]),
+        (20, ["绿色消费", "低碳消费", "绿色生活", "低碳生活", "公众参与",
+              "行为改变", "垃圾分类", "无废城市", "循环消费", "新业态"]),
+    ],
 }
 # 内容强度兜底默认分（2026-08-26 老温裁决：按文档原设计分细类）
 # 政策法规/国际动态/企业经营=10（政策/产业基础分量，无关键词也不低于产业普通动态），
-# 金融资本/技术研发/基础研究=8
+# 金融资本/技术研发/基础研究/社会创新=8
 DEFAULT_STRENGTH_BY_SUB: dict[str, int] = {
     "政策法规": 10, "国际动态": 10, "企业经营": 10,
-    "金融资本": 8, "技术研发": 8, "基础研究": 8,
+    "金融资本": 8, "技术研发": 8, "基础研究": 8, "社会创新": 8,
 }
 DEFAULT_STRENGTH = 8  # 未知细类兜底
 
 
 def score_content_strength(sub_dimension: str, title: str, summary: str) -> int:
-    """内容强度分：按细类（六细类）关键词档位，从高到低取第一命中档。"""
+    """内容强度分：按细类（七细类）关键词档位，从高到低取第一命中档。"""
     text = f"{title or ''} {summary or ''}".lower()
     rules = CONTENT_STRENGTH_RULES.get(sub_dimension, CONTENT_STRENGTH_RULES["企业经营"])
     for score, kws in rules:
@@ -2834,6 +2839,9 @@ FINANCE_KW = [
     "ESG", "绿色金融", "碳金融", "债券", "融资", "投资", "基金", "期货",
     "收购", "并购", "IPO", "股价", "碳资产", "绿色债券", "成交",
     "投融资", "私募", "股权投资", "风险投资",
+    # v5.0（2026-08-26 老温决策）：绿色金融产品 → 产业·金融资本——
+    # "碳减排挂钩贷款/绿色贷款"等产品类词（防 A1 双碳词抢先归企业经营）
+    "贷款", "绿色贷款",
     "carbon market", "carbon price", "carbon trading", "ETS",
     "green bond", "finance", "investment", "fund",
 ]
@@ -2853,15 +2861,43 @@ ENTERPRISE_KW = [
     "装机", "投产", "并网", "产能", "产量", "出口", "工厂", "公司",
     "集团", "项目", "电站", "电网", "充电桩", "电动车", "新能源汽车",
     "订单", "营收", "合作", "建厂", "扩产", "量产", "供应", "中标", "签约",
+    # v5.0（2026-08-26 老温决策）：碳普惠/碳账户已落地应用 → 产业·企业经营
+    # （政府发文的管理办法/方案仍由 GOV_STRONG_KW 优先归政策·政策法规）
+    "碳普惠", "碳账户",
     "solar", "wind", "battery", "hydrogen", "storage",
     "renewable", "nuclear", "factory", "plant",
     "gigafactory", "ev", "electric vehicle",
 ]
-# 基础研究词（2026-08-23 新增）→ 科技·基础研究
+# 基础研究词（2026-08-23 新增）→ 创新·基础研究
+# v5.0（2026-08-26）：补中文「研究」——AI 研究报告（斯坦福 AI 指数等）归基础研究；
+# 「报告」不加（AI 公司年度经营报告会误判基础研究，且产品化词「发布」可正确兜住）
 BASIC_RESEARCH_KW = [
     "论文", "理论", "方法学", "机理", "机制", "原理", "benchmark",
     "arxiv", "学术", "发表", "科研", "实验室", "数据集", "dataset",
-    "paper", "research", "study",
+    "paper", "research", "study", "研究",
+]
+# 基础研究窄词（v5.0 新增，2026-08-26）：普通路径（非 AI 源）的学术载体判定。
+# 比 BASIC_RESEARCH_KW 更窄——不含「研究/发表/机制」等泛词（研究院/发表声明/市场机制
+# 会误判）；AI 内容走 AI 分流（宽词含「研究」覆盖 AI 研究报告），非 AI 学术内容走本表
+BASIC_RESEARCH_KW_NARROW = [
+    "论文", "学术", "arxiv", "科研", "实验室", "数据集", "benchmark",
+    "paper", "机理", "方法学", "原理",
+]
+# AI 产品化词（v5.0 新增，2026-08-26）：AI 命中后按技术阶段分流——
+# 先查 BASIC_RESEARCH_KW（发布论文/研究报告 → 基础研究）再查本表（→ 产业·企业经营）
+AI_PRODUCT_KW = [
+    "发布", "推出", "上线", "商用", "商业化", "产品", "API", "订阅",
+    "定价", "部署", "开放平台", "应用商店", "正式版",
+    "launch", "release", "product", "deploy", "commercial",
+    "subscription", "pricing",
+]
+# 社会创新词（v5.0 新增，2026-08-26）→ 创新·社会创新：制度/机制/模式/消费/行为等
+# 尚未产业化的创新。注意：不放「社区/共享/试点/机制」等泛词（误抢产业落地）；
+# 碳普惠/碳账户按老温决策归产业（DUAL_CARBON 的碳普惠 + ENTERPRISE_KW 的碳账户/碳普惠）
+SOCIAL_INNOVATION_KW = [
+    "社会创新", "制度创新", "机制创新", "创新机制", "模式创新", "商业模式",
+    "绿色消费", "低碳消费", "绿色生活", "低碳生活", "公众参与",
+    "行为改变", "生活方式", "垃圾分类", "无废城市", "循环消费", "新业态",
 ]
 # 政策弱词（2026-08-19）：兜底前的政府信号（GOV_STRONG_KW 之外的剩余原政策词）
 POLICY_WEAK_KW = [
@@ -2870,16 +2906,34 @@ POLICY_WEAK_KW = [
 ]
 
 
+def _ai_stage_sub(text: str) -> tuple[str, str]:
+    """AI 按技术阶段分流（v5.0，2026-08-26）：AI 源直通 / AI 词命中后共用。
+
+    三段式：基础研究词（论文/研究/报告/arxiv…）→ 创新·基础研究；
+    产品化词（发布/推出/上线/API/部署…）→ 产业·企业经营；
+    其余（突破/研发/样机/智能体开发…）→ 创新·技术研发。
+    顺序保证「发布论文/发布研究报告」先命中基础研究词，不被误判产品化。
+    """
+    if any(kw.lower() in text for kw in BASIC_RESEARCH_KW):
+        return "创新", "基础研究"
+    if any(kw.lower() in text for kw in AI_PRODUCT_KW):
+        return "产业", "企业经营"
+    return "创新", "技术研发"
+
+
 def categorize_dimension(site_id: str, title: str, summary: str, library: str) -> tuple[str, str]:
-    """三层分类 + 六细类（2026-08-23 重构）：绿色政策/绿色产业/科技创新。
+    """三层分类 + 七细类（2026-08-26 v5.0）：政策/创新/产业（中性命名）。
 
     返回 (dimension, sub_dimension)：
-      绿色政策 = 政策法规（政府发文）/ 国际动态（国际组织/国家间）
-      绿色产业 = 企业经营（企业进展/兜底）/ 金融资本（碳市场/绿色金融/并购）
-      科技创新 = 技术研发（技术突破/应用开发）/ 基础研究（AI/能源/环境前沿理论）
-    优先级：AI_SITES 直通(科技) > TECH_SITES(科技) > 政府强词(政策·政策法规)
-    > 国际动态词(政策·国际动态) > 金融词(产业·金融资本) > 双碳核心词(产业·企业经营)
-    > AI 词(科技·技术研发/基础研究) > 技术研发词(科技·技术研发)
+      政策 = 政策法规（政府发文）/ 国际动态（国际组织/国家间）
+      创新 = 技术研发（技术突破/应用开发）/ 基础研究（论文/理论/研究报告）/
+             社会创新（制度/机制/模式/消费/行为，v5.0 新增）
+      产业 = 企业经营（企业进展/AI 产品化/碳普惠碳账户落地/兜底）/
+             金融资本（碳市场/绿色金融产品/并购）
+    优先级：DIM_SITE_OVERRIDE > AI_SITES 分流 > TECH_SITES(创新·技术研发)
+    > 政府强词(政策·政策法规) > 国际动态词(政策·国际动态) > 金融词(产业·金融资本)
+    > 双碳核心词 A1(产业·企业经营) > 社会创新词(创新·社会创新)
+    > AI 词分流 > 基础研究窄词(创新·基础研究) > 技术研发词(创新·技术研发)
     > 企业经营词(产业·企业经营) > 政策库默认(政策·政策法规)
     > 政策弱词(政策·政策法规) > 兜底(产业·企业经营)。
     """
@@ -2890,52 +2944,55 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     if site_id in DIM_SITE_OVERRIDE:
         dim, sub = DIM_SITE_OVERRIDE[site_id]
         return dim, sub
-    # 纯 AI 源全链条直通（AIHOT/机器之心等标题未必含 AI 关键词）→ 科技创新
-    # 细分：基础研究词（论文/理论/机理…）→ 基础研究，否则技术研发
+    # AI 源（AIHOT/机器之心等标题未必含 AI 关键词）→ 按技术阶段分流（v5.0）
     if site_id in AI_SITES:
-        if any(kw.lower() in text for kw in BASIC_RESEARCH_KW):
-            return "科技创新", "基础研究"
-        return "科技创新", "技术研发"
+        return _ai_stage_sub(text)
     # GitHub 开源趋势（TECH_SITES/radarai）：仓库名常不含 AI 关键词，摘要可参与
-    # AI 判定；AI 项目归科技·技术研发，绿色技术项目也归科技·技术研发（技术榜）
+    # AI 判定；开源项目属研发阶段 → 创新·技术研发（v5.0 保持）
     if site_id in TECH_SITES:
-        if any(kw.lower() in text for kw in AI_DIM_KW):
-            return "科技创新", "技术研发"
-        return "科技创新", "技术研发"
+        return "创新", "技术研发"
     # 政府强词（仅标题：印发/通知/部委名/政策/监管…）→ 政策·政策法规
     if any(kw.lower() in title_l for kw in GOV_STRONG_KW):
-        return "绿色政策", "政策法规"
+        return "政策", "政策法规"
     # 国际动态词（国际组织/国家间：COP/IEA/欧盟/峰会…）→ 政策·国际动态
     if any(kw.lower() in text for kw in INTERNATIONAL_KW):
-        return "绿色政策", "国际动态"
+        return "政策", "国际动态"
     # 金融词（碳市场/碳交易/碳价/ESG/并购…）→ 产业·金融资本——先于双碳判定：
     # "碳排放权交易/碳市场"是金融信号而非企业经营（防"碳排放"误抢金融）
     for kw in FINANCE_KW:
         if kw.lower() in text:
-            return "绿色产业", "金融资本"
+            return "产业", "金融资本"
     # 决策点 A1 双碳优先：双碳核心词 → 产业·企业经营（即使标题含 AI 背景词）
+    # v5.0：碳普惠在此命中（老温 2026-08-26 决策：已落地应用 → 产业层）
     if any(kw.lower() in text for kw in DUAL_CARBON_KW):
-        return "绿色产业", "企业经营"
-    # AI 词（标题级，词边界）→ 科技·（基础研究/技术研发）
+        return "产业", "企业经营"
+    # 社会创新词（v5.0 新增：制度/机制/模式/绿色消费/公众参与…）→ 创新·社会创新
+    for kw in SOCIAL_INNOVATION_KW:
+        if kw.lower() in text:
+            return "创新", "社会创新"
+    # AI 词（标题级，词边界）→ 按技术阶段分流（v5.0）
     if any(kw.lower() in title_l for kw in AI_DIM_KW) or _dim_re.search(AI_TITLE_RE, title_l):
-        if any(kw.lower() in text for kw in BASIC_RESEARCH_KW):
-            return "科技创新", "基础研究"
-        return "科技创新", "技术研发"
-    # 技术研发词（突破/研发/首次/专利…）→ 科技·技术研发（先于企业经营判定）
+        return _ai_stage_sub(text)
+    # 基础研究窄词（v5.0 新增：非 AI 源的学术载体——论文/学术/arxiv/机理…）
+    # → 创新·基础研究（先于技术研发词：Nature 论文、学术成果按载体归基础研究）
+    for kw in BASIC_RESEARCH_KW_NARROW:
+        if kw.lower() in text:
+            return "创新", "基础研究"
+    # 技术研发词（突破/研发/首次/专利…）→ 创新·技术研发（先于企业经营判定）
     for kw in TECH_DEV_KW:
         if kw.lower() in text:
-            return "科技创新", "技术研发"
-    # 企业经营词（投产/公司/储能/光伏…）→ 产业·企业经营
+            return "创新", "技术研发"
+    # 企业经营词（投产/公司/储能/光伏…，含 v5.0 碳普惠/碳账户落地）→ 产业·企业经营
     for kw in ENTERPRISE_KW:
         if kw.lower() in text:
-            return "绿色产业", "企业经营"
+            return "产业", "企业经营"
     # 政策库（官方原文）默认政策——官方文件即使含双碳词也不改判产业
     if library == "policy":
-        return "绿色政策", "政策法规"
+        return "政策", "政策法规"
     for kw in POLICY_WEAK_KW:
         if kw.lower() in text:
-            return "绿色政策", "政策法规"
-    return "绿色产业", "企业经营"  # 兜底：媒体库行业动态归产业·企业经营
+            return "政策", "政策法规"
+    return "产业", "企业经营"  # 兜底：媒体库行业动态归产业·企业经营
 
 
 # ── 维度二：国际标准分类法（Domain Taxonomy，2026-08-23 新增） ──────────────
@@ -3139,11 +3196,11 @@ def classify_ipc(title: str, summary: str) -> str:
 # ── 维度三 + layer + TRL（2026-08-23 新增） ─────────────────────────────────
 # 完整标签词典见 docs/标准文档/本体与标签词典.md
 
-# dimension（中文）→ layer（国际化 Layer 1/2/3）
+# dimension（中文）→ layer（国际化 Layer 1/2/3；v5.0 中性命名，Layer 编号不变）
 DIM_TO_LAYER: dict[str, str] = {
-    "绿色政策": "Layer 1",
-    "绿色产业": "Layer 2",
-    "科技创新": "Layer 3",
+    "政策": "Layer 1",
+    "产业": "Layer 2",
+    "创新": "Layer 3",
 }
 
 # 交叉技术标签（Enabling Technologies，多对多：一条信息可同时命中多个）
@@ -3943,7 +4000,7 @@ def main() -> int:
         # 最大化命中率——raw 与 history 标题重叠度高（2026-08-23）
         try:
             for _it in (_hist or []):
-                if not isinstance(_it, dict) or _it.get("dimension") == "绿色政策":
+                if not isinstance(_it, dict) or _it.get("dimension") == "政策":
                     continue
                 _tk = _title_dedup_key(_it.get("title", ""))
                 if _tk and _tk not in archived_tech_features:
@@ -4002,7 +4059,7 @@ def main() -> int:
                 rec["time_source"] = "scraped"
         else:
             rec["time_source"] = "published"
-        # 三层分类 + 六细类（2026-08-23）：绿色政策/绿色产业/科技创新
+        # 三层分类 + 七细类（2026-08-26 v5.0）：政策/创新/产业（中性命名）
         dimension, sub_dimension = categorize_dimension(
             rec.get("site_id", ""),
             rec.get("title", ""),
@@ -4025,7 +4082,7 @@ def main() -> int:
         rec["trl"] = classify_trl(rec.get("title", ""), rec.get("summary", ""))
         # 技术特征提取（2026-08-23 新增，护城河字段）：仅 Layer 2/3 提取，Layer 1 政策类跳过
         rec["tech_feature"] = ""
-        if dimension != "绿色政策":
+        if dimension != "政策":
             _tf_key = _title_dedup_key(rec.get("title", "")) or rec.get("url", "")
             if _tf_key in archived_tech_features:
                 rec["tech_feature"] = archived_tech_features[_tf_key]

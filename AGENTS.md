@@ -5,7 +5,7 @@
 
 ## 项目是什么
 
-绿色低碳创新动态雷达（Green Hot News）——聚合国内外绿色低碳动态，**四维覆盖：政策 / 产业 / 市场信号 / AI**（四维=四个观察窗口而非互斥分类：政策=部委发文动向、产业=企业进展兜底、市场信号=碳市场/绿色资本、AI=AI×绿色落地；2026-08-20 由「政府/行业/金融/AI」改名，见 docs/标准文档/打分体系标准.md v2.2）。
+绿色低碳创新动态雷达（Green Hot News）——聚合国内外绿色低碳动态，**三层覆盖：政策 / 创新 / 产业**（2026-08-26 v5.0 中性命名，按**创新价值链**排序：政策=政府发文·国际动态（为什么）、创新=技术研发·基础研究·社会创新（可能吗）、产业=企业经营·金融资本（成了吗）；三层不按领域区分，科技/文化/工业/社会学按**技术阶段/性质**入层，见 docs/标准文档/打分体系标准.md v5.0）。
 数据流：服务器每 30 分钟抓取 70 个源 → `data/*.json`（网站数据）+ `Notes/政策库|媒体库/`（Obsidian 素材）→ 人工策展 → `Notes/政策wiki/` + `Notes/数据库/`（qmd 多维标签数据库，正文走 mihomo 代理抓取）。
 
 ## 📐 文档权威（改代码前必读）
@@ -24,27 +24,27 @@
 - **`docs/todo/`**：全部待办文件（todo.md 长期待办 + 每日 todolist + 调研/核查报告）。**新增待办、当日工作日志、调研报告一律放此目录**。
 - docs/ 根目录只保留设计（底层数据库构建方法等）、方案（tech_feature 提取方案等）、运维（服务器部署与运维）等非标准、非待办文档。
 
-## ⚠️ 打分体系铁律（2026-08-14 v2.0）
+## ⚠️ 打分体系铁律（2026-08-26 v5.0）
 
-1. **打分公式 = `docs/标准文档/打分体系标准.md` 定义的 v2.2 五维模型**：
-   内容强度 30（按维度自适应）+ 来源权威 25 + 主题相关 25 + 人物 10 + 时效 10 = 0-100
-2. **内容强度必须按四维自适应**（政策看文件/产业看突破/市场信号看信号/AI看落地）——禁止退回 v1.0 那种"只认政策文件"的单维度类型分（那是技术/AI 被压分的教训）
+1. **打分公式 = `docs/标准文档/打分体系标准.md` 定义的 v5.0 六维模型**：
+   内容强度 30（按七细类自适应）+ 来源权威 20 + 主题相关 25 + 人物 10 + 时效 10 + 技术成熟度 TRL 5 = 0-100
+2. **内容强度必须按七细类自适应**（政策法规看文件/国际动态看协议/技术研发看突破/基础研究看发表/社会创新看机制模式创新/企业经营看进展/金融资本看信号）——禁止退回 v1.0 那种"只认政策文件"的单维度类型分（那是技术/AI 被压分的教训）
 3. **修改打分 = 修改 `docs/标准文档/打分体系标准.md` + `scripts/update_news.py` 两处，必须同步**，并跑一轮 `python3.11 scripts/update_news.py --obsidian-dir . --window-hours 96` 验证分布
-4. 评分相关前端字段：`score` / `score_level` / `score_breakdown{source,strength,topic,people,freshness}` / `dimension`（注意是 `strength` 不是 `type`）
+4. 评分相关前端字段：`score` / `score_level` / `score_breakdown{source,strength,topic,people,freshness,trl}` / `dimension`（三层中文：政策/创新/产业） / `sub_dimension`（七细类）/ `trl`（注意是 `strength` 不是 `type`）
 
 ## 🗂️ 关键架构（一句话版）
 
 - 抓取：`scripts/update_news.py`（70 源，`fetch_*` 函数 + `BUILTIN_SOURCES` 注册；AI 全链条源走 `AI_SITES` 白名单直通，GitHub 开源趋势走 `TECH_SITES` 直通但需绿色/AI 词过滤，人形机器人源走 `ROBOT_SITES` 直通，36氪/虎嗅等 AI 综合媒体走 `AI_MEDIA_SITES` 过滤，X 平台快讯走 `X_SITES` + `X_ACCOUNTS` 账号白名单过滤（2026-08-19 零成本方案：x.com 账号页 SSR 含 schema.org Microdata，requests 直抓，无需 API key）；Google News 源一律单主题词 query + when:30d——括号 OR 语法返回全站混合内容，勿用）
 - 打分：`score_item()` → `score_content_strength()`（按维度自适应）/ `score_topic()` / `score_people()` / `score_freshness()`
-- 四维分类：`categorize_dimension()`（**2026-08-20 观察窗口化：政策/产业/市场信号/AI**；优先级 AI_SITES直通 > 政府强词(仅标题) > 金融词 > 双碳核心词(A1 双碳优先) > AI词 > 行业词 > 政策库默认政策 > 政策弱词 > 产业兜底；技术突破归产业档，radarai 需绿色/AI 词过滤）
+- 三层分类：`categorize_dimension()`（**2026-08-26 v5.0：政策/创新/产业 + 七细类**；优先级 DIM_SITE_OVERRIDE > AI_SITES 分流 > TECH_SITES(创新·技术研发) > 政府强词(仅标题) > 国际动态词 > 金融词 > 双碳核心词(A1 双碳优先) > 社会创新词 > AI 词分流 > 基础研究窄词 > 技术研发词 > 企业经营词 > 政策库默认 > 政策弱词 > 产业兜底；**AI 按技术阶段分流**：论文/研究报告→创新·基础研究、模型/产品发布→产业·企业经营、其余研发→创新·技术研发；碳普惠/碳账户/绿色金融产品→产业层（老温 08-26 决策）；radarai 需绿色/AI 词过滤）
 - 前端：`index.html`（两区布局：上方排行榜——主题×周期(日/周/月)×区域(国内/国际)切换；下方实时时间线——跟随筛选、60s 轮询新条目自动插入高亮）+ `assets/app.js` + `assets/styles.css`；数据源 `data/history.json`（62 天累积，含 `region` 字段）+ `data/latest-24h.json`
 - 服务器：`/opt/green-hot-news/`（systemd timer 每 30 分钟，非 git 仓库，代码同步靠 scp；正文抓取经 mihomo 代理 → 夏威夷家宽出口，见 docs/服务器部署与运维.md）
-- wiki：`Notes/政策wiki/` 按四维导航（政策/产业/市场信号/AI + 人物横切），新板块归入对应维度
+- wiki：`Notes/政策wiki/` 按三层导航（政策/创新/产业 + 人物横切），新板块归入对应层
 
 ## 🚀 常用命令
 
 ```bash
-# 本地抓取+生成数据（含打分/四维分类）
+# 本地抓取+生成数据（含打分/三层分类）
 python3.11 scripts/update_news.py --obsidian-dir . --window-hours 96
 
 # 只生成网站数据（服务器/CI 模式）

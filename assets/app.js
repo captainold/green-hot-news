@@ -10,8 +10,8 @@
 
   // ── State ──────────────────────────────────────────────────────────────────
   let historyItems = [];        // history.json（62 天累积，主数据源）
-    let currentDim = "全部";      // 三层主分类：全部 | 绿色政策 | 绿色产业 | 科技创新
-    let currentSubDim = "";      // 六细类过滤（空=不过滤）：政策法规/国际动态/企业经营/金融资本/技术研发/基础研究
+    let currentDim = "全部";      // 三层主分类：全部 | 政策 | 创新 | 产业
+    let currentSubDim = "";      // 七细类过滤（空=不过滤）：政策法规/国际动态/技术研发/基础研究/社会创新/企业经营/金融资本
     let currentPeriod = "周";     // 日 | 周 | 月
     let currentRegion = "国际";   // 国内 | 国际（互斥：国内=region 中国，国际=非中国，2026-08-19）
     let sortMode = "重要性";      // 重要性 | 新到旧
@@ -30,17 +30,17 @@
     let sourceCount = 0;   // 成功抓取的源数量
     let greenCount = 0;    // 绿色过滤后的新闻条数
 
-  // 三层主分类（2026-08-23 重构：绿色政策/绿色产业/科技创新，六细类见 SUB_DIMS）
+  // 三层主分类（2026-08-26 v5.0：中性命名 政策/创新/产业，创新价值链顺序；七细类见 SUB_DIMS）
   // 关系图谱节点用的是「主题标签」（碳市场/新能源…），见 TOPIC_COLORS
-  const DIMS = ["全部", "绿色政策", "绿色产业", "科技创新"];
-  // 三层 tab 副标题（2026-08-23）：政策=政府发文·国际动态 / 产业=企业经营·金融资本 / 科技=技术研发·基础研究
+  const DIMS = ["全部", "政策", "创新", "产业"];
+  // 三层 tab 副标题（2026-08-26 v5.0）：政策=政府发文·国际动态 / 创新=技术研发·基础研究·社会创新 / 产业=企业经营·金融资本
   const DIM_SUBS = {
-    "绿色政策": "政府发文·国际动态",
-    "绿色产业": "企业经营·金融资本",
-    "科技创新": "技术研发·基础研究",
+    "政策": "政府发文·国际动态",
+    "创新": "技术研发·基础研究·社会创新",
+    "产业": "企业经营·金融资本",
   };
-  // 六细类（sub_dimension，卡片次级标签 + 可点击过滤）
-  const SUB_DIMS = ["政策法规", "国际动态", "企业经营", "金融资本", "技术研发", "基础研究"];
+  // 七细类（sub_dimension，卡片次级标签 + 可点击过滤；v5.0 新增社会创新）
+  const SUB_DIMS = ["政策法规", "国际动态", "技术研发", "基础研究", "社会创新", "企业经营", "金融资本"];
   const PERIODS = ["日", "周", "月"];
   const REGIONS = ["国内", "国际"];
   const SORTS = ["重要性", "新到旧"];
@@ -125,7 +125,7 @@
     });
   }
 
-  // 四大主题选择器（四维：政策/产业/市场信号/AI + 全部，tab 带观察窗口副标题）
+  // 三层主题选择器（政策/创新/产业 + 全部，2026-08-26 v5.0 中性命名，tab 带细类副标题）
   function buildDimSwitch() {
     buildSwitch(topicSwitch, DIMS, currentDim, (v) => { currentDim = v; page = 1; render(); });
     topicSwitch.querySelectorAll(".mode-btn").forEach((b) => {
@@ -343,9 +343,9 @@
   function filterItems() {
     let items = [...historyItems];
     if (currentDim !== "全部") {
-      items = items.filter(i => (i.dimension || "绿色产业") === currentDim);
+      items = items.filter(i => (i.dimension || "产业") === currentDim);
     }
-    // 六细类过滤（2026-08-23 新增：点击卡片细类标签过滤）
+    // 七细类过滤（2026-08-23 新增：点击卡片细类标签过滤）
     if (currentSubDim) {
       items = items.filter(i => (i.sub_dimension || "") === currentSubDim);
     }
@@ -440,9 +440,9 @@
         ? `综合 ${score} 分\n来源权威 ${bd.source} + 内容强度 ${bd.strength} + 主题相关 ${bd.topic} + 人物 ${bd.people} + 时效 ${bd.freshness}`
         : "暂无评分";
 
-      // 三层标签（绿色政策/绿色产业/科技创新）
+      // 三层标签（政策/创新/产业，v5.0 中性命名）
       const dimTag = card.querySelector(".dim-tag");
-      const dim = item.dimension || "绿色产业";
+      const dim = item.dimension || "产业";
       dimTag.textContent = dim;
       dimTag.classList.add(`dim-${dim}`);
 

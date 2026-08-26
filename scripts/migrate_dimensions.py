@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.11
 """三层分类迁移（2026-08-23 重构：四维「政策/产业/市场信号/AI」→
-三层「绿色政策/绿色产业/科技创新」+ 六细类「政策法规/国际动态/企业经营/金融资本/技术研发/基础研究」）。
+三层「绿色政策/绿色产业/科技创新」+ 六细类；2026-08-26 v5.0 二次复用：
+三层中性命名「政策/创新/产业」+ 七细类「政策法规/国际动态/技术研发/基础研究/社会创新/企业经营/金融资本」，
+AI 按技术阶段分流，碳普惠/碳账户归产业层）。
 
 - 重算 history.json 所有条目的 dimension + sub_dimension（用新 categorize_dimension）
 - 重打分（score_item 内容强度按细类 key 计算——CONTENT_STRENGTH_RULES 的 key 变了）
@@ -74,7 +76,7 @@ def _prefill_cache_from_history() -> int:
     for it in items:
         if not isinstance(it, dict):
             continue
-        if it.get("dimension") == "绿色政策":
+        if it.get("dimension") == "政策":
             continue
         # 缓存 key 统一用规范化标题（2026-08-23：Google News 聚合 URL 每次抓取不同，
         # 按 URL 缓存永不命中；与 update_news.py 的 key 规则一致）
@@ -137,7 +139,7 @@ def migrate_file(path: Path) -> int:
             # 技术特征提取（2026-08-23 新增）：仅 Layer 2/3，用缓存避免重复调用 LLM
             if "tech_feature" not in it:
                 it["tech_feature"] = ""
-            if dim != "绿色政策" and not it.get("tech_feature"):
+            if dim != "政策" and not it.get("tech_feature"):
                 _tf_url = it.get("url", "")
                 _tf_key = _title_key(it.get("title", "")) or _tf_url
                 if _tf_key in tf_cache:
@@ -183,7 +185,7 @@ def migrate_file(path: Path) -> int:
 
 
 def main() -> int:
-    print("三层分类迁移（2026-08-23：绿色政策/绿色产业/科技创新 + 六细类 + 技术特征）", flush=True)
+    print("三层分类迁移（2026-08-26 v5.0：政策/创新/产业 + 七细类 + AI 分流 + 技术特征）", flush=True)
     _pre = _prefill_cache_from_history()
     print(f"  预填充技术特征缓存 {_pre} 条（从 history.json，含\"无\"）", flush=True)
     total = 0
