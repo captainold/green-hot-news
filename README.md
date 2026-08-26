@@ -1,6 +1,6 @@
 # Green Hot News · 绿色低碳创新动态雷达
 
-国内外最新绿色低碳动态聚合站：**政策 + 产业 + 市场信号 + AI** 四维覆盖。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、GitHub 开源趋势、全网热榜的绿色低碳动态（69 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v2.2**（内容强度按四维自适应 + 来源权威 + 主题相关 + 人物 + 时效，五维加权 0-100）。前端**三区布局**：顶部 **📈 四维趋势图**（政策/产业/市场信号/AI 四色时序曲线，纵轴=新闻数量、横轴=原文发表时间，当日/3天/1周/1月/自定义范围切换 + dataZoom 缩放联动桶粒度，点击浮窗新闻跳转定位到下方卡片）+ 中部**排行榜**（排名序号 1. 2. 3. 前三金银铜 + 级别颜色圆点 + 主题/周期/区域/**分数段**四组切换器，按综合分排名）+ 底部**实时时间线**（跟随筛选、新条目自动插入高亮滚动、加载更早），评分弱化（分数藏摘要、级别用颜色暗示），**当日高分浓缩**一键复制转发。
+国内外最新绿色低碳动态聚合站：**政策 + 创新 + 产业** 三层覆盖（2026-08-26 v5.0 中性命名，按创新价值链排序：政策=政府发文·国际动态 / 创新=技术研发·基础研究·社会创新 / 产业=企业经营·金融资本）。自动抓取政府、国际组织、行业媒体、绿色科技媒体、AI 全链条媒体、学术期刊、社会创新智库、GitHub 开源趋势、全网热榜的绿色低碳动态（74 源），通过新加坡服务器定时更新，Nginx 部署为静态站点，Obsidian 笔记库双向同步。内置**打分体系 v5.0**（内容强度按七细类自适应 + 来源权威 + 主题相关 + 人物 + 时效 + 技术成熟度 TRL，六维加权 0-100）。前端**三区布局**：顶部**主题排行榜**（政策/创新/产业三层切换，主题/周期/区域/分数段四组切换器，按综合分排名）+ 中部**动态时间线**（跟随筛选、新条目自动插入高亮滚动、加载更早）+ 底部**关系图谱**（主题/Layer/国际分类/交叉技术四维切换），「📋 一键复制概要」当日高分浓缩转发。
 
 ## 在线入口
 
@@ -16,10 +16,10 @@
 新加坡服务器 47.82.211.111 (Alibaba Cloud Linux 3)
 ├── systemd timer: green-policy.timer（每30分钟）
 │     └→ green-policy-sync.sh
-│           ├─ 1. update_news.py 抓取 69 个源
+│           ├─ 1. update_news.py 抓取 74 个源
 │           │     ├─ 官方部委/国际组织 → Notes/政策库/
-│           │     ├─ 媒体/热榜/AI → Notes/媒体库/（四维分类 + 打分 v2.0）
-│           │     └─ 生成 data/*.json 网站数据（含 score/dimension 字段）
+│           │     ├─ 媒体/热榜/AI/学术/智库 → Notes/媒体库/（三层分类 + 打分 v5.0）
+│           │     └─ 生成 data/*.json 网站数据（含 score/dimension/sub_dimension 字段）
 │           ├─ 2. Notes/ git commit + push → /srv/git/green-policy-materials.git
 │           └─ 3. data/ 站点数据更新（nginx 直接服务）
 └── nginx: https://ywm.life → /opt/green-hot-news/
@@ -31,7 +31,7 @@
       └─ 每30分钟 auto-push → 服务器 bare 仓库
 ```
 
-## 覆盖范围（69 个源，2026-08-19 服务器为准）
+## 覆盖范围（74 个源，2026-08-26 服务器为准）
 
 ### 国内政策源（政策库 · 中国）
 - 国家发改委、生态环境部、生态环境部·解读、国家能源局、工信部、中国人民银行（新闻发布+政策文件）、NCSC 国家气候中心、环境规划院 CAEP、国家节能中心（官网直抓，官方解读/一图读懂，2026-08-19 接入）
@@ -55,6 +55,12 @@
 
 ### 绿色科技/AI（媒体库）
 - **Climate Change AI**（AI×气候交叉）、**中国科技网**（科技日报）、**CleanTechnica**（清洁技术）
+
+### 社会创新/可持续消费学术严肃源（媒体库 · 2026-08-26 接入，填补社会创新维度）
+> 老温拍板「偏学术和严肃讨论，不要娱乐生活类」——支撑 创新·社会创新 细类（制度/机制/模式/消费/行为研究）
+- **Nature Sustainability**（可持续科学顶级学术期刊，RSS；ACADEMIC_SITES 直通：社会创新词命中→创新·社会创新，否则创新·基础研究）
+- **Hot or Cool Institute**（柏林 1.5°C 生活方式研究所，news 卡片抓取；SOCIAL_THINKTANK_SITES 直通创新·社会创新）
+- **UNEP 联合国环境署**（RSS，政策库·国际组织；可持续消费/生活方式类→创新·社会创新）
 
 ### AI 领域全链条（媒体库 · 2026-08-14 AI 维度扩充）
 > 理论 → 模型 → 市场 → 商业 全覆盖，AI_SITES 白名单直通（不进绿色关键词过滤）
@@ -91,22 +97,23 @@ python3.11 scripts/update_news.py --obsidian-dir . --window-hours 720
 python3.11 scripts/update_news.py --output-dir data --window-hours 24
 ```
 
-## 四维定位（2026-08-14 主题升级）
+## 三层定位（2026-08-26 v5.0 重构）
 
-| 维度 | 定位 | 信源 |
-|------|------|------|
-| 🏛️ 政策 | 制度锚点 | 国内 9 部委/机构 + 官方解读 + 6 国际组织 + 美日印官方发布 |
-| 🔋 产业 | 产业脉搏 | 中国能源报、北极星、CleanTechnica、RadarAI·GitHub趋势 |
-| 💰 市场信号 | 市场温度计 | 碳交易网、碳道、Carbon Brief、财新、高盛 |
-| 🤖 AI | 新视野（理论→模型→市场→商业 + 交叉） | OpenAI、arXiv·AI、机器之心、量子位、VentureBeat AI、Climate Change AI、中国科技网、Artificial Analysis |
+| 层 | 定位 | 细类 | 信源 |
+|------|------|------|------|
+| 🏛️ 政策 | 制度锚点（为什么） | 政策法规 / 国际动态 | 国内 9 部委/机构 + 官方解读 + 6 国际组织 + 美日印官方 + UNEP |
+| 🧪 创新 | 技术种子（可能吗） | 技术研发 / 基础研究 / 社会创新 | arXiv·AI、Nature Sustainability、Hot or Cool、Climate Change AI、中国科技网 |
+| ⚙️ 产业 | 产业脉搏（成了吗） | 企业经营 / 金融资本 | 中国能源报、北极星、CleanTechnica、RadarAI·GitHub趋势、碳交易网、碳道、Carbon Brief、财新、高盛 |
+
+> AI 按技术阶段分流（v5.0）：论文/研究报告→创新·基础研究，模型/产品发布→产业·企业经营，其余研发→创新·技术研发。
 
 ## 数据输出
 
-- `data/latest-24h.json` — 24小时绿色动态信号（过滤后，含 `score`/`score_level`/`score_breakdown`/`dimension`/`region` 字段）
+- `data/latest-24h.json` — 24小时绿色动态信号（过滤后，含 `score`/`score_level`/`score_breakdown`/`dimension`/`sub_dimension`/`trl`/`region` 字段）
 - `data/latest-24h-all.json` — 24小时全量数据
 - `data/history.json` — 62 天历史累积（2026-08-17：排行榜日/周/月周期切换数据源；去重按规范化标题 `_title_dedup_key`——2026-08-19 修复 Google News 聚合 URL base64 每次抓取不同导致同新闻 x8 重复，含 `region` 字段）
-- `data/source-status.json` — 69 个源健康状态
-- `data/daily-digest.md` — 当日高分浓缩版（评分 ≥70 A 级以上，四维精选，可直接转发；`scripts/daily_digest.py` 生成，服务器每次抓取后自动更新）
+- `data/source-status.json` — 74 个源健康状态
+- `data/daily-digest.md` — 当日高分浓缩版（评分 ≥70 A 级以上，三层精选，可直接转发；`scripts/daily_digest.py` 生成，服务器每次抓取后自动更新）
 - `data/published-index.json` — 发布时间索引
 - `data/title-index.json` — 完整标题索引
 - `data/summary-index.json` — 摘要索引（前端可展开摘要，News Minimalist 风格）
