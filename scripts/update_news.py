@@ -523,6 +523,48 @@ def fetch_ndrc(session: requests.Session, now: datetime) -> list[RawItem]:
     return items[:500]
 
 
+def fetch_cac(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中央网信办（中国网信网）— 网信政务栏目（委员会文件/政策/解读）。
+
+    2026-08-27 接入（P2：网信办《促进网信企业高质量发展行动计划》官网源，
+    该文件 2026-08-21 发布于 cac.gov.cn，网信政务栏目列表页可抓）。
+    中国站源禁用代理直连（qjem 教训：走家宽代理出口访问中国站失败）。
+    """
+    items: list[RawItem] = []
+    try:
+        # 独立 Session：trust_env=False 直连（禁用 env 代理——本地走代理挂起、
+        # 服务器走 mihomo 出口 403），浏览器 UA（cac.gov.cn WAF 按 UA 挡 python-requests）
+        s = requests.Session()
+        s.trust_env = False
+        s.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9"})
+        r = s.get("https://www.cac.gov.cn/wxzw/A0937index_1.htm", timeout=(5, 10))
+        r.raise_for_status()
+        r.encoding = "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        for a in soup.select("a[href]"):
+            href = a.get("href", "").strip()
+            text = a.get_text(strip=True)
+            if not text or not href or len(text) < 8:
+                continue
+            if href.startswith("//"):
+                href = "https:" + href
+            elif href.startswith("/"):
+                href = "https://www.cac.gov.cn" + href
+            # 只收 cac.gov.cn 文章页（URL 含日期路径 /YYYY-MM/）
+            if "cac.gov.cn" not in href or "/20" not in href:
+                continue
+            items.append(RawItem(
+                site_id="cac", site_name="中央网信办",
+                source="网信政务",
+                title=text, url=href,
+                published_at=None,
+                meta={},
+            ))
+    except Exception:
+        pass
+    return items
+
+
 def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
     """生态环境部 — 新闻."""
     items: list[RawItem] = []
@@ -2706,7 +2748,7 @@ def score_content_strength(sub_dimension: str, title: str, summary: str) -> int:
 # 2) 来源权威分（site_id → 0-20，v4.0 从 25 分制压缩：匀 5 分给 TRL 第 6 维度）
 SOURCE_SCORE: dict[str, int] = {
     # 部委官方（20 分）
-    "ndrc": 20, "mee": 20, "nea": 20, "miit": 20,
+    "ndrc": 20, "mee": 20, "nea": 20, "miit": 20, "cac": 20,
     # 国外主要国家政策源（2026-08-14 新增：官方部委档）
     "us_epa": 20, "us_doe": 20, "eu_commission": 20,
     "euractiv": 16, "india_pib": 20,
@@ -3274,7 +3316,7 @@ SOURCE_ISIC: dict[str, str] = {
     "jiqizhixin": "J 信息通信", "qbitai": "J 信息通信", "openai": "J 信息通信",
     "arxiv_ai": "J 信息通信", "aihot": "J 信息通信", "artificialanalysis": "J 信息通信",
     "36kr": "J 信息通信", "huxiu": "J 信息通信", "radarai": "J 信息通信",
-    "ndrc": "O 公共行政", "mee": "O 公共行政", "nea": "O 公共行政", "miit": "O 公共行政",
+    "ndrc": "O 公共行政", "mee": "O 公共行政", "nea": "O 公共行政", "miit": "O 公共行政", "cac": "O 公共行政",
     "us_epa": "O 公共行政", "us_doe": "O 公共行政", "eu_commission": "O 公共行政",
     "india_pib": "O 公共行政", "jp_moe": "O 公共行政", "jp_meti": "O 公共行政",
     "jp_anre": "O 公共行政", "ncsc": "O 公共行政", "caep": "O 公共行政",
@@ -3448,6 +3490,7 @@ POLICY_KEYWORDS = [
 # Sites where ALL content is inherently green policy
 GREEN_SITES = {
     "tanpaifang", "ideacarbon", "ndrc", "nea", "mee",
+ "cac",
     "carbonbrief", "iea", "irena", "unfccc", "worldbank",
     "chinaenergy", "bjx", "reuters", "miit",
     "ccai", "stdaily",
@@ -3660,6 +3703,7 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_mee_jiedu, "mee_jiedu", "生态环境部·解读"),
     (fetch_nea, "nea", "国家能源局"),
     (fetch_miit, "miit", "工信部"),
+    (fetch_cac, "cac", "中央网信办"),
     # ── 国外主要国家政策源（2026-08-14 新增：Google News 搜 site） ──
     (fetch_us_epa, "us_epa", "美国EPA"),
     (fetch_us_doe, "us_doe", "美国DOE"),
@@ -3762,6 +3806,7 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     # 政策库 · 中国部委
     "ndrc":       ("policy", "中国"),
     "mee":        ("policy", "中国"),
+    "cac":        ("policy", "中国"),
     "mee_jiedu":  ("policy", "中国"),
     "nea":        ("policy", "中国"),
     "miit":       ("policy", "中国"),
@@ -4445,7 +4490,7 @@ def person_role(name: str) -> str:
 # ── Auto-tagging ────────────────────────────────────────────────────────────────
 # Source → default region mapping
 SOURCE_REGION: dict[str, str] = {
-    "ndrc": "中国", "nea": "中国", "mee": "中国", "mee_jiedu": "中国", "miit": "中国",
+    "ndrc": "中国", "nea": "中国", "mee": "中国", "mee_jiedu": "中国", "miit": "中国", "cac": "中国",
     # 国外主要国家政策源（2026-08-14 新增）
     "us_epa": "美国", "us_doe": "美国", "eu_commission": "欧盟",
     "euractiv": "欧盟", "india_pib": "印度",
