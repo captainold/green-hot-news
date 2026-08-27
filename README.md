@@ -10,6 +10,15 @@
 - Obsidian 笔记库：`C:\Users\wenyu\Documents\Obsidian_wen\green-hot-news\Notes\`
 - 服务器部署与运维文档：[docs/服务器部署与运维.md](docs/服务器部署与运维.md)
 
+## 反馈与评分标准（2026-08-27 反馈渠道方案）
+
+- **评分标准（公开版）**：https://ywm.life/score-standard.html —— 六维打分模型规则框架公开（实现细节关键词表不公开），首页卡片悬停评分徽章可看六维分解
+- **意见反馈**：首页「📮 反馈」按钮，或直接
+  - 邮箱：`feedback@ywm.life`（Cloudflare Email Routing 转发，每周日自动汇总进待办）
+  - GitHub Issue：[green-hot-news-feedback](https://github.com/captainold/green-hot-news-feedback)（标签：bug / 新闻线索 / 评分异议 / 建议）
+  - 微信群：暂缓（等出现第一批真实反馈后建群，公告文案见 docs/群公告文案-草案.md）
+- 主程序代码保持私有（green-hot-news），反馈仓库公开——打分标准透明可讨论，实现细节保留
+
 ## 架构总览（2026-08-19 现状）
 
 ```
