@@ -6,7 +6,7 @@
   data/qa-report.json  — 结构化结果（agent/程序消费）
   data/qa-report.md    — 人类可读报告（老温/会话开始汇报用）
 
-检查项（对应历史踩坑，见 AGENTS.md / docs/todo/todo.md）：
+检查项（对应历史踩坑，见 AGENTS.md / docs/todo/00-待办总清单.md）：
   A 标题：空/导航站名污染/过短过长/HTML残留/纯数字
   B 摘要：空/污染词/过短/截断异常/HTML残留
   C 翻译：非中文标题缺 title_zh/机翻残留英文/中文误翻/失败占位
