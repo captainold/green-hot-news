@@ -156,6 +156,41 @@ html[data-theme="dark"] .theme-toggle:hover {
   border-color: var(--cb-blue-hover); color: var(--cb-blue-hover);
 }
 
+/* ── Hero 反馈区（2026-08-27 反馈渠道方案） ───────────── */
+.hero-link {
+  margin-left: auto;
+  display: inline-flex; align-items: center;
+  height: 2.1rem; padding: 0 .9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: .8rem; text-decoration: none; white-space: nowrap;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.hero-link:hover {
+  border-color: var(--cb-blue); color: var(--cb-blue);
+  transform: translateY(-1px);
+}
+html[data-theme="dark"] .hero-link:hover {
+  border-color: var(--cb-blue-hover); color: var(--cb-blue-hover);
+}
+#feedbackBtn { margin-left: .4rem; }
+.feedback-opt {
+  display: flex; align-items: center; gap: .8rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--bg-card); color: var(--text);
+  text-decoration: none; font-size: .85rem;
+  transition: border-color .15s, transform .15s;
+}
+.feedback-opt:hover {
+  border-color: var(--cb-blue); transform: translateY(-1px);
+}
+html[data-theme="dark"] .feedback-opt:hover {
+  border-color: var(--cb-blue-hover);
+}
+
 /* ── Stats ──────────────────────────────────────────── */
 .stats {
   display: flex; flex-wrap: wrap; gap: .6rem 1.4rem;

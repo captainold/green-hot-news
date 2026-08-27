@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>评分标准 · 绿色低碳创新动态雷达</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🌿</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --card: #f8fafc;
+        --text: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --accent: #16a34a;
+        --accent-soft: #dcfce7;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: "DM Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+      .shell { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+      .topbar {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 32px;
+      }
+      .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+      .logo a { color: var(--text); text-decoration: none; }
+      .back-btn {
+        background: var(--card); border: 1px solid var(--line); color: var(--text);
+        padding: 8px 16px; border-radius: 999px; font-size: 14px; cursor: pointer;
+        text-decoration: none;
+      }
+      .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+      h1 { font-size: 30px; margin-bottom: 8px; }
+      .sub { color: var(--muted); font-size: 15px; margin-bottom: 40px; }
+      .notice {
+        background: var(--accent-soft); border: 1px solid #bbf7d0; color: #166534;
+        padding: 14px 18px; border-radius: 12px; font-size: 14px; margin-bottom: 40px;
+      }
+      h2 {
+        font-size: 20px; margin: 44px 0 16px; padding-left: 12px;
+        border-left: 4px solid var(--accent);
+      }
+      p { margin-bottom: 12px; font-size: 15px; }
+      ul { margin: 0 0 12px 20px; }
+      li { margin-bottom: 6px; font-size: 15px; }
+      table {
+        width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0 24px;
+      }
+      th, td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; }
+      th { background: var(--card); font-weight: 600; }
+      .dim-score { font-weight: 700; color: var(--accent); white-space: nowrap; }
+      .feedback {
+        background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+        padding: 24px; margin-top: 48px;
+      }
+      .feedback h3 { font-size: 17px; margin-bottom: 12px; }
+      .feedback ul { margin-bottom: 0; }
+      code { background: #f1f5f9; padding: 1px 6px; border-radius: 6px; font-size: 13px; }
+      @media (max-width: 640px) {
+        .shell { padding: 24px 16px 60px; }
+        h1 { font-size: 24px; }
+        table { font-size: 13px; }
+        th, td { padding: 8px 6px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div class="logo"><span>🌿</span><a href="/">绿色低碳创新动态雷达</a></div>
+        <a class="back-btn" href="/">← 返回雷达</a>
+      </div>
+
+      <h1>🎯 评分标准</h1>
+      <p class="sub">六维打分模型 · 规则公开 · 分数可解释 · 欢迎讨论</p>
+
+      <div class="notice">
+        ⚖️ 雷达的每一条新闻都按以下规则打分（0-100），六维分解可在首页卡片悬停评分徽章查看。
+        内部判定依赖一套关键词实现细节（不公开），但规则框架完全透明——对某条评分有异议，欢迎反馈，异议会直接进入改进流程。
+      </div>
+
+      <h2>设计原则</h2>
+      <ul>
+        <li><strong>七细类自适应</strong>：政策法规看文件级别、国际动态看协议/峰会、技术研发看技术突破、基础研究看研究发表、社会创新看机制/模式创新、企业经营看企业进展、金融资本看市场信号——每个细类都能凭自身价值得高分，不偏科</li>
+        <li><strong>内容价值优先</strong>：内容强度 30 分 &gt; 来源权威 20 分——内容比出身重要</li>
+        <li><strong>核心议题优先</strong>：碳市场、双碳、能源转型是主战场</li>
+        <li><strong>分数可解释</strong>：每条新闻都有六维分解</li>
+        <li><strong>按阶段不按领域</strong>：同一条技术新闻，研发期归「创新」、落地期归「产业」；政策文件即使讲技术也归「政策」</li>
+      </ul>
+
+      <h2>六个维度（总分 100）</h2>
+      <table>
+        <thead>
+          <tr><th>维度</th><th>分值</th><th>规则</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>内容强度</td><td class="dim-score">0-30</td><td>按七细类各自判据分四档：里程碑级 30 / 重要级 25 / 进展级 20 / 一般级（默认）</td></tr>
+          <tr><td>来源权威</td><td class="dim-score">0-20</td><td>部委 20 &gt; 官方解读 18 &gt; 国际组织 17 &gt; 专业媒体 14 &gt; 绿色科技媒体 12 &gt; 行业媒体 10 &gt; 热榜 6</td></tr>
+          <tr><td>主题相关</td><td class="dim-score">0-25</td><td>核心议题 25 &gt; 重要议题 18 &gt; 一般议题 12 &gt; 弱相关 6</td></tr>
+          <tr><td>人物</td><td class="dim-score">0-10</td><td>部长/主任级 10 &gt; 副主任级 7 &gt; 院长/教授 5 &gt; 分析师 3（取最高）</td></tr>
+          <tr><td>时效</td><td class="dim-score">0-10</td><td>24h 内 10 &gt; 48h 8 &gt; 72h 6 &gt; 96h 4 &gt; 更久 2</td></tr>
+          <tr><td>技术成熟度 TRL</td><td class="dim-score">0-5</td><td>已工程化/商业化（7-9 档）5 / 技术开发（4-6 档）5 / 基础原理（1-3 档）4 / 政策类不适用 3</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 8px">内容强度四档判据（七细类通用框架）</h3>
+      <table>
+        <thead>
+          <tr><th>档</th><th>分值</th><th>判据</th><th>含义</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>里程碑级</td><td class="dim-score">30</td><td>国家级/全球级的开创性、突破性、历史性事件</td><td>稀缺、影响面大、持续关注度</td></tr>
+          <tr><td>重要级</td><td class="dim-score">25</td><td>高规格推进、关键节点、明确政策转向</td><td>重要但未达里程碑</td></tr>
+          <tr><td>进展级</td><td class="dim-score">20</td><td>有实质内容的常规进展、报告、数据发布</td><td>常规节奏</td></tr>
+          <tr><td>一般级</td><td class="dim-score">默认</td><td>无强信号，属该细类普通条目</td><td>政策/产业基础分量 10，其余 8</td></tr>
+        </tbody>
+      </table>
+
+      <p style="color: var(--muted); font-size: 14px">
+        各细类判据侧重：政策法规 = 文件层级 × 发布主体；国际动态 = 协议层级 × 气候里程碑；
+        技术研发 = 突破程度 × 首创性；基础研究 = 发现价值 × 发表层级；
+        社会创新 = 机制层级 × 首创性；企业经营 = 里程碑 × 规模；金融资本 = 碳市场里程碑 × 资本规模。
+      </p>
+
+      <h2>三层分类（政策 / 创新 / 产业）</h2>
+      <p>按<strong>创新价值链</strong>叙事排序：政策（为什么）→ 创新（可能吗）→ 产业（成了吗）。</p>
+      <table>
+        <thead>
+          <tr><th>层</th><th>细类</th><th>内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>🏛️ 政策</td><td>政策法规 / 国际动态</td><td>政府发文、部委动态、国际组织与国家间协议</td></tr>
+          <tr><td>🔬 创新</td><td>技术研发 / 基础研究 / 社会创新</td><td>技术突破、学术发表、机制/模式/消费行为创新</td></tr>
+          <tr><td>🏭 产业</td><td>企业经营 / 金融资本</td><td>企业投产经营、碳市场与绿色金融</td></tr>
+        </tbody>
+      </table>
+      <p style="color: var(--muted); font-size: 14px">
+        AI 按技术阶段分流：论文/研究报告 → 创新·基础研究；模型/产品发布 → 产业·企业经营；其余研发 → 创新·技术研发。
+      </p>
+
+      <h2>等级划分</h2>
+      <table>
+        <thead>
+          <tr><th>等级</th><th>分数</th><th>含义</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>S</td><td class="dim-score">85-100</td><td>重大动态（金色）</td></tr>
+          <tr><td>A</td><td class="dim-score">70-84</td><td>重要（绿色）</td></tr>
+          <tr><td>B</td><td class="dim-score">55-69</td><td>关注（蓝色）</td></tr>
+          <tr><td>C</td><td class="dim-score">40-54</td><td>一般（灰色）</td></tr>
+          <tr><td>D</td><td class="dim-score">&lt;40</td><td>低（暗灰）</td></tr>
+        </tbody>
+      </table>
+
+      <h2>判定示例</h2>
+      <table>
+        <thead>
+          <tr><th>条目</th><th>层·细类</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>生态环境部印发《碳排放权交易管理暂行条例》</td><td>政策·政策法规</td><td>政府发文</td></tr>
+          <tr><td>COP30 达成气候融资联合声明</td><td>政策·国际动态</td><td>国际组织动态</td></tr>
+          <tr><td>全国碳市场累计成交量突破 9 亿吨</td><td>产业·金融资本</td><td>碳市场/金融</td></tr>
+          <tr><td>宁德时代投产储能电池工厂</td><td>产业·企业经营</td><td>企业投产</td></tr>
+          <tr><td>OpenAI 发布新一代大模型</td><td>产业·企业经营</td><td>AI 产品化</td></tr>
+          <tr><td>arXiv 新论文提出碳捕捉材料理论模型</td><td>创新·基础研究</td><td>基础研究</td></tr>
+          <tr><td>某市启动碳普惠试点，市民开通个人碳账户</td><td>产业·企业经营</td><td>碳普惠落地</td></tr>
+          <tr><td>某机构提出社区碳减排新机制倡议</td><td>创新·社会创新</td><td>社会创新</td></tr>
+        </tbody>
+      </table>
+
+      <div class="feedback">
+        <h3>📮 对评分有异议？有新闻线索？</h3>
+        <ul>
+          <li><strong>邮箱</strong>：<code>feedback@ywm.life</code>（正式反馈，7 天内答复）</li>
+          <li><strong>GitHub</strong>：<a href="https://github.com/captainold/green-hot-news-feedback" target="_blank" rel="noopener">green-hot-news-feedback</a>（Issue 选「评分异议」或「新闻线索」标签）</li>
+          <li><strong>首页</strong>：返回雷达点「📮 反馈」按钮</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
