@@ -13,6 +13,7 @@ Design goals:
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Optional
@@ -1112,8 +1113,14 @@ def _fetch_via_jina(url: str, timeout: tuple = (10, 40)) -> Optional[dict]:
         ...正文
     """
     try:
-        r = requests.get("https://r.jina.ai/" + url, timeout=timeout,
-                         headers={"User-Agent": BROWSER_UA})
+        headers = {"User-Agent": BROWSER_UA}
+        # 可选：JINA_API_KEY 环境变量（/etc/green-policy.env 或 .env）——
+        # r.jina.ai 免费无 key 层风控强（同 IP 高频会被 challenge 403），
+        # 配 key（jina.ai 免费注册）后限额高且免 challenge。
+        jina_key = os.environ.get("JINA_API_KEY", "").strip()
+        if jina_key:
+            headers["Authorization"] = f"Bearer {jina_key}"
+        r = requests.get("https://r.jina.ai/" + url, timeout=timeout, headers=headers)
         r.raise_for_status()
         text = r.text
         if "Markdown Content:" not in text:
