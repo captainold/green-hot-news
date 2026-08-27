@@ -2381,6 +2381,26 @@ ALLNET_BOARDS = [
     (139, "IT之家最新"),
 ]
 
+# 娱乐八卦/社会杂闻硬性排除词（2026-08-27 P1 修复：08-25 发现 latest-24h 混入
+# 59 条娱乐八卦——梁洁刺棠/郭二娃行贿/孙颖莎世排等）。命中即拒，**优先于绿色
+# 词判断**（防止"电力工人高空作业疑似摆拍"这类沾边词误放）。说明：
+# ① 单字"碳"在 POLICY_KEYWORDS 里，"碳水/高碳水"等饮食健康类标题会误命中，
+#    靠本黑名单前置拦截（allnet 分支另有"碳"后缀负向断言双保险）；
+# ② 按类别词收录，不追具体明星名（无穷无尽）。
+ALLNET_BLOCK_WORDS = [
+    # 明星/娱乐八卦
+    "明星", "娱乐", "八卦", "恋情", "官宣", "离婚", "出轨", "结婚", "怀孕",
+    "生子", "绯闻", "塌房", "狗仔", "男团", "女团", "演唱会", "综艺", "选秀",
+    "出道", "专辑", "票房", "影视", "电视剧", "电影", "剧集", "网红", "主播",
+    # 社会杂闻/悲剧
+    "摆拍", "剧本", "确诊", "患病", "住院", "手术", "坠楼", "跳楼", "车祸",
+    "身亡", "去世", "遇难",
+    # 健康饮食（防"碳"单字误伤的重灾区）
+    "碳水", "高碳水", "蛋白质", "减肥", "养生", "食谱", "膳食", "营养", "一餐",
+    # 校园育儿杂闻
+    "幼儿园", "作业",
+]
+
 
 def fetch_allnet(session: requests.Session, now: datetime) -> list[RawItem]:
     """全网热点 (api.allnet.hot) — 抓取主流热榜条目。
@@ -3570,6 +3590,29 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "", summary: st
     # 经管学术期刊（2026-08-24）：经济管理学刊——老温指定全部抓取，全量直通
     if site_id in ACADEMIC_JOURNAL_SITES:
         return True
+    # 全网热点 allnet（2026-08-27 P1 修复：08-25 发现 59 条娱乐八卦混入）：
+    # ① ALLNET_BLOCK_WORDS 黑名单硬性排除（优先于绿色词，防"电力工人摆拍"沾边误放）；
+    # ② 须命中绿色主题词或 AI 词才入库（同 TECH_SITES 逻辑）；
+    # ③ 单字"碳"降级——后接 水/酸/烤/素/纤维/刷/笔/纸 时不命中（碳水/碳酸/碳烤/碳素/碳纤维）；
+    # ④ 不看 URL（jump_url 是源站链接，含词不可靠）。
+    if site_id == "allnet":
+        t = f"{title or ''} {summary or ''}".lower()
+        if any(w in t for w in ALLNET_BLOCK_WORDS):
+            return False
+        for kw in POLICY_KEYWORDS:
+            kw_lower = kw.lower()
+            if kw_lower == "碳":
+                if re.search(r"碳(?!水|酸|烤|素|纤维|刷|笔|纸)", t):
+                    return True
+                continue
+            if kw_lower.isascii() and len(kw_lower) <= 4:
+                if re.search(rf"\b{re.escape(kw_lower)}\b", t):
+                    return True
+            elif kw_lower in t:
+                return True
+        if any(kw.lower() in t for kw in AI_DIM_KW):
+            return True
+        return False
     # AI 综合媒体（2026-08-19）：36氪/虎嗅是科技商业媒体——命中绿色词或 AI 词
     # 才入库（与 TECH_SITES 同逻辑，过滤无关科技商业噪音）
     if site_id in AI_MEDIA_SITES:

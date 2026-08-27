@@ -1088,6 +1088,60 @@ def _rich_extract(resp, url: str) -> str:
         return body
 
 
+# ── Jina Reader 兜底通道（2026-08-27 P1-3）───────────────────────────────────
+# us_doe(energy.gov)/openai(openai.com) 被 Cloudflare 挡：服务器直连/家宽代理
+# 均 403（本地住宅 IP 正常 200+提取成功）——r.jina.ai 第三方阅读器通道服务器
+# 实测 200+全文（us_doe 14.9KB / openai 5.5KB）。只对白名单域名启用（第三方
+# 免费版有限流，不能全源走）。
+JINA_FALLBACK_DOMAINS = ("energy.gov", "openai.com")
+
+
+def _should_use_jina(url: str) -> bool:
+    u = (url or "").lower()
+    return any(d in u for d in JINA_FALLBACK_DOMAINS)
+
+
+def _fetch_via_jina(url: str, timeout: tuple = (10, 40)) -> Optional[dict]:
+    """Jina Reader 通道抓取，返回与 fetch_article 同构 dict 或 None。
+
+    r.jina.ai 输出格式（实测）：
+        Title: xxx
+        URL Source: https://...
+        Published Time: 2026-08-17T17:01:20-0400
+        Markdown Content:
+        ...正文
+    """
+    try:
+        r = requests.get("https://r.jina.ai/" + url, timeout=timeout,
+                         headers={"User-Agent": BROWSER_UA})
+        r.raise_for_status()
+        text = r.text
+        if "Markdown Content:" not in text:
+            return None
+        title = ""
+        published = ""
+        for line in text.splitlines():
+            if line.startswith("Title:"):
+                title = line[len("Title:"):].strip()
+            elif line.startswith("Published Time:"):
+                published = line[len("Published Time:"):].strip()
+            if title and published:
+                break
+        body = text.split("Markdown Content:", 1)[1].strip()
+        if len(body) < MIN_PARAGRAPH_CHARS:
+            return None
+        return {
+            "summary": _clean_summary_meta(_cut_at_sentence(body, MAX_SUMMARY_CHARS)),
+            "content": body,  # 富文本全量（qmd 用；调用方按需 _clean_rich_body）
+            "title": title or None,
+            "published": published or None,
+            "source_org": None,
+            "real_url": url,
+        }
+    except Exception:
+        return None
+
+
 def fetch_article(url: str, session: Optional[requests.Session] = None,
                   timeout: tuple[int, int] = (10, 20),
                   retries: int = 2,
@@ -1136,11 +1190,26 @@ def fetch_article(url: str, session: Optional[requests.Session] = None,
                                         headers={"Cookie": ck})
                 break
             except Exception:  # network flakiness: retry fresh
+                # 白名单域名直连网络失败（SSL EOF/超时等，服务器走家宽代理时
+                # energy.gov 实测 SSL EOF）→ Jina Reader 兜底（2026-08-27 P1-3）
+                if _should_use_jina(url):
+                    jr = _fetch_via_jina(url, timeout)
+                    if jr:
+                        return jr
                 if attempt >= retries:
                     return None
         else:
             return None
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except Exception:
+            # 白名单域名被反爬挡（服务器直连/代理 energy.gov、openai.com 均 403
+            # Cloudflare challenge）→ Jina Reader 兜底（2026-08-27 P1-3）
+            if _should_use_jina(url):
+                jr = _fetch_via_jina(url, timeout)
+                if jr:
+                    return jr
+            return None
         if "text/html" not in resp.headers.get("Content-Type", "").lower():
             # PDF / JSON / redirect payload — not worth archiving
             return None
