@@ -94,27 +94,46 @@ def main() -> int:
     args = ap.parse_args()
 
     user = _env_value("feedback_imap_user")
-    pwd = _env_value("feedback_imap_pass")
+    pwd = _env_value("feedback_imap_pass") or _env_value("Gmail_apppasswords")
     if not user or not pwd:
-        print("❌ .env 缺 feedback_imap_user / feedback_imap_pass（Gmail App Password）", file=sys.stderr)
+        print("❌ .env 缺 feedback_imap_user（Gmail 地址）/ feedback_imap_pass 或 Gmail_apppasswords（App Password）", file=sys.stderr)
         return 2
 
     since = (datetime.now() - timedelta(days=args.days)).strftime("%d-%b-%Y")
     try:
         m = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT, timeout=30)
         m.login(user, pwd)
-        m.select("INBOX")
-        typ, data = m.search(None, f'(SINCE "{since}")')
+        # 搜 All Mail 而非 INBOX（2026-08-27 实测：发件人=destination 邮箱的
+        # 测试邮件会被 Gmail 去重隐藏出收件箱，但转发链路正常、邮件在 All Mail；
+        # 真实用户从自己邮箱发来则收件箱正常显示。All Mail 全量搜不漏归档）
+        try:
+            typ, _ = m.select('"[Gmail]/All Mail"')
+            if typ != "OK":
+                m.select("INBOX")
+        except imaplib.IMAP4.error:
+            m.select("INBOX")
+        # 标准 IMAP TO + SINCE 搜索：只取发往 feedback@ywm.life 的邮件
+        # （Cloudflare Email Routing 转发保留原收件人；Gmail 的 X-GM-RAW 扩展
+        # imaplib 编码有坑，标准 TO 条件实测可用且同样服务器端过滤）
+        typ, data = m.search(None, f'(TO "feedback@ywm.life" SINCE "{since}")')
         if typ != "OK":
             print("搜索失败", file=sys.stderr)
             return 1
         ids = data[0].split()
-        print(f"📬 feedback 邮箱最近 {args.days} 天：{len(ids)} 封\n")
+        print(f"📬 feedback 邮箱最近 {args.days} 天：{len(ids)} 封（收件箱总量，含其他邮件）\n")
+        shown = 0
         for i in ids:
             typ, msg_data = m.fetch(i, "(RFC822)")
             if typ != "OK" or not msg_data or not isinstance(msg_data[0], tuple):
                 continue
             msg = email.message_from_bytes(msg_data[0][1])
+            # 只处理发往 feedback@ywm.life 的邮件（Cloudflare Email Routing 转发
+            # 保留原收件人；Gmail 收件箱里的 GitHub 通知等日常邮件一律跳过）
+            to_headers = " ".join(
+                msg.get_all("To", []) + msg.get_all("Cc", [])
+                + msg.get_all("Delivered-To", []) + msg.get_all("X-Original-To", []))
+            if "feedback@ywm.life" not in to_headers.lower():
+                continue
             frm = _decode_header(msg.get("From", ""))
             subj = _decode_header(msg.get("Subject", ""))
             date_raw = msg.get("Date", "")
@@ -131,8 +150,11 @@ def main() -> int:
             if preview:
                 print(f"摘要:   {preview}")
             print()
+            shown += 1
             if args.mark_seen:
                 m.store(i, "+FLAGS", "\\Seen")
+        if shown == 0:
+            print("（无 feedback@ywm.life 邮件——转发链路可能未生效，或暂无来信）")
         m.logout()
     except Exception as e:
         print(f"❌ IMAP 错误: {type(e).__name__}: {e}", file=sys.stderr)
