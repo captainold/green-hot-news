@@ -20,7 +20,9 @@ import argparse
 import json
 import re
 import sys
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -38,8 +40,9 @@ SF_BASE = "https://api.siliconflow.cn/v1"
 SF_MODEL = "deepseek-ai/DeepSeek-V3"
 CANDIDATES_N = 8
 SELECT_N = 4
-MIN_INTERVAL = 0.6  # QPS 控制
-_FATAL_STATUS = {401, 402, 403, 429}
+WORKERS = 4  # 并发 4（2026-08-27：Hermes 后台进程 30 分钟 SIGTERM，全量 1382 条须压进 30 分钟内）
+_MIN_INTERVAL = 0.8  # 每 worker 线程内节流
+_FATAL_STATUS = {401, 402, 403}
 
 PROMPT_TEMPLATE = """你是绿色低碳情报数据库的关联编辑。给定主条目和候选条目，选出 {n} 条与主条目内容**最相关、最有价值**的关联（跨领域隐形关联加分：政策↔产业落地、技术↔金融信号、研究↔应用）。
 
@@ -79,18 +82,27 @@ def load_items() -> list[dict]:
     return data.get("items", data) if isinstance(data, dict) else data
 
 
-def load_qmd_map() -> dict[str, Path]:
-    """url → qmd 文件路径（frontmatter 的 url 字段匹配）。"""
+def load_qmd_map() -> tuple[dict[str, Path], dict[str, Path]]:
+    """返回 (url→qmd 文件路径, 标题→qmd 文件路径)。
+
+    qmd 文件名 = "<日期> <safe标题>.qmd"（带日期前缀），Obsidian [[链接]]
+    必须指向完整文件名（不含扩展名）才能解析；title→filename 映射用于
+    把 related 的标题转成链接目标（2026-08-27 修复：曾只写标题导致红链）。
+    """
     m: dict[str, Path] = {}
+    by_title: dict[str, Path] = {}
     for f in QMD_DIR.glob("*.qmd"):
         try:
             text = f.read_text(encoding="utf-8", errors="ignore")
             mm = re.search(r'^url:\s*"([^"]+)"', text, re.MULTILINE)
             if mm:
                 m[mm.group(1)] = f
+            tm = re.search(r'^title:\s*"([^"]+)"', text, re.MULTILINE)
+            if tm:
+                by_title[tm.group(1)[:60]] = f
         except Exception:
             continue
-    return m
+    return m, by_title
 
 
 def _tags_of(item: dict) -> set:
@@ -132,8 +144,8 @@ def rule_candidates(item: dict, items: list[dict], qmd_urls: set[str], n: int = 
     return [o for _, o in scored[:n]]
 
 
-def llm_pick(item: dict, candidates: list[dict]) -> list[int]:
-    """LLM 精选：返回选中的候选序号（1-based）。失败返回空。"""
+def llm_pick(item: dict, candidates: list[dict], _retry: int = 0) -> list[int]:
+    """LLM 精选：返回选中的候选序号（1-based）。失败返回空（规则候选兜底）。"""
     key = _env_key()
     if not key:
         return []
@@ -148,7 +160,7 @@ def llm_pick(item: dict, candidates: list[dict]) -> list[int]:
         summary=(item.get("summary") or "")[:250],
         candidates="\n".join(lines),
     )
-    time.sleep(MIN_INTERVAL)
+    time.sleep(_MIN_INTERVAL)  # 每 worker 线程内节流（并发 4 总 QPS ≈ 5）
     try:
         r = requests.post(
             f"{SF_BASE}/chat/completions",
@@ -158,6 +170,9 @@ def llm_pick(item: dict, candidates: list[dict]) -> list[int]:
                   "max_tokens": 200, "temperature": 0},
             timeout=(15, 60),
         )
+        if r.status_code == 429 and _retry < 2:  # 限流：短暂等待重试
+            time.sleep(2 + _retry * 2)
+            return llm_pick(item, candidates, _retry + 1)
         if r.status_code in _FATAL_STATUS:
             return []
         r.raise_for_status()
@@ -172,21 +187,48 @@ def llm_pick(item: dict, candidates: list[dict]) -> list[int]:
         return []
 
 
-def update_qmd(path: Path, related_titles: list[str]) -> bool:
-    """frontmatter 加 related 字段 + 正文追加「相关条目」段。返回是否修改。"""
+def update_qmd(path: Path, related_titles: list[str], by_title: dict[str, Path],
+               force: bool = False) -> bool:
+    """frontmatter 加 related 字段（标题转完整文件名链接）+ 正文「相关条目」段。
+
+    链接目标 = 文件名去 .qmd（含日期前缀），找不到映射的标题跳过（防红链）。
+    force=True 时重写已有 related（修正链接目标用）。返回是否修改。
+    """
     text = path.read_text(encoding="utf-8", errors="ignore")
     if "related:" in text.split("---", 2)[1] if text.startswith("---") else False:
-        return False  # 幂等：已有 related 跳过
-    rel_yaml = "[" + ", ".join(f'"{t[:60]}"' for t in related_titles) + "]"
-    # frontmatter 末尾（第二个 --- 前）插入 related
+        if not force:
+            return False  # 幂等：已有 related 跳过
+    # 标题 → 完整文件名（Obsidian [[文件名]] 语法，目标含日期前缀）
+    # 精确匹配优先，未命中走包含模糊匹配（frontmatter title 与缓存标题
+    # 可能因截断/转义不一致——2026-08-27 修复边缘红链）
+    targets = []
+    for t in related_titles:
+        f = by_title.get(t)
+        if f is None:
+            for k, v in by_title.items():
+                if t in k or k in t:
+                    f = v
+                    break
+        if f is None:
+            continue
+        targets.append(f.stem)
+    if not targets:
+        return False
+    rel_yaml = "[" + ", ".join(f'"{t}"' for t in targets) + "]"
+    # frontmatter 末尾（第二个 --- 前）插入 related；
+    # 先删已有 related 行（防 force 重跑重复插入——2026-08-27 修复重复键）
     parts = text.split("---", 2)
     if len(parts) < 3:
         return False
-    fm = parts[1].rstrip() + "\n" + f"related: {rel_yaml}\n"
+    fm_clean = re.sub(r"^related:.*$", "", parts[1], flags=re.MULTILINE)
+    fm = fm_clean.rstrip() + "\n" + f"related: {rel_yaml}\n"
     new_text = "---" + fm + "---" + parts[2]
     # 正文加相关条目段（放在「技术特征」段后、文件末尾前）
-    block = "\n## 相关条目\n\n" + "\n".join(f"- [[{t[:60]}]]" for t in related_titles) + "\n"
-    if "## 相关条目" not in new_text:
+    block = "\n## 相关条目\n\n" + "\n".join(f"- [[{t}]]" for t in targets) + "\n"
+    if "## 相关条目" in new_text:
+        if force:  # force：替换旧段（旧链接是标题格式，红链）
+            new_text = re.sub(r"\n## 相关条目\n.*?(?=\n## |\Z)", "\n" + block.rstrip(), new_text, count=1, flags=re.S)
+    else:
         new_text = new_text.rstrip() + "\n" + block
     path.write_text(new_text, encoding="utf-8")
     return True
@@ -196,22 +238,26 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="AI 互打双链接")
     ap.add_argument("--limit", type=int, default=0, help="只处理前 N 条（小批验证）")
     ap.add_argument("--days", type=int, default=0, help="只处理最近 N 天（按 published_at/first_seen_at）")
+    ap.add_argument("--workers", type=int, default=WORKERS, help="并发数（默认 4）")
+    ap.add_argument("--force", action="store_true", help="重写已有 related 的 qmd（修正链接目标用）")
     args = ap.parse_args()
 
     items = load_items()
-    qmd_map = load_qmd_map()
-    print(f"条目 {len(items)} 条，qmd 文件 {len(qmd_map)} 个", flush=True)
+    qmd_map, by_title = load_qmd_map()
+    print(f"条目 {len(items)} 条，qmd 文件 {len(qmd_map)} 个，并发 {args.workers}", flush=True)
     if not qmd_map:
         print("❌ 无 qmd 映射（检查 Notes/数据库）", file=sys.stderr)
         return 1
 
     cache = _load_cache()
-    processed = skipped = linked = 0
+    lock = threading.Lock()
+    stats = {"processed": 0, "linked": 0, "skipped": 0}
     now = time.time()
-    for item in items:
+
+    def process(item: dict) -> None:
         url = item.get("url", "")
         if url not in qmd_map:
-            continue
+            return
         # 窗口过滤
         if args.days > 0:
             ts = item.get("published_at") or item.get("first_seen_at") or ""
@@ -219,29 +265,33 @@ def main() -> int:
                 import datetime as _dt
                 t = _dt.datetime.fromisoformat(ts.replace("Z", "+00:00")).timestamp()
                 if now - t > args.days * 86400:
-                    continue
+                    return
             except Exception:
                 pass
-        # 幂等：已有 related 的 qmd 跳过
+        # 幂等：已有 related 的 qmd 跳过（--force 时重写）
         qmd_text = qmd_map[url].read_text(encoding="utf-8", errors="ignore")
         fm_part = qmd_text.split("---", 2)[1] if qmd_text.startswith("---") else ""
-        if "related:" in fm_part:
-            skipped += 1
-            continue
+        if "related:" in fm_part and not args.force:
+            with lock:
+                stats["skipped"] += 1
+            return
         # 缓存命中
         if url in cache:
             cached = cache[url]
             if cached:
-                if update_qmd(qmd_map[url], cached):
-                    linked += 1
-            processed += 1
-            continue
+                if update_qmd(qmd_map[url], cached, by_title, args.force):
+                    with lock:
+                        stats["linked"] += 1
+            with lock:
+                stats["processed"] += 1
+            return
 
         cands = rule_candidates(item, items, set(qmd_map.keys()))
         if len(cands) < 2:
-            cache[url] = []
-            processed += 1
-            continue
+            with lock:
+                cache[url] = []
+                stats["processed"] += 1
+            return
         picked = llm_pick(item, cands)
         if not picked:
             # LLM 失败：规则候选兜底（取前 3，保证有链接）
@@ -249,21 +299,35 @@ def main() -> int:
         titles = [cands[i - 1].get("title", "")[:60] for i in picked]
         titles = [t for t in titles if t and t != (item.get("title") or "")[:60]]
         if not titles:
-            cache[url] = []
-            processed += 1
-            continue
-        cache[url] = titles
-        if update_qmd(qmd_map[url], titles):
-            linked += 1
-        processed += 1
-        if processed % 25 == 0:
-            _save_cache(cache)
-            print(f"进度 {processed}（链接 {linked}，跳过 {skipped}）", flush=True)
-        if args.limit and processed >= args.limit:
-            break
+            with lock:
+                cache[url] = []
+                stats["processed"] += 1
+            return
+        with lock:
+            cache[url] = titles
+            stats["processed"] += 1
+        if update_qmd(qmd_map[url], titles, by_title, args.force):
+            with lock:
+                stats["linked"] += 1
+
+    # 待处理队列（跳过无 qmd 的条目）
+    queue = [it for it in items if it.get("url") in qmd_map]
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        futures = [pool.submit(process, it) for it in queue]
+        done = 0
+        for fut in as_completed(futures):
+            done += 1
+            if done % 50 == 0:
+                with lock:
+                    _save_cache(cache)
+                    print(f"进度 {stats['processed']}（链接 {stats['linked']}，跳过 {stats['skipped']}）", flush=True)
+            if args.limit and done >= args.limit:
+                for f in futures:
+                    f.cancel()
+                break
 
     _save_cache(cache)
-    print(f"完成：处理 {processed}，生成链接 {linked}，跳过（已有）{skipped}", flush=True)
+    print(f"完成：处理 {stats['processed']}，生成链接 {stats['linked']}，跳过（已有）{stats['skipped']}", flush=True)
     return 0
 
 
