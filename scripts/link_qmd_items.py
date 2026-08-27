@@ -211,7 +211,10 @@ def update_qmd(path: Path, related_titles: list[str], by_title: dict[str, Path],
                     break
         if f is None:
             continue
-        targets.append(f.stem)
+        # 2026-08-27 修复：Obsidian wikilink 解析器对 [[xxx]] 只尝试 .md 扩展名，
+        # 不认 registerExtensions 注册的 .qmd（Obsidian 1.13.7 实测）——链接必须
+        # 显式带扩展名 [[xxx.qmd]]（wikilink 支持指向任意文件，带扩展名直接匹配）
+        targets.append(f.name)
     if not targets:
         return False
     rel_yaml = "[" + ", ".join(f'"{t}"' for t in targets) + "]"
