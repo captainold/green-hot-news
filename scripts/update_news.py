@@ -2027,6 +2027,24 @@ def fetch_natsustain(session: requests.Session, now: datetime) -> list[RawItem]:
     )
 
 
+def fetch_nclimate(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Nature Climate Change — 气候科学/政策顶级期刊（2026-08-27 接入：
+    P2 学术期刊追踪，气候方向；直通创新·基础研究/社会创新）。"""
+    return fetch_rss_feed(
+        session, "https://www.nature.com/nclimate.rss",
+        "nclimate", "Nature Climate Change", now, limit=30,
+    )
+
+
+def fetch_nbt(session: requests.Session, now: datetime) -> list[RawItem]:
+    """Nature Biotechnology — 生物技术顶级期刊（2026-08-27 接入：
+    P2 学术期刊追踪，生物方向——老温点名"尤其生物类"；生物技术×绿色交叉）。"""
+    return fetch_rss_feed(
+        session, "https://www.nature.com/nbt.rss",
+        "nbt", "Nature Biotechnology", now, limit=30,
+    )
+
+
 def fetch_hotorcool(session: requests.Session, now: datetime) -> list[RawItem]:
     """Hot or Cool Institute — 柏林 1.5°C 生活方式研究智库（2026-08-26 接入：
     可持续生活方式/消费行为/社会创新严肃讨论源，WordPress news 卡片 data-href 抓取）。"""
@@ -2776,6 +2794,7 @@ SOURCE_SCORE: dict[str, int] = {
     "iea": 17, "irena": 17, "unfccc": 17, "worldbank": 17,
     # 社会创新/可持续消费学术严肃源（2026-08-26 接入）
     "natsustain": 18,  # Nature 子刊（学术顶刊，专业媒体高档）
+    "nclimate": 18, "nbt": 18,  # Nature 子刊（2026-08-27 学术期刊追踪）
     "hotorcool": 14,   # 生活方式研究智库（同 E3G/Agora 智库档）
     "unep": 17,        # 联合国环境署（国际组织档）
     # 专业政策/碳媒体 + AI×气候专业
@@ -3326,6 +3345,7 @@ SOURCE_ISIC: dict[str, str] = {
     "ccai": "M 专业科技活动",
     # 社会创新/学术源（2026-08-26 接入）
     "natsustain": "M 专业科技活动", "hotorcool": "M 专业科技活动",
+    "nclimate": "M 专业科技活动", "nbt": "M 专业科技活动",
     "unep": "O 公共行政",
     "qjem": "M 专业科技活动",  # 经济管理学刊（2026-08-24 学术期刊）
 }
@@ -3507,6 +3527,7 @@ GREEN_SITES = {
     "greenpeace", "mongabay",
     # 社会创新/可持续消费学术严肃源（2026-08-26 接入：填补社会创新维度）
     "natsustain", "hotorcool", "unep",
+    "nclimate", "nbt",  # Nature 子刊（2026-08-27 学术期刊追踪）
     # 国家节能中心（2026-08-19 接入：发改委下属事业单位，全站节能降碳官方解读）
     "chinanecc",
 }
@@ -3534,6 +3555,7 @@ LOW_FREQ_SITES = {
     "carnegie", "rand", "americanprogress", "goldman",
     # 社会创新/学术源（2026-08-26 接入：期刊周更/智库月更，21 天宽窗口）
     "natsustain", "hotorcool",
+    "nclimate", "nbt",  # Nature 子刊（2026-08-27 学术期刊追踪）
     # 国家节能中心（官方解读周级更新，2026-08-19 接入）
     "chinanecc",
 }
@@ -3581,6 +3603,8 @@ TECH_SITES = {
 # 社会创新词命中（可持续消费/生活方式/行为研究）→ 创新·社会创新
 ACADEMIC_SITES = {
     "natsustain",   # Nature Sustainability（可持续科学顶级期刊）
+    "nclimate",     # Nature Climate Change（气候顶级期刊，2026-08-27）
+    "nbt",          # Nature Biotechnology（生物技术顶级期刊，2026-08-27 生物方向）
 }
 
 # 社会创新智库源（2026-08-26 晚补）：整源直通 创新·社会创新——
@@ -3762,6 +3786,8 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_reuters_energy, "reuters", "Reuters Energy"),
     # 社会创新/可持续消费学术严肃源（2026-08-26 接入：填补社会创新维度空桶）
     (fetch_natsustain, "natsustain", "Nature Sustainability"),
+    (fetch_nclimate, "nclimate", "Nature Climate Change"),
+    (fetch_nbt, "nbt", "Nature Biotechnology"),
     (fetch_hotorcool, "hotorcool", "Hot or Cool Institute"),
     (fetch_unep, "unep", "UNEP"),
     # Chinese industry
