@@ -22,6 +22,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from typing import Optional
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -164,7 +165,8 @@ def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
 
 
 def export(input_path: Path, output_dir: Path, force: bool = False,
-           limit: int = 0, md_copy: bool = False) -> int:
+           limit: int = 0, md_copy: bool = False,
+           only_sites: Optional[set] = None) -> int:
     """导出条目为 qmd（qmd 主格式），返回写入的文件数。
 
     md_copy=True（2026-08-24 起默认关闭）：额外写一份 .md 副本。
@@ -198,6 +200,10 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
     pending: list[dict] = []
     for item in items:
         if not isinstance(item, dict):
+            continue
+        # 只导出指定站点（2026-08-27：us_doe/openai 服务器 403 无正文，
+        # 本地 Clash 出口可抓 → --only-sites 定向重导出回填正文）
+        if only_sites and item.get("site_id") not in only_sites:
             continue
         url = item.get("url", "")
         if url and url in existing_urls:
@@ -368,6 +374,8 @@ def main() -> int:
                     help="仅刷新 frontmatter：按 url 重建 YAML 多维标签，正文保留（不重抓）")
     ap.add_argument("--md-copy", action="store_true",
                     help="额外写 .md 副本（默认关闭——Obsidian 同名双文件干扰）")
+    ap.add_argument("--only-sites", default="",
+                    help="只导出指定 site_id（逗号分隔，如 us_doe,openai）——定向重导出/回填用")
     args = ap.parse_args()
 
     out = Path(args.output)
@@ -379,7 +387,9 @@ def main() -> int:
         total = refresh_frontmatter(Path(args.input), out)
         print(f"完成，共刷新 {total} 个 qmd frontmatter")
         return 0
-    total = export(Path(args.input), out, args.force, args.limit, args.md_copy)
+    only = {s.strip() for s in args.only_sites.split(",") if s.strip()}
+    total = export(Path(args.input), out, args.force, args.limit, args.md_copy,
+                   only_sites=only or None)
     print(f"完成，共写入 {total} 条 qmd")
     return 0
 
