@@ -742,15 +742,65 @@ def download_images(markdown: str, att_dir: Path, session: Optional[requests.Ses
                 pass
 
 
+def _cell_text(td) -> str:
+    """单元格内文本：块级标签（p/div/li/h）与 <br> 边界转段落分隔。
+
+    2026-08-27 修复：pbc 等 TRS 政府站把整篇正文放在 <td> 里，旧实现
+    td.get_text(' ') 把段落全合并成一行。现在 <p>/<div>/<br> 之间用
+    \\n\\n 分隔，保持段落结构。
+    """
+    parts: list[str] = []
+    for child in td.children:
+        name = getattr(child, "name", None)
+        if name is None:  # NavigableString
+            t = str(child).strip()
+            if t:
+                parts.append(t)
+        elif name == "br":
+            parts.append("")  # 段落分隔占位
+        elif name in ("p", "div", "li", "h1", "h2", "h3", "h4"):
+            t = child.get_text(" ", strip=True)
+            if t:
+                parts.append(t)
+        else:
+            t = child.get_text(" ", strip=True)
+            if t:
+                parts.append(t)
+    # 合并连续空段 → 段落间 \\n\\n
+    out: list[str] = []
+    for p in parts:
+        if p:
+            out.append(p)
+        elif out and out[-1]:
+            out.append("")
+    text = "\n\n".join(out)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
+
+
 def _table_to_markdown(table) -> str:
-    """<table> → GitHub Markdown 表格（简单表格；colspan/rowspan 降级为文本）。"""
+    """<table> → GitHub Markdown 表格（简单表格；colspan/rowspan 降级为文本）。
+
+    2026-08-27 修复：单元格用 _cell_text 保留段落换行；若任一单元格含换行
+    或超长（>200 字符，如 TRS 政府站整篇正文在 td 里）→ 降级为段落文本，
+    不进 markdown 表格（表格单元格不能含换行，否则破坏表格语法）。
+    """
     rows = []
     for tr in table.find_all("tr"):
-        cells = [td.get_text(" ", strip=True) for td in tr.find_all(["td", "th"])]
+        cells = [_cell_text(td) for td in tr.find_all(["td", "th"])]
         if cells:
             rows.append(cells)
     if not rows:
         return ""
+    if any("\n" in c or len(c) > 200 for r in rows for c in r):
+        # 布局表格（正文在单元格里）：降级为普通段落
+        paras: list[str] = []
+        for r in rows:
+            for c in r:
+                for p in c.split("\n\n"):
+                    p = p.strip()
+                    if p:
+                        paras.append(p)
+        return "\n\n".join(paras)
     # 统一列数
     ncols = max(len(r) for r in rows)
     rows = [r + [""] * (ncols - len(r)) for r in rows]
@@ -852,8 +902,11 @@ def extract_rich(html: str, soup: Optional[BeautifulSoup] = None,
     for el in soup.select(GARBAGE_SELECTORS):
         el.decompose()
 
-    # 容器选择（与 extract_readable 相同逻辑）
-    for sel in ("[class*='TRS_Editor']", "[class*='Custom_UnionStyle']", "[class*='wysiwyg']"):
+    # 容器选择（与 extract_readable 相同逻辑；2026-08-27 补 #zoom/.content——
+    # pbc 等 TRS 政府站正文容器是 id=zoom 或 class=content，缺了会落回外层
+    # 大表格，正文 <p> 段落被当表格单元格合并成一行）
+    for sel in ("[class*='TRS_Editor']", "[class*='Custom_UnionStyle']",
+                "[class*='wysiwyg']", "#zoom", "[class*='content']"):
         cands = soup.select(sel)
         if cands:
             text = cands[0].get_text(" ", strip=True)
@@ -1057,6 +1110,42 @@ def _clean_rich_body(s: str, title: str = "") -> str:
     return s.strip()
 
 
+def _demote_oversized_tables(md: str, max_cell: int = 200) -> str:
+    """trafilatura markdown 输出后处理（2026-08-27）：超长表格行降级为段落。
+
+    TRS 政府站（pbc 等）正文整篇放在 <td> 里，trafilatura markdown 输出把
+    整篇正文变成一行超长表格（老温 08-27 反馈换行不标准）。单行 >200 字符
+    的表格块判定为"正文塞表格"，拆单元格为段落；正常数据表格（短行）不动。
+    """
+    lines = md.split("\n")
+    result: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("|") and len(line) > max_cell:
+            j = i + 1
+            block = [line]
+            while j < len(lines) and lines[j].startswith("|"):
+                block.append(lines[j])
+                j += 1
+            total = sum(len(b) for b in block)
+            if total > max_cell * 2:
+                paras: list[str] = []
+                for bl in block:
+                    cells = [c.strip() for c in bl.strip().strip("|").split("|")]
+                    for c in cells:
+                        c2 = c.strip()
+                        if c2 and c2 != "---" and len(c2) > 3:
+                            paras.append(c2)
+                if paras:
+                    result.append("\n\n".join(paras))
+                i = j
+                continue
+        result.append(line)
+        i += 1
+    return "\n".join(result)
+
+
 def _rich_extract(resp, url: str) -> str:
     """富文本正文提取（2026-08-24 换 trafilatura——学术界标准，F1 0.93）。
 
@@ -1082,6 +1171,17 @@ def _rich_extract(resp, url: str) -> str:
             md = _clean_arxiv_junk(md)
         # 有信息量图片过滤（2026-08-24 老温需求）：只提图表/示意/架构图，跳过新闻配图
         md = _filter_md_images(md)
+        # 超长表格行降级（2026-08-27：TRS 政府站正文塞表格 → 段落换行）
+        md = _demote_oversized_tables(md)
+        # 2026-08-27：TRS 站（pbc 等）正文 <p> 被 trafilatura 合并成单个超长块
+        # （表格降级后仍是 >2000 字符单行）→ 改用自研 extract_rich 重提
+        # （#zoom/.content 容器选择 + 段落换行，见 extract_rich）
+        longest = max((len(l) for l in md.split("\n")), default=0)
+        if longest > 2000:
+            md2, _ = extract_rich(resp.text, BeautifulSoup(resp.text, "html.parser"),
+                                  base_url=url)
+            if md2:
+                md = md2
         return md
     except ImportError:
         soup = BeautifulSoup(resp.text, "html.parser")
