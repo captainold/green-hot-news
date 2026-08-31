@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""经济指标长期监控抓取（2026-08-31 老温拍板，一期美国/全球，二期中国指标待加）。
+"""经济指标长期监控抓取（2026-08-31 老温拍板：一期美国/全球 + 二期中国/欧洲）。
 
-数据源：FRED 免费 CSV 端点（fredgraph.csv），零 key 零成本（同 X 平台 SSR 直抓思路）。
+数据源：
+- FRED 免费 CSV 端点（fredgraph.csv），零 key 零成本（同 X 平台 SSR 直抓思路）——美国/全球/欧洲
+- 东方财富数据中心 API（datacenter-web.eastmoney.com，官方权威，免费）——中国
+- 中国人民银行官网社融 xlsx（标准库 zipfile+xml 解析）——中国社融
 框架：沃什产业链四层——上游要素投入 / 中游运营+劳动力 / 下游终端需求 / 宏观反馈。
 输出：data/econ-indicators.json（时序累积，幂等追加，单指标失败不阻塞整体）。
 
@@ -14,6 +17,8 @@
 - PDFP（国内私人最终购买）无直接序列 → 合成：PCEC96 季度均值 + GPDIC1（十亿 chained 2017 美元）
 - 应届毕业生吸收 → 16-24 岁失业率（LNS14000036）近似
 - CP（企业利润）同时归上游资本回报 + 中游利润，两组均展示
+- 中国 CPI/PPI 为同比（东财官方口径）、PMI 为制造业指数、M2/贷款/GDP 为官方增速/增量
+- 社融为当月增量（人民银行官网 xlsx 解析）
 """
 from __future__ import annotations
 
@@ -21,7 +26,10 @@ import argparse
 import csv
 import io
 import json
+import re
 import sys
+import zipfile
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -30,19 +38,32 @@ import requests
 UTC = timezone.utc
 SH_TZ = timezone(timedelta(hours=8))
 FRED_CSV = "https://fred.stlouisfed.org/graph/fredgraph.csv"
+EM_API = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+PBC_BASE = "https://www.pbc.gov.cn"
+PBC_INDEX = f"{PBC_BASE}/diaochatongjisi/116219/116319/index.html"
 # ⚠️ 2026-08-31 实测：FRED 对带自定义浏览器 UA 的 requests 请求挂起（Read timed out），
-# 无 headers 裸 requests 稳定秒回（36 序列 38.5s 全通）。故不设 UA、不用 Session 复用连接。
+# 无 headers 裸 requests 稳定秒回（36 序列 38.5s 全通）。故 FRED 不设 UA、不复用连接。
+# 东财/人行接口需要 UA + Referer（否则被 WAF 挡）。
 TIMEOUT = 20
 RETRIES = 2
+EM_UA = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/122.0 Safari/537.36",
+    "Referer": "https://data.eastmoney.com/",
+}
+PBC_UA = {"User-Agent": "Mozilla/5.0"}
+# 东财 LPR 接口的固定 token（页面 JS 里公开，2026-08-31 实测）
+EM_LPR_TOKEN = "894050c76af8597a853f5b408b759f5d"
 
-# ── 指标清单（FRED ID 全部实测 200，2026-08-31 验证）────────────────────────────
+# ── 指标清单（FRED ID 全部实测 200，东财 reportName 全部实测通，2026-08-31 验证）──
 # freq: D=日 W=周 M=月 Q=季
 # groups: 所属产业链层（可多组，CP 归上游+中游）
+# source: fred（默认）/ eastmoney / pbc；region: US（默认）/ GLOBAL / CN / EU
+# em_* 字段：东财专用（reportName + 值字段 + 日期字段 + sort 字段，可省略走默认）
 ECON_INDICATORS: list[dict] = [
     # ── 上游：生产要素与资本投入 ──
     {"id": "DCOILWTICO",    "name": "WTI 原油",          "unit": "美元/桶",        "freq": "D", "groups": ["upstream"], "desc": "西德克萨斯中质原油现货价，输入型通胀前沿指标"},
-    {"id": "DCOILBRENTEU",  "name": "布伦特原油",        "unit": "美元/桶",        "freq": "D", "groups": ["upstream"], "desc": "欧洲基准原油，全球定价锚"},
-    {"id": "PCOPPUSDM",     "name": "铜价",              "unit": "美元/吨",        "freq": "D", "groups": ["upstream"], "desc": "全球铜现货价（LME，美元/吨），工业金属与经济景气风向标"},
+    {"id": "DCOILBRENTEU",  "name": "布伦特原油",        "unit": "美元/桶",        "freq": "D", "groups": ["upstream"], "desc": "欧洲基准原油，全球定价锚", "region": "GLOBAL"},
+    {"id": "PCOPPUSDM",     "name": "铜价",              "unit": "美元/吨",        "freq": "D", "groups": ["upstream"], "desc": "全球铜现货价（LME，美元/吨），工业金属与经济景气风向标", "region": "GLOBAL"},
     {"id": "DHHNGSP",       "name": "天然气（亨利港）",  "unit": "美元/百万英热",  "freq": "D", "groups": ["upstream"], "desc": "美国亨利港天然气现货价"},
     {"id": "PNFIC1",        "name": "非住宅固定投资",    "unit": "十亿美元(2017)",  "freq": "Q", "groups": ["upstream"], "desc": "实际私人非住宅固定投资——企业扩产/AI 基建真金白银（chained 2017）"},
     {"id": "GPDIC1",        "name": "私人国内投资总额",  "unit": "十亿美元(2017)",  "freq": "Q", "groups": ["upstream"], "desc": "实际私人国内投资总额（chained 2017），资本投入总盘子"},
@@ -55,10 +76,14 @@ ECON_INDICATORS: list[dict] = [
     {"id": "JTSJOL",        "name": "职位空缺",          "unit": "千人",           "freq": "M", "groups": ["midstream"], "desc": "JOLTS 职位空缺——劳动力需求"},
     {"id": "JTSQUR",        "name": "离职率",            "unit": "%",              "freq": "M", "groups": ["midstream"], "desc": "JOLTS 离职率（周转率）——员工议价能力信号"},
     {"id": "LNS14000036",   "name": "16-24岁失业率",     "unit": "%",              "freq": "M", "groups": ["midstream"], "desc": "青年失业率——应届毕业生吸纳能力近似口径"},
+    {"id": "DEUR",          "name": "德国失业率",        "unit": "%",              "freq": "M", "groups": ["midstream"], "desc": "德国失业率——欧洲最大经济体劳动力健康度", "region": "EU", "fred_id": "LRHUTTTTDEM156S"},
     # ── 下游：终端需求与消费 ──
     {"id": "PCEC96",        "name": "实际消费支出",      "unit": "十亿美元(2017)",  "freq": "M", "groups": ["downstream"], "desc": "实际个人消费支出（chained 2017）——终端需求基本盘"},
     {"id": "PDFP",          "name": "国内私人最终购买",  "unit": "十亿美元(2017)",  "freq": "Q", "groups": ["downstream"], "desc": "合成口径：PCEC96 季度均值 + GPDIC1（消费+私人投资），沃什看重的纯净需求指标"},
     {"id": "GDPC1",         "name": "实际 GDP",          "unit": "十亿美元(2017)",  "freq": "Q", "groups": ["downstream"], "desc": "实际国内生产总值（chained 2017）"},
+    {"id": "CNGDP",         "name": "中国 GDP 同比",     "unit": "%",              "freq": "Q", "groups": ["downstream"], "desc": "中国 GDP 累计同比（东财官方口径）", "region": "CN", "source": "eastmoney",
+     "em_report": "RPT_ECONOMY_GDP", "em_value": "SUM_SAME", "em_date": "REPORT_DATE", "em_sort": "REPORT_DATE"},
+    {"id": "EUGDP",         "name": "欧元区 GDP",        "unit": "百万欧元",        "freq": "Q", "groups": ["downstream"], "desc": "欧元区实际 GDP（Eurostat，chain linked）", "region": "EU", "fred_id": "CLVMNACSCAB1GQEA19"},
     # ── 宏观反馈：物价体系与金融条件 ──
     {"id": "PCEPI",         "name": "PCE 物价指数",      "unit": "指数(2017=100)", "freq": "M", "groups": ["macro"], "desc": "美联储法定通胀标尺"},
     {"id": "PCEPILFE",      "name": "核心 PCE",          "unit": "指数(2017=100)", "freq": "M", "groups": ["macro"], "desc": "剔除食品能源的 PCE——政策锚"},
@@ -82,6 +107,28 @@ ECON_INDICATORS: list[dict] = [
     {"id": "CSUSHPINSA",    "name": "Case-Shiller 房价", "unit": "指数(2000=100)", "freq": "M", "groups": ["macro"], "desc": "美国 20 城房价指数（季调）——利率敏感行业"},
     {"id": "WALCL",         "name": "美联储资产负债表",  "unit": "十亿美元",        "freq": "W", "groups": ["macro"], "desc": "联储总资产——流动性深度（CSV 原始单位百万美元，÷1000）", "scale": 0.001},
     {"id": "RRPONTSYD",     "name": "隔夜逆回购",        "unit": "十亿美元",        "freq": "D", "groups": ["macro"], "desc": "ON RRP 用量——流动性阀门"},
+    # ── 二期：中国（东财官方）──
+    {"id": "CNCPI",         "name": "中国 CPI 同比",     "unit": "%",              "freq": "M", "groups": ["macro"], "desc": "中国居民消费价格同比（东财官方口径）", "region": "CN", "source": "eastmoney",
+     "em_report": "RPT_ECONOMY_CPI", "em_value": "NATIONAL_SAME", "em_date": "REPORT_DATE", "em_sort": "REPORT_DATE"},
+    {"id": "CNPPI",         "name": "中国 PPI 同比",     "unit": "%",              "freq": "M", "groups": ["macro"], "desc": "中国工业生产者出厂价格同比（东财官方口径）", "region": "CN", "source": "eastmoney",
+     "em_report": "RPT_ECONOMY_PPI", "em_value": "BASE_SAME", "em_date": "REPORT_DATE", "em_sort": "REPORT_DATE"},
+    {"id": "CNPMI",         "name": "中国制造业 PMI",    "unit": "指数",           "freq": "M", "groups": ["macro"], "desc": "中国制造业采购经理指数（东财官方口径，50=荣枯线）", "region": "CN", "source": "eastmoney",
+     "em_report": "RPT_ECONOMY_PMI", "em_value": "MAKE_INDEX", "em_date": "REPORT_DATE", "em_sort": "REPORT_DATE"},
+    {"id": "CNLPR",         "name": "中国 LPR 1年期",    "unit": "%",              "freq": "M", "groups": ["macro"], "desc": "贷款市场报价利率 1 年期（东财官方口径）", "region": "CN", "source": "eastmoney",
+     "em_report": "RPTA_WEB_RATE", "em_value": "LPR1Y", "em_date": "TRADE_DATE", "em_sort": "TRADE_DATE", "em_token": EM_LPR_TOKEN},
+    {"id": "CNM2",          "name": "中国 M2 同比",      "unit": "%",              "freq": "M", "groups": ["macro"], "desc": "中国广义货币 M2 同比（东财官方口径）", "region": "CN", "source": "eastmoney",
+     "em_report": "RPT_ECONOMY_CURRENCY_SUPPLY", "em_value": "BASIC_CURRENCY_SAME", "em_date": "REPORT_DATE", "em_sort": "REPORT_DATE"},
+    {"id": "CNLOAN",        "name": "中国新增贷款",      "unit": "亿元",           "freq": "M", "groups": ["macro"], "desc": "中国当月新增人民币贷款（东财官方口径）", "region": "CN", "source": "eastmoney",
+     "em_report": "RPT_ECONOMY_RMB_LOAN", "em_value": "RMB_LOAN", "em_date": "REPORT_DATE", "em_sort": "REPORT_DATE"},
+    {"id": "CNSHEHUI",      "name": "中国社融增量",      "unit": "亿元",           "freq": "M", "groups": ["macro"], "desc": "中国当月社会融资规模增量（人民银行官网）", "region": "CN", "source": "pbc"},
+    # ── 二期：欧洲（FRED）──
+    {"id": "ECBDFR",        "name": "ECB 存款利率",      "unit": "%",              "freq": "D", "groups": ["macro"], "desc": "欧洲央行存款便利利率", "region": "EU"},
+    {"id": "ECBMRRFR",      "name": "ECB 主要再融资",    "unit": "%",              "freq": "D", "groups": ["macro"], "desc": "欧洲央行主要再融资利率", "region": "EU"},
+    {"id": "ECBMLFR",       "name": "ECB 边际贷款",      "unit": "%",              "freq": "D", "groups": ["macro"], "desc": "欧洲央行边际贷款便利利率", "region": "EU"},
+    {"id": "EUHICP",        "name": "欧元区 HICP",       "unit": "指数(2015=100)", "freq": "M", "groups": ["macro"], "desc": "欧元区调和消费者物价指数（Eurostat）", "region": "EU", "fred_id": "CP0000EZ19M086NEST"},
+    {"id": "DE10Y",         "name": "德国 10Y 国债",     "unit": "%",              "freq": "M", "groups": ["macro"], "desc": "德国 10 年期国债收益率——欧洲无风险利率锚", "region": "EU", "fred_id": "IRLTLT01DEM156N"},
+    {"id": "EURUSD",        "name": "欧元/美元汇率",     "unit": "USD/EUR",        "freq": "D", "groups": ["macro"], "desc": "欧元兑美元汇率——欧洲国际定价基准", "region": "EU", "fred_id": "DEXUSEU"},
+    {"id": "EUHY",          "name": "欧元区高收益利差",  "unit": "%",              "freq": "D", "groups": ["macro"], "desc": "ICE BofA 欧元高收益债期权调整利差——欧洲风险偏好", "region": "EU", "fred_id": "BAMLHE00EHYIOAS"},
 ]
 
 GROUPS = [
@@ -91,14 +138,7 @@ GROUPS = [
     ("macro",      "🎯 宏观反馈 · 物价与金融条件"),
 ]
 
-# 地区归属（2026-08-31 老温询问「区分中国/美国/欧洲/全球」后加）
-# 一期全为 FRED 数据源：US=美国（37 项）、GLOBAL=全球定价（布伦特/铜 2 项）；
-# 二期规划：CN=中国（PPI/社融/LPR/PMI）、EU=欧洲（ECB/HICP/德债）——数据源接入时在
-# ECON_INDICATORS 对应条目加 "region" 键即可，前端自动按地区徽标/筛选展示。
-REGION_BY_ID = {
-    "DCOILBRENTEU": "GLOBAL",  # 北海布伦特——国际原油定价锚
-    "PCOPPUSDM": "GLOBAL",     # LME 铜——全球工业金属定价
-}
+# 地区归属（2026-08-31）：默认 US，指标定义里显式 region 覆盖（GLOBAL/CN/EU）
 REGION_NAMES = {"US": "🇺🇸 美国", "GLOBAL": "🌐 全球", "CN": "🇨🇳 中国", "EU": "🇪🇺 欧洲"}
 
 GROUP_KEY_OF = {g["id"]: g for g in ECON_INDICATORS}
@@ -108,6 +148,7 @@ def utc_now() -> datetime:
     return datetime.now(tz=UTC)
 
 
+# ── FRED 抓取 ────────────────────────────────────────────────────────────────
 def fetch_series(series_id: str, cosd: str) -> list[list]:
     """抓单个 FRED 序列 CSV → [[date, value], ...]（升序，跳过缺失值）。
 
@@ -138,6 +179,150 @@ def fetch_series(series_id: str, cosd: str) -> list[list]:
         except Exception as e:
             last_err = e
     raise last_err if last_err else RuntimeError(f"fetch {series_id} failed")
+
+
+# ── 东方财富数据中心抓取（中国官方指标）───────────────────────────────────────
+# PITFALL(2026-08-31 生产实测)：东财是中国站，若服务器 HTTPS_PROXY 走 mihomo 家宽
+# （夏威夷出口）访问会失败/变慢 → 显式禁用代理直连（同 update_news.py qjem 处理）。
+_NO_PROXY = {"http": None, "https": None}
+
+
+def fetch_eastmoney(spec: dict, cosd: str) -> list[list]:
+    """东财 datacenter API → [[date, value], ...]（升序）。
+
+    字段：em_report=报表名、em_value=取值字段、em_date=日期字段、em_sort=排序字段、
+    em_token=可选固定 token（LPR 需要）。
+    """
+    params = {
+        "reportName": spec["em_report"],
+        "columns": "ALL",
+        "pageNumber": 1,
+        "pageSize": 2000,  # 3 年月频 ~36 行，2000 足够全量
+        "sortColumns": spec.get("em_sort", "REPORT_DATE"),
+        "sortTypes": -1,
+    }
+    if spec.get("em_token"):
+        params["token"] = spec["em_token"]
+    last_err: Exception | None = None
+    for attempt in range(RETRIES + 1):
+        try:
+            r = requests.get(EM_API, params=params, headers=EM_UA, timeout=TIMEOUT, proxies=_NO_PROXY)
+            r.raise_for_status()
+            d = r.json()
+            rows_data = (d.get("result") or {}).get("data") or []
+            date_field = spec.get("em_date", "REPORT_DATE")
+            val_field = spec["em_value"]
+            out: list[list] = []
+            for row in rows_data:
+                date_s = str(row.get(date_field) or "")[:10]
+                val_s = row.get(val_field)
+                if not date_s or val_s is None or val_s == "":
+                    continue
+                try:
+                    val = float(val_s)
+                except (TypeError, ValueError):
+                    continue
+                if date_s >= cosd:
+                    out.append([date_s, val])
+            out.sort(key=lambda x: x[0])
+            return out
+        except Exception as e:
+            last_err = e
+    raise last_err if last_err else RuntimeError(f"eastmoney {spec['id']} failed")
+
+
+# ── 中国人民银行社融抓取（xlsx 标准库解析）─────────────────────────────────────
+# 人行同为中国站，显式禁用代理直连（同东财）。
+def _pbc_get(url: str, timeout: int = 30) -> str:
+    r = requests.get(url, headers=PBC_UA, timeout=timeout, proxies=_NO_PROXY)
+    r.raise_for_status()
+    r.encoding = r.apparent_encoding or "utf-8"
+    return r.text
+
+
+def _xlsx_rows(content: bytes) -> list[list]:
+    """纯标准库解析 xlsx：zipfile 解包 + xml 读 sharedStrings + sheet。"""
+    zf = zipfile.ZipFile(io.BytesIO(content))
+    shared: list[str] = []
+    try:
+        root = ET.fromstring(zf.read("xl/sharedStrings.xml"))
+        NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+        for si in root.iter(f"{NS}si"):
+            text = "".join(t.text or "" for t in si.iter(f"{NS}t"))
+            shared.append(text)
+    except KeyError:
+        pass
+    sheets = sorted(n for n in zf.namelist() if n.startswith("xl/worksheets/sheet") and n.endswith(".xml"))
+    if not sheets:
+        return []
+    root = ET.fromstring(zf.read(sheets[0]))
+    NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+    rows_out: list[list] = []
+    for row in root.iter(f"{NS}row"):
+        cells: list[str] = []
+        for c in row.iter(f"{NS}c"):
+            v = c.find(f"{NS}v")
+            t = c.get("t")
+            if v is None:
+                cells.append("")
+            elif t == "s":
+                cells.append(shared[int(v.text)] if v.text is not None else "")
+            else:
+                cells.append(v.text or "")
+        rows_out.append(cells)
+    return rows_out
+
+
+def fetch_pbc_shehui(cosd: str) -> list[list]:
+    """人民银行官网社融增量表 → [[date, value], ...]（升序，亿元）。
+
+    路径：统计调查司 → 年份统计 → 社会融资规模 → xlsx（增量表）。
+    表格结构（2024-2026 实测一致）：行 8 表头（月份/社融增量/...），行 11 起数据，
+    列 0=月份（2026.01 格式）、列 1=社融增量（亿元）。为覆盖近 N 年需逐年前往抓。
+    """
+    try:
+        idx = _pbc_get(PBC_INDEX)
+        years = re.findall(r"""href=["']([^"']+)["'][^>]*>\s*(\d{4})年统计数据\s*</a>""", idx)
+        if not years:
+            return []
+        target_years = sorted({int(y) for _, y in years}, reverse=True)[:3]  # 近 3 年
+        rows_all: dict[str, float] = {}
+        for year in target_years:
+            href = [h for h, y in years if int(y) == year]
+            if not href:
+                continue
+            ypage = _pbc_get(PBC_BASE + href[0] if href[0].startswith("/") else href[0])
+            topics = re.findall(r"""href=["']([^"']+)["'][^>]*>\s*(社会融资规模)\s*</a>""", ypage)
+            if not topics:
+                continue
+            tpage = _pbc_get(PBC_BASE + topics[0][0] if topics[0][0].startswith("/") else topics[0][0])
+            books = re.findall(r"""href=["']([^"']+\.xlsx?)["']""", tpage)
+            if not books:
+                continue
+            url = PBC_BASE + books[0] if books[0].startswith("/") else books[0]
+            content = requests.get(url, headers=PBC_UA, timeout=60, proxies=_NO_PROXY).content
+            rows = _xlsx_rows(content)
+            for r in rows:
+                month_s = str(r[0] or "").strip()
+                m = re.match(r"^(\d{4})\.(\d{1,2})$", month_s)
+                if not m:
+                    continue
+                val_s = str(r[1] if len(r) > 1 else "").strip()
+                if not val_s:
+                    continue
+                try:
+                    val = float(val_s)
+                except ValueError:
+                    continue
+                month_num = m.group(2)
+                if len(month_num) == 1:
+                    month_num = "0" + month_num
+                date_s = f"{m.group(1)}-{month_num}-01"
+                rows_all[date_s] = val
+        out = [[d, rows_all[d]] for d in sorted(rows_all) if d >= cosd]
+        return out
+    except Exception:
+        return []
 
 
 def aggregate_quarterly(monthly_rows: list[list]) -> list[list]:
@@ -188,8 +373,18 @@ def build_pdfp(cosd: str) -> list[list] | None:
     return out
 
 
+def fetch_by_source(spec: dict, cosd: str) -> list[list]:
+    """按 source 分发抓取。fred 用 fred_id（默认=id）；eastmoney/pbc 走各自实现。"""
+    src = spec.get("source", "fred")
+    if src == "eastmoney":
+        return fetch_eastmoney(spec, cosd)
+    if src == "pbc":
+        return fetch_pbc_shehui(cosd)
+    return fetch_series(spec.get("fred_id", spec["id"]), cosd)
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="经济指标长期监控（FRED 免费 CSV）")
+    parser = argparse.ArgumentParser(description="经济指标长期监控（FRED + 东财 + 人行）")
     parser.add_argument("--output-dir", default="data", help="输出目录")
     parser.add_argument("--years", type=int, default=3, help="保留近 N 年（默认 3）")
     args = parser.parse_args()
@@ -222,7 +417,7 @@ def main() -> int:
             if sid == "PDFP":
                 rows = pdfp_rows or []
             else:
-                rows = fetch_series(sid, cosd)
+                rows = fetch_by_source(spec, cosd)
                 rows = scale_rows(rows, spec.get("scale", 1.0))
             rows = merge_rows(old_rows, rows)
             rows = clip_rows(rows, args.years)
@@ -236,7 +431,8 @@ def main() -> int:
                 "unit": spec["unit"],
                 "freq": spec["freq"],
                 "groups": spec["groups"],
-                "region": REGION_BY_ID.get(sid, "US"),
+                "region": spec.get("region", "US"),
+                "source": spec.get("source", "fred"),
                 "desc": spec["desc"],
                 "points": len(rows),
                 "latest": {"date": rows[-1][0], "value": rows[-1][1]},
@@ -260,7 +456,7 @@ def main() -> int:
 
     payload = {
         "generated_at": now.astimezone(SH_TZ).isoformat(timespec="seconds"),
-        "source": "FRED fredgraph.csv (free, no key)",
+        "source": "FRED + 东方财富 + 中国人民银行",
         "years": args.years,
         "groups": groups,
         "series": series_out,
