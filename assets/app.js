@@ -26,6 +26,7 @@
     let econChart = null;         // 经济指标大图 echarts 实例
     let econSelected = null;      // 当前选中指标 id
     let econRange = "近 1 年";     // 大图走势范围（近 1 年 | 近 3 年）
+    let econRegion = "全部";      // 经济指标地区筛选（全部 | 美国 | 全球，二期加中国/欧洲）
     // 搜索状态（2026-08-23 新增，务必与 parseObsidianQuery 配合使用）
     const searchState = {
       active: false,      // 是否有有效搜索
@@ -694,6 +695,8 @@
   // 结构：groups[4 层] + series[id] { name, unit, freq, desc, latest, history }
   // 状态变量 econData/econChart/econSelected/econRange 声明在顶部 State 区（避免 TDZ）
   const ECON_RANGES = ["近 1 年", "近 3 年"];
+  // 地区筛选（2026-08-31 老温询问地区区分后加；动态取数据里的 region，二期 CN/EU 自动出现）
+  const econRegionSwitch = $("#econRegionSwitch");
   const econRangeSwitch = $("#econRangeSwitch");
   const econBody = $("#econBody");
   const econSub = $("#econSub");
@@ -744,6 +747,7 @@
   }
 
   // 指标卡
+  const REGION_LABEL = { US: "🇺🇸 美国", GLOBAL: "🌐 全球", CN: "🇨🇳 中国", EU: "🇪🇺 欧洲" };
   function econCard(s) {
     const chg = chgInfo(s);
     const card = document.createElement("button");
@@ -752,8 +756,12 @@
     card.title = `${s.desc || ""}\n数据源：FRED · ${s.freq === "D" ? "日" : s.freq === "W" ? "周" : s.freq === "M" ? "月" : "季"}频`;
     const dark = document.documentElement.getAttribute("data-theme") === "dark";
     const sparkColor = dark ? "#4ade80" : "#16a34a";
+    const regionTxt = REGION_LABEL[s.region] || s.region || "";
     card.innerHTML = `
-      <span class="econ-card-name">${s.name}<em>${s.unit || ""}</em></span>
+      <span class="econ-card-top">
+        <span class="econ-card-name">${s.name}<em>${s.unit || ""}</em></span>
+        ${regionTxt ? `<span class="econ-card-region">${regionTxt}</span>` : ""}
+      </span>
       <span class="econ-card-val">${fmtVal((s.latest || {}).value)}</span>
       <span class="econ-card-date">${(s.latest || {}).date || ""}</span>
       ${chg ? `<span class="econ-card-chg ${chg.up ? "up" : "down"}">${chg.text}</span>` : ""}
@@ -771,7 +779,10 @@
     const detailEl = document.getElementById("econDetail");
     const chartEl = document.getElementById("econChart");
     if (!detailEl || !chartEl) return;
-    if (!econSelected || !econData || !econData.series[econSelected]) {
+    // 地区筛选后：选中指标不在当前地区 → 收起大图
+    const regionKey = Object.keys(REGION_LABEL).find((k) => REGION_LABEL[k] === econRegion) || null;
+    const inRegion = !regionKey || (econData && econData.series[econSelected] && econData.series[econSelected].region === regionKey);
+    if (!econSelected || !econData || !econData.series[econSelected] || !inRegion) {
       detailEl.hidden = true;
       return;
     }
@@ -832,19 +843,43 @@
   }
 
   // 渲染经济指标区
+  function econRegionOptions() {
+    // 动态取数据里的地区（二期加 CN/EU 自动出现在筛选里）
+    const seen = new Set();
+    if (econData && econData.series) {
+      Object.values(econData.series).forEach((s) => { if (s.region) seen.add(s.region); });
+    }
+    return ["全部"].concat([...seen].map((r) => REGION_LABEL[r] || r));
+  }
+
+  function buildEconRegionSwitch() {
+    if (!econRegionSwitch) return;
+    const opts = econRegionOptions();
+    buildSwitch(econRegionSwitch, opts, econRegion, (v) => {
+      econRegion = v;
+      renderEcon();
+    });
+  }
+
   function renderEcon() {
     if (!econData || !econBody) return;
     const groups = econData.groups || [];
     const allSeries = econData.series || {};
     const dark = document.documentElement.getAttribute("data-theme") === "dark";
     const sparkColor = dark ? "#4ade80" : "#16a34a";
+    buildEconRegionSwitch();
 
     // 副标题 + 计数
     if (econSub) {
       const gen = econData.generated_at ? `更新于 ${econData.generated_at.slice(5, 16).replace("T", " ")}` : "";
-      econSub.textContent = `数据源 FRED（美国/全球） · ${gen}`;
+      const regionTxt = econRegion === "全部" ? "全部地区" : econRegion;
+      econSub.textContent = `数据源 FRED · ${regionTxt} · ${gen}`;
     }
-    if (econCount) econCount.textContent = `${Object.keys(allSeries).length} 项指标 · ${groups.length} 层`;
+    const regionKey = Object.keys(REGION_LABEL).find((k) => REGION_LABEL[k] === econRegion) || null;
+    const filteredSeries = regionKey
+      ? Object.fromEntries(Object.entries(allSeries).filter(([, s]) => s.region === regionKey))
+      : allSeries;
+    if (econCount) econCount.textContent = `${Object.keys(filteredSeries).length} 项指标 · ${groups.length} 层`;
 
     econBody.innerHTML = "";
     const frag = document.createDocumentFragment();
@@ -868,13 +903,13 @@
       sec.className = "econ-group";
       const head = document.createElement("div");
       head.className = "econ-group-head";
-      const ids = (g.series || []).filter((id) => allSeries[id]);
+      const ids = (g.series || []).filter((id) => filteredSeries[id]);
       head.innerHTML = `<span class="econ-group-name">${g.name}</span><span class="econ-group-count">${ids.length} 项</span>`;
       sec.appendChild(head);
       const grid = document.createElement("div");
       grid.className = "econ-grid";
       ids.forEach((id) => {
-        const s = allSeries[id];
+        const s = filteredSeries[id];
         const card = econCard(s);
         // 卡片内的 sparkline 用主题色（若卡上已带则覆盖一致）
         grid.appendChild(card);

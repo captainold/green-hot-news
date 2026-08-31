@@ -91,6 +91,16 @@ GROUPS = [
     ("macro",      "🎯 宏观反馈 · 物价与金融条件"),
 ]
 
+# 地区归属（2026-08-31 老温询问「区分中国/美国/欧洲/全球」后加）
+# 一期全为 FRED 数据源：US=美国（37 项）、GLOBAL=全球定价（布伦特/铜 2 项）；
+# 二期规划：CN=中国（PPI/社融/LPR/PMI）、EU=欧洲（ECB/HICP/德债）——数据源接入时在
+# ECON_INDICATORS 对应条目加 "region" 键即可，前端自动按地区徽标/筛选展示。
+REGION_BY_ID = {
+    "DCOILBRENTEU": "GLOBAL",  # 北海布伦特——国际原油定价锚
+    "PCOPPUSDM": "GLOBAL",     # LME 铜——全球工业金属定价
+}
+REGION_NAMES = {"US": "🇺🇸 美国", "GLOBAL": "🌐 全球", "CN": "🇨🇳 中国", "EU": "🇪🇺 欧洲"}
+
 GROUP_KEY_OF = {g["id"]: g for g in ECON_INDICATORS}
 
 
@@ -226,6 +236,7 @@ def main() -> int:
                 "unit": spec["unit"],
                 "freq": spec["freq"],
                 "groups": spec["groups"],
+                "region": REGION_BY_ID.get(sid, "US"),
                 "desc": spec["desc"],
                 "points": len(rows),
                 "latest": {"date": rows[-1][0], "value": rows[-1][1]},

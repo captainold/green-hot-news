@@ -824,10 +824,24 @@ html[data-theme="dark"] .tech-feature { background: rgba(16, 185, 129, .1); }
   border-color: #f59e0b;
   box-shadow: 0 0 0 2px rgba(245, 158, 11, .18);
 }
+.econ-card-top {
+  display: flex; align-items: center; justify-content: space-between; gap: .3rem;
+  min-width: 0;
+}
 .econ-card-name {
   font-size: .72rem; color: var(--text-muted);
   display: flex; align-items: baseline; gap: .3rem;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-width: 0; flex: 1;
+}
+.econ-card-region {
+  flex-shrink: 0;
+  font-size: .58rem; color: var(--text-dim);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: .05rem .35rem;
+  white-space: nowrap;
 }
 .econ-card-name em { font-style: normal; font-size: .62rem; color: var(--text-dim); }
 .econ-card-val {
