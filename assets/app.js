@@ -21,6 +21,11 @@
     let graphChart = null;        // ECharts 关系图谱实例（须在 initTheme 前声明，避免 TDZ）
     let graphResizeBound = false; // resize 监听只挂一次（dispose/re-init 不重复挂）
     let searchQuery = "";         // Obsidian 语法搜索 query（2026-08-23 新增）
+    // 经济指标长期监控（2026-08-31，须在 initTheme 前声明，避免 TDZ——applyTheme 会重绘）
+    let econData = null;          // econ-indicators.json 全量
+    let econChart = null;         // 经济指标大图 echarts 实例
+    let econSelected = null;      // 当前选中指标 id
+    let econRange = "近 1 年";     // 大图走势范围（近 1 年 | 近 3 年）
     // 搜索状态（2026-08-23 新增，务必与 parseObsidianQuery 配合使用）
     const searchState = {
       active: false,      // 是否有有效搜索
@@ -95,6 +100,7 @@
     }
     try { localStorage.setItem("ghn-theme", dark ? "dark" : "light"); } catch (e) { /* ignore */ }
     if (graphChart) renderGraph(lastFiltered);
+    if (econChart && econSelected) renderEconDetail();
   }
   function initTheme() {
     let saved = null;
@@ -683,6 +689,227 @@
     }, true);
   }
 
+  // ── 经济指标长期监控（2026-08-31 沃什产业链框架，FRED 数据源）───────────────
+  // 数据：data/econ-indicators.json（scripts/fetch_econ_indicators.py 每日生成）
+  // 结构：groups[4 层] + series[id] { name, unit, freq, desc, latest, history }
+  // 状态变量 econData/econChart/econSelected/econRange 声明在顶部 State 区（避免 TDZ）
+  const ECON_RANGES = ["近 1 年", "近 3 年"];
+  const econRangeSwitch = $("#econRangeSwitch");
+  const econBody = $("#econBody");
+  const econSub = $("#econSub");
+  const econCount = $("#econCount");
+
+  // 数值格式化（按量级自适应）
+  function fmtVal(v) {
+    if (v === null || v === undefined || isNaN(v)) return "—";
+    const a = Math.abs(v);
+    if (a >= 10000) return v.toLocaleString("zh-CN", { maximumFractionDigits: 0 });
+    if (a >= 1000) return v.toLocaleString("zh-CN", { maximumFractionDigits: 0 });
+    if (a >= 100) return v.toFixed(1);
+    return v.toFixed(2);
+  }
+
+  // 迷你趋势 sparkline（SVG polyline，近 N 点归一化）
+  function sparklineSVG(rows, color) {
+    if (!rows || rows.length < 2) return "";
+    const n = Math.min(rows.length, 120);
+    const slice = rows.slice(-n);
+    const vals = slice.map((r) => r[1]);
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const span = (max - min) || 1;
+    const W = 100, H = 28, P = 2;
+    const pts = vals.map((v, i) => {
+      const x = P + (i / (n - 1)) * (W - 2 * P);
+      const y = H - P - ((v - min) / span) * (H - 2 * P);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+    return `<svg class="econ-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+  }
+
+  // 环比变化：% 单位显示 pp，其他显示相对百分比
+  function chgInfo(s) {
+    const h = s.history || [];
+    if (h.length < 2) return null;
+    const [last, prev] = [h[h.length - 1], h[h.length - 2]];
+    const diff = last[1] - prev[1];
+    const isPct = (s.unit || "").includes("%");
+    return {
+      diff,
+      isPct,
+      text: isPct
+        ? `${diff >= 0 ? "▲" : "▼"} ${fmtVal(Math.abs(diff))}pp`
+        : `${diff >= 0 ? "▲" : "▼"} ${fmtVal(Math.abs(diff))} (${fmtVal(prev[1] !== 0 ? Math.abs(diff / prev[1]) * 100 : 0)}%)`,
+      up: diff >= 0,
+    };
+  }
+
+  // 指标卡
+  function econCard(s) {
+    const chg = chgInfo(s);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "econ-card" + (econSelected === s.id ? " active" : "");
+    card.title = `${s.desc || ""}\n数据源：FRED · ${s.freq === "D" ? "日" : s.freq === "W" ? "周" : s.freq === "M" ? "月" : "季"}频`;
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    const sparkColor = dark ? "#4ade80" : "#16a34a";
+    card.innerHTML = `
+      <span class="econ-card-name">${s.name}<em>${s.unit || ""}</em></span>
+      <span class="econ-card-val">${fmtVal((s.latest || {}).value)}</span>
+      <span class="econ-card-date">${(s.latest || {}).date || ""}</span>
+      ${chg ? `<span class="econ-card-chg ${chg.up ? "up" : "down"}">${chg.text}</span>` : ""}
+      ${sparklineSVG(s.history, sparkColor)}
+    `;
+    card.addEventListener("click", () => {
+      econSelected = (econSelected === s.id) ? null : s.id;
+      renderEcon();
+    });
+    return card;
+  }
+
+  // 大图渲染（选中指标时）
+  function renderEconDetail() {
+    const detailEl = document.getElementById("econDetail");
+    const chartEl = document.getElementById("econChart");
+    if (!detailEl || !chartEl) return;
+    if (!econSelected || !econData || !econData.series[econSelected]) {
+      detailEl.hidden = true;
+      return;
+    }
+    const s = econData.series[econSelected];
+    detailEl.hidden = false;
+    const titleEl = document.getElementById("econDetailTitle");
+    const metaEl = document.getElementById("econDetailMeta");
+    if (titleEl) titleEl.textContent = `${s.name}（${s.unit || ""}）`;
+    if (metaEl) metaEl.textContent = s.desc || "";
+
+    const years = econRange === "近 3 年" ? 3 : 1;
+    const cutoff = Date.now() - years * 365 * 24 * 3600 * 1000;
+    const rows = (s.history || []).filter((r) => Date.parse(r[0]) >= cutoff);
+    const dates = rows.map((r) => r[0]);
+    const vals = rows.map((r) => r[1]);
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    const labelColor = dark ? "#f2f4f7" : "#0a0b0d";
+    const subColor = dark ? "#8a93a0" : "#5b616e";
+    const axisColor = dark ? "rgba(245,246,247,.25)" : "rgba(91,97,110,.3)";
+
+    if (!econChart) {
+      chartEl.innerHTML = "";
+      econChart = echarts.init(chartEl);
+      window.addEventListener("resize", () => econChart && econChart.resize());
+    }
+    econChart.setOption({
+      backgroundColor: "transparent",
+      tooltip: {
+        trigger: "axis",
+        backgroundColor: dark ? "rgba(20,22,27,.95)" : "rgba(255,255,255,.97)",
+        borderColor: dark ? "rgba(245,246,247,.15)" : "rgba(91,97,110,.2)",
+        textStyle: { color: labelColor, fontSize: 12 },
+      },
+      grid: { left: 56, right: 16, top: 12, bottom: 24 },
+      xAxis: {
+        type: "category",
+        data: dates,
+        axisLine: { lineStyle: { color: axisColor } },
+        axisLabel: { color: subColor, fontSize: 10 },
+      },
+      yAxis: {
+        type: "value",
+        scale: true,
+        axisLine: { show: false },
+        splitLine: { lineStyle: { color: axisColor, type: "dashed" } },
+        axisLabel: { color: subColor, fontSize: 10 },
+      },
+      series: [{
+        type: "line",
+        data: vals,
+        showSymbol: false,
+        smooth: true,
+        lineStyle: { width: 2, color: "#16a34a" },
+        areaStyle: { color: "rgba(22,163,74,.12)" },
+        emphasis: { focus: "series" },
+      }],
+    }, true);
+  }
+
+  // 渲染经济指标区
+  function renderEcon() {
+    if (!econData || !econBody) return;
+    const groups = econData.groups || [];
+    const allSeries = econData.series || {};
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    const sparkColor = dark ? "#4ade80" : "#16a34a";
+
+    // 副标题 + 计数
+    if (econSub) {
+      const gen = econData.generated_at ? `更新于 ${econData.generated_at.slice(5, 16).replace("T", " ")}` : "";
+      econSub.textContent = `数据源 FRED（美国/全球） · ${gen}`;
+    }
+    if (econCount) econCount.textContent = `${Object.keys(allSeries).length} 项指标 · ${groups.length} 层`;
+
+    econBody.innerHTML = "";
+    const frag = document.createDocumentFragment();
+
+    // 大图区（选中指标时显示）
+    const detail = document.createElement("div");
+    detail.id = "econDetail";
+    detail.className = "econ-detail";
+    detail.hidden = true;
+    detail.innerHTML = `
+      <div class="econ-detail-head">
+        <span class="econ-detail-title" id="econDetailTitle"></span>
+        <span class="econ-detail-meta" id="econDetailMeta"></span>
+      </div>
+      <div id="econChart" class="econ-chart" style="height: 300px"></div>
+    `;
+    frag.appendChild(detail);
+
+    groups.forEach((g) => {
+      const sec = document.createElement("div");
+      sec.className = "econ-group";
+      const head = document.createElement("div");
+      head.className = "econ-group-head";
+      const ids = (g.series || []).filter((id) => allSeries[id]);
+      head.innerHTML = `<span class="econ-group-name">${g.name}</span><span class="econ-group-count">${ids.length} 项</span>`;
+      sec.appendChild(head);
+      const grid = document.createElement("div");
+      grid.className = "econ-grid";
+      ids.forEach((id) => {
+        const s = allSeries[id];
+        const card = econCard(s);
+        // 卡片内的 sparkline 用主题色（若卡上已带则覆盖一致）
+        grid.appendChild(card);
+      });
+      sec.appendChild(grid);
+      frag.appendChild(sec);
+    });
+
+    econBody.appendChild(frag);
+    renderEconDetail();
+  }
+
+  async function loadEcon() {
+    if (!econBody) return;
+    try {
+      const r = await fetch(`./data/econ-indicators.json${cb}`);
+      if (!r.ok) throw new Error(String(r.status));
+      const d = await r.json();
+      // 数据无变化则不重渲染（避免打断大图交互）
+      if (econData && econData.generated_at === d.generated_at) return;
+      econData = d;
+      renderEcon();
+    } catch (e) {
+      econBody.innerHTML = '<p style="color:var(--text-dim);padding:1rem;text-align:center;font-size:.8rem;">经济指标数据未就绪（服务器每日自动更新）</p>';
+    }
+  }
+
+  // 走势范围切换
+  if (econRangeSwitch) {
+    buildSwitch(econRangeSwitch, ECON_RANGES, econRange, (v) => {
+      econRange = v;
+      renderEconDetail();
+    });
+  }
+
   // ── 一键复制概要（含网站宣传）──────────────────────────────────────────────
   // 摘要清洗：去「摘要：」前缀/发布时间/小编水印/阅读量（与 daily_digest.clean_summary 对齐）
   function cleanSummary(s) {
@@ -882,6 +1109,7 @@
 
   // ── Init ───────────────────────────────────────────────────────────────────
   loadData();
+  loadEcon();
   setInterval(loadData, 10 * 60 * 1000);  // 全量刷新（含 history 重新拉取）
   setInterval(pollNew, POLL_MS);          // 新条目轮询（60s）
 })();

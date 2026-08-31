@@ -769,9 +769,90 @@ html[data-theme="dark"] .tech-feature { background: rgba(16, 185, 129, .1); }
 .board-graph .board-body { padding: .4rem .6rem .6rem; }
 .graph-chart { width: 100%; }
 
+/* ── 经济指标长期监控（2026-08-31） ─────────────────── */
+.board-econ .board-head { border-left: 3px solid #f59e0b; flex-wrap: wrap; gap: .5rem; }
+.econ-range-switch { display: flex; align-items: center; gap: .4rem; }
+.board-econ .board-body { padding: 1rem 1.2rem 1.2rem; }
+.econ-loading { color: var(--text-dim); font-size: .8rem; text-align: center; padding: 1.5rem 0; }
+
+.econ-detail {
+  margin-bottom: 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  padding: .8rem .9rem .5rem;
+}
+.econ-detail-head {
+  display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap;
+  margin-bottom: .3rem;
+}
+.econ-detail-title { font-size: .95rem; font-weight: 700; color: var(--text); }
+.econ-detail-meta { font-size: .72rem; color: var(--text-muted); }
+.econ-chart { width: 100%; }
+
+.econ-group { margin-bottom: 1.1rem; }
+.econ-group:last-child { margin-bottom: 0; }
+.econ-group-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: .55rem;
+}
+.econ-group-name { font-size: .85rem; font-weight: 700; color: var(--text); letter-spacing: -.01em; }
+.econ-group-count { font-size: .68rem; color: var(--text-dim); }
+
+.econ-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: .6rem;
+}
+.econ-card {
+  display: flex; flex-direction: column; gap: .2rem;
+  padding: .6rem .7rem .5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.econ-card:hover {
+  border-color: #f59e0b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 11, 13, .08);
+}
+.econ-card.active {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, .18);
+}
+.econ-card-name {
+  font-size: .72rem; color: var(--text-muted);
+  display: flex; align-items: baseline; gap: .3rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.econ-card-name em { font-style: normal; font-size: .62rem; color: var(--text-dim); }
+.econ-card-val {
+  font-size: 1.15rem; font-weight: 700; color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+  line-height: 1.2;
+}
+.econ-card-date { font-size: .62rem; color: var(--text-dim); }
+.econ-card-chg { font-size: .68rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.econ-card-chg.up { color: #e11d48; }
+.econ-card-chg.down { color: #0ea5e9; }
+html[data-theme="dark"] .econ-card-chg.up { color: #fb7185; }
+html[data-theme="dark"] .econ-card-chg.down { color: #38bdf8; }
+.econ-spark {
+  width: 100%; height: 26px;
+  margin-top: .15rem;
+  opacity: .85;
+}
+
 /* ── 新增元素响应式 ─────────────────────────────────── */
 @media (max-width: 640px) {
   .controls-row { gap: .5rem .9rem; }
   .list-controls { justify-content: space-between; width: 100%; }
   .board-graph .board-body { padding: .2rem; }
+  .econ-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: .45rem; }
+  .board-econ .board-body { padding: .8rem .7rem .9rem; }
 }

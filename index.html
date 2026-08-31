@@ -131,6 +131,25 @@
           <div id="graphChart" class="graph-chart" style="height: 420px"></div>
         </div>
       </section>
+
+      <!-- 区域四：最底部——经济指标长期监控（2026-08-31 沃什产业链框架，FRED 数据源） -->
+      <section class="board board-econ">
+        <div class="board-head">
+          <div class="board-title">
+            <span class="board-icon">📊</span>
+            <h2>经济指标</h2>
+            <span class="board-sub" id="econSub"></span>
+          </div>
+          <div class="econ-range-switch">
+            <span class="filter-label">走势范围</span>
+            <div class="mode-switch" id="econRangeSwitch"></div>
+          </div>
+          <span class="board-count" id="econCount"></span>
+        </div>
+        <div class="board-body" id="econBody">
+          <p class="econ-loading" id="econLoading">经济指标加载中...</p>
+        </div>
+      </section>
     </main>
 
     <!-- 反馈弹层（2026-08-27 反馈渠道方案） -->
