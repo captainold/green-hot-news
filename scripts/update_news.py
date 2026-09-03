@@ -147,6 +147,30 @@ def _title_prefix_key(title: str) -> str:
     return _title_dedup_key(title)[:30]
 
 
+def _diff_multi_block(a: str, b: str) -> bool:
+    """标题差异散布判定（2026-09-03 去重治理 P1 模板闸门）。
+
+    difflib ratio 会被"模板标题"骗过：artificialanalysis 等站同骨架不同实体
+    （"Muse Spark 1.3 Models - ..." vs "Gemini 3.8 Flash Models - ..."）ratio
+    可 >0.8，实为不同新闻（模型评测）；jp_anre 年度预算（令和7 vs 8 年度）、
+    月度运行报告同理。而同文变体（翻译措辞/标点/语序差异）的差异点散布全文。
+    判定：非相同片段若被 ≥3 字符的相同段隔开成多块 → 散布（判同文变体）；
+    差异集中单一连续块（实体/年度/型号替换，间隙 <3 字符）→ 模板（判不同文）。
+    """
+    import difflib
+    a, b = (a or "").strip(), (b or "").strip()
+    if len(a) < 12 or len(b) < 12:
+        return True
+    sm = difflib.SequenceMatcher(None, a, b, autojunk=False)
+    ops = [o for o in sm.get_opcodes() if o[0] != "equal"]
+    if len(ops) < 2:
+        return False  # 单一连续差异块 → 模板/版本替换，不视为重复
+    for prev, cur in zip(ops, ops[1:]):
+        if cur[1] - prev[2] >= 3:  # 两侧差异被 ≥3 字符相同段隔开
+            return True
+    return False
+
+
 def create_session() -> requests.Session:
     session = requests.Session()
     session.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"})
@@ -3942,18 +3966,62 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
             existing = (json.loads(path.read_text(encoding="utf-8")) or {}).get("items", []) or []
         except Exception:
             existing = []
+    def _item_time(it: dict):
+        ts = it.get("published_at") or it.get("first_seen_at") or ""
+        return parse_iso(ts) if ts else None
+
     seen: dict[str, dict] = {}
     seen_prefix: dict[str, list[str]] = {}  # 2026-08-24: 前缀桶 → 已见标题（相似度去重候选）
+    # 2026-09-03 去重治理 P1：同 site + ±72h 时间窗相似去重。
+    # 背景：前缀桶 _title_prefix_key 取规范化标题前 30 字符，同事件变体标题常在第 3
+    # 字即分岔（实测 2026-09-02 美司法部 NYT v OpenAI 意见书：AIHOT 三条
+    # "介入纽约时报诉 OpenAI 案…"/"就 OpenAI 版权诉讼…"/"在 OpenAI 与纽约时报版权
+    # 诉讼中…" 分属 3 桶永不互相比较，其中两条 difflib 0.806 本应命中）→ 同事件
+    # 三条 75 分连排动态页。放宽：同 site_id 且时间 ±72h 的标题互相做相似度比较，
+    # 保留先收录版本（existing/new 均生效，存量重复随下轮 merge 自动收敛）。
+    _DEDUP_WINDOW_H = 72
+    # P1 模板站黑名单（2026-09-03）：这些站标题 = 固定骨架 + 实体名/年度替换
+    # （artificialanalysis 每模型一页 "X Models - ...Comparison"、jp_anre 令和
+    # 7/8 年度预算通知），相似≠同文，仅关闭 P1 相似合并；精确 key/URL 去重不受影响
+    _P1_TEMPLATE_SITES = {"artificialanalysis", "jp_anre"}
+    # 模板标题特征：雪球股票页模板（不同股票名+代码，实为不同页面）
+    _P1_TEMPLATE_TITLE_MARKS = ("股票股价_",)
+    _seen_site_recent: dict[str, list[tuple[datetime, str]]] = {}
+
+    def _site_recent_hit(site: str, ts: datetime | None, title: str) -> bool:
+        if not site or ts is None:
+            return False
+        if site in _P1_TEMPLATE_SITES:
+            return False
+        if any(_m in title for _m in _P1_TEMPLATE_TITLE_MARKS):
+            return False
+        _win = timedelta(hours=_DEDUP_WINDOW_H)
+        for _cts, _ctitle in _seen_site_recent.get(site, ()):
+            if (abs(_cts - ts) <= _win and _titles_similar(title, _ctitle)
+                    and _diff_multi_block(title, _ctitle)):
+                return True
+        return False
+
+    def _remember_site_title(site: str, ts: datetime | None, title: str) -> None:
+        if not site or ts is None or not title:
+            return
+        _seen_site_recent.setdefault(site, []).append((ts, title))
+
     for it in existing:
         u = it.get("url") or ""
         # 2026-08-19：按规范化标题去重（Google News 聚合 URL 每次抓取不同，
         # 按 url 会累积同一条新闻的多份副本——实测日本环境省 x8 重复）
         k = _title_dedup_key(it.get("title", ""))
         if k and k not in seen:
-            seen[k] = it
             _t = it.get("title", "") or ""
+            # P1：存量内部同 site 时间窗变体合并（保留先收录版本）
+            _site = it.get("site_id") or it.get("site_name") or ""
+            if _site_recent_hit(_site, _item_time(it), _t):
+                continue
+            seen[k] = it
             _pfx = _title_prefix_key(_t)
             seen_prefix.setdefault(_pfx, []).append(_t)
+            _remember_site_title(_site, _item_time(it), _t)
         elif u and not k:
             seen[u] = it
     added = 0
@@ -3966,17 +4034,18 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
             _pfx = _title_prefix_key(_t)
             if any(_titles_similar(_t, _cand) for _cand in seen_prefix.get(_pfx, [])):
                 continue
+            # P1：同 site 时间窗措辞变体（跨批重复收录的主战场）
+            _site = it.get("site_id") or it.get("site_name") or ""
+            if _site_recent_hit(_site, _item_time(it), _t):
+                continue
             seen[k] = it
             seen_prefix.setdefault(_pfx, []).append(_t)
+            _remember_site_title(_site, _item_time(it), _t)
             added += 1
         elif u and not k and u not in seen:
             seen[u] = it
             added += 1
     cutoff = now - timedelta(days=62)
-
-    def _item_time(it: dict):
-        ts = it.get("published_at") or it.get("first_seen_at") or ""
-        return parse_iso(ts) if ts else None
 
     items = [it for it in seen.values() if (_item_time(it) or now) >= cutoff]
     # 统一清理历史条目的标题尾部源名后缀，并回填缺失的 title_zh（非中文才翻译，
