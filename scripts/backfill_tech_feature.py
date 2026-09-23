@@ -144,10 +144,14 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0, help="只处理前 N 条（0=全量）")
     ap.add_argument("--dry-run", action="store_true", help="只统计候选，不提取")
+    ap.add_argument("--notes-dir", default="数据库",
+                    help="素材目录名（Notes/ 下），默认 数据库；P2 合并后库为 素材库")
     args = ap.parse_args()
 
     cache = load_cache()
-    qmd_files = sorted(NOTES_DIR.glob("*.md"))
+    notes_dir = ROOT / "Notes" / args.notes_dir
+    qmd_files = sorted(notes_dir.rglob("*.md"))
+    print(f"扫描目录: Notes/{args.notes_dir} → {len(qmd_files)} 个 md", flush=True)
 
     # 收集候选
     candidates: list[dict] = []

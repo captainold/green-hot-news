@@ -122,7 +122,7 @@ def main() -> int:
                 broken[t.strip()] += 1
                 if len(broken_by_file[rel]) < 5:
                     broken_by_file[rel].append(t.strip())
-        if p.parent == SC or SC in p.parents:
+        if (p.parent == SC or SC in p.parents) and not p.name.startswith("ai-index"):
             sc_total += 1
             if not fm_scalar(fm, "id"):
                 sc_no_id += 1
@@ -177,7 +177,7 @@ def main() -> int:
         if inbound.get(key, 0) == 0:
             orphans.append(key)
     print(f"\n孤立节点（0 入链）: {len(orphans)}")
-    for o in orphans[:15]:
+    for o in orphans[:30]:
         print("   ", o)
 
     return 1 if (total_real or dup_ids or rel_bad or sc_no_id) else 0
