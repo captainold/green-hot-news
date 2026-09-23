@@ -26,3 +26,9 @@ _deploy_cnp0.bat
 
 # Obsidian Git 冲突残留（插件生成，冲突解决后无需入库）
 conflict-files-obsidian-git.md
+
+# 本地缓存与备份（整理项目时归集的一次性备份/清单/测试产物）
+cache/
+
+# Excalidraw 手绘工作区（个人 vault 产物，不入主仓库）
+Excalidraw/
