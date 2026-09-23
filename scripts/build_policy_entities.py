@@ -132,6 +132,7 @@ def main() -> int:
         POL_DIR.mkdir(parents=True, exist_ok=True)
 
     written: list[tuple[str, str]] = []
+    entries: list[tuple[str, str, str]] = []   # (pid, title, short) —— 导航表用全量，不随跳过而变
     for it in picked:
         title = (it.get("title_zh") or it.get("title") or "").strip()
         region = it.get("region") or "中国"
@@ -223,6 +224,7 @@ def main() -> int:
             "",
         ]
         path = POL_DIR / f"{title[:80]}.md"
+        entries.append((pid, title, short))
         exists = path.exists()
         if exists and not args.force:
             continue
@@ -232,12 +234,12 @@ def main() -> int:
         print(f"  {'重建' if exists else '新建'} {pid}")
 
     # 导航页条目列表（标记块整体刷新）
-    if args.apply and written:
+    if args.apply and entries:
         text = WIKI_ROOT.read_text(encoding="utf-8")
         block = ["<!-- pol-entities:start -->", "", "### 重要政策条目（P4 首批，自动生成）", "",
-                 "| 政策 | 地区 | 素材 |", "|------|------|------|"]
-        for pid, title in written:
-            block.append(f"| [[{title[:80]}|{title[:36]}]] | {pid.split('/')[1][:2]} | `{pid}` |")
+                 "| 政策 | 地区 | 实体 id |", "|------|------|--------|"]
+        for pid, title, short in entries:
+            block.append(f"| [[{title[:80]}|{short}]] | {pid.split('/')[1][:2]} | `{pid}` |")
         block += ["", "<!-- pol-entities:end -->", ""]
         new_block = "\n".join(block)
         if "<!-- pol-entities:start -->" in text:
@@ -247,7 +249,7 @@ def main() -> int:
             anchor = "## 板块结构（六段模板）"
             text = text.replace(anchor, new_block + "\n" + anchor)
         WIKI_ROOT.write_text(text, encoding="utf-8")
-        print(f"📚 导航页条目列表已刷新（{len(written)} 条）")
+        print(f"📚 导航页条目列表已刷新（{len(entries)} 条）")
 
     print(f"\n{'写入' if args.apply else '待写入'} {len(written)} 个政策实体页 → {POL_DIR}")
     return 0
