@@ -24,8 +24,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-DIM_ICON = {"政策": "🏛️", "产业": "🔋", "市场信号": "💰", "AI": "🤖"}
-DIM_ORDER = ["政策", "产业", "市场信号", "AI"]
+DIM_ICON = {"政策": "🏛️", "创新": "🧪", "产业": "⚙️"}
+DIM_ORDER = ["政策", "创新", "产业"]
 TOTAL_SITES = 47  # 雷达信源总数（README/信息收集目标列表同步维护）
 
 
@@ -176,7 +176,7 @@ def build_digest(items: list[dict], top: int, min_score: int, generated_at: str,
     dist = " / ".join(f"{DIM_ICON[d]} {d} {len(by_dim.get(d, []))}" for d in DIM_ORDER if by_dim.get(d))
     lines.append(f"📊 分布：{dist}")
     lines.append("")
-    lines.append(f"—— 绿色低碳动态雷达 · {TOTAL_SITES} 信源 · 政策/技术/金融/AI科技 四维 ——")
+    lines.append(f"—— 绿色低碳动态雷达 · {site_count} 信源 · 政策/创新/产业 三层 ——")
     return "\n".join(lines).rstrip() + "\n"
 
 
