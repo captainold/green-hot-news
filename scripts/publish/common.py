@@ -75,7 +75,8 @@ def clean_title(title: str) -> str:
     if "摘要：" in t:
         t = t.split("摘要：", 1)[0].strip()
     t = re.sub(r"[\u4e00-\u9fff]{0,6}(小编|编辑)\s*[^\u4e00-\u9fff]*\d*[天小时分]?前\s*$", "", t)
-    t = re.sub(r"\s*[-–—]\s*[^，。；！？、\s]{2,24}$", "", t).strip()
+    # 去尾部 " - 站点名"（站名可含空格，如 " - PV Tech"；上限 30 字防误截长副标题）
+    t = re.sub(r"\s*[-–—]\s*[^，。；！？、]{2,30}$", "", t).strip()
     return t
 
 

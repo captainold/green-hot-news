@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -31,7 +32,9 @@ from common import ROOT, out_dir, today_str, utf8_console
 def run_step(script: str, *extra: str) -> bool:
     cmd = [sys.executable, str(Path(__file__).parent / script), *extra]
     print(f"\n▶ {' '.join(cmd)}")
-    r = subprocess.run(cmd, cwd=ROOT)
+    # UTF-8 输出：防 Windows GBK 控制台被 emoji print 绊倒（update_news 结尾 print ✅ 曾致 exit 1）
+    env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    r = subprocess.run(cmd, cwd=ROOT, env=env)
     return r.returncode == 0
 
 
