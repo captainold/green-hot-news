@@ -7,7 +7,7 @@
 
 流程：
 1. 读 tech-feature-index.json 缓存（url → tech_feature，避免重复调 LLM）
-2. 遍历 Notes/数据库/*.qmd，解析 frontmatter + ## 正文 节
+2. 遍历 Notes/数据库/*.md，解析 frontmatter + ## 正文 节
 3. 候选 = layer∈{Layer2,Layer3} 且 tech_feature∈{空,"无"} 且正文非空 且不在缓存
 4. 并发 4 调 extract_tech_feature(title, summary, content) 重新提取
 5. 提取到特征（非「无」非空）→ 回填 qmd frontmatter + 写缓存
@@ -147,7 +147,7 @@ def main() -> int:
     args = ap.parse_args()
 
     cache = load_cache()
-    qmd_files = sorted(NOTES_DIR.glob("*.qmd"))
+    qmd_files = sorted(NOTES_DIR.glob("*.md"))
 
     # 收集候选
     candidates: list[dict] = []

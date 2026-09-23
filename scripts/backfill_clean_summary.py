@@ -12,7 +12,7 @@
   data/history.json + latest-24h.json + latest-24h-all.json：
     - url 含 news.google.com/rss/articles 的条目 → summary 置空（伪摘要无信息量）
     - 其他条目 → summary 重跑 _clean_summary（剥残留 HTML 标签）
-  Notes/数据库/*.qmd：
+  Notes/数据库/*.md：
     - url 含 news.google.com/rss/articles 的 → 删除整个「## 摘要」段
     - 其他 → 「## 摘要」段内容重跑 _clean_summary
 
@@ -95,7 +95,7 @@ def backfill_qmd(qmd_dir: Path) -> int:
             return m.group(0)
         return m.group(1) + cleaned + "\n"
 
-    for f in sorted(qmd_dir.glob("*.qmd")):
+    for f in sorted(qmd_dir.glob("*.md")):
         try:
             txt = f.read_text(encoding="utf-8", errors="ignore")
         except Exception:
@@ -120,7 +120,7 @@ def main() -> int:
     ap.add_argument("--qmd-only", action="store_true", help="只回填 qmd 摘要段落")
     args = ap.parse_args()
 
-    do_json = not args.qmd_only
+    do_json = not args.md_only
     do_qmd = not args.json_only
 
     if do_json:

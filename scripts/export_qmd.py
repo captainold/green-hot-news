@@ -1,7 +1,7 @@
-"""qmd 导出器——把 data/*.json 的条目导出为 .qmd 数据库记录（护城河：本地 Obsidian 多维检索）。
+"""qmd 导出器——把 data/*.json 的条目导出为 .md 数据库记录（护城河：本地 Obsidian 多维检索）。
 
 架构（2026-08-24 老温定稿）：**qmd 为主格式，md 为副本**。
-- 主：Notes/数据库/*.qmd —— 多维标签 frontmatter + 富文本全文（图片/表格/结构）+ 技术特征
+- 主：Notes/数据库/*.md —— 多维标签 frontmatter + 富文本全文（图片/表格/结构）+ 技术特征
 - 副本：Notes/数据库/*.md —— 内容相同，兼容 Obsidian 原生生态（插件/工具只认 .md 的场景）
 - 图片附件：Notes/数据库/attachments/（md5 命名，qmd/md 内相对路径引用）
 
@@ -165,13 +165,9 @@ def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
 
 
 def export(input_path: Path, output_dir: Path, force: bool = False,
-           limit: int = 0, md_copy: bool = False,
+           limit: int = 0,
            only_sites: Optional[set] = None) -> int:
-    """导出条目为 qmd（qmd 主格式），返回写入的文件数。
-
-    md_copy=True（2026-08-24 起默认关闭）：额外写一份 .md 副本。
-    老温定稿「qmd 为主格式」——Obsidian Quarto 插件已可用，md 副本
-    会在 Obsidian 文件浏览器造成同名双文件干扰，默认不再生成。
+    """导出条目为 .md（2026-09-15 起统一 .md，原 .qmd），返回写入的文件数。
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -187,7 +183,7 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
 
     # 已存在的 qmd 文件 → 按 url 去重；已有正文的跳过（幂等）
     existing_urls: set[str] = set()
-    for f in output_dir.glob("*.qmd"):
+    for f in output_dir.glob("*.md"):
         try:
             text = f.read_text(encoding="utf-8")
             m = re.search(r'^url:\s*"([^"]+)"', text, re.MULTILINE)
@@ -207,7 +203,7 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
             continue
         url = item.get("url", "")
         if url and url in existing_urls:
-            fname = f"{_date_of(item)} {_safe_filename(item.get('title', ''))}.qmd"
+            fname = f"{_date_of(item)} {_safe_filename(item.get('title', ''))}.md"
             fpath = output_dir / fname
             if not force and fpath.exists():
                 txt = fpath.read_text(encoding="utf-8", errors="ignore")
@@ -240,12 +236,9 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
                 content, n_img = "", 0
             if not content:
                 no_body += 1
-            fname = f"{_date_of(it)} {_safe_filename(it.get('title', ''))}.qmd"
+            fname = f"{_date_of(it)} {_safe_filename(it.get('title', ''))}.md"
             qmd_text = build_qmd(it, content)
             (output_dir / fname).write_text(qmd_text, encoding="utf-8")
-            if md_copy:
-                # md 副本（默认关闭——Obsidian 同名双文件干扰，见 export docstring）
-                (output_dir / fname.replace(".qmd", ".md")).write_text(qmd_text, encoding="utf-8")
             if it.get("url"):
                 existing_urls.add(it["url"])
             written += 1
@@ -256,7 +249,7 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
     return written
 
 
-def backfill_images(output_dir: Path, md_copy: bool = False) -> int:
+def backfill_images(output_dir: Path) -> int:
     """补图模式（2026-08-24）：对已有正文的 qmd 只做图片下载补全。
 
     首次全量导出时部分源站图 404/超时失败（保留原 URL）——重跑正文浪费，
@@ -269,7 +262,7 @@ def backfill_images(output_dir: Path, md_copy: bool = False) -> int:
 
     output_dir = Path(output_dir)
     att_dir = output_dir / "attachments"
-    files = [f for f in output_dir.glob("*.qmd")
+    files = [f for f in output_dir.glob("*.md")
              if re.search(r"!\[[^\]]*\]\(https?://", f.read_text(encoding="utf-8", errors="ignore"))]
     if not files:
         print("  无待补图 qmd（正文无 http 图片引用）")
@@ -293,10 +286,6 @@ def backfill_images(output_dir: Path, md_copy: bool = False) -> int:
             return 0
         new_text = text[:m.end()] + new_body
         f.write_text(new_text, encoding="utf-8")
-        if md_copy:
-            md = f.with_suffix(".md")
-            if md.exists():
-                md.write_text(new_text, encoding="utf-8")
         return n
 
     total = 0
@@ -331,7 +320,7 @@ def refresh_frontmatter(input_path: Path, output_dir: Path) -> int:
     refreshed = 0
     skipped_no_fm = 0
     fm_re = re.compile(r"^---\n.*?\n---\n", re.DOTALL | re.MULTILINE)
-    for f in sorted(output_dir.glob("*.qmd")):
+    for f in sorted(output_dir.glob("*.md")):
         try:
             text = f.read_text(encoding="utf-8", errors="ignore")
         except Exception:
@@ -363,7 +352,7 @@ def refresh_frontmatter(input_path: Path, output_dir: Path) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="qmd 数据库导出器（qmd 主 + md 副本 + 富文本全文）")
+    ap = argparse.ArgumentParser(description="数据库导出器（.md + 富文本全文）")
     ap.add_argument("--input", default=str(ROOT / "data" / "latest-24h.json"))
     ap.add_argument("--output", default=str(ROOT / "Notes" / "数据库"))
     ap.add_argument("--force", action="store_true", help="重新抓取正文（覆盖已有）")
@@ -372,15 +361,13 @@ def main() -> int:
                     help="补图模式：只对已有正文的 qmd 下载图片（不重抓正文）")
     ap.add_argument("--refresh-frontmatter", action="store_true",
                     help="仅刷新 frontmatter：按 url 重建 YAML 多维标签，正文保留（不重抓）")
-    ap.add_argument("--md-copy", action="store_true",
-                    help="额外写 .md 副本（默认关闭——Obsidian 同名双文件干扰）")
     ap.add_argument("--only-sites", default="",
                     help="只导出指定 site_id（逗号分隔，如 us_doe,openai）——定向重导出/回填用")
     args = ap.parse_args()
 
     out = Path(args.output)
     if args.backfill_images:
-        total = backfill_images(out, md_copy=args.md_copy)
+        total = backfill_images(out)
         print(f"完成，共补图 {total} 张")
         return 0
     if args.refresh_frontmatter:
@@ -388,7 +375,7 @@ def main() -> int:
         print(f"完成，共刷新 {total} 个 qmd frontmatter")
         return 0
     only = {s.strip() for s in args.only_sites.split(",") if s.strip()}
-    total = export(Path(args.input), out, args.force, args.limit, args.md_copy,
+    total = export(Path(args.input), out, args.force, args.limit,
                    only_sites=only or None)
     print(f"完成，共写入 {total} 条 qmd")
     return 0

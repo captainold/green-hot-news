@@ -21,7 +21,7 @@ def main() -> int:
     targets_checked = 0
     targets_missing = 0
     samples = []
-    for f in DB.glob("*.qmd"):
+    for f in DB.glob("*.md"):
         txt = f.read_text(encoding="utf-8", errors="ignore")
         if not txt.startswith("---"):
             continue
@@ -44,7 +44,7 @@ def main() -> int:
             tg = re.findall(r"\[\[([^\]]+)\]\]", txt)
             for t in tg:
                 targets_checked += 1
-                if not (DB / (t + ".qmd")).exists():
+                if not (DB / (t + ".md")).exists():
                     targets_missing += 1
         if len(samples) < 3 and items:
             samples.append((f.name[:30], items[:4]))

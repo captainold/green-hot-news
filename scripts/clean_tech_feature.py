@@ -70,7 +70,7 @@ def main() -> int:
 
     # 1. 清理 qmd
     changes: list[tuple[str, str, str]] = []  # (file, old, new)
-    for fp in sorted(NOTES_DIR.glob("*.qmd")):
+    for fp in sorted(NOTES_DIR.glob("*.md")):
         r = process_qmd(fp)
         if r:
             old, new = r
@@ -79,7 +79,7 @@ def main() -> int:
     # 2. 同步 data JSON（按 url → 清理后的值）
     #    先收集 qmd 里 url → new tf（从 qmd frontmatter 读 url）
     url_to_new: dict[str, str] = {}
-    for fp in sorted(NOTES_DIR.glob("*.qmd")):
+    for fp in sorted(NOTES_DIR.glob("*.md")):
         txt = fp.read_text(encoding="utf-8", errors="ignore")
         m_url = re.search(r'^url:\s*"?([^"\n]+)"?\s*$', txt, re.M)
         m_tf = _RE_TF.search(txt)
@@ -117,7 +117,7 @@ def main() -> int:
         print()
 
     if args.apply:
-        for fp in sorted(NOTES_DIR.glob("*.qmd")):
+        for fp in sorted(NOTES_DIR.glob("*.md")):
             txt = fp.read_text(encoding="utf-8", errors="ignore")
             m = _RE_TF.search(txt)
             if not m:

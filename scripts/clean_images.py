@@ -38,7 +38,7 @@ def main() -> int:
     removed_total = 0
     kept_total = 0
     files_changed = 0
-    for fp in sorted(NOTES_DIR.glob("*.qmd")):
+    for fp in sorted(NOTES_DIR.glob("*.md")):
         try:
             txt = fp.read_text(encoding="utf-8", errors="ignore")
         except Exception:
@@ -67,7 +67,7 @@ def main() -> int:
 
     # 2. 删孤儿附件（清理后不再被任何 qmd 引用的 attachments 文件）
     referenced: set[str] = set()
-    for fp in NOTES_DIR.glob("*.qmd"):
+    for fp in NOTES_DIR.glob("*.md"):
         try:
             txt = fp.read_text(encoding="utf-8", errors="ignore")
         except Exception:

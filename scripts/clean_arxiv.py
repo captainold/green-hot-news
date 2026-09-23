@@ -37,7 +37,7 @@ def main() -> int:
     changed = 0
     total_arxiv = 0
     removed_lines = 0
-    for fp in sorted(NOTES_DIR.glob("*.qmd")):
+    for fp in sorted(NOTES_DIR.glob("*.md")):
         try:
             txt = fp.read_text(encoding="utf-8", errors="ignore")
         except Exception:

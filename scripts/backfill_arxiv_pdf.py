@@ -48,7 +48,7 @@ def main() -> int:
     args = ap.parse_args()
 
     candidates: list[tuple[Path, str, int]] = []  # (file, url, score)
-    for fp in sorted(NOTES_DIR.glob("*.qmd")):
+    for fp in sorted(NOTES_DIR.glob("*.md")):
         try:
             txt = fp.read_text(encoding="utf-8", errors="ignore")
         except Exception:

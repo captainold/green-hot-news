@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AI 互打双链接（2026-08-27 P3）：给 Notes/数据库/*.qmd 生成相关条目双链。
+"""AI 互打双链接（2026-08-27 P3）：给 Notes/素材库/*.md 生成相关条目双链。
 
 流程：规则候选（标签/细类相似度 top N）→ LLM 精选（SiliconFlow DeepSeek-V4-Pro
 从候选中选 3-5 条最相关）→ 写 qmd frontmatter `related` 字段 + 正文「相关条目」段。
@@ -31,7 +31,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import requests  # noqa: E402
 
 HISTORY = ROOT / "data" / "history.json"
-QMD_DIR = ROOT / "Notes" / "数据库"
+QMD_DIR = ROOT / "Notes" / "素材库"
 CACHE_PATH = ROOT / "data" / "qmd-links-cache.json"
 
 SF_BASE = "https://api.siliconflow.cn/v1"
@@ -85,13 +85,13 @@ def load_items() -> list[dict]:
 def load_qmd_map() -> tuple[dict[str, Path], dict[str, Path]]:
     """返回 (url→qmd 文件路径, 标题→qmd 文件路径)。
 
-    qmd 文件名 = "<日期> <safe标题>.qmd"（带日期前缀），Obsidian [[链接]]
+    qmd 文件名 = "<日期> <safe标题>.md"（带日期前缀），Obsidian [[链接]]
     必须指向完整文件名（不含扩展名）才能解析；title→filename 映射用于
     把 related 的标题转成链接目标（2026-08-27 修复：曾只写标题导致红链）。
     """
     m: dict[str, Path] = {}
     by_title: dict[str, Path] = {}
-    for f in QMD_DIR.glob("*.qmd"):
+    for f in QMD_DIR.glob("*.md"):
         try:
             text = f.read_text(encoding="utf-8", errors="ignore")
             mm = re.search(r'^url:\s*"([^"]+)"', text, re.MULTILINE)
@@ -191,7 +191,7 @@ def update_qmd(path: Path, related_titles: list[str], by_title: dict[str, Path],
                force: bool = False) -> bool:
     """frontmatter 加 related 字段（标题转完整文件名链接）+ 正文「相关条目」段。
 
-    链接目标 = 文件名去 .qmd（含日期前缀），找不到映射的标题跳过（防红链）。
+    链接目标 = 文件名去 .md（含日期前缀），找不到映射的标题跳过（防红链）。
     force=True 时重写已有 related（修正链接目标用）。返回是否修改。
     """
     text = path.read_text(encoding="utf-8", errors="ignore")
@@ -211,13 +211,12 @@ def update_qmd(path: Path, related_titles: list[str], by_title: dict[str, Path],
                     break
         if f is None:
             continue
-        # 2026-08-27 修复：Obsidian wikilink 解析器对 [[xxx]] 只尝试 .md 扩展名，
-        # 不认 registerExtensions 注册的 .qmd（Obsidian 1.13.7 实测）——链接必须
-        # 显式带扩展名 [[xxx.qmd]]（wikilink 支持指向任意文件，带扩展名直接匹配）
-        targets.append(f.name)
+        # 2026-09-15：库已统一 .md，wikilink [[xxx]] 默认解析 .md，无需带扩展名。
+        # targets 存 stem（去扩展名），related 字段存 stem + ".md"。
+        targets.append(f.stem)
     if not targets:
         return False
-    rel_yaml = "[" + ", ".join(f'"{t}"' for t in targets) + "]"
+    rel_yaml = "[" + ", ".join(f'"{t}.md"' for t in targets) + "]"
     # frontmatter 末尾（第二个 --- 前）插入 related；
     # 先删已有 related 行（防 force 重跑重复插入——2026-08-27 修复重复键）
     parts = text.split("---", 2)
