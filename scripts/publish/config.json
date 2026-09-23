@@ -1,0 +1,15 @@
+{
+  "selection": {
+    "min_score_a": 70,
+    "min_count": 8,
+    "max_per_dim": 6,
+    "per_site": 2,
+    "max_age_days": 7
+  },
+  "wechat": {
+    "appid": "",
+    "appsecret": "",
+    "author": "绿色低碳动态雷达"
+  },
+  "schedule_note": "每日 08:35 由会话定时任务驱动 daily_publish.py --all；数据由服务器 30 分钟 timer 持续刷新，本地 update_news.py 仅兜底"
+}

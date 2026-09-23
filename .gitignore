@@ -32,3 +32,7 @@ cache/
 
 # Excalidraw 手绘工作区（个人 vault 产物，不入主仓库）
 Excalidraw/
+
+# 每日发布工作流：本地产物与密钥（发布素材按天生成的，不入库；config.local.json 存公众号密钥）
+data/publish/
+scripts/publish/config.local.json
