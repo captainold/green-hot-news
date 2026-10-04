@@ -504,7 +504,8 @@ def refresh_frontmatter(input_path: Path, output_dir: Path) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description="数据库导出器（.md + 富文本全文）")
     ap.add_argument("--input", default=str(ROOT / "data" / "latest-24h.json"))
-    ap.add_argument("--output", default=str(ROOT / "Notes" / "数据库"))
+    ap.add_argument("--output", default=str(ROOT / "Notes" / "素材库"),
+                    help="输出目录；默认 Notes/素材库（2026-10-04 切库）。旧扁平布局请显式传 Notes/数据库")
     ap.add_argument("--force", action="store_true", help="重新抓取正文（覆盖已有）")
     ap.add_argument("--limit", type=int, default=0, help="只导出前 N 条（小批验证用）")
     ap.add_argument("--backfill-images", action="store_true",
@@ -521,6 +522,10 @@ def main() -> int:
     out = Path(args.output)
     if args.material and args.output == str(ROOT / "Notes" / "数据库"):
         out = ROOT / "Notes" / "素材库"
+    elif not args.material and out == ROOT / "Notes" / "素材库":
+        # 2026-10-04：默认输出已是素材库，不自动开分层会把扁平文件写进素材库根目录
+        args.material = True
+        print("ℹ️ 输出为 Notes/素材库 → 自动启用 --material 分层布局")
     if args.backfill_images:
         total = backfill_images(out)
         print(f"完成，共补图 {total} 张")

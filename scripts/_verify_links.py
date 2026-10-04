@@ -1,11 +1,14 @@
-"""双链接结果验证（2026-08-27）：分布统计 + 链接目标存在性抽查。"""
+"""双链接结果验证（2026-08-27）：分布统计 + 链接目标存在性抽查。
+
+2026-10-04 切库后扫描目标改为 `Notes/素材库`（分层，rglob）。
+"""
 import json
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DB = ROOT / "Notes" / "数据库"
+DB = ROOT / "Notes" / "素材库"
 CACHE = ROOT / "data" / "qmd-links-cache.json"
 
 
@@ -21,7 +24,7 @@ def main() -> int:
     targets_checked = 0
     targets_missing = 0
     samples = []
-    for f in DB.glob("*.md"):
+    for f in DB.rglob("*.md"):
         txt = f.read_text(encoding="utf-8", errors="ignore")
         if not txt.startswith("---"):
             continue

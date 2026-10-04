@@ -5,8 +5,11 @@
 39 篇碳交易网笔记正文被清空。本脚本从每篇 frontmatter 的 url 重新
 抓取正文 + summary，写回 ## 正文 段（保留原 frontmatter 和标题）。
 
+2026-10-04 切库后路径：`Notes/素材库/媒体/中国碳交易网`（退役 `Notes/媒体库` 已归档）；
+`--dir` 可指向任意素材库子目录做同站点批量补正文。
+
 用法:
-  python3.11 scripts/refetch_bodies.py [--dry-run]
+  python3.11 scripts/refetch_bodies.py [--dry-run] [--dir Notes/素材库/媒体/中国碳交易网]
 """
 import argparse
 import re
@@ -17,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from article_content import fetch_article  # noqa: E402
 
-TARGET_DIR = Path("Notes/媒体库/中国碳交易网")
+TARGET_DIR = Path(__file__).resolve().parent.parent / "Notes" / "素材库" / "媒体" / "中国碳交易网"
 MIN_BODY = 50
 
 
@@ -93,9 +96,11 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--dir", default=str(TARGET_DIR),
+                    help=f"目标目录（默认 {TARGET_DIR}；切库后素材库路径）")
     args = ap.parse_args()
 
-    files = sorted(TARGET_DIR.rglob("*.md"))
+    files = sorted(Path(args.dir).rglob("*.md"))
     targets = find_empty(files)
     print(f"正文为空/极短: {len(targets)} 篇")
     if args.dry_run:

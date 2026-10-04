@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import tech_feature as tf  # noqa: E402
 
-NOTES_DIR = ROOT / "Notes" / "数据库"
+NOTES_DIR = ROOT / "Notes" / "素材库"
 CACHE_PATH = ROOT / "data" / "tech-feature-index.json"
 CONTENT_MAX = 2000
 
@@ -144,8 +144,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0, help="只处理前 N 条（0=全量）")
     ap.add_argument("--dry-run", action="store_true", help="只统计候选，不提取")
-    ap.add_argument("--notes-dir", default="数据库",
-                    help="素材目录名（Notes/ 下），默认 数据库；P2 合并后库为 素材库")
+    ap.add_argument("--notes-dir", default="素材库",
+                    help="素材目录名（Notes/ 下），默认 素材库（2026-10-04 切库；退役 数据库 已归档）")
     args = ap.parse_args()
 
     cache = load_cache()

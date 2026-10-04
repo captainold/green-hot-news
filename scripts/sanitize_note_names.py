@@ -40,7 +40,7 @@ def sanitize(stem: str) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true")
-    ap.add_argument("--roots", default="素材库,数据库,政策库,媒体库")
+    ap.add_argument("--roots", default="素材库")
     args = ap.parse_args()
 
     renames: list[tuple[Path, Path]] = []

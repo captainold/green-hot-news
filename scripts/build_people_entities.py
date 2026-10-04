@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 NOTES = ROOT / "Notes"
 ENT_DIR = NOTES / "实体" / "人物"
 UPDATE_NEWS = ROOT / "scripts" / "update_news.py"
-SCAN_ROOTS = ["素材库", "政策库", "数据库", "媒体库"]
+SCAN_ROOTS = ["素材库"]  # 2026-10-04 切库：退役 政策库/数据库/媒体库 已归档
 
 
 def parse_person_rules() -> dict[str, str]:

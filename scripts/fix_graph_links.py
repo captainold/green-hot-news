@@ -56,7 +56,7 @@ def main() -> int:
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--unlink", action="store_true",
                     help="仍无法解析的目标降级为纯文本（保留文字、消除断链），并写入审计日志")
-    ap.add_argument("--roots", default="素材库,实体,政策wiki,数据库,政策库,媒体库")
+    ap.add_argument("--roots", default="素材库,实体,政策wiki")
     args = ap.parse_args()
 
     all_md = [p for p in NOTES.rglob("*.md") if ".obsidian" not in p.parts]

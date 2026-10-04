@@ -91,7 +91,7 @@ def load_qmd_map() -> tuple[dict[str, Path], dict[str, Path]]:
     """
     m: dict[str, Path] = {}
     by_title: dict[str, Path] = {}
-    for f in QMD_DIR.glob("*.md"):
+    for f in QMD_DIR.rglob("*.md"):
         try:
             text = f.read_text(encoding="utf-8", errors="ignore")
             mm = re.search(r'^url:\s*"([^"]+)"', text, re.MULTILINE)
@@ -248,7 +248,7 @@ def main() -> int:
     qmd_map, by_title = load_qmd_map()
     print(f"条目 {len(items)} 条，qmd 文件 {len(qmd_map)} 个，并发 {args.workers}", flush=True)
     if not qmd_map:
-        print("❌ 无 qmd 映射（检查 Notes/数据库）", file=sys.stderr)
+        print("❌ 无 qmd 映射（检查 Notes/素材库）", file=sys.stderr)
         return 1
 
     cache = _load_cache()

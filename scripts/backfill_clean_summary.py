@@ -34,7 +34,7 @@ from update_news import _clean_summary  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 JSON_FILES = ["data/history.json", "data/latest-24h.json", "data/latest-24h-all.json"]
-QMD_DIR = ROOT / "Notes" / "数据库"
+QMD_DIR = ROOT / "Notes" / "素材库"
 
 _GOOGLE_NEWS_URL_RE = re.compile(r"news\.google\.com/rss/articles")
 
@@ -95,7 +95,7 @@ def backfill_qmd(qmd_dir: Path) -> int:
             return m.group(0)
         return m.group(1) + cleaned + "\n"
 
-    for f in sorted(qmd_dir.glob("*.md")):
+    for f in sorted(qmd_dir.rglob("*.md")):
         try:
             txt = f.read_text(encoding="utf-8", errors="ignore")
         except Exception:
@@ -120,7 +120,7 @@ def main() -> int:
     ap.add_argument("--qmd-only", action="store_true", help="只回填 qmd 摘要段落")
     args = ap.parse_args()
 
-    do_json = not args.md_only
+    do_json = not args.qmd_only
     do_qmd = not args.json_only
 
     if do_json:
