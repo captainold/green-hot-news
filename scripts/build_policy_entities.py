@@ -17,6 +17,7 @@ r"""政策条目实体页生成（2026-09-23，P4 wiki 深化首批）。
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -41,7 +42,10 @@ NOISE = ("研讨会", "座谈", "交流", "会议", "发布会", "活动", "培�
          "学习", "调研", "来访", "到访", "举办", "签署仪式", "开幕", "致辞", "论坛",
          "休市", "假期", "节假日", "会见", "一图读懂", "图解", "公示", "名单", "周报",
          "月报", "指数", "解读", "专访", "观察", "评论", "速递", "快报", "首款", "宣布",
-         "专业委员会", "专委会", "协会", "学会")
+         "专业委员会", "专委会", "协会", "学会",
+         # 2026-10-04 vault 池新增噪声（交易所日常业务公告 / 媒体栏目稿 / 摘要蹭词）
+         "竞价", "挂牌", "交割", "划转", "信托", "发放公告", "风险提示", "招聘公告",
+         "【关注】", "之十五", "系列", "答记者问")
 GREEN = ("碳", "绿色", "低碳", "节能", "减排", "新能源", "可再生", "光伏", "风电", "储能",
          "氢", "电网", "环保", "生态环境", "气候", "资源循环", "ESG", "清洁能源", "双碳",
          "能效", "循环经济", "电动车", "充电", "绿色金融", "碳排放", "污染")
@@ -70,16 +74,95 @@ def slug(title: str) -> str:
     return base[:14] or "政策"
 
 
+def _unescape(s: str) -> str:
+    """还原 YAML 双引号标量里的转义（`\\"` / `\\\\`）。
+
+    2026-10-04 踩坑：素材库 frontmatter 里 `title: "…《…\\"十五五\\"规划》…"` 带转义引号，
+    不还原就会把 `\\"` 当成标题内容 → 生成含 `"` `\\` 的**非法文件名**，写盘直接炸。
+    """
+    return s.replace('\\"', '"').replace("\\\\", "\\")
+
+
+def safe_filename(title: str) -> str:
+    """去文件系统非法字符 + 按字节控长（与 export_qmd._safe_filename 同口径）。"""
+    s = re.sub(r'[\\/:*?"<>|\r\n\t]', "", title or "").strip().rstrip(".")
+    b = s.encode("utf-8")[:200]
+    return b.decode("utf-8", "ignore") or "政策"
+
+
+def yaml_str(s: str) -> str:
+    """写 frontmatter 用：转义反斜杠与双引号（否则标题里的引号会撑破 YAML）。"""
+    return '"' + (s or "").replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def load_vault_items() -> list[dict]:
+    """把素材库政策条目读成与 history.json 同构的 item（供 --source vault 用）。
+
+    history.json 只覆盖 62 天（实测命中判据 9 条），素材库全量能给出 119 条候选，
+    这是「政策实体页扩量」的真实瓶颈所在（2026-10-04 实测）。
+    """
+    fm_re = re.compile(r"^---\s*\n(.*?)\n---", re.S)
+    out: list[dict] = []
+    for p in (NOTES / "素材库" / "政策").rglob("*.md"):
+        text = p.read_text(encoding="utf-8", errors="replace")
+        m = fm_re.match(text)
+        if not m:
+            continue
+        fm: dict[str, str] = {}
+        for line in m.group(1).split("\n"):
+            if ":" in line:
+                k, v = line.split(":", 1)
+                fm[k.strip()] = _unescape(v.strip().strip('"'))
+        sm = re.search(r"^##\s*摘要\s*$", text, re.M)
+        summary = ""
+        if sm:
+            rest = text[sm.end():]
+            nx = re.search(r"^##\s", rest, re.M)
+            summary = re.sub(r"\s+", " ", (rest[:nx.start()] if nx else rest)).strip()
+        score_raw = fm.get("score", "0")
+        try:
+            score = int(float(score_raw))
+        except ValueError:
+            score = 0
+        out.append({
+            "dimension": fm.get("dimension", ""),
+            "sub_dimension": fm.get("sub_dimension", ""),
+            "title": fm.get("title", "") or p.stem,
+            "summary": summary,
+            "site_id": fm.get("site", ""),
+            "site_name": fm.get("site", ""),
+            "source": fm.get("site", ""),
+            "region": fm.get("region", "中国"),
+            "score": score,
+            "published_at": fm.get("published_at", "") or fm.get("date", ""),
+            "url": fm.get("url", ""),
+            "topics": [x.strip() for x in re.findall(r"[^\[\],]+",
+                                                     fm.get("topics", "")) if x.strip()],
+            "_note_stem": p.stem,
+        })
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply", action="store_true", help="不传则只预览（dry-run）")
     ap.add_argument("--limit", type=int, default=15)
     ap.add_argument("--per-site", type=int, default=4, help="同一来源最多入选几条")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--source", choices=["history", "vault"], default="history",
+                    help="候选池：history=62 天 data/history.json（默认）；vault=素材库全量")
+    ap.add_argument("--from-year", type=int, default=0, help="只要 >= 该年（0=不限）")
+    ap.add_argument("--min-score", type=int, default=0, help="只要评分 >= 该值")
+    ap.add_argument("--green-in-summary", action="store_true",
+                    help="绿色词允许只出现在摘要（默认只认标题，防交易所日常公告蹭词）")
     args = ap.parse_args()
 
-    data = json.loads(HISTORY.read_text(encoding="utf-8"))
-    items = data["items"] if isinstance(data, dict) and "items" in data else data
+    if args.source == "vault":
+        items = load_vault_items()
+        print(f"[info] 素材库候选池 {len(items)} 条政策条目")
+    else:
+        data = json.loads(HISTORY.read_text(encoding="utf-8"))
+        items = data["items"] if isinstance(data, dict) and "items" in data else data
     mat = json.loads(MAT_INDEX.read_text(encoding="utf-8")) if MAT_INDEX.exists() else {}
     orgs = {p.stem: p for p in ORG_DIR.rglob("*.md")} if ORG_DIR.exists() else {}
     # 官方发布主体：机构实体里非「媒体」的 org id（org/cn|eu|jp|us|in|int）
@@ -93,6 +176,17 @@ def main() -> int:
 
     picked: list[dict] = []
     seen: set[str] = set()
+    existing_names: set[str] = set()
+    # 已有页面先入 seen：同一政策被两个来源转载时（标题尾多一个「-站点」）不再重复建页。
+    # existing_names 用于放行"就是同一份文件"的情形（--force 重建时不该被自己的 seen 挡住）
+    if POL_DIR.exists():
+        for q in POL_DIR.rglob("*.md"):
+            nm = re.search(r"^name:\s*(.+?)\s*$", q.read_text(encoding="utf-8",
+                                                             errors="replace"), re.M)
+            if nm:
+                v = nm.group(1).strip().strip('"').replace('\\"', '"')
+                existing_names.add(v)
+                seen.add(re.sub(r"[-–—]\s*[^-–—]{0,20}$", "", v).strip())
     cands: list[tuple[int, int, dict]] = []
     for it in items:
         if it.get("dimension") != "政策":
@@ -104,11 +198,17 @@ def main() -> int:
             continue
         if not any(w in title for w in DOC_WORDS):
             continue
+        year = int(((it.get("published_at") or "")[:4] or "0")) if \
+            (it.get("published_at") or "")[:4].isdigit() else 0
+        if args.from_year and year < args.from_year:
+            continue
+        if args.min_score and (it.get("score") or 0) < args.min_score:
+            continue
         is_official = ((it.get("site_id") or "").lower() in official_sites
                        or (it.get("source") or "") in official_ids)
         if not is_official and not any(w in title for w in ISSUER):
             continue
-        blob = title + " " + (it.get("summary") or "")
+        blob = title + (" " + (it.get("summary") or "") if args.green_in_summary else "")
         if not any(g in blob for g in GREEN):
             continue
         cands.append((2 if is_official else 1, it.get("score") or 0, it))
@@ -116,7 +216,7 @@ def main() -> int:
     for _auth, _score, it in sorted(cands, key=lambda x: (-x[0], -x[1])):
         title = (it.get("title_zh") or it.get("title") or "").strip()
         key = re.sub(r"[-–—]\s*[^-–—]{0,20}$", "", title).strip()
-        if key in seen:
+        if key in seen and title not in existing_names:
             continue
         sid = it.get("site_id") or ""
         if per_site.get(sid, 0) >= args.per_site:
@@ -133,13 +233,32 @@ def main() -> int:
 
     written: list[tuple[str, str]] = []
     entries: list[tuple[str, str, str]] = []   # (pid, title, short) —— 导航表用全量，不随跳过而变
+    # pid 去重：现有页面的 id 先入集合，防止同短名不同文件写出重复 id（verify_graph 会报 id 重复）；
+    # 存成 {pid: 文件} 才能放行"重建自己"（--force 时 pid 属于本文件，不算冲突）
+    known_pids: dict[str, Path] = {}
+    if POL_DIR.exists():
+        for q in POL_DIR.rglob("*.md"):
+            oid = _org_id(q)
+            if oid:
+                known_pids[oid] = q.resolve()
     for it in picked:
         title = (it.get("title_zh") or it.get("title") or "").strip()
         region = it.get("region") or "中国"
         cc = CC.get(region, "int")
         year = (it.get("published_at") or "")[:4] or "2026"
-        sid = re.sub(r"[^a-z0-9]+", "", (it.get("site_id") or "src").lower()) or "src"
+        sid = re.sub(r"[^a-z0-9\u4e00-\u9fff]+", "", (it.get("site_id") or "src").lower()) or "src"
         pid = f"pol/{cc}-{sid}-{year}-{slug(title)}"
+        target_path = POL_DIR / f"{safe_filename(title)[:80]}.md"
+        owner = known_pids.get(pid)
+        if owner is not None and owner != target_path.resolve():
+            # 同一发文机关的两份文件前 14 字可能相同（如「工业和信息化部办公厅关于印发…」）
+            # → 用标题哈希补尾，别丢页
+            alt = f"{pid}-{hashlib.sha1(title.encode('utf-8')).hexdigest()[:4]}"
+            if alt in known_pids:
+                print(f"  ⏭ id 已占用且补尾仍冲突，跳过：{title[:44]}")
+                continue
+            pid = alt
+        known_pids[pid] = target_path.resolve()
         short = slug(title)
         date = (it.get("published_at") or "")[:10]
         url = it.get("url") or ""
@@ -171,15 +290,15 @@ def main() -> int:
         tp = [t for t in (it.get("topics") or []) if t in topics]
         # 素材来源
         mrow = mat.get(url) or next((v for v in mat.values() if v.get("url") == url), None)
-        note = Path(mrow["path"]).stem if mrow else ""
+        note = it.get("_note_stem") or (Path(mrow["path"]).stem if mrow else "")
         mat_id = next((k for k, v in mat.items() if v.get("url") == url), "")
 
         lines = [
             "---",
             f'id: "{pid}"',
             'type: "pol"',
-            f'name: "{title}"',
-            f'aliases: ["{short}", "{pid}"]',
+            f'name: {yaml_str(title)}',
+            f'aliases: [{yaml_str(short)}, {yaml_str(pid)}]',
             f'region: "{region}"',
             f"topics: {json.dumps(tp, ensure_ascii=False)}",
             f'related: {json.dumps([org_id] if org_id else [], ensure_ascii=False)}',
@@ -223,7 +342,7 @@ def main() -> int:
             "要点摘自素材摘要，**待人工深化**（文号/效力/关联政策）。",
             "",
         ]
-        path = POL_DIR / f"{title[:80]}.md"
+        path = target_path
         entries.append((pid, title, short))
         exists = path.exists()
         if exists and not args.force:
