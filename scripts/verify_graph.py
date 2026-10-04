@@ -27,11 +27,15 @@ CODE_SPLIT_RE = re.compile(r"(```.*?```|`[^`\n]*`)", re.DOTALL)
 
 
 def body_links(text: str) -> list[str]:
-    """正文里的 [[...]] 目标（跳过代码块与行内代码）。"""
+    """正文里的 [[...]] 目标（跳过代码块与行内代码）。
+
+    表格里写别名必须转义竖线 `[[笔记\\|别名]]`（不转义会把表格列断掉，Obsidian 官方写法），
+    这里把目标末尾的转义反斜杠去掉，否则 `笔记\\` 会被当成另一个目标报断链。
+    """
     out: list[str] = []
     parts = CODE_SPLIT_RE.split(text)
     for i in range(0, len(parts), 2):
-        out += WIKILINK_RE.findall(parts[i])
+        out += [t.rstrip("\\") for t in WIKILINK_RE.findall(parts[i])]
     return out
 
 

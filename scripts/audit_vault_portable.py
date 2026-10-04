@@ -34,7 +34,9 @@ def main() -> int:
         n = p.name
         if len(n.encode("utf-8")) > 255:
             longb.append((len(n.encode("utf-8")), str(p)))
-        if any(c in n for c in '<>:"/\\|?*') or n != n.rstrip(". ") or not n.strip():
+        # 结尾点/空格要看 **stem**：`X .md` 整名以 d 结尾，只看整名会漏（实测漏了 122 个）
+        if (any(c in n for c in '<>:"/\\|?*') or n != n.rstrip(". ")
+                or p.stem != p.stem.rstrip(". ") or not n.strip()):
             illegal.append(str(p))
         if len(str(p)) > 250:
             longpath.append((len(str(p)), str(p)))

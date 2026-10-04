@@ -52,9 +52,14 @@ def _clip_bytes(s: str, limit: int) -> str:
 
 
 def _safe_filename(title: str) -> str:
-    """去文件系统非法字符 + 按字节控长（预算见 _NAME_TITLE_BYTES）。"""
+    """去文件系统非法字符 + 按字节控长（预算见 _NAME_TITLE_BYTES）。
+
+    2026-10-04 补：截断点正好落在空格上时会留下**结尾空格**（实测 122 个），
+    NTFS 无法正常创建/打开这种名字，且 verify_graph.resolve() 会对目标 strip()
+    → 引用它的链接永远解析不到。故截断后再去一次首尾空格与结尾点。
+    """
     s = re.sub(r'[\\/:*?"<>|\r\n\t]', "", title or "").strip()
-    return _clip_bytes(s[:80], _NAME_TITLE_BYTES) or "untitled"
+    return _clip_bytes(s[:80], _NAME_TITLE_BYTES).strip().rstrip(".") or "untitled"
 
 
 def _date_of(item: dict) -> str:
