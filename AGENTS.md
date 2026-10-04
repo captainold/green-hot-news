@@ -41,7 +41,7 @@
 - 三层分类：`categorize_dimension()`（**2026-08-26 v5.0：政策/创新/产业 + 七细类**；优先级 DIM_SITE_OVERRIDE > AI_SITES 分流 > TECH_SITES(创新·技术研发) > 政府强词(仅标题) > 国际动态词 > 金融词 > 双碳核心词(A1 双碳优先) > 社会创新词 > AI 词分流 > 基础研究窄词 > 技术研发词 > 企业经营词 > 政策库默认 > 政策弱词 > 产业兜底；**AI 按技术阶段分流**：论文/研究报告→创新·基础研究、模型/产品发布→产业·企业经营、其余研发→创新·技术研发；碳普惠/碳账户/绿色金融产品→产业层（老温 08-26 决策）；radarai 需绿色/AI 词过滤）
 - 前端：`index.html`（两区布局：上方排行榜——主题×周期(日/周/月)×区域(国内/国际)切换；下方实时时间线——跟随筛选、60s 轮询新条目自动插入高亮）+ `assets/app.js` + `assets/styles.css`；数据源 `data/history.json`（62 天累积，含 `region` 字段）+ `data/latest-24h.json`
 - 服务器：`/opt/green-hot-news/`（systemd timer 每 30 分钟 → `green-policy-sync.sh`；**主目录也是 git 仓库**，脚本会 `git add data/ admin/ index.html assets/ scripts/` 后提交，代码同步仍以 scp 为准；`Notes/` 是独立 git 仓库，脚本每轮 commit → `pull --rebase -X theirs origin master` → push 到 `/srv/git/green-policy-materials.git`；正文抓取经 mihomo 代理 → 夏威夷家宽出口，见 docs/服务器部署与运维.md）
-- 素材产出（2026-09-23 切库后）：`scripts/export_qmd.py --material` 写 `Notes/素材库/政策/<组>/<站点>/`、`Notes/素材库/媒体/<站点>/`、`attachments/`；`id = mat/<sha1(url)[:12]>`；索引 `ai-index-政策|媒体.md` + `cache/mat-index.json`（派生，可重建）
+- 素材产出（2026-09-23 切库后）：`scripts/export_qmd.py --material` 写 `Notes/素材库/政策/<组>/<站点>/`、`Notes/素材库/媒体/<站点>/`、`attachments/`；`id = mat/<sha1(url)[:12]>`；索引 `ai-index-政策|媒体.md` + `cache/mat-index.json`（派生，可重建）。**文件名跨平台铁律（2026-10-04 踩坑）**：≤255 UTF-8 **字节**（ext4 上限，NTFS 是 255 字符）+ 同目录大小写不敏感唯一（NTFS/macOS 会互相覆盖）→ `export_qmd` 用 `_clip_bytes`/`_ci_existing`，改文件名逻辑后必须跑 `scripts/audit_vault_portable.py`
 - wiki：`Notes/政策wiki/` 按三层导航（政策/创新/产业 + 人物横切），新板块归入对应层
 
 ## 🚀 常用命令
@@ -64,6 +64,8 @@ python3.11 scripts/migrate_legacy_to_material.py --apply [--limit 100]
 python3.11 scripts/fix_retired_lib_links.py [--apply]
 # 图谱与素材库体检（断链/缺 id/id 重复/孤立节点，全 0 才算绿）
 python3.11 scripts/verify_graph.py
+# vault 可移植性体检（文件名 >255 字节 / 大小写重名 / Windows 非法字符 / Unicode 归一化 / 超长路径）
+python3.11 scripts/audit_vault_portable.py [Notes/素材库]
 
 # 本地预览
 python3.11 -m http.server 8899

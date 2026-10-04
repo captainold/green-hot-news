@@ -95,23 +95,45 @@ def material_dir(item: dict, mat_root: Path) -> Path:
     return Path(*parts)
 
 
+def _ci_existing(path: Path) -> Path | None:
+    """大小写不敏感地找同目录同名文件（Windows/macOS 无法共存大小写重名）。
+
+    ext4 上 `Hurricane POLO.md` 与 `Hurricane Polo.md` 可并存，落到 Windows 只能留一个
+    → 本地 git 永远显示 modified。2026-10-04 服务器切库实测 1 例。
+    """
+    if path.exists():
+        return path
+    if not path.parent.is_dir():
+        return None
+    low = path.name.casefold()
+    try:
+        for f in path.parent.iterdir():
+            if f.name.casefold() == low:
+                return f
+    except OSError:
+        pass
+    return None
+
+
 def target_path(item: dict, output_dir: Path, material: bool) -> Path:
     """条目落盘路径（material=True → 素材库分层布局；否则旧扁平数据库布局）。
 
     同名不同 url（同日同站点同标题，如「Ideacarbon 盘前资讯」系列）不能互相覆盖：
     已有文件 url 不同时给新文件加 id 后缀 `〔mat-<6位>〕`（方括号是不可链接字符，故用全角）。
+    大小写不敏感查重：跨平台（Windows/macOS）同目录大小写重名会互相覆盖。
     """
     fname = f"{_date_of(item)} {_safe_filename(item.get('title', ''))}.md"
     path = (material_dir(item, output_dir) if material else Path(output_dir)) / fname
-    if path.exists():
+    existing = _ci_existing(path)
+    if existing is not None:
         url = (item.get("url") or "").strip()
         try:
             m = re.search(r'^url:\s*"?([^"\n]+)"?\s*$',
-                          path.read_text(encoding="utf-8", errors="replace"), re.M)
+                          existing.read_text(encoding="utf-8", errors="replace"), re.M)
             cur = m.group(1).strip() if m else ""
         except Exception:
             cur = ""
-        if url and cur and cur != url:
+        if url and cur != url:
             path = path.with_name(f"{path.stem} 〔mat-{mat_id(url)[4:10]}〕.md")
     return path
 
