@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -50,10 +51,65 @@ def _date_of(item: dict) -> str:
     return "undated"
 
 
+# ── 素材库（2026-09-23 切库：唯一写手） ──────────────────────────────────────
+def mat_id(url: str) -> str:
+    """素材稳定 id：`mat/<sha1(url)[:12]>`（规范 §2.2，url 不变则 id 不变）。"""
+    return "mat/" + hashlib.sha1((url or "").encode("utf-8")).hexdigest()[:12]
+
+
+def _safe_dirname(name: str) -> str:
+    return re.sub(r'[<>:"/\\|?*]', "_", name or "").strip()
+
+
+def material_dir(item: dict, mat_root: Path) -> Path:
+    """素材库内目标目录：`素材库/政策/<分组>/<站点>/` 或 `素材库/媒体/<站点>/`。
+
+    与 P2 合并快照的既有布局保持一致（政策/中国/国家发改委、媒体/36氪…）。
+    站点分库规则复用 update_news.site_library/site_policy_group（延迟导入避免循环依赖）。
+    """
+    site_id = item.get("site_id", "")
+    site_name = item.get("site_name") or site_id or "unknown"
+    lib, group = "媒体", ""
+    try:
+        import update_news as _un  # 延迟导入：update_news 反向依赖本模块
+        if _un.site_library(site_id) != "media":
+            lib, group = "政策", (_un.site_policy_group(site_id) or "其他")
+    except Exception:
+        pass
+    parts = [mat_root, lib] + ([group] if group else []) + [_safe_dirname(site_name)]
+    return Path(*parts)
+
+
+def target_path(item: dict, output_dir: Path, material: bool) -> Path:
+    """条目落盘路径（material=True → 素材库分层布局；否则旧扁平数据库布局）。
+
+    同名不同 url（同日同站点同标题，如「Ideacarbon 盘前资讯」系列）不能互相覆盖：
+    已有文件 url 不同时给新文件加 id 后缀 `〔mat-<6位>〕`（方括号是不可链接字符，故用全角）。
+    """
+    fname = f"{_date_of(item)} {_safe_filename(item.get('title', ''))}.md"
+    path = (material_dir(item, output_dir) if material else Path(output_dir)) / fname
+    if path.exists():
+        url = (item.get("url") or "").strip()
+        try:
+            m = re.search(r'^url:\s*"?([^"\n]+)"?\s*$',
+                          path.read_text(encoding="utf-8", errors="replace"), re.M)
+            cur = m.group(1).strip() if m else ""
+        except Exception:
+            cur = ""
+        if url and cur and cur != url:
+            path = path.with_name(f"{path.stem} 〔mat-{mat_id(url)[4:10]}〕.md")
+    return path
+
+
 def build_frontmatter(item: dict) -> dict:
-    """从 JSON 条目提取多维标签，构建 YAML frontmatter 字段（taxonomy 展平为独立字段，便于 Obsidian 检索）。"""
+    """从 JSON 条目提取多维标签，构建 YAML frontmatter 字段（taxonomy 展平为独立字段，便于 Obsidian 检索）。
+
+    2026-09-23 切库：首字段补素材稳定 id `mat/<sha1(url)[:12]>`，补 `related`（空列表，
+    由 P4/P5 工具后续接线）与 `summary`（供 update_news.load_archived_summaries 回读）。
+    """
     tax = item.get("taxonomy") or {}
     return {
+        "id": mat_id(item.get("url", "")),
         "title": item.get("title", ""),
         "title_zh": item.get("title_zh", ""),
         "url": item.get("url", ""),
@@ -75,6 +131,9 @@ def build_frontmatter(item: dict) -> dict:
         "score": item.get("score", 0),
         "score_level": item.get("score_level", ""),
         "published_at": item.get("published_at", ""),
+        "summary": (item.get("summary") or "").replace("\n", " ").strip(),
+        "author": item.get("author") or "",
+        "related": item.get("related") or [],
     }
 
 
@@ -140,6 +199,26 @@ def build_qmd(item: dict, content: str = "") -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+# 重写时需原样保留的小节：build_qmd 只产出 摘要/正文/技术特征，这几节由 P3/P4 工具接线
+# （link_entities / wire_wiki_links）。不保留的话，任何一次正文回填都会把图谱接线擦掉
+# —— 2026-10-04 实测（us_epa Clean Trucks Plan 丢 `## 关联实体`）。
+KEEP_SECTIONS = ("相关条目", "关联实体")
+
+
+def extra_sections(text: str) -> str:
+    """取出既有笔记里 KEEP_SECTIONS 各节正文（用于重写时续接）。"""
+    parts: list[str] = []
+    for name in KEEP_SECTIONS:
+        m = re.search(rf"^##\s*{name}\s*$", text, re.M)
+        if not m:
+            continue
+        rest = text[m.end():]
+        nxt = re.search(r"^##\s", rest, re.M)
+        body = (rest[:nxt.start()] if nxt else rest).rstrip()
+        parts.append(f"## {name}\n{body}" if body else f"## {name}")
+    return "\n\n".join(parts)
+
+
 def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
     """抓取富文本正文 + 下载图片附件。
 
@@ -164,10 +243,45 @@ def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
     return content, n_img
 
 
+def _load_url_index(output_dir: Path, material: bool) -> dict[str, Path]:
+    """url → 已落盘文件路径（增量幂等判断用）。
+
+    material 模式优先读 `cache/mat-index.json`（build_material_index 生成，10k 条一次读盘，
+    免去每轮 rglob 全库）；缓存缺失/过期时回退 rglob（兼容嵌套布局）。
+    """
+    if material:
+        cache = ROOT / "cache" / "mat-index.json"
+        try:
+            meta = json.loads(cache.read_text(encoding="utf-8"))
+            idx = {v["url"]: output_dir / v["path"]
+                   for v in meta.values() if v.get("url") and v.get("path")}
+            if idx:
+                return idx
+        except Exception:
+            pass
+    idx = {}
+    for f in output_dir.rglob("*.md"):
+        try:
+            # 只读文件头（frontmatter 在最前）：10k+ 文件的全库扫描省掉大量 IO
+            with f.open("r", encoding="utf-8", errors="ignore") as fh:
+                head = fh.read(800)
+            m = re.search(r'^url:\s*"?([^"\n]+)"?\s*$', head, re.MULTILINE)
+            if m:
+                idx[m.group(1).strip()] = f
+        except Exception:
+            continue
+    return idx
+
+
 def export(input_path: Path, output_dir: Path, force: bool = False,
            limit: int = 0,
-           only_sites: Optional[set] = None) -> int:
+           only_sites: Optional[set] = None,
+           material: bool = False) -> int:
     """导出条目为 .md（2026-09-15 起统一 .md，原 .qmd），返回写入的文件数。
+
+    material=True（2026-09-23 切库）：写入 `Notes/素材库/政策/<分组>/<站点>/` 或
+    `Notes/素材库/媒体/<站点>/`，frontmatter 带素材稳定 id；否则沿用旧的扁平
+    `Notes/数据库/` 布局（保留以便回滚）。
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -181,16 +295,8 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
     output_dir.mkdir(parents=True, exist_ok=True)
     att_dir = output_dir / "attachments"
 
-    # 已存在的 qmd 文件 → 按 url 去重；已有正文的跳过（幂等）
-    existing_urls: set[str] = set()
-    for f in output_dir.glob("*.md"):
-        try:
-            text = f.read_text(encoding="utf-8")
-            m = re.search(r'^url:\s*"([^"]+)"', text, re.MULTILINE)
-            if m:
-                existing_urls.add(m.group(1))
-        except Exception:
-            continue
+    # 已落盘文件 → 按 url 去重；已有正文的跳过（幂等）
+    url_index = _load_url_index(output_dir, material)
 
     # 待处理：新 url + （force 或 旧文件无正文）
     pending: list[dict] = []
@@ -202,9 +308,10 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
         if only_sites and item.get("site_id") not in only_sites:
             continue
         url = item.get("url", "")
-        if url and url in existing_urls:
-            fname = f"{_date_of(item)} {_safe_filename(item.get('title', ''))}.md"
-            fpath = output_dir / fname
+        if url and url in url_index:
+            # 已存在同一 url：按**原落盘路径**判断/回写（published_at 后续被修正会让文件名
+            # 的日期段变化，重算路径会生成重复文件 —— 2026-10-04 实测 us_epa 一条）
+            fpath = url_index[url]
             if not force and fpath.exists():
                 txt = fpath.read_text(encoding="utf-8", errors="ignore")
                 if "## 正文" in txt and len(txt) > _MIN_BODY_CHARS + 400:
@@ -236,16 +343,22 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
                 content, n_img = "", 0
             if not content:
                 no_body += 1
-            fname = f"{_date_of(it)} {_safe_filename(it.get('title', ''))}.md"
-            qmd_text = build_qmd(it, content)
-            (output_dir / fname).write_text(qmd_text, encoding="utf-8")
-            if it.get("url"):
-                existing_urls.add(it["url"])
+            url = it.get("url", "")
+            fpath = (url_index.get(url) if url else None) or target_path(it, output_dir, material)
+            new_text = build_qmd(it, content)
+            if fpath.exists():
+                keep = extra_sections(fpath.read_text(encoding="utf-8", errors="ignore"))
+                if keep:
+                    new_text = new_text.rstrip() + "\n\n" + keep + "\n"
+            fpath.parent.mkdir(parents=True, exist_ok=True)
+            fpath.write_text(new_text, encoding="utf-8")
+            if url:
+                url_index[url] = fpath
             written += 1
             if written % 20 == 0:
                 print(f"    进度 {written}/{len(pending)}（无正文 {no_body}）", flush=True)
 
-    print(f"  {input_path.name}: 写入 {written} 条 qmd（{no_body} 条无正文），图片附件 → {att_dir}")
+    print(f"  {input_path.name}: 写入 {written} 条（{no_body} 条无正文）→ {output_dir}，图片附件 → {att_dir}")
     return written
 
 
@@ -363,9 +476,14 @@ def main() -> int:
                     help="仅刷新 frontmatter：按 url 重建 YAML 多维标签，正文保留（不重抓）")
     ap.add_argument("--only-sites", default="",
                     help="只导出指定 site_id（逗号分隔，如 us_doe,openai）——定向重导出/回填用")
+    ap.add_argument("--material", action="store_true",
+                    help="素材库模式（2026-09-23 切库）：写入 素材库/政策/<分组>/<站点>/ 或 素材库/媒体/<站点>/，"
+                         "frontmatter 带 mat id；默认输出目录相应改为 Notes/素材库")
     args = ap.parse_args()
 
     out = Path(args.output)
+    if args.material and args.output == str(ROOT / "Notes" / "数据库"):
+        out = ROOT / "Notes" / "素材库"
     if args.backfill_images:
         total = backfill_images(out)
         print(f"完成，共补图 {total} 张")
@@ -376,8 +494,8 @@ def main() -> int:
         return 0
     only = {s.strip() for s in args.only_sites.split(",") if s.strip()}
     total = export(Path(args.input), out, args.force, args.limit,
-                   only_sites=only or None)
-    print(f"完成，共写入 {total} 条 qmd")
+                   only_sites=only or None, material=args.material)
+    print(f"完成，共写入 {total} 条 → {out}")
     return 0
 
 
