@@ -34,12 +34,27 @@ import article_content  # noqa: E402
 _FETCH_WORKERS = 4
 # 正文有效长度阈值（低于视为抓取失败/导航垃圾页）
 _MIN_BODY_CHARS = 200
+# 文件名标题段字节预算：11(日期+空格) + 200 + 14(〔mat-xxxxxx〕) + 10( 【dupN】) + 3(.md) < 255
+_NAME_TITLE_BYTES = 200
+
+
+def _clip_bytes(s: str, limit: int) -> str:
+    """按 UTF-8 **字节**截断（ext4/xfs 文件名上限 255 字节）。
+
+    2026-10-04 实测：按字符截断（80 字）对 CJK 会到 240 字节，加日期前缀与
+    ` 【dupN】` 后缀后 263 字节 → 服务器 `git reset --hard` 报
+    `unable to create file …: File name too long`，整个 vault 落不了盘。
+    """
+    b = s.encode("utf-8")
+    if len(b) <= limit:
+        return s
+    return b[:limit].decode("utf-8", "ignore")
 
 
 def _safe_filename(title: str) -> str:
-    """去文件系统非法字符 + 控制长度。"""
+    """去文件系统非法字符 + 按字节控长（预算见 _NAME_TITLE_BYTES）。"""
     s = re.sub(r'[\\/:*?"<>|\r\n\t]', "", title or "").strip()
-    return s[:80] or "untitled"
+    return _clip_bytes(s[:80], _NAME_TITLE_BYTES) or "untitled"
 
 
 def _date_of(item: dict) -> str:
