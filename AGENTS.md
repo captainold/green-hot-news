@@ -66,6 +66,10 @@ python3.11 scripts/fix_retired_lib_links.py [--apply]
 python3.11 scripts/verify_graph.py
 # vault 可移植性体检（文件名 >255 字节 / 大小写重名 / Windows 非法字符 / Unicode 归一化 / 超长路径）
 python3.11 scripts/audit_vault_portable.py [Notes/素材库]
+# 素材库正文补抓（Google News 聚合自动解码；只补空白节、不改 url/id、保留相关条目+关联实体；
+# 反爬/导航垃圾页自动拦截；断点续跑缓存 cache/refetch-bodies-cache.json。先 --dry-run 看候选）
+python3.11 scripts/refetch_material_bodies.py --dry-run --gnews-only --spread --limit 40
+python3.11 scripts/refetch_material_bodies.py --apply --gnews-only --spread --limit 200 --report cache/refetch.json
 
 # 本地预览
 python3.11 -m http.server 8899
