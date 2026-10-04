@@ -6,7 +6,7 @@
 ## 项目是什么
 
 绿色低碳创新动态雷达（Green Hot News）——聚合国内外绿色低碳动态，**三层覆盖：政策 / 创新 / 产业**（2026-08-26 v5.0 中性命名，按**创新价值链**排序：政策=政府发文·国际动态（为什么）、创新=技术研发·基础研究·社会创新（可能吗）、产业=企业经营·金融资本（成了吗）；三层不按领域区分，科技/文化/工业/社会学按**技术阶段/性质**入层，见 docs/标准文档/打分体系标准.md v5.0）。
-数据流：服务器每 30 分钟抓取 70 个源 → `data/*.json`（网站数据）+ `Notes/素材库/`（政策源+媒体源素材，.md 多维标签数据库，2026-09-15 起 qmd 已统一为 md）→ 人工策展 → `Notes/政策wiki/`（知识层）+ `Notes/实体/`（知识图谱节点，org/tec/reg/top 等）。
+数据流：服务器每 30 分钟抓取 70 个源 → `data/*.json`（网站数据）+ `Notes/素材库/`（**唯一素材库**：政策源+媒体源素材，.md 多维标签数据库，2026-09-15 qmd 统一为 md；**2026-09-23 切库：`update_news.py` 默认只写素材库**，原 `Notes/政策库` `Notes/媒体库` `Notes/数据库` 已退役并归档）→ 人工策展 → `Notes/政策wiki/`（知识层）+ `Notes/实体/`（知识图谱节点，org/tec/reg/top 等）。
 
 ## 📐 文档权威（改代码前必读）
 
@@ -40,7 +40,8 @@
 - 打分：`score_item()` → `score_content_strength()`（按维度自适应）/ `score_topic()` / `score_people()` / `score_freshness()`
 - 三层分类：`categorize_dimension()`（**2026-08-26 v5.0：政策/创新/产业 + 七细类**；优先级 DIM_SITE_OVERRIDE > AI_SITES 分流 > TECH_SITES(创新·技术研发) > 政府强词(仅标题) > 国际动态词 > 金融词 > 双碳核心词(A1 双碳优先) > 社会创新词 > AI 词分流 > 基础研究窄词 > 技术研发词 > 企业经营词 > 政策库默认 > 政策弱词 > 产业兜底；**AI 按技术阶段分流**：论文/研究报告→创新·基础研究、模型/产品发布→产业·企业经营、其余研发→创新·技术研发；碳普惠/碳账户/绿色金融产品→产业层（老温 08-26 决策）；radarai 需绿色/AI 词过滤）
 - 前端：`index.html`（两区布局：上方排行榜——主题×周期(日/周/月)×区域(国内/国际)切换；下方实时时间线——跟随筛选、60s 轮询新条目自动插入高亮）+ `assets/app.js` + `assets/styles.css`；数据源 `data/history.json`（62 天累积，含 `region` 字段）+ `data/latest-24h.json`
-- 服务器：`/opt/green-hot-news/`（systemd timer 每 30 分钟，非 git 仓库，代码同步靠 scp；正文抓取经 mihomo 代理 → 夏威夷家宽出口，见 docs/服务器部署与运维.md）
+- 服务器：`/opt/green-hot-news/`（systemd timer 每 30 分钟 → `green-policy-sync.sh`；**主目录也是 git 仓库**，脚本会 `git add data/ admin/ index.html assets/ scripts/` 后提交，代码同步仍以 scp 为准；`Notes/` 是独立 git 仓库，脚本每轮 commit → `pull --rebase -X theirs origin master` → push 到 `/srv/git/green-policy-materials.git`；正文抓取经 mihomo 代理 → 夏威夷家宽出口，见 docs/服务器部署与运维.md）
+- 素材产出（2026-09-23 切库后）：`scripts/export_qmd.py --material` 写 `Notes/素材库/政策/<组>/<站点>/`、`Notes/素材库/媒体/<站点>/`、`attachments/`；`id = mat/<sha1(url)[:12]>`；索引 `ai-index-政策|媒体.md` + `cache/mat-index.json`（派生，可重建）
 - wiki：`Notes/政策wiki/` 按三层导航（政策/创新/产业 + 人物横切），新板块归入对应层
 
 ## 🚀 常用命令
@@ -51,6 +52,18 @@ python3.11 scripts/update_news.py --obsidian-dir . --window-hours 96
 
 # 只生成网站数据（服务器/CI 模式）
 python3.11 scripts/update_news.py --output-dir data --window-hours 24
+
+# ── 素材库（切库后）─────────────────────────────────────────────
+# 素材导出（默认就写 Notes/素材库；--legacy-qmd 才写 Notes/数据库）
+python3.11 scripts/export_qmd.py --material --input data/latest-24h.json --output Notes/素材库 --limit 5
+# 重建素材索引（ai-index-政策|媒体.md + cache/mat-index.json，约 1 分钟）
+python3.11 scripts/build_material_index.py --apply
+# 退役三库 → 素材库（复用既有正文不重抓；服务器切库要跑这个）
+python3.11 scripts/migrate_legacy_to_material.py --apply [--limit 100]
+# 退役库改名导致的断链修复（url 为桥建旧名→新名映射）
+python3.11 scripts/fix_retired_lib_links.py [--apply]
+# 图谱与素材库体检（断链/缺 id/id 重复/孤立节点，全 0 才算绿）
+python3.11 scripts/verify_graph.py
 
 # 本地预览
 python3.11 -m http.server 8899
