@@ -4099,6 +4099,14 @@ def main() -> int:
     parser.add_argument("--window-hours", type=int, default=24, help="Time window in hours")
     parser.add_argument("--rss-opml", default=None, help="Optional OPML file for extra RSS feeds")
     parser.add_argument("--obsidian-dir", default=None, help="Export news as Obsidian markdown notes to this dir")
+    parser.add_argument("--legacy-obsidian", action="store_true",
+                        help="已退役：仍导出 Notes/政策库 + Notes/媒体库（2026-09-23 切库后默认关闭，"
+                             "素材库为唯一写手）")
+    parser.add_argument("--legacy-qmd", action="store_true",
+                        help="已退役：仍把素材写到 Notes/数据库（扁平布局，无 mat id）；默认写 Notes/素材库")
+    parser.add_argument("--rebuild-index", action="store_true",
+                        help="素材导出后重建 Notes/素材库/ai-index-*.md 与 cache/mat-index.json"
+                             "（约 1 分钟，默认关闭；日常维护可单独跑 scripts/build_material_index.py --apply）")
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)
@@ -4254,7 +4262,7 @@ def main() -> int:
     # ── Obsidian export ────────────────────────────────────────────────────
     obsidian_new = 0
     obsidian_with_body = 0
-    if args.obsidian_dir:
+    if args.obsidian_dir and args.legacy_obsidian:
         obsidian_new, obsidian_with_body = export_to_obsidian(green_items, args.obsidian_dir, now)
 
     # Backfill publish times in JSON from the local archive (detail-page times,
@@ -4518,24 +4526,40 @@ def main() -> int:
     merge_history(output_dir, green_items_24h, now)
     print("  merge_history 完成", flush=True)
 
-    # ── qmd 数据库增量导出（2026-08-24 一体式：抓取完成直接产出 qmd 富文本）──
-    # 架构：JSON 是网站数据源（单一事实源），qmd 是 Obsidian 数据库层——
-    # 同一步产出，无需独立脚本步骤。已存在正文的条目自动跳过（增量）。
+    # ── 素材库增量导出（2026-09-23 切库：素材库为唯一写手）──────────────────
+    # 架构：JSON 是网站数据源（单一事实源），素材库是 Obsidian 知识层底座——
+    # 同一步产出，无需独立脚本步骤。已存在正文的条目自动跳过（增量，按 url 幂等）。
+    # 退役路径：Notes/数据库（扁平、无 mat id）→ --legacy-qmd；
+    #           Notes/政策库 + Notes/媒体库 → --legacy-obsidian。
     try:
         import export_qmd  # 同目录模块（sys.path[0]=scripts）
-        qmd_out = Path(__file__).resolve().parent.parent / "Notes" / "数据库"
-        qmd_n = export_qmd.export(Path(output_dir) / "latest-24h.json", qmd_out)
-        if qmd_n:
-            print(f"  ✅ qmd 增量导出: {qmd_n} 条 → {qmd_out}", flush=True)
+        if args.legacy_qmd:
+            qmd_out = Path(__file__).resolve().parent.parent / "Notes" / "数据库"
+            qmd_n = export_qmd.export(Path(output_dir) / "latest-24h.json", qmd_out)
+            if qmd_n:
+                print(f"  ✅ [legacy] 数据库增量导出: {qmd_n} 条 → {qmd_out}", flush=True)
+        else:
+            mat_out = Path(__file__).resolve().parent.parent / "Notes" / "素材库"
+            mat_n = export_qmd.export(Path(output_dir) / "latest-24h.json", mat_out,
+                                      material=True)
+            if mat_n:
+                print(f"  ✅ 素材库增量导出: {mat_n} 条 → {mat_out}", flush=True)
+        if args.rebuild_index:
+            import build_material_index
+            stats = build_material_index.build(apply=True)
+            print(f"  ✅ 素材库索引重建: {stats}", flush=True)
     except Exception as _e:
-        print(f"  ⚠️ qmd 导出失败（不阻断主流程）: {_e}", flush=True)
+        print(f"  ⚠️ 素材导出失败（不阻断主流程）: {_e}", flush=True)
 
     print(f"✅ Green Policy Radar done.")
     print(f"   Green items: {len(green_items_24h)}")
     print(f"   All items:   {len(all_items_24h)}")
     print(f"   Sources:     {len(source_statuses)} ({status_payload['successful']} ok / {status_payload['failed']} failed)")
     if args.obsidian_dir:
-        print(f"   Obsidian:    {obsidian_new} new notes → {args.obsidian_dir}/Notes/政策库/ ({obsidian_with_body} with 正文)")
+        if args.legacy_obsidian:
+            print(f"   Obsidian:    [legacy] {obsidian_new} new notes → {args.obsidian_dir}/Notes/政策库/ ({obsidian_with_body} with 正文)")
+        else:
+            print(f"   Obsidian:    素材库为唯一写目标（Notes/素材库/政策|媒体/…）")
     return 0
 
 
@@ -4778,8 +4802,10 @@ def format_published(iso_str: str) -> str:
 
 
 def load_archived_published(base_dir_str: str) -> dict[str, str]:
-    """Map url -> published (Beijing 'YYYY-MM-DD HH:MM') from existing notes
-    (政策库 + 媒体库)."""
+    """Map url -> published (Beijing 'YYYY-MM-DD HH:MM') from existing notes.
+
+    2026-09-23 切库：素材库笔记用 `published_at`（旧政策库/媒体库用 `published`），两者都认。
+    """
     mapping: dict[str, str] = {}
     notes_root = Path(base_dir_str) / "Notes"
     if not notes_root.exists():
@@ -4799,7 +4825,7 @@ def load_archived_published(base_dir_str: str) -> dict[str, str]:
                     k, v = line.split(":", 1)
                     fm[k.strip()] = v.strip().strip('"')
             url = fm.get("url", "")
-            pub = fm.get("published", "")
+            pub = fm.get("published", "") or fm.get("published_at", "")
             if url and pub:
                 mapping[url] = pub
         except Exception:
@@ -4825,10 +4851,10 @@ def load_archived_titles(base_dir_str: str) -> dict[str, str]:
             m = re.search(r"^# (.+)$", content, re.M)
             if not m:
                 continue
-            um = re.search(r"^url:\s*(\S+)", content, re.M)
+            um = re.search(r'^url:\s*"?([^"\n]+)"?\s*$', content, re.M)
             if not um:
                 continue
-            mapping[um.group(1)] = m.group(1).strip()
+            mapping[um.group(1).strip()] = m.group(1).strip()
         except Exception:
             continue
     return mapping
@@ -4849,13 +4875,13 @@ def load_archived_summaries(base_dir_str: str) -> dict[str, str]:
             continue
         try:
             content = p.read_text(encoding="utf-8")
-            um = re.search(r"^url:\s*(\S+)", content, re.M)
+            um = re.search(r'^url:\s*"?([^"\n]+)"?\s*$', content, re.M)
             sm = re.search(r'^summary:\s*"?(.+?)"?\s*$', content, re.M)
             if not um or not sm:
                 continue
             summary = sm.group(1).strip().rstrip('"')
             if summary and len(summary) > 8:
-                mapping[um.group(1)] = summary
+                mapping[um.group(1).strip()] = summary
         except Exception:
             continue
     return mapping
