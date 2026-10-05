@@ -36,6 +36,42 @@ _FETCH_WORKERS = 4
 _MIN_BODY_CHARS = 200
 # 文件名标题段字节预算：11(日期+空格) + 200 + 14(〔mat-xxxxxx〕) + 10( 【dupN】) + 3(.md) < 255
 _NAME_TITLE_BYTES = 200
+# 解码 gnews url 的进程内缓存（同一 b64 一轮内可能重复出现；跨轮由 mat-index 天然记忆）
+_GNEWS_DECODE_CACHE: dict[str, Optional[str]] = {}
+
+
+def _resolve_gnews_dup(url: str, url_index: dict[str, Path], session) -> Optional[str]:
+    """gnews 聚合 url → 解码后的真实 url（仅在它撞上既有直连笔记时有意义）。
+
+    2026-10-05 dup 根治（批准项）：1039 组「同文两条 url」的根因是 `export()` 的 url
+    索引只认原始 url——Google News 聚合 url 与站点直连 url 永不相等 → 同文落两个文件
+    （`〔mat-xxx〕` 后缀 / 【dupN】由此而来）。这里把新 gnews url 解码成真实 url 再查
+    一次索引：命中直连笔记 → 返回真实 url（调用方按直连路径 upsert，不再新建文件）。
+    解码 ~1.6s/条（Google batchexecute 两步协议），所以**只对索引查不到的 gnews url
+    解码**（已在索引的原样返回，等下面正常路径处理）。失败返回 None（按真新文章建文件，
+    与旧行为一致）。
+    """
+    if url in _GNEWS_DECODE_CACHE:
+        return _GNEWS_DECODE_CACHE[url]
+    real = None
+    try:
+        real = article_content._decode_google_news_url(url, session=session)
+    except Exception:
+        real = None
+    _GNEWS_DECODE_CACHE[url] = real if real else None
+    return _GNEWS_DECODE_CACHE[url]
+
+
+def _has_body(fpath: Path) -> bool:
+    """文件是否已有正文节（有内容，不是「正文暂缺」占位）。"""
+    try:
+        txt = fpath.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return False
+    i = txt.find("## 正文")
+    if i < 0:
+        return len(txt) > _MIN_BODY_CHARS + 400      # 老格式无正文节：按总长判断
+    return len(txt[i:]) > 260 and "正文暂缺" not in txt[i:i + 120]
 
 
 def _clip_bytes(s: str, limit: int) -> str:
@@ -354,12 +390,23 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
             # 已存在同一 url：按**原落盘路径**判断/回写（published_at 后续被修正会让文件名
             # 的日期段变化，重算路径会生成重复文件 —— 2026-10-04 实测 us_epa 一条）
             fpath = url_index[url]
-            if not force and fpath.exists():
-                txt = fpath.read_text(encoding="utf-8", errors="ignore")
-                if "## 正文" in txt and len(txt) > _MIN_BODY_CHARS + 400:
-                    continue  # 已有正文，跳过
+            if not force and fpath.exists() and _has_body(fpath):
+                continue  # 已有正文，跳过
             pending.append(item)
             continue
+        # dup 根治（2026-10-05）：gnews 聚合 url 不在索引时，先解码成真实 url 再查一次。
+        # 命中既有直连笔记 → 记住映射，落盘时按直连路径 upsert（不再新建 〔mat-〕孪生文件）。
+        # 只在这一分支解码（索引已命中的 gnews 条目无需解码），控制 batchexecute 调用量。
+        _dup_real: Optional[str] = None
+        if url and "news.google.com" in url and url not in url_index:
+            _dup_real = _resolve_gnews_dup(url, url_index, _req.Session())
+            if _dup_real and _dup_real in url_index:
+                it_path = url_index[_dup_real]
+                if not force and it_path.exists() and _has_body(it_path):
+                    continue  # 直连笔记已有正文：同文已在库，直接跳过
+                item["_dup_of"] = _dup_real
+                pending.append(item)
+                continue
         pending.append(item)
     if limit:
         pending = pending[:limit]
@@ -386,10 +433,24 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
             if not content:
                 no_body += 1
             url = it.get("url", "")
-            fpath = (url_index.get(url) if url else None) or target_path(it, output_dir, material)
+            # dup 归并：本条是某直连笔记的 gnews 孪生 → 写进直连笔记的路径（正文互补，
+            # 保留它原有的图谱接线小节），url/id 仍是 gnews 自己的（id 不能漂移）
+            if it.pop("_dup_of", None):
+                real = _resolve_gnews_dup(url, url_index, session) if url else None
+                fpath = url_index.get(real) if real else None
+                fpath = fpath if fpath else target_path(it, output_dir, material)
+            else:
+                fpath = (url_index.get(url) if url else None) or target_path(it, output_dir, material)
             new_text = build_qmd(it, content)
             if fpath.exists():
-                keep = extra_sections(fpath.read_text(encoding="utf-8", errors="ignore"))
+                old = fpath.read_text(encoding="utf-8", errors="ignore")
+                keep = extra_sections(old)
+                # 互补原则：新抓为空而旧文有正文 → 保留旧正文（只更新元信息/接线）
+                if not content and _has_body(fpath):
+                    i_body = old.find("## 正文")
+                    if i_body >= 0:
+                        old_body = old[i_body:].split("## 关联实体")[0].rstrip()
+                        new_text = new_text.rstrip() + "\n\n" + old_body + "\n"
                 if keep:
                     new_text = new_text.rstrip() + "\n\n" + keep + "\n"
             fpath.parent.mkdir(parents=True, exist_ok=True)
