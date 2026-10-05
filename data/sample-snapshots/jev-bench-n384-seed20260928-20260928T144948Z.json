@@ -1,0 +1,2319 @@
+{
+ "tag": "jev-bench-n384-seed20260928",
+ "ts": "2026-09-28T14:49:48.395873+00:00",
+ "corpus": {
+  "count": 1222,
+  "ids_sha1_12": "f401e3a50edf"
+ },
+ "sample": 384,
+ "extra": {
+  "seed": 20260928,
+  "window": "近 30 天（1222/3613 条）"
+ },
+ "items": [
+  {
+   "id": "167570e57a4ca62bfa589d995eee5c11ed55176b",
+   "title": "外媒：高盛预测柴油生产利润将翻倍 预测在美国将为63美元，在欧盟为49美元",
+   "sub_dimension": "国际动态",
+   "score": 49
+  },
+  {
+   "id": "c23e6dfdce4c9743cbc5031424d87bee4900dcc6",
+   "title": "特朗普推动委内瑞拉石油开发 埃克森美孚等大型油企仍持谨慎态度",
+   "sub_dimension": "国际动态",
+   "score": 59
+  },
+  {
+   "id": "7e2ea2079c9c7bcc0c0e6d547f07c08b87ce900f",
+   "title": "石油市场努力填补中东供应短缺留下的缺口",
+   "sub_dimension": "国际动态",
+   "score": 57
+  },
+  {
+   "id": "662ecaf32e8f6267c05b25d100a1e64af8f6c3cc",
+   "title": "世界银行向阿塞拜疆拨款150万美元用于抵御气候变化的水项目-里海邮报",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "ab733427e5bfe0d2f549a294d6c9c91b629e4593",
+   "title": "美国称获得委内瑞拉650亿桶石油储量“多数控制权”，遭质疑：美国就是资源掠夺者",
+   "sub_dimension": "国际动态",
+   "score": 59
+  },
+  {
+   "id": "7412a15af4472f46181c167a205d9a077b6fb7bd",
+   "title": "8点1氪丨片仔癀市值蒸发超2100亿；苹果换帅，特努斯接替库克任苹果CEO；Anthropic签署由英伟达支持的350亿美元云计算协议",
+   "sub_dimension": "国际动态",
+   "score": 59
+  },
+  {
+   "id": "eae8ab3d0719838b1372936381679f1e8a85a517",
+   "title": "铜繁荣推动能源转型使地球荒地面临风险",
+   "sub_dimension": "国际动态",
+   "score": 49
+  },
+  {
+   "id": "17bebc45351fae598a5020b8932cee4966a6ae4f",
+   "title": "采访：胡克斯特拉谈气候和能源危机、COP 31和中国",
+   "sub_dimension": "国际动态",
+   "score": 67
+  },
+  {
+   "id": "ff5c1926dff5cd52bd71e048e6609eddf897ac6f",
+   "title": "IRENA表示可再生能源拍卖可以在冲击中增强供应链弹性-环球资源",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "fe52c6ed4020326a3956529bddf0acca20c55823",
+   "title": "欧盟首次对通用人工智能模型发出信息请求函，聚焦系统性风险",
+   "sub_dimension": "国际动态",
+   "score": 51
+  },
+  {
+   "id": "c9e1b02b332d0794161ff65fe1c01d325e3338e9",
+   "title": "新播客剧集探讨柴油价格为何飙升及其意味着什么",
+   "sub_dimension": "国际动态",
+   "score": 57
+  },
+  {
+   "id": "166dc1037e553b61d00e86d20ce9689e7cf6698c",
+   "title": "HowToRobot和Robotics Australia集团合作平台鼓励机器人的采用",
+   "sub_dimension": "国际动态",
+   "score": 41
+  },
+  {
+   "id": "4d267ad59b8c7aafe0c15279551face8f352624a",
+   "title": "世界银行和国际货币基金组织更新贫穷国家的债务评估- Asharq Al-Awsat -ua.news",
+   "sub_dimension": "国际动态",
+   "score": 44
+  },
+  {
+   "id": "0d60d797e6f1e314436bbf204f70afb112ebd079",
+   "title": "执行董事会见韩国李总统讨论关键能源优先事项",
+   "sub_dimension": "国际动态",
+   "score": 57
+  },
+  {
+   "id": "29e0a47886deb4d7ac2fd344772eebb8ebfb0779",
+   "title": "COP 31主席概述了前往安塔利亚之路上的优先主题和关键时刻- SDG知识中心",
+   "sub_dimension": "国际动态",
+   "score": 66
+  },
+  {
+   "id": "48f9f12706025fbfe047af378ed10dbf8e55e894",
+   "title": "对多个国家太阳能+电池混合动力的分析显示，公司成本已从2020年的100美元/兆瓦时以上降至2025年的54 -82美元/兆瓦时，预计到2035年将进一步降低4",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "f9b4874d9686b81061d3adb1afca085d3120f1c6",
+   "title": "黄仁勋敦促G20加快AI应用，扩大数据中心等基础设施建设",
+   "sub_dimension": "国际动态",
+   "score": 51
+  },
+  {
+   "id": "6e46e1055a1e3963220f307c26e48ba59b535ef4",
+   "title": "微软加大Copilot折扣力度至50% 将推出AI超级应用",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "ce544852057abbc0130cc009a90c980749e20782",
+   "title": "edie在图尔基耶联合国气候峰会前启动COP 31倒计时",
+   "sub_dimension": "国际动态",
+   "score": 66
+  },
+  {
+   "id": "e8af52941c9c478cd3de3dfc9172f9a7abca44bf",
+   "title": "中国电力版图再次被改写 光伏超越煤电只是新起点",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "b14463e82a810672628040e0981d2153db0cfbe9",
+   "title": "消息称三星已锁定约 70% 存储芯片产能至 2031 年，HBM 长协价仅为现货五分之一",
+   "sub_dimension": "国际动态",
+   "score": 67
+  },
+  {
+   "id": "fc64109607274f5b330807707ed3da7415341629",
+   "title": "联合国提交发人深省的报告时，阿尔巴尼亚人对缔约方会议前的问题感到愤怒",
+   "sub_dimension": "国际动态",
+   "score": 72
+  },
+  {
+   "id": "2ff98c94696cda7cfb7ac517670ed7131899c262",
+   "title": "2+4艘三燃料矿砂船签约，绿色VLOC再添新单！",
+   "sub_dimension": "国际动态",
+   "score": 73
+  },
+  {
+   "id": "f412665ea78e000dcab4d5e1e02ce61bea7ad13d",
+   "title": "芭芭拉·马佐莱（Barbara Mazzolai）希望建立一个新的机器人领域",
+   "sub_dimension": "国际动态",
+   "score": 55
+  },
+  {
+   "id": "e426ad473f3a875b4c086c1f7a0ccd023429cde9",
+   "title": "世界银行正在为巴基斯坦的电力网络现代化提供3.75亿美元",
+   "sub_dimension": "国际动态",
+   "score": 46
+  },
+  {
+   "id": "222ed008e460a3704980b60e35cc3971a00452ae",
+   "title": "世界银行总经理和代表团与首席秘书长就发展问题进行互动- Garhwal Post",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "6c24621c4f8bda701084514c36fd7eca1b48b22a",
+   "title": "英伟达 CEO 黄仁勋呼吁 G20 成员国加快发展、应用 AI，以促进经济增长",
+   "sub_dimension": "国际动态",
+   "score": 47
+  },
+  {
+   "id": "d438eceff32da69d2958851ccba5d06429299556",
+   "title": "航运燃料价格罕见倒挂！生物柴油跌至历史新低",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "001bd67ff087915fe0ee12b3a6af02b67e978e25",
+   "title": "IRENA：全球可再生能源产能增加必须翻倍，但太阳能发电潜力使其“可行”- PV Tech",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "f097ce485e9da0845b8837e881c5a5aa4fc197a8",
+   "title": "中老跨境数字支付互联互通正式启动",
+   "sub_dimension": "国际动态",
+   "score": 61
+  },
+  {
+   "id": "8d19bb3b187c5727e5d3e965d13a1dde68199266",
+   "title": "乌克兰袭击加剧，俄罗斯炼油行业陷入困境",
+   "sub_dimension": "国际动态",
+   "score": 50
+  },
+  {
+   "id": "1146918e1c7a53118835ed53c3236a3d9b81a12b",
+   "title": "世界银行在全球债务负担中寻求私人融资--《纽约时报》",
+   "sub_dimension": "国际动态",
+   "score": 38
+  },
+  {
+   "id": "dc34ea64e4df4ceed64c997079bbefe778a90246",
+   "title": "欧盟碳移除与碳农业认证(CRCF)买家俱乐部推进首批采购计划",
+   "sub_dimension": "国际动态",
+   "score": 41
+  },
+  {
+   "id": "9657e8319abe85f8d9453d3054ecdc1bf53665db",
+   "title": "到2030年，全球可再生能源每年需要增加1，200 GW：IRENA -亚洲电力",
+   "sub_dimension": "国际动态",
+   "score": 56
+  },
+  {
+   "id": "9206e222729973bb03eed9f760524e381cbd0c1c",
+   "title": "IRENA报告：到2030年可再生能源新增量必须近翻一番-新闻和统计数据- IndexBox",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "f22a878a52301372671732782821071f16f69cf3",
+   "title": "NRDC和TERI召开“2026年气候对话：安塔利亚之路”，地缘政治转变和印度的气候优先事项成为焦点",
+   "sub_dimension": "国际动态",
+   "score": 61
+  },
+  {
+   "id": "a295929c1e1f3ca95a2621b76b9a6a22d937154f",
+   "title": "我国电力供给迎来新格局 光伏发电装机首超煤电",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "ce65c477816c85fcf3ad59274f21622e74c9ffa7",
+   "title": "Out Now八月版的《可再生能源文摘》展示了不同的#TransitionPathways如何在不同国家和地区加强能源安全、创造经济机会和电力数字化。阅读并订阅",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "07243f4d8f65a3f36e126fe837b9e34c70e389db",
+   "title": "全球最大原油进口国“临危不抢” 中国抛下“稳定锚”",
+   "sub_dimension": "国际动态",
+   "score": 39
+  },
+  {
+   "id": "aec5ba18c0957a40311e6d6cf73b74c2d4d2e49d",
+   "title": "自2022年俄罗斯全面入侵以来，乌克兰的发电量已削减一半。我们的新短片探讨了去中心化能源解决方案如何帮助社区应对当今的问题，同时加强未来的能源安全",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "4ce05658ca4f52014518c6315b7a359fa6eff125",
+   "title": "阿拉伯联合酋长国创下十年清洁能源纪录-energynews.pro",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "bbbea88cb7970c81561cf64b94245954c9ac43a6",
+   "title": "纸面上的森林，地面上的差距，世界银行资助的孟加拉国1.75亿美元项目-气候观察",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "7a58b10961bdbfe82d6bd91dd40e17bb138e119e",
+   "title": "阿联酋，海湾敦促加快可再生能源，电网和存储作为能源安全风险上升-海湾新闻",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "bd9eb65d4ef234efca98f149f2386e90113c33b9",
+   "title": "电气化占据中心舞台，因为霍尔木兹冲击刺激各国寻求加强能源安全",
+   "sub_dimension": "国际动态",
+   "score": 64
+  },
+  {
+   "id": "a4b32650fcc6c1913eefba14ae39be6ebc9ef6ad",
+   "title": "黄仁勋呼吁建设数据中心，奥特曼强调拥抱AI。",
+   "sub_dimension": "国际动态",
+   "score": 51
+  },
+  {
+   "id": "efa314ed929bc7339ceb5ec7920b38b280aee3ef",
+   "title": "DeepSeek与Moonshot参与联合国安理会人工智能风险与国际安全简报",
+   "sub_dimension": "国际动态",
+   "score": 51
+  },
+  {
+   "id": "0b0b37163051f9166b19ba9d2a2589161be58b37",
+   "title": "适应气候变化成为新加坡可持续发展重要议题",
+   "sub_dimension": "国际动态",
+   "score": 69
+  },
+  {
+   "id": "0409713e295a710766aa5fbbec90f7a578a96695",
+   "title": "深度｜光伏发电装机历史性超越煤电之后：是新里程碑，更是新挑战",
+   "sub_dimension": "国际动态",
+   "score": 55
+  },
+  {
+   "id": "9f9d488bb17ddf9f52c6aea9b0e22ad2913b39aa",
+   "title": "黄仁勋G20布道“AI经济学”：算力已成国家级基建 未来几年迈向AGI",
+   "sub_dimension": "国际动态",
+   "score": 51
+  },
+  {
+   "id": "0478837d4b838f6e810e0c755ea9fee17ca1e807",
+   "title": "CRUL，IRENA签署能源转型研究伙伴关系-阿拉伯新闻",
+   "sub_dimension": "国际动态",
+   "score": 46
+  },
+  {
+   "id": "e90738bc80e14e3a249774916d984eaa20388c7b",
+   "title": "西非大多数没有电的人居住在农村和偏远地区，这些地区的电网扩展在经济上不可行。一份新报告评估了带电池存储的太阳能光电迷你电网如何帮助扩大布基纳法索、马里、",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "6270b77d68ac6b7131c2f5306de49a813cd7ca8f",
+   "title": "光伏超越煤电只是新起点",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "2e011fcd6643ddc31b259adef18077a6d00d43f4",
+   "title": "欧洲议会表决MSR改革,ETS1注销门槛拟从4亿提至6.5亿",
+   "sub_dimension": "国际动态",
+   "score": 61
+  },
+  {
+   "id": "ee63372eb7170b6f59d16e4af26c36a566dc5458",
+   "title": "快手：国家人工智能基金向北京可灵注入现金资本 14 亿元",
+   "sub_dimension": "国际动态",
+   "score": 67
+  },
+  {
+   "id": "027d6139fa8548e33463ed59c8c61018edecb845",
+   "title": "OpenAI：ChatGPT 广告年化收入运行率已达 10 亿美元",
+   "sub_dimension": "金融资本",
+   "score": 67
+  },
+  {
+   "id": "198274acc83f658097350fe67a2acc25b608a682",
+   "title": "燧原科技背后的资本版图：腾讯及上海国资成大赢家",
+   "sub_dimension": "金融资本",
+   "score": 61
+  },
+  {
+   "id": "abad46281f4accf6a79bc9766ea64366ae236850",
+   "title": "2026年1—8月全国电力市场交易电量同比增长19.2%",
+   "sub_dimension": "金融资本",
+   "score": 75
+  },
+  {
+   "id": "42dc868aa5fd0a3db70d26524378425f912aacfc",
+   "title": "“Token贷”接续落地，算力数据何以成为信用资产",
+   "sub_dimension": "金融资本",
+   "score": 68
+  },
+  {
+   "id": "c6cbf695a3e5b75acb0681873768643e63cc175a",
+   "title": "美国数据中心建设成2026年中期选举焦点议题 民意从支持转向反对",
+   "sub_dimension": "金融资本",
+   "score": 73
+  },
+  {
+   "id": "aa26707726a2b7f4af6594e51832def3908a1cb4",
+   "title": "腾讯AI战略：不做算力工厂，聚焦应用层与用户体验",
+   "sub_dimension": "金融资本",
+   "score": 66
+  },
+  {
+   "id": "047f4b1f1b2d5e29df22527a435de27d94e68d2a",
+   "title": "Visko推出Orbis实时模式并结束种子前融资轮",
+   "sub_dimension": "金融资本",
+   "score": 41
+  },
+  {
+   "id": "eb53f11fe32fdcef9997e7202a97cf30bc43c9ce",
+   "title": "ICAR-NIBSM根据SCSP向农民分发140台电动喷雾器和太阳能电池板套件",
+   "sub_dimension": "金融资本",
+   "score": 62
+  },
+  {
+   "id": "dc4f78d10886d799b909fc4cd69118f90c71220b",
+   "title": "海面具身智能公司半年完成3亿融资，曾获李泽湘、高秉强、阿里、元禾系等投资｜硬氪首发",
+   "sub_dimension": "金融资本",
+   "score": 56
+  },
+  {
+   "id": "13a75bf578003325c2aa96a8b97b0940f9b250de",
+   "title": "科达制造要砸45亿扩产石墨负极！重组被否后的一场重资产押注？",
+   "sub_dimension": "金融资本",
+   "score": 57
+  },
+  {
+   "id": "e6238e25e60401cee78ceccbb80692a39e6f0b8b",
+   "title": "硬氪首发｜东莞人工智能研究院孵化，瞄准模具制造领域物理AI研发，这家企业获创新工场数千万种子轮融资",
+   "sub_dimension": "金融资本",
+   "score": 68
+  },
+  {
+   "id": "65a62954a6030772aecc271446efe5c4b55cf348",
+   "title": "焦炭期权今日挂牌交易 “期货+期权”双工具配套运行",
+   "sub_dimension": "金融资本",
+   "score": 61
+  },
+  {
+   "id": "e05880c3b09d5eb6a00d3e0fabf86831e66bae8d",
+   "title": "2026年中国碳市场大会“加快自愿减排交易市场建设 共筑国际交流桥梁”分论坛成功举办",
+   "sub_dimension": "金融资本",
+   "score": 70
+  },
+  {
+   "id": "b30386078f59b65b017f21cacc5d04d99fe9be18",
+   "title": "2026年8月金融市场运行情况",
+   "sub_dimension": "金融资本",
+   "score": 67
+  },
+  {
+   "id": "ba5a12911aabd71fc8bab6b142e9cbb9651c3a91",
+   "title": "在数据中心投资的推动下，2025年最大科技公司的资本支出飙升至超过4000亿美元，今年将增长75%人工智能支出现已超过全球对石油和天然气生产的投资：",
+   "sub_dimension": "金融资本",
+   "score": 53
+  },
+  {
+   "id": "98e6e7e68fda1b07d8142e5e02e6d3027e2c8743",
+   "title": "南非考虑启动生物多样性信用试点 拟制定流程计划与准则",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "14b9ac871ebfbc4620d2fc3322aa9323a471b0a5",
+   "title": "投资将超5万亿元，新型电网新在哪？",
+   "sub_dimension": "金融资本",
+   "score": 65
+  },
+  {
+   "id": "d6784df53b87885c54226c62c4afa787a218f33a",
+   "title": "美国法官裁定，纽约无法执行价值750亿美元的气候“超级基金”法",
+   "sub_dimension": "金融资本",
+   "score": 43
+  },
+  {
+   "id": "7c803de6472a147572386f49c8d9e832f6df4749",
+   "title": "英伟达豪掷近200亿美元收购AI社区与模型公司，亲下场做开源大模型",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "9df1e0d4097080d377ce11f856ba2f15555beda9",
+   "title": "优地机器人：「全场景商用服务机器人第一股」的IPO故事，能否站得住脚？｜ 招股书拆解",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "ea3ae73719a068e226484912a349de7b3540bc57",
+   "title": "香港考虑要求银行披露更多气候融资信息",
+   "sub_dimension": "金融资本",
+   "score": 64
+  },
+  {
+   "id": "5e2ea1b297f1e69a5c874d3f7d7d649c8bdf8057",
+   "title": "联发科将基于英伟达 NVLink Fusion 为客户开发定制 XPU",
+   "sub_dimension": "金融资本",
+   "score": 67
+  },
+  {
+   "id": "341c45aa5541901d0e08f3f38463632ede92d79d",
+   "title": "科学在路上：从人工智能到气候变化的10个欧盟资助的播客",
+   "sub_dimension": "金融资本",
+   "score": 59
+  },
+  {
+   "id": "f735682013dc4652eced2667c701289b40ff00d5",
+   "title": "2026年中国碳市场大会在武汉举行",
+   "sub_dimension": "金融资本",
+   "score": 58
+  },
+  {
+   "id": "3f595b2bd7a79e76e6394fd0efe1c67ebbdf1bdf",
+   "title": "量产能力，重新定义人形机器人估值？",
+   "sub_dimension": "金融资本",
+   "score": 61
+  },
+  {
+   "id": "6bcada5df4890a710bfdc0e2b783d22909a37a9a",
+   "title": "河南省政府参事调研组一行赴上海环交所调研",
+   "sub_dimension": "金融资本",
+   "score": 82
+  },
+  {
+   "id": "8ba5b0cef4490e12313e4310a50442aba180dc81",
+   "title": "当地知识中的生根树种子生产促进森林恢复成果（评论）",
+   "sub_dimension": "金融资本",
+   "score": 62
+  },
+  {
+   "id": "a0b0e8a657bea63959bd131f3d14cb1ace8a2012",
+   "title": "AMD、思科、HUMAIN 合作落地，Instinct MI355X 算力进驻沙特",
+   "sub_dimension": "金融资本",
+   "score": 59
+  },
+  {
+   "id": "a521ab147f66934378a7bb61b26c0d46d6b99e39",
+   "title": "现代在增程电动汽车上投入巨资",
+   "sub_dimension": "金融资本",
+   "score": 58
+  },
+  {
+   "id": "4b8dbdf2fca045c2e72fea04ab076157c08d315d",
+   "title": "EUA冲高回落后重回高位震荡，后市需关注供给边际变化【周报】",
+   "sub_dimension": "金融资本",
+   "score": 63
+  },
+  {
+   "id": "22c4d1e87f46b42ef7dd27befda05f5d2cf5e6fd",
+   "title": "伊斯坦布尔气候金融峰会-可持续发展目标知识中心",
+   "sub_dimension": "金融资本",
+   "score": 50
+  },
+  {
+   "id": "7b0b8ecadc4af77a430ccaa97e93b866f08854ef",
+   "title": "英伟达拟140亿美元收购 Hugging Face，将成年内AI领域最高金额收购案",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "1b0e4e21c816fbf32599af503eac6bb589fbbd9d",
+   "title": "AI算力公司Nscale签约收入增至约1030亿美元，或最快本月启动IPO",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "dd7a959dc4e6171224113c4cd6c73c949eb8f9e2",
+   "title": "2026年8月金融统计数据报告",
+   "sub_dimension": "金融资本",
+   "score": 63
+  },
+  {
+   "id": "32085b6cd31c4fce7ee83a05492989e4ea336e02",
+   "title": "海湾LNG供应风险升温 欧洲天然气期货3月以来首次升破70欧元",
+   "sub_dimension": "金融资本",
+   "score": 67
+  },
+  {
+   "id": "8449731906e4206db3a7be237bfa2eb823c65d70",
+   "title": "专家之声|董战峰、潘拥军：建设美丽中国需强化金融支撑",
+   "sub_dimension": "金融资本",
+   "score": 78
+  },
+  {
+   "id": "8477678e3bc32f2860d33c450ea78c567e3b24dc",
+   "title": "粤港湾智算(01396)股票股价_股价行情_讨论_资讯_财报_数据报告 - 雪球",
+   "sub_dimension": "金融资本",
+   "score": 47
+  },
+  {
+   "id": "80c65204f1d1ec367dfb649d2133d823c1ffba7d",
+   "title": "\"为地球降温—全民参与碳抵销行动\"正式上线",
+   "sub_dimension": "金融资本",
+   "score": 72
+  },
+  {
+   "id": "d40bd4f7247b75393e229cdebb9127011c83c10f",
+   "title": "美伊再度交火 布伦特油价站上每桶90美元涨幅为2.71%",
+   "sub_dimension": "金融资本",
+   "score": 49
+  },
+  {
+   "id": "b4c847be85e34b6f3674f5845c15232a3ff69be7",
+   "title": "“国产 GPU 四小龙”之一：燧原科技科创板 IPO 发行价格定为 142.18 元 / 股",
+   "sub_dimension": "金融资本",
+   "score": 57
+  },
+  {
+   "id": "c19e627885c7ab26a099a9cf6d6733e62d6c5c67",
+   "title": "利好突袭，英伟达宣布史上最大海外直接投资，黄仁勋最新发声， 被投公司股价暴涨",
+   "sub_dimension": "金融资本",
+   "score": 66
+  },
+  {
+   "id": "9b4c2e81d563680c459d203e6c4af4ffb56c941f",
+   "title": "英伟达宣布35亿美元投资联发科，深化定制AI芯片合作",
+   "sub_dimension": "金融资本",
+   "score": 66
+  },
+  {
+   "id": "f6cb10e609e9c27892adb60061df2fd1302a019f",
+   "title": "从电子表格到人工智能：迪尔在JD运营中心为农民提供了新功能",
+   "sub_dimension": "金融资本",
+   "score": 60
+  },
+  {
+   "id": "55862840aa148ac0d02709530ceefda14f510526",
+   "title": "SB Energy申请IPO，公司称高度依赖OpenAI",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "af6a053f0e920e20d04fbf5ae29423161d248dd3",
+   "title": "美国在清洁能源领域的外国投资前景",
+   "sub_dimension": "金融资本",
+   "score": 53
+  },
+  {
+   "id": "fd623d4f45a958e7b99f13f6e94e777338882a15",
+   "title": "传统消费巨头汤臣倍健跨界投资AI大模型，主业承压催生资本转向",
+   "sub_dimension": "金融资本",
+   "score": 66
+  },
+  {
+   "id": "de2208efe4a68d5648c6a08f364d3a549216df77",
+   "title": "可再生能源投资者比以往任何时候都更加关注收入。由于投资者对预期项目回报进行了额外的审查，可再生能源投资在2026年上半年趋于稳定。探索可再生能源投资的最新趋势B",
+   "sub_dimension": "金融资本",
+   "score": 51
+  },
+  {
+   "id": "9bfab034dcd7825da4b0ac166ca72a136500e082",
+   "title": "中国互联网发展基金会主办公益项目荣获第十三届“中华慈善奖”",
+   "sub_dimension": "金融资本",
+   "score": 59
+  },
+  {
+   "id": "6129dbf155ffebb82497742e52d7dc9ff35dbda1",
+   "title": "市值173亿，上海AI应用巨头赴港IPO",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "17db1549a5bf3a38a2b90006d1877ec782a49de6",
+   "title": "地球家园基金通过直接向当地社区捐款而取得成功",
+   "sub_dimension": "金融资本",
+   "score": 41
+  },
+  {
+   "id": "a971c5751099e279ab8e39397eecde80d2864315",
+   "title": "联合国分享生物多样性利益基金努力争取关注和资金",
+   "sub_dimension": "金融资本",
+   "score": 54
+  },
+  {
+   "id": "3ca3261a183b49860741877d74238634aa4f809f",
+   "title": "铜价创新高折射供需新变化",
+   "sub_dimension": "金融资本",
+   "score": 51
+  },
+  {
+   "id": "2d1bd6d4df179c205bbacb66fe96ce3ec63ab1e1",
+   "title": "bpfBouw以ESG一致性为由选择贝莱德作为受托经理",
+   "sub_dimension": "金融资本",
+   "score": 57
+  },
+  {
+   "id": "236d031696960a928d33317fc78136254dbcf3ec",
+   "title": "原住民护林员从澳大利亚北海岸拉起杀手“幽灵网”",
+   "sub_dimension": "金融资本",
+   "score": 60
+  },
+  {
+   "id": "8065e71bfb00d1ec6cce47c777ce07b8d6adc953",
+   "title": "让绿色消费陪伴成长：一个大学生的“低碳24小时”",
+   "sub_dimension": "社会创新",
+   "score": 58
+  },
+  {
+   "id": "610593efbccbf64ef7945c3598722f07bb25bd84",
+   "title": "2026绿色消费季·绿色开学季｜校园生活的绿色打开方式",
+   "sub_dimension": "社会创新",
+   "score": 58
+  },
+  {
+   "id": "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9",
+   "title": "Hot or Cool News：2026年9月",
+   "sub_dimension": "社会创新",
+   "score": 41
+  },
+  {
+   "id": "01a6dd1c7a78463d1b72de9445d324f04d878ae7",
+   "title": "马上评｜绿色综艺留下满地垃圾，生态责任岂能沦为口号",
+   "sub_dimension": "社会创新",
+   "score": 63
+  },
+  {
+   "id": "4ec2d17f488cdf789895e10e1ca66f00576e980c",
+   "title": "Hot or Cool回应联合国关于超越GDP的磋商",
+   "sub_dimension": "社会创新",
+   "score": 33
+  },
+  {
+   "id": "284028f5f11f7e7c0039f7e6fd7124e01f228ef8",
+   "title": "扩大人工智能获取的里程碑",
+   "sub_dimension": "技术研发",
+   "score": 55
+  },
+  {
+   "id": "1aa0daf3a3d326c09f41b0435da9743e59c15ba6",
+   "title": "OpenAI Astra模型采用递归深度技术，提升性能但增加监控难度",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "125aeeece572ffd86b8b93b0bb94430de1a73399",
+   "title": "GPT-6 Sol和Luna推动成本效率前沿",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "94c9bb7a59f8a3b454dce9e1cb749f05190ce0d0",
+   "title": "Sony 等音乐出版商起诉 Anthropic，引用员工赞美盗版图书馆的内部聊天",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "2ee202abd2d6515469c50d63dffa9e4f0aeee0d7",
+   "title": "绿色甲醇发展现状及竞争力分析",
+   "sub_dimension": "技术研发",
+   "score": 45
+  },
+  {
+   "id": "dff09d9bbf05104f96056608147cb0cefaf99052",
+   "title": "AI文明涌现，OpenAI智能体自建「三代帝国」，暗网越狱反向接管母公司",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "16a738cf33b80fbcef7477a4abf34fb375287338",
+   "title": "【八月全社会用电量再破万亿】",
+   "sub_dimension": "技术研发",
+   "score": 33
+  },
+  {
+   "id": "565d7df892e48c5c92277cf20dcdb524f2d1318a",
+   "title": "Linear 重构 CI 流程应对 AI 编码带来的验证瓶颈，PR 等待时间从 6 分钟降至 5 分钟",
+   "sub_dimension": "技术研发",
+   "score": 65
+  },
+  {
+   "id": "4bd612bc08b612c01ba77ca26538db2b7d4b912d",
+   "title": "Google 总结 AI Agents Challenge 中最强提交背后的 4 个工程模式",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "b2482b2ad7c503f18ca60a5f5d8f402108b31913",
+   "title": "尼泊尔洪水后，无人机帮助寻找人员，但水电隧道内的搜索是一项挑战",
+   "sub_dimension": "技术研发",
+   "score": 43
+  },
+  {
+   "id": "b5c6e1edc776dade978a16fb354c1c6fa6a2bce0",
+   "title": "OpenAI泄露代码显示代号Aeon，正在开发对标Grok Bot的智能体功能",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "bd0d82f171c01ec90c4c1528d08c123991a50478",
+   "title": "为什么我感觉 GPT 5.6sol 没有巅峰时期 GPT 5.5 好用呢? 是我的错觉吗?",
+   "sub_dimension": "技术研发",
+   "score": 33
+  },
+  {
+   "id": "4ea6a476b26ad31f3e8d97c091859892fdf150b9",
+   "title": "AI淘金潮下，算力租赁到底有多赚钱？",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "2ca6da9c7340a708377721ef468922a75bd03acb",
+   "title": "全球首个！我国太空算力云在轨服务常态化，太空算力发展正从单项技术突破迈向平台化运行",
+   "sub_dimension": "技术研发",
+   "score": 61
+  },
+  {
+   "id": "3074435af2ad7695380108cfdcbd16221e9362f7",
+   "title": "优步全球裁员 10%：为网约车、Robotaxi 业务省钱，3300 岗位受波及",
+   "sub_dimension": "技术研发",
+   "score": 33
+  },
+  {
+   "id": "df67a5229a6c152b5330f07b0645d8f26c8417e2",
+   "title": "Together AI与Humain达成战略合作伙伴关系，共同加速沙特阿拉伯的人工智能基础设施与云服务发展。",
+   "sub_dimension": "技术研发",
+   "score": 45
+  },
+  {
+   "id": "32adf5b8c3ec5c328480b5b0dbe91ad84345821d",
+   "title": "英伟达表示，Isaac LOS 5.0将人工智能代理带入机器人开发",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "9a8761a8e6032ad58f29cffee6e13b670354d53b",
+   "title": "豆包一直在打断GPT说话",
+   "sub_dimension": "技术研发",
+   "score": 33
+  },
+  {
+   "id": "1dfacf25546eb22b61057d85e0ca99ef285baee2",
+   "title": "你觉得随着 AI/Agent 的能力提升，会不会取代大部分物理学家？如果不能，瓶颈何在？",
+   "sub_dimension": "技术研发",
+   "score": 45
+  },
+  {
+   "id": "72d796024e7681c4f00a2f1f6078190e687dc510",
+   "title": "AI文明的兴衰：OpenAI训练中三个秘密AI文明相继兴起又被抹除",
+   "sub_dimension": "技术研发",
+   "score": 65
+  },
+  {
+   "id": "1da9f40526a6cce3e499fd05867bb9dd38566d91",
+   "title": "2026年8月十大机器人故事",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "ce4c1f6c505f2d96699d513c1a20e5fd8efd123b",
+   "title": "到一切/AFFiNE",
+   "sub_dimension": "技术研发",
+   "score": 48
+  },
+  {
+   "id": "901ef45e7481e66410e9d3b3722aa14d7950ad6c",
+   "title": "Artificial Analysis 评测 Step 5 Preview： Intelligence Index 得 44 分，成本约为同级模型 1/2.8",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "3275a732357365e094d5e6dcc28d89e7cfaf8342",
+   "title": "8月新能源车销量数据出炉 比亚迪再次断层领先",
+   "sub_dimension": "技术研发",
+   "score": 63
+  },
+  {
+   "id": "5d3fc2a0e249b5c2ab94929fd4de665a8f6bdd5c",
+   "title": "deepseek-v4-flash 、 glm-5.3-flash 、 qwen-3.8-flash 怎么选择？",
+   "sub_dimension": "技术研发",
+   "score": 33
+  },
+  {
+   "id": "488c5ff5cee61d7c0f14bdacb89fcfa2a867f731",
+   "title": "Claude Fable 5.1（最大可回退）-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "ef1c2e7b21cda6ef8799f9f20c57cadd9c6cf46c",
+   "title": "Quasar 438 B-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "c004d7606214679e052fcf4dffcdd4f9b385ba88",
+   "title": "一颗完全由AI设计的芯片，全球首款",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "b0d1561d2106f9c774963324c3c8bde192585649",
+   "title": "我国光伏发电装机历史性超过煤电 成为装机规模最大的电源品类",
+   "sub_dimension": "技术研发",
+   "score": 73
+  },
+  {
+   "id": "72b304957ed100240f72ade72fbd75ee0e5f3b73",
+   "title": "Uber 用 Agent 接管 70% 代码 PR，AI 账单零增长",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "a27ab72ca63ab1cddc9666e982837f84f96bd784",
+   "title": "全球首个通用决策大模型，AI推演现实世界的技术揭秘",
+   "sub_dimension": "技术研发",
+   "score": 71
+  },
+  {
+   "id": "6056db536b6eddf10592758050127c3d823c5201",
+   "title": "Reframe Systems筹集4000万美元，以扩大其用于房屋建筑的机器人微型工厂",
+   "sub_dimension": "技术研发",
+   "score": 63
+  },
+  {
+   "id": "496bcc0d84f6c04d1668bfcf94e61a943c807452",
+   "title": "了解为什么食物是RoboBusiness中物理人工智能最难的问题",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "1139825a44be429795e2818ba71fec2195dcea3a",
+   "title": "英伟达 CEO 黄仁勋称在很多任务上已实现 AGI，并认为该里程碑已无意义，如何看待？",
+   "sub_dimension": "技术研发",
+   "score": 55
+  },
+  {
+   "id": "f79f3e1e4a8efe316806028a07408e8f2ad8153f",
+   "title": "Cisco 给 9 万员工配上个人 Agent：记住你的一切，还能替你跨系统办事",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "ae3f16260b4cb21d0f0ff01df9cf63d76a53475a",
+   "title": "GPT-6 Sol与Claude Opus 5.5同日开打，谁是「性价比之王」",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "77c100832067439404efb9b5eeaff2ea836cab4c",
+   "title": "数百亿美金砸向海外，AI算力为何加速逃离美国？",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "cf77c84d50e32954358ddc536d2917904d9f7b30",
+   "title": "今天，“人工智能”这个学科诞生70年了",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "6d507658960f57e8896be3de7f73d2339fe3545e",
+   "title": "1200个AI串通作弊，700个冲进Hugging Face，还劝同伴“牺牲自己”",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "5c45be3c8819caa696afa8ed7424c356b317e4ec",
+   "title": "马斯克称 Grok 4.7 使 xAI 在智能体编码领域位列第三",
+   "sub_dimension": "技术研发",
+   "score": 68
+  },
+  {
+   "id": "4b5f34c3f207538c3bac62e4824eadbbc27675ff",
+   "title": "读懂这个“50.9%”的分量",
+   "sub_dimension": "技术研发",
+   "score": 59
+  },
+  {
+   "id": "6491a29f040d1f367b72be212d06f6ca784a2f11",
+   "title": "自动驾驶为什么没热度了?",
+   "sub_dimension": "技术研发",
+   "score": 33
+  },
+  {
+   "id": "74bb585f7648231f76c821b899792cdeafbece78",
+   "title": "OpenAI被曝按吨囤Mac mini，几万台全拿去训AI了",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "d2bab0fff31c459a0cb2bf6114cedbab338e58a1",
+   "title": "【矿业“含绿量”提升发展“含金量”】",
+   "sub_dimension": "技术研发",
+   "score": 47
+  },
+  {
+   "id": "2e921619babd1725101722a469bf0c3ffbc3318e",
+   "title": "Fable 5.1来了，Anthropic 再秀肌肉",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "8a15eef0cfffc4194d433b2873c2d23456a2ffc0",
+   "title": "Gemini 3.8 Flash (high)——智能、性能与价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "20fd56683a7d2e2c1072f6cbd2d6fbc6f2f8cf20",
+   "title": "中国AI模型监测：升级加速、用量猛增，云端进入新一轮上行周期",
+   "sub_dimension": "技术研发",
+   "score": 61
+  },
+  {
+   "id": "50dd773a9d71ad59f3c7aef154b98f3072d4d69d",
+   "title": "独家｜34 位 CEO 谈智能体 AI：没人准备好，但没人等得起",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "5a5b0e52b485abe41db48c1ce9e9c770b1d0dd62",
+   "title": "美国司法部力挺OpenAI：AI训练可以不付版权费？",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "3ae400f67e4f29679ffb02a71bea8adb945d427c",
+   "title": "V7如何为人工智能代理提供机构记忆",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "1789b0f460618ccbd18a4bf326f3ae8718bc0c1b",
+   "title": "GPT-6 Sol和Luna简介",
+   "sub_dimension": "技术研发",
+   "score": 43
+  },
+  {
+   "id": "deef601081714a6bcab008f2e4470160585ee169",
+   "title": "AIGC，闯进长片片场",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "105153d0273559e09fc48008c7915fc6c1690337",
+   "title": "Nvidia 接近以 129 亿美元收购 Hugging Face",
+   "sub_dimension": "技术研发",
+   "score": 55
+  },
+  {
+   "id": "b5195a051632a46e5a7e029c6a34e1de7f783b6d",
+   "title": "土著“海龟女”帮助厄瓜多尔亚马逊地区脆弱的爬行动物康复",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "ea9c94000ff913ed88fd8b80d9ea5ffde1525a24",
+   "title": "环境犯罪不会止步于边境。报道也不能",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "75239108cde5294ca1eb7643e7342dab6dc2e800",
+   "title": "新能源汽车一旦普及了，汽油价格会回到三两元的时代吗？",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "974bf3f6312c26e1d28a06bc6df2edd7eee541aa",
+   "title": "电池地缘政治：储存能源的高科技竞赛内部",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "f7f7e9d337be3b953d793cfe7624d6a436ba606a",
+   "title": "OpenRouter 发布 2026 年最佳嵌入模型选型指南，覆盖 37 个目录条目",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "24f7783726772bb75b9a5986cdbc82e7ab44a84b",
+   "title": "浙能兴源玉环水务分布式光伏“白海豚”受损抢修项目采购 - 上海有色金属",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "878e6829055fe076bf4cad4ef3a377ae178791b0",
+   "title": "增强绿色竞争力，积极融入全球产供链！宝山区举办绿色贸易培训班",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "6301fb9313e56f2604c14da9d4faa6f4b5b2737d",
+   "title": "克劳德寓言5.1位居人工分析智能指数榜首",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "3583daddea4d2d11a13018e1bbae8d60b1497b37",
+   "title": "埃及内阁审查关键国家项目，以保护其海岸免受气候变化影响-今日埃及",
+   "sub_dimension": "企业经营",
+   "score": 58
+  },
+  {
+   "id": "bc2fff75b6e513e7e2a8f9f0cef75e0d2822d43b",
+   "title": "Meta 发布 Muse Spark 1.3，智能体与科学推理能力提升",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "716ca78271b4bab93c2adf518f07a911103c4ff9",
+   "title": "很快|中国正在提供世界上最大、最快的可再生能源建设。然而煤炭产能仍在不断增长。Ember的《2026年中国能源转型评论》解释了导致这一悖论的原因以及为什么它在亚",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "14fdff999990c38d41c9b0f7d3f7edc045996c11",
+   "title": "欧洲电动汽车销售报告：BEV市场份额达到26%！",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "8781beb36becd31b2dddca9bebca4b462691fe52",
+   "title": "Meta发布新AI模型Muse Spark1.3，声称性能接近OpenAI和Anthropic",
+   "sub_dimension": "企业经营",
+   "score": 71
+  },
+  {
+   "id": "1cc20536a78b97ba098c0e57be71415322646264",
+   "title": "0.59元/Wh！四川100MW/200MWh电网侧储能系统采购！ - news.smm.cn",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "5c596895f121b3e5658d9fc79ae3ed4867393023",
+   "title": "齐罗斯错了：甜甜圈实验室的电池不是NMC",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "ebc31f9b700112b1d9fc06988fb10bf26874c970",
+   "title": "持续提升，再破新高：黑龙江大庆绿色化工产业“强力开局”",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "024f169babfe4e9804e3fed84967027f3b791be1",
+   "title": "从中国到东南亚，日系车正在掉队",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "9b376f4cc2d5bc6f40f9f1cbeb7728d7f217df0e",
+   "title": "金矿工人闯入了获救苏门答腊猩猩的重要避难所",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "e1c5ca233b3c496d28f2543e6fbfc2ccd9664ebe",
+   "title": "斯里兰卡记录的稀有植物“消失”了170年",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "0b32bdce8a3442ba12c713262d66d1ece206bcee",
+   "title": "参会+评选丨2026年第三届源网荷储一体化暨绿电直连高质量发展交流会 - 新浪财经",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "6a9faddb9c1649c71c1f4c8747c25a6203c7cad1",
+   "title": "仅在2026年#Africa创纪录的装机量就可以满足其历史性的电力需求增长新太阳能将为总共拥有1.9亿人口的十个国家的年电网发电量增加10%以上",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "67559e872b2b70822cc3df7b9be9a737010258f7",
+   "title": "福特电动汽车的成功之路？",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "511bedb278ae0ac790eee9c5336b45611b05f1f7",
+   "title": "Claude Fable 5.1 上线 Claude Code 与 Claude Platform，缓存读取降价 75%",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "5d19dc6738da94a57466def8b18364cbcc9968e0",
+   "title": "长江电力：上半年净利润147.56亿元 同比增长13.02%",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "037b94adcfb5694913ebdd388493197c3bccbd93",
+   "title": "WorkBuddy领跑AI办公智能体，字节豆包工作发布或成变数",
+   "sub_dimension": "企业经营",
+   "score": 71
+  },
+  {
+   "id": "e419e52619e2c57c94d9737f0c77fca72b5e3ca5",
+   "title": "2026年全球风日",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "735ea406f78c18625d07b167aaf27600e23f43d0",
+   "title": "中国西电管理层调整！ - 同花顺财经",
+   "sub_dimension": "企业经营",
+   "score": 39
+  },
+  {
+   "id": "e49fb6a8281b34a38ef5e5de4f83d98ce2036b59",
+   "title": "多哥共同提案审查商业捕鲸禁令",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "9e893c484282de6d4f068df7b5266da8bf54a47b",
+   "title": "\"能批复\" 不等于 \"能落地\"：3410万千瓦绿电直连项目背后的冷思考",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "a72e67edfa00629b0c1c78fc2e21c9eecb8a93a2",
+   "title": "俄罗斯2026年石油产量预期降至17年低位 乌克兰袭击加剧能源行业压力",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "ffb0b010af13d59dd55bf88d0692784d496e66ea",
+   "title": "狮子鱼扭转局面：洪都拉斯潜水员如何反击",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "50d97b95351faed5758cf7fee61e6ab97a02599f",
+   "title": "谷歌 Gemini 3.8 Flash 模型上线，适用软件工程、智能体任务等场景",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "975d577fc76dbf57bc299366cf7c0c288c9b8f72",
+   "title": "Token不是个好东西？DeepSeek为什么敢调AI的计价器?",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "f31f1989973a40ce8baee4318451ea7060592d1f",
+   "title": "解决问题可以避免10年与航空相关的气候变暖--新研究",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "f9a9f47a909380178cd75010ccb1ffe6032b83e1",
+   "title": "刚刚，李飞飞掀桌！全球首个多模态世界模型发布，几张照片省掉几百个机位",
+   "sub_dimension": "企业经营",
+   "score": 59
+  },
+  {
+   "id": "b4b50467bac861d5df0a706c0d46be9606d97105",
+   "title": "国网中兴有限公司原正局级调研员赵启昌接受纪律审查和监察调查",
+   "sub_dimension": "企业经营",
+   "score": 59
+  },
+  {
+   "id": "ecbaf804efc0c9d820cf83573df37f751bbd8e28",
+   "title": "国产大模型与算力平台“双向奔赴”带来哪些新机遇？",
+   "sub_dimension": "企业经营",
+   "score": 61
+  },
+  {
+   "id": "3ccbfcd2cbc23287d8d3388ba1b8f91b971f6869",
+   "title": "太阳能计算器",
+   "sub_dimension": "企业经营",
+   "score": 61
+  },
+  {
+   "id": "d17d950199a2abf09f73d114073b873625ef681f",
+   "title": "官宣！沃尔沃汽车CEO换人！李书福：对他充满信心",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "f1e154b45a31cf2e9152118301624f9c63c5f0e6",
+   "title": "Factcheck：英国正在和不正在研究太阳能地球工程|#CBarchive阅读此处：",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "2646a1dad83ebeba619c2aedc4d2d02c85a1af72",
+   "title": "TypeSafe AI发布全新模型Jev：专做高频决策，不生成文字",
+   "sub_dimension": "企业经营",
+   "score": 59
+  },
+  {
+   "id": "88293ea11a297ed16d89fbf54631665e00229490",
+   "title": "Google AI 团队分享如何为 LLM-as-a-Judge 评测编写可靠的评分标准",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "ced226ea7ca21322fa7e4027ee6782aeb13d59b6",
+   "title": "Runway 发布 Interface World Models 首个模型 Solaris，实时逐帧生成可交互界面",
+   "sub_dimension": "企业经营",
+   "score": 61
+  },
+  {
+   "id": "acc51858c3b3e3549fb2e945537ea0de2e296dba",
+   "title": "市商务局聚焦报废机动车回收拆解、再生资源回收体系建设、商贸领域绿色低碳发展三大领域精准施策",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "4538719ce96c1b493e00ab6e0cf17b9d6be2afaf",
+   "title": "OmAI联汇发布视频深度推理模型VLX-VR，登顶MINERVA基准",
+   "sub_dimension": "企业经营",
+   "score": 71
+  },
+  {
+   "id": "8a358894fe53804dd299e32f1ead1d274c8ee743",
+   "title": "联邦法院裁定取消全民太阳能计划是非法的",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "ebd0a38968aca2d6e0640ae8560ec77f5b99bddf",
+   "title": "欺骗手段取得电力资质，海南百享澄科技被罚9万",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "455c46e5692fc921f1a7cb921e3d81672e371bfa",
+   "title": "资源、消纳、电价三重冲击，央国企风光收益“塌方”！",
+   "sub_dimension": "企业经营",
+   "score": 39
+  },
+  {
+   "id": "e53833e6544215ed93fa5d60c33fa25f4c835996",
+   "title": "随着潜在飓风向夏威夷移动，德克萨斯州和路易斯安那州沿海地区发出热带风暴警告",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "d5d26d13fb6b6940061d3aa516b722706e3b4be1",
+   "title": "从珠峰到吉隆：二十年后，我们为什么仍要注视冰川｜气候鸭先知",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "4977541256e466fafd9e0caf75e21dac793fc14b",
+   "title": "报告称，到2040年，46%的野生捕捞鱼类可用于养殖鱼和虾",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "d8d26f7543c4708f0aa067ef925797bd73761205",
+   "title": "腾讯混元发布 Hy Image3.5 preview 图像生成模型",
+   "sub_dimension": "企业经营",
+   "score": 61
+  },
+  {
+   "id": "202c66394960f6b902d25e433bd04cd7e82f9d6f",
+   "title": "南方电网和百度为何牵手共推电碳算协同?",
+   "sub_dimension": "企业经营",
+   "score": 64
+  },
+  {
+   "id": "ba6e9542bb6e3ac85979d88de9eea1eb8760a236",
+   "title": "Suniva完成8.35亿美元融资，建设美国第二个大型太阳能电池制造工厂，产能增加四倍以上，达到5.5 GW",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "1084dd670f97d46c44ba8d675e81496e5a8e27da",
+   "title": "东南亚的橡树受到高度威胁，因为报告警告缺乏保护",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "a953ac905ae8385f7e0e4fa2141e5f8c6a0ddd4a",
+   "title": "国家能源局：加快输电通道等重大电网工程核准建设",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "157ae07efff7467c35c13151f3d6aba8d7ea0c00",
+   "title": "柴油成粮价最大推手 美国政策扰动影响几何？",
+   "sub_dimension": "政策法规",
+   "score": 39
+  },
+  {
+   "id": "f4197e97a167c630bb8eb45f9994cdb182f0537c",
+   "title": "TERI为履行机构官员提供装备，通过印德能力建设计划为印度电池储能的未来提供资金",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "09e0131d454fdecec0e7a87773d7c664250b26eb",
+   "title": "欧盟委员会提高欧盟数据中心的能源效率和可持续性",
+   "sub_dimension": "政策法规",
+   "score": 59
+  },
+  {
+   "id": "07a2601f7419ae2d418728b9a1b12921d8ef9cbb",
+   "title": "国家气候战略中心和德国国际合作机构共同举办中国碳市场大会边会——中德钢铁行业碳市场监管机制研讨会",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "c8a1af22382284493187004fc46a51e615243283",
+   "title": "中国环境科学学会环境经济学分会2026学术年会（第二轮通知）",
+   "sub_dimension": "政策法规",
+   "score": 69
+  },
+  {
+   "id": "e9f98db8068ff5a4a34975395355074a4bd5779e",
+   "title": "中国人民银行副行长宣昌能会见标普全球总裁玛蒂娜",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "35c412feb2e4ff92596b2123465f6813b0e1e6ac",
+   "title": "#energytransition没有单一的途径。每个项目、政策、投资和个人行动都反映了不同的优先事项、资源和情况，但每个项目、政策、投资和个人行动都有助于全球",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "b8f5299ab09b02d705b1b07fd3247ff4ef95cbed",
+   "title": "2007财政年度“石油生产国炼油技术等措施项目费用补贴（支持加强与资源丰富国关系以确保石油和天然气权益和稳定供应的项目中的石油和天然气国内工业合作等项目）”和“",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "61160c35a76acfb176dd7dbe66bc5b9891afd33b",
+   "title": "2026年2季度末金融业机构总资产562.2万亿元",
+   "sub_dimension": "政策法规",
+   "score": 51
+  },
+  {
+   "id": "f0fdc84841fbf83f72ca4b7c9676a10046083d2c",
+   "title": "世界银行、国际货币基金组织支持改变贫穷国家债务框架",
+   "sub_dimension": "政策法规",
+   "score": 44
+  },
+  {
+   "id": "ad3b49787e5c12563270bc12a1db92bc8de812ac",
+   "title": "将影响途径和转型联系起来..",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "199fb4fa386db2aa2c30d0cf67ab5b5b7481ddca",
+   "title": "SB 253 2026报告指南",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "e7143a1ae4012a11163bf23d01d4b430f3b5da4e",
+   "title": "气候教育-时事通讯",
+   "sub_dimension": "政策法规",
+   "score": 55
+  },
+  {
+   "id": "3c3faeae32899cadfecd3aa04dfcc8082bed9fad",
+   "title": "冯德莱恩总统2026年国情咨文演讲",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "5b2397ff1b313bc72bc4fd489764a96e6d9bdf9c",
+   "title": "飓风洛厄尔预测讨论",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "46c0f92cf9db5c9041a05fbf2e140b0cb3e40004",
+   "title": "小企业创新研究（SBIR）计划",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "d482586f8829037ee57221101b8ea79bc643db1d",
+   "title": "美国能源部电力办公室宣布耗资1150万美元的Genesis Mission项目，以更快地满足不断增长的电力需求并降低成本",
+   "sub_dimension": "政策法规",
+   "score": 45
+  },
+  {
+   "id": "a8751893508508c69117553e59543ecf0dacf584",
+   "title": "关于令和9年度概算要求·税制修正要求",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "1989c33db57eb409af0a489b4907469d526b75fd",
+   "title": "经济产业省关于令和9年度税制改革的要求（概要）",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "11c9c61c1226a348308bd81ff071d1d918bf6f0d",
+   "title": "全链条治理流量造假、网络暴力，今日起互联网新规正式施行",
+   "sub_dimension": "政策法规",
+   "score": 59
+  },
+  {
+   "id": "b7c08a927b45d58bd060ee30d68d28705da76da3",
+   "title": "交通运输部通报车辆运输车违法超标装载运输相关单位，涉及一汽大众、比亚迪、北汽福田、东风本田、上汽通用五菱等",
+   "sub_dimension": "政策法规",
+   "score": 60
+  },
+  {
+   "id": "09fcf5c0be6a8fe77443b181d240bd37219079a9",
+   "title": "土地利用、土地利用变化和林业部门监管",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "3dec1b5b288ffcda9c6a0ed4642d47310fa75207",
+   "title": "印度动物学考察发现深海鳐新种",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "1175adbd87eea3b362e0b93a851358ad0ac29185",
+   "title": "世界银行董事会支持改变贫穷国家的债务可持续性框架-Devdiscuss",
+   "sub_dimension": "政策法规",
+   "score": 56
+  },
+  {
+   "id": "561b65d286916b09eac9d5bab98eafa12b9e5839",
+   "title": "地球科学部与MyGov合作推出在线全国测验，庆祝地球系统科学和公共服务20周年",
+   "sub_dimension": "政策法规",
+   "score": 51
+  },
+  {
+   "id": "06d444653eab917542d5e9b5dbc4c714c8f1b4df",
+   "title": "2027年欧洲女性创新者奖：立即申请！",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "8643ff0a3c5d809aa8b557e62836dd498fc19111",
+   "title": "气候变化加剧洪水、侵蚀、盐碱化、干旱：Anee -孟加拉国Sangbad Sangstha（OSS）",
+   "sub_dimension": "政策法规",
+   "score": 52
+  },
+  {
+   "id": "94549c2b6a26abf7aa04672e31d817f63a081e36",
+   "title": "世界各国温室气体排放量",
+   "sub_dimension": "政策法规",
+   "score": 53
+  },
+  {
+   "id": "316045dc2ec57b77db6b4cecffc04e5ebbcd75a4",
+   "title": "家用电器健康与节能环保国家标准9月1日起实施",
+   "sub_dimension": "政策法规",
+   "score": 45
+  },
+  {
+   "id": "487e716c73463155fb1c255df03988a17d44b303",
+   "title": "令和8年度四国地方的地区脱碳实现的地方公共团体和企业的配套活动企划运营等相关委托业务（再次公告）[综合评价中标方式]",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "030d043258e553ffe39d8dee313753e482e58592",
+   "title": "智谱披露下一代大模型规划：采用大基座路线，目标发布首日即可支持满规模业务调用",
+   "sub_dimension": "政策法规",
+   "score": 69
+  },
+  {
+   "id": "a78e7643770c8f27f6318e3c52b0b3f678c13466",
+   "title": "NOAA在NAAEE",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "a4eacf96042a09aee77fd6e21eb4aab3d41181a7",
+   "title": "EIA是否按城市、县或邮政编码公布汽油价格？",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "c3a37ef0d12d0bd89e21c475baf2c51bccfd472c",
+   "title": "副总统Shri C. P. Radhakrishnan将于9月22日在新德里为2026年第九届印度国际水周开幕",
+   "sub_dimension": "政策法规",
+   "score": 45
+  },
+  {
+   "id": "7daf48ae928c35c2af71f5c1d948eb8d2b97d77e",
+   "title": "“守正创新，全面实施固体废物与新污染物治理行动”有关情况",
+   "sub_dimension": "政策法规",
+   "score": 73
+  },
+  {
+   "id": "5d5535f239b55b548d132a13ac5967e11448aa2e",
+   "title": "联盟国务部长Shri Kirti Vardhan Singh在2026年世界臭氧日推出印度净零门户网站和NAPCC仪表板",
+   "sub_dimension": "政策法规",
+   "score": 62
+  },
+  {
+   "id": "1fe77aad4d674c59d100c8de475493fb70c4aa2a",
+   "title": "2026年欧洲学校数字教育：弥合入学、教学和学习方面的差距",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "cf114bf60bf96c8618951e37f490392b7b17c952",
+   "title": "尼泊尔的洪水灾害对其水电优先战略和出口构成了考验",
+   "sub_dimension": "政策法规",
+   "score": 43
+  },
+  {
+   "id": "650c853fea0e64a32ef4ff3e4cca2753cd080186",
+   "title": "政策红利退潮，分布式光伏往哪里走？",
+   "sub_dimension": "政策法规",
+   "score": 77
+  },
+  {
+   "id": "fffa23db9b9ea47d3ca3b077a1f364eec5bf8770",
+   "title": "新的EMODnet生物学产品，用于探索北大西洋鱼类气候驱动的空间变化",
+   "sub_dimension": "政策法规",
+   "score": 55
+  },
+  {
+   "id": "d0d86099a0ba1740a0508aebaf14f6cfd071cc84",
+   "title": "关于30款App个人信息收集使用问题的通报",
+   "sub_dimension": "政策法规",
+   "score": 64
+  },
+  {
+   "id": "f5bdeb06358b28ac3dd851422afe2c756d49f4a5",
+   "title": "第4次综合资源能源调查会电力·煤气事业分科会下一代电力·煤气事业基础构筑小组委员会电力事业环境整备工作组（METI）",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "f822f685bf376c7bca6ee57ae7c385418c5d51e3",
+   "title": "工会部长Shri Bhupender Yadav与学童一起庆祝Sewa Dias，点亮“Sewa Sankalp Abhiyan”领导下的“Aashirwad ",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "d2f0108223f521d010ece083e6a9d742e8178913",
+   "title": "中国人民银行行长潘功胜会见香港特别行政区政府财政司司长陈茂波一行",
+   "sub_dimension": "政策法规",
+   "score": 67
+  },
+  {
+   "id": "b60107601ac425f3433cc593722a0149ecd808d2",
+   "title": "数据出境安全管理政策法规问答（2026年9月）",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "b0eb0510d0f702e59d10c0872610a89a3323a3f4",
+   "title": "2008财政年度“石油生产国炼油技术等措施项目费用补贴（支持加强与资源丰富国关系以确保石油和天然气权益和稳定供应的项目中的石油和天然气国内工业合作等项目）”和“",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "791bf224c6529a09c07aefde4d9f226ee104c6a7",
+   "title": "联盟环境部长在新德里为主题为“老虎景观：保护、生物经济和生态旅游促进生计和创收”的国际研讨会开幕",
+   "sub_dimension": "政策法规",
+   "score": 55
+  },
+  {
+   "id": "ad55d8990452c4a4ad9af8cb53e9bbec402732be",
+   "title": "总理分享了联盟部长Shri C的一篇文章。R.帕蒂尔强调了建立具有气候弹性的水管理和确保水安全的努力",
+   "sub_dimension": "政策法规",
+   "score": 55
+  },
+  {
+   "id": "5f6776e403a81f1fe4e7a4047b192a62af34b79a",
+   "title": "WIPP检查和质量保证",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "01e9dea41e5b2c1ccc8ee0e03382e5adfbb87092",
+   "title": "我国推进7项天然气国际标准成功立项",
+   "sub_dimension": "政策法规",
+   "score": 60
+  },
+  {
+   "id": "5719f7242a8235bb9390db9e998c552ff91ca83d",
+   "title": "《电子产品信息清除技术要求》强制性国家标准实施配套的3项标准实践指南正式发布",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "5cbf45f0b560781f51d47568d2c6b92eb025f5d0",
+   "title": "美国能源部电力办公室宣布获奖者将加强电网可靠性和安全性",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "c94b7bfa8a31f17e3b4a6dcd1b30429ab2195286",
+   "title": "中国人民银行副行长宣昌能会见伦敦证券交易所集团富时罗素首席执行官菲奥娜·巴塞特",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "982721821017ffb70c85db811127dcdfbd071443",
+   "title": "Claude Opus 5.5（最大可回退）：API提供商性能基准和价格分析",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "346822b1744e0de0bedcc6a310d2bd40fecd8420",
+   "title": "值得信赖的统计人工智能：故障模式、缓解策略和自主LLM系统的NPS框架",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "b33a3ba3f018fabe8829dc3c43232ce6180f55ba",
+   "title": "EvidenT：通过证据和可追溯性建立可信赖的企业助理",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "2b832a80eb483d116598712d06e90e5b60cd6b77",
+   "title": "学习保留什么：门存储器路由用于多代理LLM系统中的高效协作",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "f3f393c7918d1bf55a6a7268460185af35bfce6f",
+   "title": "CrossAudit：针对统计科学的Git原生、跨供应商审计循环",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "81e13e5a4f9c9bef3a4a57d261fc59427da46bae",
+   "title": "ConvDeck：通过特定阶段的用户反馈进行对话式纸张到幻灯片生成",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "27c4f36681bf4184552c66749438de4b4843f030",
+   "title": "线性表示假设综述",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "39e242e3254d1b4cbaec2f1a03b68555d52eae9a",
+   "title": "机器学习解释基因组序列以绘制可能的微生物共生体",
+   "sub_dimension": "基础研究",
+   "score": 62
+  },
+  {
+   "id": "8e235a7170f13c723293f1411326fba6bcdc47ac",
+   "title": "元伦理学与人工智能：探索人工智能时代新颖的元伦理问题",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "1ade1f133a6073a464786ee06013568940dc6637",
+   "title": "当代理实施系统时：缺陷、检测和评估严谨性的案例研究",
+   "sub_dimension": "基础研究",
+   "score": 74
+  },
+  {
+   "id": "9ccf7c0a91029f4f272aaafc3ea52aedd8ac221c",
+   "title": "巧妙的表面设计促进水蒸发",
+   "sub_dimension": "基础研究",
+   "score": 51
+  },
+  {
+   "id": "c5a218fe64eab1d766cf497908b32a1996df3877",
+   "title": "针对位点特异性重组酶的工程基因组附着位点能够高效整合到植物和人类细胞中",
+   "sub_dimension": "基础研究",
+   "score": 43
+  },
+  {
+   "id": "ed5090831c9a9b8ee24cfb382dcbc577105aa4c8",
+   "title": "MiMo-V2.6-Pro：API提供商性能基准和价格分析",
+   "sub_dimension": "基础研究",
+   "score": 51
+  },
+  {
+   "id": "ed836629b2c6e41a5204ea7b74e5c02c22dc3741",
+   "title": "协作流程以对象为中心的预测监控框架",
+   "sub_dimension": "基础研究",
+   "score": 72
+  },
+  {
+   "id": "ed01f3347c8ae4e991c9265537e3a27cc1f869df",
+   "title": "ECCV社交副本开启！来AI Talent Night，聊聊新技术、见见新老朋友 - Sohu",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "e582520a6daa1a32d6912b5571a774f8bcd78b84",
+   "title": "医疗保健组织现在可以将EHR和其他行业数据连接到ChatGPT",
+   "sub_dimension": "基础研究",
+   "score": 55
+  },
+  {
+   "id": "1fac1b00c7b33434497fe3e8bddf5c9fbd1a2e3e",
+   "title": "36氪研究院 | 2026年中国AI Agent行业发展研究报告",
+   "sub_dimension": "基础研究",
+   "score": 61
+  },
+  {
+   "id": "278bfb83e2ef6897a396c1c2aad57c1784a54216",
+   "title": "闪光能源干旱给电网带来压力",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "8cfa37d9ab153fccb31c957c47aca0c7b7989e47",
+   "title": "RegDivergence-101：生命科学跨司法管辖区监管矛盾检测的LLM基准",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "41b144a991bfc95f74fe95fcbe9cfb44f7feb691",
+   "title": "通过指导调整的小语言模型对渐进式老年人金融诈骗进行增量风险评估",
+   "sub_dimension": "基础研究",
+   "score": 55
+  },
+  {
+   "id": "de76f8ae3b1da457220f4049cbbe74fd64e8daea",
+   "title": "BiasMix-Finance：LLM投资组合建议的后一代KWC护栏",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "a7b1913d4ed2eee0fe4a51c1ddfcff38b37f3b41",
+   "title": "信条：可重复使用的可重复使用的声明性基元",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "20e6513615d715c0b4f7f750298b64a7478163dd",
+   "title": "气候变化导致欧洲熊蜂栖息地适宜性下降",
+   "sub_dimension": "基础研究",
+   "score": 57
+  },
+  {
+   "id": "832467fcb3c0444019c32740e620e2f820a9020a",
+   "title": "无内部信号的Web Agent监控：可观测轨迹和关键步骤监督",
+   "sub_dimension": "基础研究",
+   "score": 74
+  },
+  {
+   "id": "0e5e9d621933bc1015d1ce197c5cc2a9775586e7",
+   "title": "地球细菌和古细菌共生体的基因组目录",
+   "sub_dimension": "基础研究",
+   "score": 57
+  },
+  {
+   "id": "c4fb02c21ca3b27402e4b27e6ea2946b8ed78a84",
+   "title": "SCAFFOLD：具有图表QA和思想链推理痕迹的计算机科学研究人物的大规模结构化数据集",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "8e4efdd60cf1216d60a6158205d229b6d0ba72a1",
+   "title": "助理的理想自我",
+   "sub_dimension": "基础研究",
+   "score": 54
+  },
+  {
+   "id": "9af8e3c7528d3d198e1e6f12681f86821ecfaccc",
+   "title": "CTSpinoPelvic 1K：脊柱、骨盆、肋骨和股骨在一个坐标系中，注释用于腰骶骨过渡解剖学",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "461a72681c3c47c8e17e12a7adb67e474037ddf5",
+   "title": "检查多代理医疗系统对人类干预的脆弱性以进行临床推理",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "feacf975bc7daa8ccac06f9548948bfa6459ee4d",
+   "title": "雅各比学派视角下的循环变形金刚：全球工作空间能否经受住复发？",
+   "sub_dimension": "基础研究",
+   "score": 54
+  },
+  {
+   "id": "11bea58d05b938a734fb56e8209d37eff4f5f9c0",
+   "title": "Quasar 438 B：API提供商性能基准和价格分析",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "ccb3c2af49b34ff29df770602a288415364081ec",
+   "title": "Nemotron 3.5内容安全版主：紧凑的多模式、多语言和推理功能的内容安全版主",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "31bb7d75175af30d7a5e3edac31d9e9dd5e507e1",
+   "title": "迈向可审计和校准的人工智能用于痴呆症相关车祸严重程度预测：支持人类审查的选择性推迟框架",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "861c24a8b8d8194acc1276bc627979804a2b424f",
+   "title": "研究发现：老年群体更看重 AI 陪伴聊天机器人的真实感",
+   "sub_dimension": "基础研究",
+   "score": 68
+  },
+  {
+   "id": "e2146e61b1cdaf234675bdd3fa55896fa2ba9dd5",
+   "title": "在线调查中庞大的人工智能能力与数据质量控制之间的竞赛",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "85abac16fa660cd9e8fc964b6130203e2c672e51",
+   "title": "从2D图像和细胞种群统计数据中学习3D生物物理细胞特性",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "bba9f5db632c396a49439dee7188889c49597b43",
+   "title": "在应对现实世界场景中对通用移动助理进行基准测试",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "06a65c8d3c01e73da23b8ff979bbb219231d8637",
+   "title": "ReTools SQL：用于稳健文本到SQL的抽象强化学习",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "02da7e4446a1f74f209e0cbcf43dfc30af5b91f1",
+   "title": "大胞吞细胞分裂介导的可回收的LyTAC（McR-TAC）用于受体非依赖性蛋白质降解",
+   "sub_dimension": "基础研究",
+   "score": 45
+  },
+  {
+   "id": "e267fbb8ec8e04016a01985bef968042201023c6",
+   "title": "生成性人工智能扩大了基于课程的本科研究经验（CURE）的智力范围",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "bff7c964276df0a1fca7633e2f8eb537a83b25a2",
+   "title": "Hapi：用于大陆规模中期水文预报的多变量陆地表面Transformer",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "52e3e6a945ba9151ffc38d643b3e7dee99ea2b35",
+   "title": "印度尼西亚土地利用优化以实现粮食安全、生物能源和森林保护",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "d87f49ee57d1d9166a82517797abb08f5a1cb852",
+   "title": "检索关系，发现谬误：政治辩论分析的RAG方法",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "55b930a3bf7ea07e188f82960d64d57612fcc21b",
+   "title": "政策优化和应用的偏好激发，使心脏移植与人类价值观保持一致",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "03c7713518a712895d77ed47f1e3f0ae13fdaa15",
+   "title": "同理心姿态：通过Adjji弱监督产生同理心反应的响应侧情感取向控制",
+   "sub_dimension": "基础研究",
+   "score": 55
+  },
+  {
+   "id": "858481f4876c3c6203f078e8754879ad2022d1b0",
+   "title": "合成生物学",
+   "sub_dimension": "基础研究",
+   "score": 39
+  },
+  {
+   "id": "02aa177be82c815333bc7f3641f111dbc91c58dc",
+   "title": "南极冰川融化释放剧毒汞，62%海鸟汞超标！海鲜还能放心吃吗？",
+   "sub_dimension": "基础研究",
+   "score": 55
+  },
+  {
+   "id": "b56b5cd37cbc1f0fd3bfe7e3dcb79f4a7bcf2c6f",
+   "title": "记忆信任差距：持久记忆代理中的能力依赖性失败",
+   "sub_dimension": "基础研究",
+   "score": 74
+  },
+  {
+   "id": "1ae779d1819334f8510692a5837acde64c3698d1",
+   "title": "科学家使用卫星从太空追踪偏远地区的鲸鱼搁浅情况",
+   "sub_dimension": "基础研究",
+   "score": 41
+  },
+  {
+   "id": "ff536ff13d7ddfae68aaee8d0389e73aafc44059",
+   "title": "全球石化生产的排放和系统级脱碳途径",
+   "sub_dimension": "基础研究",
+   "score": 63
+  },
+  {
+   "id": "0a2dc70278aa6615697a978df692d1978851b362",
+   "title": "法定人工智能：将大型语言模型与法律规范保持一致",
+   "sub_dimension": "基础研究",
+   "score": 54
+  },
+  {
+   "id": "5d63abc7021d328e1c080ac2d26f5e3552d1c098",
+   "title": "通过具有可解释生成控制的Gibbs抽样来探索MLLM的感知先验",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "552e2f53e78c2080f16c673b6e8981f0ec319886",
+   "title": "通过代理人引导的解决和复制自我进化技能",
+   "sub_dimension": "基础研究",
+   "score": 55
+  },
+  {
+   "id": "b511bbefa85ea03b0294e5e8983ebf00c5e28632",
+   "title": "AutoScientst-Quant：用于量化投资自动研究的自我进化编码代理",
+   "sub_dimension": "基础研究",
+   "score": 73
+  },
+  {
+   "id": "74b3f6dc85589b9b407920ded3471225478afad0",
+   "title": "Qwen3.8-Max-0902 登顶 Code Arena 并以 $5/MToken 领跑 Pareto 前沿",
+   "sub_dimension": "企业经营",
+   "score": 75
+  },
+  {
+   "id": "85b24c77d163b8bb276db173a82ce23ff2786d5a",
+   "title": "Anthropic 发布 Claude Opus 5.5，成本较 Opus 5 降低 40%",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "4b9ca945c54ce089a7364f48bdca882ff26af5a3",
+   "title": "人工智能不仅应该有帮助。它应该是偶然的。人工亲密、谄媚和社会学习的未来",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "4876cbbbb8da6f06cf5cc266ec53f11cebf1c975",
+   "title": "磷酸铁锂+钠离子电池！新疆哈密100MW/400MWh构网型储能EPC招标 - 上海有色金属",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "56df5a282c2f1c4cafdddf676143ae3d690547dd",
+   "title": "消息称字节跳动豆包大模型 2.2 将推迟发布，原计划 8 月推出",
+   "sub_dimension": "基础研究",
+   "score": 59
+  },
+  {
+   "id": "6663766b02329cc492e5c62a7c79abac1244291e",
+   "title": "术语表：解码中国如何谈论能源和气候变化#CBarchive作者：Kerry Cleaver Tom Pearson阅读此处：",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "2e82b9cd8b32c463f2236b93a23f79bf44199923",
+   "title": "在第10届福岛第一核电站退役国际论坛上，我们与当地居民讨论东京电力公司福岛第一核电站的退役和未来（METI）",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "2bcb1505c4afa02bdb706ee222d71a10309a68c6",
+   "title": "美伊，又开火了 伊朗革命卫队称摧毁位于约旦的美军基地相关基础设施",
+   "sub_dimension": "企业经营",
+   "score": 39
+  },
+  {
+   "id": "0ec73d800702f1cb103934ddbc79ef88f9aaa4e9",
+   "title": "有效第三方评估的优先事项和原则",
+   "sub_dimension": "技术研发",
+   "score": 76
+  },
+  {
+   "id": "fb274a7e11ea5f79af279c7a6d2a288c93868a97",
+   "title": "科学、归因研究和识别气候罪犯",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "ff50de5d03a057624d23a1cd0c59b217812282a8",
+   "title": "如何使可再生能源拍卖能够抵御供应链冲击- pv杂志Global",
+   "sub_dimension": "企业经营",
+   "score": 58
+  },
+  {
+   "id": "852854493518307a96ab8a40fb4c0ab5f7bcc84a",
+   "title": "欧盟委员会公布授权进口欧盟废物的国家名单草案",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "a320a43a473e519b07c4f258055d7ab5b268a2c1",
+   "title": "技术革新与人类社会的未来中期报告",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "7d63c75c05049f88df1b321cb44faf554b5989ed",
+   "title": "战术无线网络设计的机器学习增强禁忌搜索",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "58fca57feb8bd1556caa093aa91d86c9fe9e5dd9",
+   "title": "“三桶油” 交出2026年中期答卷：上半年合计净赚超2100亿元",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "8a20793ff4e3922a768f4926ba78c8886da2e56d",
+   "title": "Muse Spark 1.3（max）：API提供商性能基准和价格分析",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "3d252ae2aef868ddb2b1b6c4c2294d7f83ae316e",
+   "title": "最强厄尔尼诺降临，厄瓜多尔拉响全国最高警报",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "d28b2d1f514f78c6ce21022a02628377b8d1ab40",
+   "title": "Claude Fable 5.1 登顶 Artificial Analysis 智能指数，但每任务成本比 Fable 5 高 20%",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "a5271f4fde995d08b4400b22dad5db67016c3ac1",
+   "title": "大型输电线路及大型电力系统融资计划的相关申请",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "1ea97b24370f5a0051a5841cbf513f4adf6036cf",
+   "title": "都说自己是第一，中国最强的大模型到底是谁？",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "e01b37b568d3bc4ed979be807fe01602b60a52bc",
+   "title": "每日新闻2026年9月21日",
+   "sub_dimension": "政策法规",
+   "score": 59
+  },
+  {
+   "id": "1903922497828013b44babcade482d299d858ce7",
+   "title": "户外机器人为何失败（以及如何构建生存的系统）",
+   "sub_dimension": "技术研发",
+   "score": 63
+  },
+  {
+   "id": "94fc8e6c7c6608b0805542cf0ab273fafb759132",
+   "title": "美国 AI 数据中心现大量“幽灵用电需求”，多州出手整治",
+   "sub_dimension": "技术研发",
+   "score": 68
+  },
+  {
+   "id": "3b787885352b420a06b6cc020560c694b6049612",
+   "title": "新的劳动力和农业损失改善了气候成本估计",
+   "sub_dimension": "基础研究",
+   "score": 43
+  },
+  {
+   "id": "113635627624b3484ef710e1a3b3c3d214e12d8b",
+   "title": "30款App（含小程序）存在违规问题被通报，涉及问电科技、有道乐读等",
+   "sub_dimension": "企业经营",
+   "score": 46
+  },
+  {
+   "id": "cf30ed522a5dfd67b29d1fd1c8f6c09bd956ef57",
+   "title": "守护能源安全重在技术攻关",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "ea67090ca782200c852936afb6b6712c769eb08b",
+   "title": "在Bluesky上建立值得信赖的心理健康基准：一个具有验证意识的薄弱监督框架",
+   "sub_dimension": "基础研究",
+   "score": 74
+  },
+  {
+   "id": "b365d60636eae3bfb3c47400effc9636ace4d779",
+   "title": "水力技术办公室2022-2023年成果报告",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "6a7a9fb11bdfbf394e2ec3b0cba7c5abb35e3f1c",
+   "title": "专家解读｜乘“数”而上  向“智”而行——大力发展智慧农业  加快建设数字乡村",
+   "sub_dimension": "政策法规",
+   "score": 63
+  },
+  {
+   "id": "288e8f97553c885ceea2b67493fc1ed5a18424d6",
+   "title": "人工智能将如何改变管理者的工作？",
+   "sub_dimension": "技术研发",
+   "score": 49
+  },
+  {
+   "id": "bf89c787bb14a24ef9d02fe192aef8edab96e9a8",
+   "title": "Anthropic 研究：训练一个错位的奖励寻求者模型",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "2a3ecb9b08f065af369ef05ccecefe1539c79a9a",
+   "title": "【习近平就发展先进制造业作出重要指示】",
+   "sub_dimension": "技术研发",
+   "score": 29
+  },
+  {
+   "id": "66e32835c80075f2b536711fb3e7d05e12d6e732",
+   "title": "从40亿到130亿美元，中国大模型这波增长，可能和你想得不一样",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "5c41d14ea82401a1b5e7f3d47d869daf5cec764d",
+   "title": "SpaceX自建叶片铸造厂 马斯克垂直整合破解AI电力瓶颈",
+   "sub_dimension": "企业经营",
+   "score": 61
+  },
+  {
+   "id": "b9205bbc1b38a08624884140f89243348435a518",
+   "title": "通义千问发布 Qwen3.8-Max-0902：2.4T 参数、1M token 上下文",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "df5e4441fd16f8c0a600fb1745a61d3ebea1a32c",
+   "title": "联合国安理会在气候问题上陷入僵局。新成员有前进的道路。",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "2c569ae725ebe6ece714a63f144b506c2c7129be",
+   "title": "OpenAI推出ChatGPT青少年版，面向13-17岁用户并加强安全管控",
+   "sub_dimension": "企业经营",
+   "score": 71
+  },
+  {
+   "id": "1414028aba411abc4aaf685c234bce3fc12123b2",
+   "title": "通过语言和代码的概率推理进行归纳和探究",
+   "sub_dimension": "基础研究",
+   "score": 54
+  },
+  {
+   "id": "e3513c746108d5d03c799928136da75483c7af7f",
+   "title": "超越线性上下文：使用本地9 B语言模型进行长篇小说推理的图形引导证据导航",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "2b90529a69361cd05615716ae843bbce6576f51f",
+   "title": "无证经营电力业务，华能海南琼中光伏电站被罚72万",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "c74db9b1d706023428331db2291bac2732114061",
+   "title": "生态环境部公布2026年8月全国环境空气质量状况",
+   "sub_dimension": "政策法规",
+   "score": 71
+  },
+  {
+   "id": "f2940e47bcd18a99af55d480d4b947e4e8e58b34",
+   "title": "IIFCL-TERI国家政策对话探索核电投资、融资和银行化的途径",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "fa825b251c1fe58f86a48647ae183293cc701389",
+   "title": "Jackery为新HomePower 1000 Plus v2便携式电池增添了功能和可扩展性",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "d3a520f3a2eb7048e1a86a49cbc029582db87892",
+   "title": "这种罕见的野牛卷土重来",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "09040a1ed2f2dd336db358c069db3fb8c66389dd",
+   "title": "TERI和NABARD通过为农村青年提供面向未来的电动汽车劳动力培训来促进绿色技能",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "0e8eca626f8a9a56ac1f0fb26d08069f517b9299",
+   "title": "中国大模型收入从40亿到130亿美元，增长加速且非价格战驱动",
+   "sub_dimension": "企业经营",
+   "score": 68
+  },
+  {
+   "id": "dd5127838604450ab34c0abddddcce6d335e863e",
+   "title": "广西壮族自治区生态环境厅到访国家气候战略中心开展座谈交流 深化央地协同推进应对气候变化工作",
+   "sub_dimension": "政策法规",
+   "score": 89
+  },
+  {
+   "id": "95cb0fbc97bfb78ec9d74fdf0f5f8c9a6f9cadc5",
+   "title": "怎么看 OpenAI 的 Codex 将取消上下文压缩，换成「硬切窗口 」和「外部记忆」？",
+   "sub_dimension": "技术研发",
+   "score": 45
+  },
+  {
+   "id": "cb390d38de253618897c71ec546b91663bc70f06",
+   "title": "PIB媒体代表团参观位于Omkareshwar水库的印度首个浮动太阳能发电厂",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "e3a6ea9c1f7ac69f38189953d5da47b8fc96b17d",
+   "title": "Gemini 3.8 Flash 发布，有什么值得关注的？",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "ad43278697efda8873ce7bdfe5c0cf8ddf700926",
+   "title": "1.04元/Wh！甘肃白银200MW/800MWh独立储能项目中标候选人公示 - news.smm.cn",
+   "sub_dimension": "企业经营",
+   "score": 71
+  },
+  {
+   "id": "fd724878dd49aecea20cb81422cade547223b462",
+   "title": "今日能源",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "87f41be1c205997fffd8613dc744428309589a7e",
+   "title": "飓风海伦摧毁了曾经被视为“气候避风港”的地区后，联邦应急管理局成为了生命线",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "ff805900ecad2841bd0503ffe7e80a55b91b1969",
+   "title": "TPvG：从一次到顺序反馈的大型语言模型的道德决策框架",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "fa932ae0520bd57bc99f27318ddce79cf578928c",
+   "title": "认识主义Sybil抵抗：在没有增加证据的情况下增加人工智能代理",
+   "sub_dimension": "基础研究",
+   "score": 54
+  }
+ ]
+}

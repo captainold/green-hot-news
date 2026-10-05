@@ -1,0 +1,1383 @@
+{
+ "tag": "jev-bench-n228-seed20260928",
+ "ts": "2026-09-28T14:29:16.107519+00:00",
+ "corpus": {
+  "count": 228,
+  "ids_sha1_12": "75b26f21647f"
+ },
+ "sample": 228,
+ "extra": {
+  "seed": 20260928,
+  "window": "近 7 天（228/3613 条）"
+ },
+ "items": [
+  {
+   "id": "9657e8319abe85f8d9453d3054ecdc1bf53665db",
+   "title": "到2030年，全球可再生能源每年需要增加1，200 GW：IRENA -亚洲电力",
+   "sub_dimension": "国际动态",
+   "score": 56
+  },
+  {
+   "id": "2e011fcd6643ddc31b259adef18077a6d00d43f4",
+   "title": "欧洲议会表决MSR改革,ETS1注销门槛拟从4亿提至6.5亿",
+   "sub_dimension": "国际动态",
+   "score": 61
+  },
+  {
+   "id": "efa314ed929bc7339ceb5ec7920b38b280aee3ef",
+   "title": "DeepSeek与Moonshot参与联合国安理会人工智能风险与国际安全简报",
+   "sub_dimension": "国际动态",
+   "score": 51
+  },
+  {
+   "id": "d438eceff32da69d2958851ccba5d06429299556",
+   "title": "航运燃料价格罕见倒挂！生物柴油跌至历史新低",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "f412665ea78e000dcab4d5e1e02ce61bea7ad13d",
+   "title": "芭芭拉·马佐莱（Barbara Mazzolai）希望建立一个新的机器人领域",
+   "sub_dimension": "国际动态",
+   "score": 55
+  },
+  {
+   "id": "6e46e1055a1e3963220f307c26e48ba59b535ef4",
+   "title": "微软加大Copilot折扣力度至50% 将推出AI超级应用",
+   "sub_dimension": "国际动态",
+   "score": 53
+  },
+  {
+   "id": "ff5c1926dff5cd52bd71e048e6609eddf897ac6f",
+   "title": "IRENA表示可再生能源拍卖可以在冲击中增强供应链弹性-环球资源",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "bd9eb65d4ef234efca98f149f2386e90113c33b9",
+   "title": "电气化占据中心舞台，因为霍尔木兹冲击刺激各国寻求加强能源安全",
+   "sub_dimension": "国际动态",
+   "score": 64
+  },
+  {
+   "id": "eae8ab3d0719838b1372936381679f1e8a85a517",
+   "title": "铜繁荣推动能源转型使地球荒地面临风险",
+   "sub_dimension": "国际动态",
+   "score": 49
+  },
+  {
+   "id": "001bd67ff087915fe0ee12b3a6af02b67e978e25",
+   "title": "IRENA：全球可再生能源产能增加必须翻倍，但太阳能发电潜力使其“可行”- PV Tech",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "4d267ad59b8c7aafe0c15279551face8f352624a",
+   "title": "世界银行和国际货币基金组织更新贫穷国家的债务评估- Asharq Al-Awsat -ua.news",
+   "sub_dimension": "国际动态",
+   "score": 44
+  },
+  {
+   "id": "9206e222729973bb03eed9f760524e381cbd0c1c",
+   "title": "IRENA报告：到2030年可再生能源新增量必须近翻一番-新闻和统计数据- IndexBox",
+   "sub_dimension": "国际动态",
+   "score": 58
+  },
+  {
+   "id": "dc34ea64e4df4ceed64c997079bbefe778a90246",
+   "title": "欧盟碳移除与碳农业认证(CRCF)买家俱乐部推进首批采购计划",
+   "sub_dimension": "国际动态",
+   "score": 41
+  },
+  {
+   "id": "fa9cce04f14c9cb0a65892c0c1bcc6ef9715c48a",
+   "title": "AIB在第十笔绿色债券中筹集了7.5亿欧元，订单量达到22亿欧元",
+   "sub_dimension": "金融资本",
+   "score": 53
+  },
+  {
+   "id": "abad46281f4accf6a79bc9766ea64366ae236850",
+   "title": "2026年1—8月全国电力市场交易电量同比增长19.2%",
+   "sub_dimension": "金融资本",
+   "score": 75
+  },
+  {
+   "id": "ae78dc7e4ac064e725e917a96f2a071d06ea3bda",
+   "title": "两部门：对全国碳市场重点排放单位开展碳排放计量审查摸底工作",
+   "sub_dimension": "金融资本",
+   "score": 84
+  },
+  {
+   "id": "80c65204f1d1ec367dfb649d2133d823c1ffba7d",
+   "title": "\"为地球降温—全民参与碳抵销行动\"正式上线",
+   "sub_dimension": "金融资本",
+   "score": 72
+  },
+  {
+   "id": "13a75bf578003325c2aa96a8b97b0940f9b250de",
+   "title": "科达制造要砸45亿扩产石墨负极！重组被否后的一场重资产押注？",
+   "sub_dimension": "金融资本",
+   "score": 57
+  },
+  {
+   "id": "4b8dbdf2fca045c2e72fea04ab076157c08d315d",
+   "title": "EUA冲高回落后重回高位震荡，后市需关注供给边际变化【周报】",
+   "sub_dimension": "金融资本",
+   "score": 63
+  },
+  {
+   "id": "93544b055b1f93692fac0218bbbcd3c059284870",
+   "title": "分析：尼泊尔2000万美元的“损失和损害”索赔仅涵盖洪水成本的0.7%",
+   "sub_dimension": "金融资本",
+   "score": 53
+  },
+  {
+   "id": "98e6e7e68fda1b07d8142e5e02e6d3027e2c8743",
+   "title": "南非考虑启动生物多样性信用试点 拟制定流程计划与准则",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "4a041d075b01ee83afe8c773da59337c69dd879c",
+   "title": "Ideacarbon碳市场盘前资讯速递（20260923）",
+   "sub_dimension": "金融资本",
+   "score": 72
+  },
+  {
+   "id": "f745848858251f61ddc0e30e711cfbca8e6c33b0",
+   "title": "特朗普败诉，太阳能基金将恢复",
+   "sub_dimension": "金融资本",
+   "score": 49
+  },
+  {
+   "id": "a2beed5be4ce851e9429869b5256f1b3189da969",
+   "title": "批评者质疑墨西哥拟议气候预算中的石油和天然气支出",
+   "sub_dimension": "金融资本",
+   "score": 47
+  },
+  {
+   "id": "dc4f78d10886d799b909fc4cd69118f90c71220b",
+   "title": "海面具身智能公司半年完成3亿融资，曾获李泽湘、高秉强、阿里、元禾系等投资｜硬氪首发",
+   "sub_dimension": "金融资本",
+   "score": 56
+  },
+  {
+   "id": "1b6bd3008a7bb6382f4822cfef4a8d79d7c95362",
+   "title": "网下打新报价违规 农银汇理基金被警示！近1年半数报价无效",
+   "sub_dimension": "金融资本",
+   "score": 69
+  },
+  {
+   "id": "a931fb56a5a513894486a2328138bc4f17cd3586",
+   "title": "AI训练数据初创公司Micro1估值从5亿美元飙升至40亿美元，完成超1亿美元融资",
+   "sub_dimension": "金融资本",
+   "score": 68
+  },
+  {
+   "id": "17db1549a5bf3a38a2b90006d1877ec782a49de6",
+   "title": "地球家园基金通过直接向当地社区捐款而取得成功",
+   "sub_dimension": "金融资本",
+   "score": 41
+  },
+  {
+   "id": "ea3ae73719a068e226484912a349de7b3540bc57",
+   "title": "香港考虑要求银行披露更多气候融资信息",
+   "sub_dimension": "金融资本",
+   "score": 64
+  },
+  {
+   "id": "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9",
+   "title": "Hot or Cool News：2026年9月",
+   "sub_dimension": "社会创新",
+   "score": 41
+  },
+  {
+   "id": "5bda217f447282a4ae70517cd2cd05571306f6ad",
+   "title": "GPT-6 Sol（max）-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "60fcd76607f0f0f4a176a6a63f8ddfda294bc4e1",
+   "title": "transformers 支持直接加载 GGUF 量化模型，本地推理性能接近 llama.cpp",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "2ff5927638fe0bdc38724ade5379403f1eb0f56a",
+   "title": "Claude Opus 5.5型号-智能、性能和价格比较",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "01476b91e138090a1d76b4efd8667d2527518aa7",
+   "title": "大模型公司，开始干咨询公司的活",
+   "sub_dimension": "技术研发",
+   "score": 64
+  },
+  {
+   "id": "f8eea8d106190a6b0b358b9c07cc89f46c539856",
+   "title": "GPT-6 Sol 与 GPT-6 Luna 在 ChatGPT Work 和 Codex 中推送",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "9c0ef034b74afc90e0ebec7870b58b4f2f142aca",
+   "title": "英特尔将在RoboBusiness讨论扩展物理人工智能所需的基础设施",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "1789b0f460618ccbd18a4bf326f3ae8718bc0c1b",
+   "title": "GPT-6 Sol和Luna简介",
+   "sub_dimension": "技术研发",
+   "score": 43
+  },
+  {
+   "id": "125aeeece572ffd86b8b93b0bb94430de1a73399",
+   "title": "GPT-6 Sol和Luna推动成本效率前沿",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "e894baf7770051f8e1c9e498313c06692b034b26",
+   "title": "Claude Opus 5.5（xHigh，带回退）-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "32adf5b8c3ec5c328480b5b0dbe91ad84345821d",
+   "title": "英伟达表示，Isaac LOS 5.0将人工智能代理带入机器人开发",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "a68d76e8ba00c36b685374e184bce2797d725621",
+   "title": "Apple 新款 Mac mini（M6/M5 Pro）与 Mac Studio（M5 Max/M5 Ultra）今日开售",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "249a51ee64eaa413b36b79636d36607799336f11",
+   "title": "thedotmack/克劳德-萨特",
+   "sub_dimension": "技术研发",
+   "score": 48
+  },
+  {
+   "id": "467f4e9f4c4006cfbee5803df9c3235e4d96588e",
+   "title": "OpenRouter 实测 Jev 1.13 与 Claude Opus 5 在 Banking77 分类任务上的准确率、延迟与成本",
+   "sub_dimension": "技术研发",
+   "score": 68
+  },
+  {
+   "id": "ba19bfef8759a81584eec9463fca0cfcfa718d0b",
+   "title": "MiMo-V2.6-Pro -智能、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "f9ffa161904d8efb7f63c5dae221e000ff2fc0e0",
+   "title": "美国多部门将AI蒸馏定性为国家安全问题，制裁风险逼近中国大模型企业",
+   "sub_dimension": "技术研发",
+   "score": 71
+  },
+  {
+   "id": "f28b2f6917a8cfb0fc50e1bf2141d16a25225537",
+   "title": "Qwen-Image-2.1 登顶 Arena 图像编辑与文生图开源榜第一",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "5c45be3c8819caa696afa8ed7424c356b317e4ec",
+   "title": "马斯克称 Grok 4.7 使 xAI 在智能体编码领域位列第三",
+   "sub_dimension": "技术研发",
+   "score": 68
+  },
+  {
+   "id": "73aa16d0347c2720f6400e5eebbc70f10716618b",
+   "title": "Kimi K3登陆AWS：中国大模型开始\"收租\"，月之暗面把开源玩成了收费站",
+   "sub_dimension": "技术研发",
+   "score": 64
+  },
+  {
+   "id": "0ec73d800702f1cb103934ddbc79ef88f9aaa4e9",
+   "title": "有效第三方评估的优先事项和原则",
+   "sub_dimension": "技术研发",
+   "score": 76
+  },
+  {
+   "id": "7e8b7a904926b5bc4fdd756cf7ee6c3126cdb7d9",
+   "title": "Claude Opus 5.5位居人工分析智能指数榜首",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "21c462647f0fab19b68ed69bb02ddbf44c390f77",
+   "title": "Jev：比LLM快193倍、便宜444倍的新决策模型引发行业争议",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "eb518513a60fdc5ddf144ea842610facb066e7bd",
+   "title": "大模型正在吃掉搜索广告位，下一代广告该怎么做？人大高瓴、斯坦福把拍卖写进Token生成过程",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "25c412e902e1c945c8cbc034a7765e4759638fc7",
+   "title": "Claude Opus 5.5（高回落）-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "901ef45e7481e66410e9d3b3722aa14d7950ad6c",
+   "title": "Artificial Analysis 评测 Step 5 Preview： Intelligence Index 得 44 分，成本约为同级模型 1/2.8",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "45474fd80edf022bd330fd9ab18e393bce2793f9",
+   "title": "Grok 4.7（xHigh）-智能、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "8580d8edf1ba08f12e5dbf46e466c87e79123de7",
+   "title": "Claude Opus 5.5 登顶 Artificial Analysis 智能指数，得分 58",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "977cef18bf9aa2ff09bb8ca5bd94be7487068ab9",
+   "title": "Grok 4.7（高）-智能、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "d7bd0a621d905ebd86ccb5807346cce304d32557",
+   "title": "Boris Cherny 实测 Claude Opus 5.5：比 Fable 5.1 快且便宜 51%",
+   "sub_dimension": "技术研发",
+   "score": 65
+  },
+  {
+   "id": "01c59f8eeae988bc78f444f981fa64806c3a7a7c",
+   "title": "智算中心上演交付竞赛，算电协同迎来双向基建大考",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "6b82ca99c502a54950efa64c043ada518d0d6827",
+   "title": "OpenAI将允许第三方在早期阶段评估其AI模型安全风险",
+   "sub_dimension": "技术研发",
+   "score": 61
+  },
+  {
+   "id": "ce4c1f6c505f2d96699d513c1a20e5fd8efd123b",
+   "title": "到一切/AFFiNE",
+   "sub_dimension": "技术研发",
+   "score": 48
+  },
+  {
+   "id": "3ba3ad632d4842077529187682220d684e7c7caa",
+   "title": "Grok 4.7型号-智能、性能和价格比较",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "23607812fef3722650ffdaa6e3eaf6fe5f888374",
+   "title": "不列颠哥伦比亚省起诉 OpenAI，指其未在枪击案前将 flagged ChatGPT 活动转介警方",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "1903922497828013b44babcade482d299d858ce7",
+   "title": "户外机器人为何失败（以及如何构建生存的系统）",
+   "sub_dimension": "技术研发",
+   "score": 63
+  },
+  {
+   "id": "2ee202abd2d6515469c50d63dffa9e4f0aeee0d7",
+   "title": "绿色甲醇发展现状及竞争力分析",
+   "sub_dimension": "技术研发",
+   "score": 45
+  },
+  {
+   "id": "ca941eaf58a97e2a26dcfec7700396aee8d6dc17",
+   "title": "lobehub/lobehub",
+   "sub_dimension": "技术研发",
+   "score": 59
+  },
+  {
+   "id": "05182805925b2806dad70ca847f6faa2e207854a",
+   "title": "Claude Opus 5.5 登顶 Artificial Analysis Intelligence Index，并降价 20%",
+   "sub_dimension": "技术研发",
+   "score": 53
+  },
+  {
+   "id": "dba4203782184bb040b1d9ed5a8dcb36c074291f",
+   "title": "找准新型能源体系建设着力点",
+   "sub_dimension": "技术研发",
+   "score": 65
+  },
+  {
+   "id": "2f9c9e32363faa830f77b72462242bb3ba6923a1",
+   "title": "Claude Opus 5.5 上架 Arena 的 Agent Arena 与 Battle Mode",
+   "sub_dimension": "技术研发",
+   "score": 71
+  },
+  {
+   "id": "7442935dfa2929c7e96b74316f24623602a5e682",
+   "title": "五角大楼调查：过度依赖 Maven AI 是美军误击伊朗米纳布学校的原因之一",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "dfe7cffe321d890a56e09315e3fb06481542812a",
+   "title": "Claude Opus 5.5（最大可回退）-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "26fcf65e3b3d27635bbeb915a42b7873499aaba8",
+   "title": "OpenRouter 解读 NVIDIA Nemotron 3.5 Lightning 如何承担 Agent 高频执行调用",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "e1f26aa003a8126b6049ac5ef76bd56135af5fc2",
+   "title": "五角大楼内部审查：过度依赖 Palantir Maven AI 系统导致误击伊朗学校、123 名儿童死亡",
+   "sub_dimension": "技术研发",
+   "score": 65
+  },
+  {
+   "id": "54efadfe28c39b752b693c302f9c6f40c2f3d6f4",
+   "title": "针对GPT-6的更好的提示缓存",
+   "sub_dimension": "技术研发",
+   "score": 43
+  },
+  {
+   "id": "678276ac5d5c28f12bf539c464a588cb668da4ad",
+   "title": "IAC在拉古纳塞卡完成自主赛车赛事",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "eed0058bc57df1e547cc8a00a74c623d64979a05",
+   "title": "Claude Opus 5.5（中等，后备）-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "ae3f16260b4cb21d0f0ff01df9cf63d76a53475a",
+   "title": "GPT-6 Sol与Claude Opus 5.5同日开打，谁是「性价比之王」",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "b5c6e1edc776dade978a16fb354c1c6fa6a2bce0",
+   "title": "OpenAI泄露代码显示代号Aeon，正在开发对标Grok Bot的智能体功能",
+   "sub_dimension": "技术研发",
+   "score": 66
+  },
+  {
+   "id": "e3e0bf96e1b5b08f242c9ca570c82a6c126595ac",
+   "title": "售电量提前14天破万亿：南方电网8月数据揭秘谁是用电大户",
+   "sub_dimension": "技术研发",
+   "score": 57
+  },
+  {
+   "id": "01ea98ae92fd5f0b58f88eae35a3ecb5613d37df",
+   "title": "GPT-6 Luna（max）-情报、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "202c66394960f6b902d25e433bd04cd7e82f9d6f",
+   "title": "南方电网和百度为何牵手共推电碳算协同?",
+   "sub_dimension": "企业经营",
+   "score": 64
+  },
+  {
+   "id": "315140b9fc835a57c0b99702901fe7c16c9f3c5a",
+   "title": "Sam Altman 称 GPT-6 Sol 和 Luna 按任务定价在市场上没有对手",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "151b9b422fb12dfda5dadea4f3297cec84bf7899",
+   "title": "Meta Muse 助手曝出严重 0-day 漏洞，Amazon 已开始封禁 Muse",
+   "sub_dimension": "企业经营",
+   "score": 67
+  },
+  {
+   "id": "dfdf82fd8ea0d37a0b8a37957cb3d7a9a572764c",
+   "title": "随着美国太阳能产业的发展，红州革命正在酝酿",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "debf1472facc2ba17cd2b7f9ab6042e746bf681e",
+   "title": "适应气候变化的建筑包括太阳能电池板",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "efc5afff99af5383f2346ff4f3367bfd4af1875f",
+   "title": "到2030年我国电气化率将跃居全球主要经济体首位",
+   "sub_dimension": "企业经营",
+   "score": 59
+  },
+  {
+   "id": "4ac021ec5badb9ff920f0d81e34d699656dd68f3",
+   "title": "GPT-6 Sol 与 Luna 发布，API 价格比 GPT-5.6 低 50%",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "2fbf12d559482a719710147b14ba472e35350e3a",
+   "title": "钨价高位突遭断供导致子公司全面停产，两大A股矿业巨头对簿公堂",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "c85a57a37504f86b08f5001dcfb03f333a42495e",
+   "title": "分析：“超级厄尔尼诺”创下“非凡”历史纪录",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "8906d37edc1bbc69eb83be4c6969ce94a5e3a0e0",
+   "title": "研究表明，抹香鲸在休息时吹泡泡以保持漂浮",
+   "sub_dimension": "企业经营",
+   "score": 54
+  },
+  {
+   "id": "9860b56a3c68208bcc480548211e595c47dfe217",
+   "title": "山西200MW/400MWh独立储能EPC中标候选人公示 - news.smm.cn",
+   "sub_dimension": "企业经营",
+   "score": 71
+  },
+  {
+   "id": "895a5ecbb9e2819500ac7f3ef56956195c074429",
+   "title": "Artificial Analysis 评测 GPT-6 Sol 和 Luna：成本减半但各评测有升有降",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "471248f0b5537cb34f8bb77c837bc04d259b62ad",
+   "title": "Kimi 发布浏览器扩展，由 Kimi WebBridge 更名而来",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "b6588657da3173697b73a25b325fe8314ae3ae95",
+   "title": "随着雨林高速公路铺设计划的推进，巴西创建了四个亚马逊保护区",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "4977541256e466fafd9e0caf75e21dac793fc14b",
+   "title": "报告称，到2040年，46%的野生捕捞鱼类可用于养殖鱼和虾",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "7dcfeb86bf639d7b49bc80bdab4e9d91d77610da",
+   "title": "环氧乙烷价格刷新年内高点 产业链上市公司业绩表现分化",
+   "sub_dimension": "企业经营",
+   "score": 54
+  },
+  {
+   "id": "0b27b38e34d58b1a101281d1169da572d27b9ca3",
+   "title": "全球审查发现，烟头占水生垃圾的12%",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "ac5f5a10c540ad11969c5ee4b1d6adeb0deefddd",
+   "title": "全国首张医疗碳中和“蓝碳”证书颁发",
+   "sub_dimension": "企业经营",
+   "score": 62
+  },
+  {
+   "id": "d200a440ebf788de2d982b381fd975e39db5e828",
+   "title": "世界犀牛日：如何才能拯救一个物种？",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "95c0d36df41c0cf3c80de3728289a08cf7fe5327",
+   "title": "多机构报告:我国绿色低碳发展正系统性重塑产业体系",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "91449a446d9b904e0bdfc95e37612797dac882c8",
+   "title": "一种罕见的懒猴在中国的数量可能比科学家想象的要多得多",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "1a56245c24a1f6f749162b787db41e0a43eb15c1",
+   "title": "研究：旅游业有潜力扭转巴厘岛旅游热点珊瑚衰退",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "213761309bf0f2339fc0af412bc7cfa111da8b04",
+   "title": "中国电建旗下16家设计院最新“挣钱能力”披露",
+   "sub_dimension": "企业经营",
+   "score": 37
+  },
+  {
+   "id": "08854588fe3b4a60ead2f71f42321401d45bfc6f",
+   "title": "Arena 上线 GPT-6 Sol 与 GPT-6 Luna 测试，评分即将公布",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "fff8f4701d6f5112f70528b42eef193a5f7becaf",
+   "title": "加州部落从交通管理局收回海滩和祖传村庄遗址",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "faeab865a1989d2bd21db29e3be1b6637dd40a62",
+   "title": "莱姆电子再度斩获“北极星杯”2026年度光伏影响力品牌奖_莱姆电子_传感器",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "1fe4363ecaf046c56f3dd7c76983fef1916bde42",
+   "title": "高通发布2纳米旗舰芯片",
+   "sub_dimension": "企业经营",
+   "score": 45
+  },
+  {
+   "id": "8a358894fe53804dd299e32f1ead1d274c8ee743",
+   "title": "联邦法院裁定取消全民太阳能计划是非法的",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "d92f7266fde1c508b99c527aaf6f8e65d851b1e1",
+   "title": "磷酸铁锂+钠离子！河北100MW/400MWh独立储能电站EPC招标 - news.smm.cn",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "6ed34c21eea31c92e7ccb6168253f3414b44e102",
+   "title": "Anthropic 发布 Claude Opus 5.5，Claude 5.5 系列首个模型",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "92dddca9c612dd5a17f02f522cd77b63ecad736d",
+   "title": "卡兹克实测对比 Grok 4.7 与小米 MiMo V2.6：后者成不可能三角版本答案",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "3326261af4c42dc60227fb519c670f281a64a4df",
+   "title": "阿里在2026云栖大会上发布原生智能体电脑QwenBook",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "6893aa29ea008272442c302906320493190024ea",
+   "title": "Claude Opus 5.5 上线 OpenRouter，智能体编码等能力领先 Opus 5",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "3da0bca0448771e5f17f9313fff39a315a31e692",
+   "title": "从绿色工厂到零碳工厂:深度减碳驱动制造业升级",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "a29e7e565697897411fee4f95f60e1316e6d65f2",
+   "title": "干旱和国家忽视加深了秘鲁最近联系的Matsés的健康危机",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "d5a8205075f304d91dd16b329d8e3e3870358718",
+   "title": "2027年气候与能源峰会",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "735ea406f78c18625d07b167aaf27600e23f43d0",
+   "title": "中国西电管理层调整！ - 同花顺财经",
+   "sub_dimension": "企业经营",
+   "score": 39
+  },
+  {
+   "id": "a9be97d211da09e63843100901e1174ccfadb2f6",
+   "title": "OpenAI 为 GPT-6 推出改进的提示词缓存系统与诊断工具",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "5dc972f5806451de72eabe2c13d9ed54b8ac0c2c",
+   "title": "美国灯柱电动汽车充电站初创公司着眼于快速扩大规模",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "b1db04ba321344b304d04296f33b64815f83a8a8",
+   "title": "这些海豚在叫喊",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "9e3778aed15f44f90589a7be9bb5486ce6330047",
+   "title": "现代担心中国电动汽车生产商也会破坏他们在美国的业务？",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "73edbbcb67ef973a0710051810d661e4a1c1b813",
+   "title": "Claude Opus 5.5 与 GPT-6 Sol/Luna 发布，Simon Willison 详解新一轮价格战",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "6f60da400005d9689523b689a9342e979f7edc10",
+   "title": "OpenAI GPT-6 Sol 和 GPT-6 Luna 上线 OpenRouter",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "974bf3f6312c26e1d28a06bc6df2edd7eee541aa",
+   "title": "电池地缘政治：储存能源的高科技竞赛内部",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "e621a8cf52917e1c19ccd510754034bc2f7d6df5",
+   "title": "本质上开源其平台的关键部分，以更轻松地开发",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "13cd8f0c1ba9f6b19e04e3ff80e868bdb9376d3e",
+   "title": "均价0.87元/Wh！山东青岛独立共享储能电站中标候选人公示 - news.smm.cn",
+   "sub_dimension": "企业经营",
+   "score": 71
+  },
+  {
+   "id": "e949b729ee9e04e76328b198203078de438f6352",
+   "title": "大江奔涌 奋进翠屏丨守好长江生态底色 擦亮翠屏绿色名片",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "87af281dbc8efd0e6891daf3801760eb7c84c8aa",
+   "title": "LiteParse 9 月更新：PDFium 提速 20-25%，新增视觉定位与 is-complex 路由 API",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "50ff8ed727654652f928ad6b8db9ab8aba2b5205",
+   "title": "数据显示，建筑商不受电池存储需求的影响",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "ff50de5d03a057624d23a1cd0c59b217812282a8",
+   "title": "如何使可再生能源拍卖能够抵御供应链冲击- pv杂志Global",
+   "sub_dimension": "企业经营",
+   "score": 58
+  },
+  {
+   "id": "e1f3ee8180acf56eb00847556c2a3ec78363e162",
+   "title": "OpenAI 发布 GPT-6 Sol 和 GPT-6 Luna，API 价格比 GPT-5.6 促销价低 50%",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "9717cbc481e00da4f6578aaa6e6687cab09306d5",
+   "title": "OpenRouter 推出 Batch API，批量推理可享半价",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "baf0695a34fbfd832052f0d9106355eaf8f6b9da",
+   "title": "自由潜水如何帮助印度尼西亚巴瑶保护传统和保护海洋生物",
+   "sub_dimension": "企业经营",
+   "score": 41
+  },
+  {
+   "id": "fa1dc2ae31662a9cdf487b9c25b081b68986528d",
+   "title": "小米发布开放权重模型 MiMo-V2.6-Pro，登顶 Artificial Analysis 开放权重模型智能指数",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "19015978fdec7fcbc5767ff4b704722d996e3e22",
+   "title": "世界银行、国际货币基金组织支持贫穷国家债务框架--《快报》",
+   "sub_dimension": "政策法规",
+   "score": 46
+  },
+  {
+   "id": "ad55d8990452c4a4ad9af8cb53e9bbec402732be",
+   "title": "总理分享了联盟部长Shri C的一篇文章。R.帕蒂尔强调了建立具有气候弹性的水管理和确保水安全的努力",
+   "sub_dimension": "政策法规",
+   "score": 55
+  },
+  {
+   "id": "f0fdc84841fbf83f72ca4b7c9676a10046083d2c",
+   "title": "世界银行、国际货币基金组织支持改变贫穷国家债务框架",
+   "sub_dimension": "政策法规",
+   "score": 44
+  },
+  {
+   "id": "634453d16f56e82a75df915fc962caefcf8cdd36",
+   "title": "可再生能源创纪录，但步伐必须近一倍才能实现2030年目标- The Well News",
+   "sub_dimension": "政策法规",
+   "score": 63
+  },
+  {
+   "id": "d4d9d0ec390b7de8ab6cb8926191f5cc637d1547",
+   "title": "飓风Polo预测讨论",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "01e9dea41e5b2c1ccc8ee0e03382e5adfbb87092",
+   "title": "我国推进7项天然气国际标准成功立项",
+   "sub_dimension": "政策法规",
+   "score": 60
+  },
+  {
+   "id": "b491060f6d25bc755be33af76268e158438d8e93",
+   "title": "上市公司生产美国大部分原油和天然气",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "40b5afbe8288c862d8591778455a1674767edd5b",
+   "title": "国际货币基金组织和世界银行同意对低收入国家债务可持续性框架进行修改- IndexBox",
+   "sub_dimension": "政策法规",
+   "score": 56
+  },
+  {
+   "id": "f2f46031b2c446ace9ded6e0d39785bf0fbccac1",
+   "title": "专家解读之二：发挥国家绿色算力设施引领作用 推动算力产业绿色低碳转型",
+   "sub_dimension": "政策法规",
+   "score": 75
+  },
+  {
+   "id": "5f6776e403a81f1fe4e7a4047b192a62af34b79a",
+   "title": "WIPP检查和质量保证",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "a2fb581512460da7b19731ade7131a209680b6d0",
+   "title": "国家发改委发布36个项目，拟引入民间投资超150亿元",
+   "sub_dimension": "政策法规",
+   "score": 70
+  },
+  {
+   "id": "39839d46f66c4521194ed0954f04807017d52608",
+   "title": "Eurobarometer调查显示，公众对欧洲农业的支持压倒性",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "2cd37e3f58c026ba6dd41502786b005e2d454663",
+   "title": "世界每年需要1.2太瓦的可再生能源才能实现2030年目标-立即可再生能源",
+   "sub_dimension": "政策法规",
+   "score": 58
+  },
+  {
+   "id": "4f6abaeb4448c84560ac6796a3abb9ce8d8dd005",
+   "title": "能源首部ESG行业标准落地！定量指标占80%、设置一票否决！",
+   "sub_dimension": "政策法规",
+   "score": 73
+  },
+  {
+   "id": "e83aaac04bc22cb1d72969bad1b32bbcc4f8c5e9",
+   "title": "碳市场开放联盟进入实施运行阶段",
+   "sub_dimension": "政策法规",
+   "score": 62
+  },
+  {
+   "id": "e3da7e54ca64ffa9baea588575f3fdc02af8691b",
+   "title": "专家解读之一：健全绿色算力设施评价指标体系 引导算力设施绿色低碳发展",
+   "sub_dimension": "政策法规",
+   "score": 73
+  },
+  {
+   "id": "1fe77aad4d674c59d100c8de475493fb70c4aa2a",
+   "title": "2026年欧洲学校数字教育：弥合入学、教学和学习方面的差距",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "ac314f56640219cf696cc5186b0f15166b8d456a",
+   "title": "北太平洋东部热带天气讨论",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "2f23ff30bc65e0be3e0cc8c6b8d2042c9329b763",
+   "title": "自然资源部：“十五五”时期我国重要矿产资源需求仍将保持刚性增长",
+   "sub_dimension": "政策法规",
+   "score": 59
+  },
+  {
+   "id": "0d5683e42f0859359c002def88ebe1bab909b891",
+   "title": "NOAA渔业部门宣布2026年联邦休闲红笛鲷季节，并为南大西洋休闲红笛鲷捕捞发放豁免捕捞许可证",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "df1555665687c2bd567b06c9e38d41d681481fe7",
+   "title": "国家发展改革委举行9月份新闻发布会",
+   "sub_dimension": "政策法规",
+   "score": 67
+  },
+  {
+   "id": "3b1d91a0ab5131fb80355e2d61f652270091bed9",
+   "title": "EPA和DOJ与波多黎各灭菌商就违反清洁空气法达成70万美元的和解",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "1175adbd87eea3b362e0b93a851358ad0ac29185",
+   "title": "世界银行董事会支持改变贫穷国家的债务可持续性框架-Devdiscuss",
+   "sub_dimension": "政策法规",
+   "score": 56
+  },
+  {
+   "id": "7daf48ae928c35c2af71f5c1d948eb8d2b97d77e",
+   "title": "“守正创新，全面实施固体废物与新污染物治理行动”有关情况",
+   "sub_dimension": "政策法规",
+   "score": 73
+  },
+  {
+   "id": "fa460890169ca6b65dd2f3cf9c217bb588f667b4",
+   "title": "每日新闻2026年9月22日",
+   "sub_dimension": "政策法规",
+   "score": 61
+  },
+  {
+   "id": "41dd48f64c7777d8c516a1c22ae4eba0c60d8c6b",
+   "title": "国家气候战略中心赴中国国家版本馆中央总馆开展主题党日活动",
+   "sub_dimension": "政策法规",
+   "score": 75
+  },
+  {
+   "id": "cafbf9de7fcdee776569245d3dc9fd5006d41b59",
+   "title": "中央网信办召开网络直播规范发展工作会议",
+   "sub_dimension": "政策法规",
+   "score": 69
+  },
+  {
+   "id": "77f2882fe9f8abb3826b7ffae4821e088f057e7f",
+   "title": "公证护航涉外航运,助力船舶碳合规出海履约",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "bbc3baec877b9c8dea2bc15a07767e70d423114d",
+   "title": "9月例行新闻发布会最新情况通报",
+   "sub_dimension": "政策法规",
+   "score": 73
+  },
+  {
+   "id": "65eb8f41615363e7eeb3682cc33ea421fe86660c",
+   "title": "欧洲委员会布鲁塞尔，21.9.2026 C（2026）3472最终附件1至3委员会授权法规（欧盟）附件。",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "930e8a003000a382e6a52246b63b1a6b4c57a45d",
+   "title": "国资委明确五个“更先进”：国资央企要加快提高制造业综合实力",
+   "sub_dimension": "政策法规",
+   "score": 59
+  },
+  {
+   "id": "4c838fbdd02e45b553c9447255db10c30fd6ccd3",
+   "title": "Epoch AI 研究报告：达到同等 AI 性能的成本每季度下降约 47%",
+   "sub_dimension": "基础研究",
+   "score": 63
+  },
+  {
+   "id": "31bb7d75175af30d7a5e3edac31d9e9dd5e507e1",
+   "title": "迈向可审计和校准的人工智能用于痴呆症相关车祸严重程度预测：支持人类审查的选择性推迟框架",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "ed5090831c9a9b8ee24cfb382dcbc577105aa4c8",
+   "title": "MiMo-V2.6-Pro：API提供商性能基准和价格分析",
+   "sub_dimension": "基础研究",
+   "score": 51
+  },
+  {
+   "id": "ff5f2cce0168d2aab523a2a89d4f0a05e29bace4",
+   "title": "基准Grok 4.7",
+   "sub_dimension": "基础研究",
+   "score": 51
+  },
+  {
+   "id": "50d40dd186bbec0a9ac3007ed94e21ee621c52c6",
+   "title": "协议夸大证据：LLM法官共识中的错误依赖性",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "2e41a98eb28a86ccc06505a00ec2a2304b04e518",
+   "title": "托管LLM中无持久性的复制：实时信念评估中的测量敏感性",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "24670c7af77e91727604b523eaf32f245e77dade",
+   "title": "AutoGym：蓝图-第一代可验证剂健身房",
+   "sub_dimension": "基础研究",
+   "score": 61
+  },
+  {
+   "id": "365c53b80964874c74611c969c20f2bee7a5177e",
+   "title": "利用GPT-6 Astra将研究时间和成本并行减少一半",
+   "sub_dimension": "基础研究",
+   "score": 55
+  },
+  {
+   "id": "0e27a261828e9aa7927fe525961ce6d544149ffe",
+   "title": "DVA神经元：自适应Lily神经元的设计和验证：从单神经元动力学到多神经元尖峰网络",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "34d5f689c5619661c7bd2df2863e10c0aab1d402",
+   "title": "教学知识还是临床案例？数据类型如何塑造医学大型语言模型",
+   "sub_dimension": "基础研究",
+   "score": 54
+  },
+  {
+   "id": "f7f8f7ef7b2f2d4531319eb1008414d3d96e3f10",
+   "title": "Process Light：基于大语言模型的交通信号控制的过程监督",
+   "sub_dimension": "基础研究",
+   "score": 61
+  },
+  {
+   "id": "e3513c746108d5d03c799928136da75483c7af7f",
+   "title": "超越线性上下文：使用本地9 B语言模型进行长篇小说推理的图形引导证据导航",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "b2c334fa52a118a00c619fc26cdb2c2909bfb539",
+   "title": "从研究前沿到实验台：多模式医学图像智能诊断四层实验教学系统设计",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "2451723d1b65757f0eb2c26270b260c9aa8b3518",
+   "title": "Artificial Analysis 评测 Grok 4.7：智能指数得分 46，编码智能体指数升至 56",
+   "sub_dimension": "基础研究",
+   "score": 64
+  },
+  {
+   "id": "437e7e1fd55265d85db3d684d51578d381caeac6",
+   "title": "PAANI：河流机器人仿真中的设备视觉证据融合和可解释性指导",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "ea67090ca782200c852936afb6b6712c769eb08b",
+   "title": "在Bluesky上建立值得信赖的心理健康基准：一个具有验证意识的薄弱监督框架",
+   "sub_dimension": "基础研究",
+   "score": 74
+  },
+  {
+   "id": "50021be134ca6906114efdf8295d80c0d7c5f129",
+   "title": "顺序电子重建实现水电解中持久的氧氧化还原",
+   "sub_dimension": "基础研究",
+   "score": 57
+  },
+  {
+   "id": "08005ad10e2f7ccd07a1736c79dc3891a883fd27",
+   "title": "类人代理的生成式排队多行为控制系统",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "27c4f36681bf4184552c66749438de4b4843f030",
+   "title": "线性表示假设综述",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "25218db8e4964e5b237e4b3e00385c0eec6bfee4",
+   "title": "以较低的成本分割文档：基于LLM的页面流分割的多分割边界决策",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "e02b3a8cecf4321ff6c75af97466ad1d4e223a8d",
+   "title": "目标驱动的变体分类",
+   "sub_dimension": "基础研究",
+   "score": 73
+  },
+  {
+   "id": "346822b1744e0de0bedcc6a310d2bd40fecd8420",
+   "title": "值得信赖的统计人工智能：故障模式、缓解策略和自主LLM系统的NPS框架",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "d64bd3a275800488fc003c0e5b44eab6e6896a4a",
+   "title": "AI安全论战升温！特朗普：只会鼓励AI发展 必要时司法部会出手",
+   "sub_dimension": "基础研究",
+   "score": 64
+  },
+  {
+   "id": "8b47921c1889dc8ce41e8a12bcb4a80f8361fff5",
+   "title": "IntLawNER：命名实体识别数据集和国际法基准",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "1fac1b00c7b33434497fe3e8bddf5c9fbd1a2e3e",
+   "title": "36氪研究院 | 2026年中国AI Agent行业发展研究报告",
+   "sub_dimension": "基础研究",
+   "score": 61
+  },
+  {
+   "id": "875939677374d91b7c33913dae48034680697c98",
+   "title": "我们不断重新发现的小说文字记录",
+   "sub_dimension": "基础研究",
+   "score": 43
+  },
+  {
+   "id": "7334e538c783010076d20e1bc547aefebe5f5781",
+   "title": "钨业龙头中钨高新子公司原董事长胡启明被查",
+   "sub_dimension": "基础研究",
+   "score": 49
+  },
+  {
+   "id": "c3e18a7a1358a5c08ad8e2db2502acd2001ecb7e",
+   "title": "GaitVista：面向可扩展纵向步态评估的可靠性感知AI测量",
+   "sub_dimension": "基础研究",
+   "score": 74
+  },
+  {
+   "id": "4f33c78ea6a833dfdd8f80768a6144301b17342c",
+   "title": "一款经济实惠的人工智能集成智能手杖，为视障用户提供多模式移动援助",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "626e4edb13d55a76f63c0f01e4a0ab120e166771",
+   "title": "自组织代理团队学会共同推理",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "faa11d82dfb3251f417a067dc378d0f89f153b87",
+   "title": "文本、像素还是两者兼而有之？评估多模式文档QA的输入表示",
+   "sub_dimension": "基础研究",
+   "score": 55
+  },
+  {
+   "id": "9af8e3c7528d3d198e1e6f12681f86821ecfaccc",
+   "title": "CTSpinoPelvic 1K：脊柱、骨盆、肋骨和股骨在一个坐标系中，注释用于腰骶骨过渡解剖学",
+   "sub_dimension": "基础研究",
+   "score": 65
+  },
+  {
+   "id": "ead8e217628e093e331ae068f5d2ba608b5aeefe",
+   "title": "AI竞赛从办公效率转向生命科学，Anthropic建湿实验室探索药物研发",
+   "sub_dimension": "基础研究",
+   "score": 61
+  },
+  {
+   "id": "f77b4246ac104783caaf8a6d87e8bcd068fa134e",
+   "title": "ISA-Bench：跨指令集架构计算推理的基准",
+   "sub_dimension": "基础研究",
+   "score": 74
+  },
+  {
+   "id": "ba1ee01316613f745e8301444bc8e853b171ff90",
+   "title": "VLM应该什么时候看？仅为需要和使用的视觉通话付费",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "0c35f2dfe5de036d7a84dd038b750115408193a7",
+   "title": "MAWILE：用于检查LLM评估者的多轴工作空间",
+   "sub_dimension": "基础研究",
+   "score": 60
+  },
+  {
+   "id": "bff7c964276df0a1fca7633e2f8eb537a83b25a2",
+   "title": "Hapi：用于大陆规模中期水文预报的多变量陆地表面Transformer",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "982721821017ffb70c85db811127dcdfbd071443",
+   "title": "Claude Opus 5.5（最大可回退）：API提供商性能基准和价格分析",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "85abac16fa660cd9e8fc964b6130203e2c672e51",
+   "title": "从2D图像和细胞种群统计数据中学习3D生物物理细胞特性",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "6950f3cbe1382af87f3b4391ea5be555dc2d4346",
+   "title": "人工深思熟虑群体的智慧",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "92a0e01be262e1cf637a682b6ad68502cb7f7105",
+   "title": "自主机器人出租车部署对城市能源和交通的影响",
+   "sub_dimension": "基础研究",
+   "score": 76
+  },
+  {
+   "id": "b33a3ba3f018fabe8829dc3c43232ce6180f55ba",
+   "title": "EvidenT：通过证据和可追溯性建立可信赖的企业助理",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "1f62472c48650b7651f45f4685118c6e1e399272",
+   "title": "人工智能群体的社会影响力和科学注意力的分配",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "85b24c77d163b8bb276db173a82ce23ff2786d5a",
+   "title": "Anthropic 发布 Claude Opus 5.5，成本较 Opus 5 降低 40%",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "f17b9ebdb45e72e4c762962fcf02ddbf5ce75b30",
+   "title": "解释者：海平面上升如何对人类，遗产和自然构成“生存威胁”",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "a3fa9e10e5085f5a84874943a7d0f35d206ce960",
+   "title": "水弹性利益相关者平台启动活动",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "d38b708e9300d23e1f1285e65385c535aaa857b3",
+   "title": "对于卡尔纳利河这样的狂野河流来说，尼泊尔的灾难是警告，也是答案（评论）",
+   "sub_dimension": "企业经营",
+   "score": 53
+  },
+  {
+   "id": "04ba861884afe1640fd054cb0cb5bd92ff0da3fc",
+   "title": "Claude Opus 5.5 发布：较 Opus 5 降价提速，系统卡披露安全演习中约半数运行或有危害行为",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "d17d950199a2abf09f73d114073b873625ef681f",
+   "title": "官宣！沃尔沃汽车CEO换人！李书福：对他充满信心",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "07c7384d8ed51f955a0b292d879fce9a5375145c",
+   "title": "拍摄斯里兰卡人象冲突--采访费德里科·博雷拉",
+   "sub_dimension": "企业经营",
+   "score": 43
+  },
+  {
+   "id": "e0c83a63e812d99b44da0d065d57450eadeea403",
+   "title": "小米发布 MiMo-V2.6 Pro 与 Flash 全模态开源模型",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "5ebbae742f4c53801a06797ac39121ef1e2fe6b9",
+   "title": "脂肪熊周为阿拉斯加重量级冠军拉开帷幕。1，200磅冠军尚克能否再次获胜？",
+   "sub_dimension": "企业经营",
+   "score": 55
+  },
+  {
+   "id": "22172e58188789b40c1f1e0a239736a1186141b2",
+   "title": "尊重简·古道尔的保护遗产并打击错误信息",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "ede6ee3135753ba43968205bbba967de96340aa4",
+   "title": "Claude Code v2.1.280 发布，新增 Claude Opus 5.5 为默认 Opus 模型",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "39a5d729ea9d32343273ef8dab39c829176ca357",
+   "title": "OpenAI 发布 GPT-6 Sol 和 GPT-6 Luna，API 价格较 GPT-5.6 促销价低 50%",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "f31f1989973a40ce8baee4318451ea7060592d1f",
+   "title": "解决问题可以避免10年与航空相关的气候变暖--新研究",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "8dbe347ae53599048dc395cb49239e62f82e69fe",
+   "title": "Meta个人AI智能体Muse上线两周登顶美国应用榜，扎克伯格身家单日增约250亿美元",
+   "sub_dimension": "企业经营",
+   "score": 61
+  },
+  {
+   "id": "f7f7e9d337be3b953d793cfe7624d6a436ba606a",
+   "title": "OpenRouter 发布 2026 年最佳嵌入模型选型指南，覆盖 37 个目录条目",
+   "sub_dimension": "企业经营",
+   "score": 65
+  },
+  {
+   "id": "f545a73806085967dc07c0bf9573d6c737b4fee7",
+   "title": "小米发布并开源 MiMo-V2.6 系列，扩展强化学习规模迈向自我提升",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "5def2e8fe52ba0ab369b057ef7cd017d8c56186d",
+   "title": "全球可再生能源发电能力：到2030年需要快速增长",
+   "sub_dimension": "企业经营",
+   "score": 58
+  },
+  {
+   "id": "03b0ef5183e9ab35ed00cb0feba4e3691419b1fd",
+   "title": "爬行动物、黄金和金钱：澳大利亚如何打击野生动物贩运",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "e4280964fa0b90ac6017e3d02ab247210f5d7559",
+   "title": "小米 MiMo-V2.6-Pro 登上 Code Arena： WebDev 榜约第10名，开源权重中约第3",
+   "sub_dimension": "企业经营",
+   "score": 63
+  },
+  {
+   "id": "ad43278697efda8873ce7bdfe5c0cf8ddf700926",
+   "title": "1.04元/Wh！甘肃白银200MW/800MWh独立储能项目中标候选人公示 - news.smm.cn",
+   "sub_dimension": "企业经营",
+   "score": 71
+  }
+ ]
+}

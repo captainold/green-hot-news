@@ -1,0 +1,428 @@
+{
+ "version": 1,
+ "exported_at": "2026-09-29T13:35:48.767Z",
+ "total": 84,
+ "labeled": 84,
+ "labels": {
+  "e64ebbc8b1362ca421615cccec5c74a790d4dc7a": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "171a4087bb080598dab25830560466fd5c9ca3e7": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "6e76d50a7688f313edcc51aa13f92d9755c18614": {
+   "strength": 2,
+   "sub": "政策法规",
+   "note": ""
+  },
+  "f164700d9564009d523a2ac105e3088591a41436": {
+   "strength": 1,
+   "sub": "政策法规",
+   "note": "但是这个不是政策法规，这个属于是针对政策法规的专家解读。不过如果这条信息来自于官方政府网站，那么可以参照政府通告的重要性进行类比。 "
+  },
+  "f6bf12c4cff1dbcad6981f628ba67f237fcd9415": {
+   "strength": 2,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "60be7c5bec6c7c7fda964e9811eb0fb540af7b79": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "534ea97410e11aaa92f30532cedac89e6094dd03": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "923f172278e0e60d9407fd222ca60fadbbd47e8a": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "c02c0873076b98bf2cdd4a6ab4067abe949783a3": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "35c412feb2e4ff92596b2123465f6813b0e1e6ac": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "d390d14b8b52147831811e46f102e38d62ee563e": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "013ba351bdaaf537c340f9bc12890b5d7bfdb27f": {
+   "strength": 2,
+   "sub": "政策法规",
+   "note": ""
+  },
+  "9657e8319abe85f8d9453d3054ecdc1bf53665db": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "b14463e82a810672628040e0981d2153db0cfbe9": {
+   "strength": 2,
+   "sub": "企业经营",
+   "note": ""
+  },
+  "c0dca56a0af433cf58f0cd8d48c81a52d007afa8": {
+   "strength": 2,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "20f308059501421b601d7707ee196bbd81f570eb": {
+   "strength": 0,
+   "sub": "企业经营",
+   "note": "这条不属于新闻，是订阅促销信息。 "
+  },
+  "351b63c5ef5aaac0414f7e5b5dfeb15c453ad55b": {
+   "strength": 0,
+   "sub": "",
+   "note": "这条也不算是新闻。 "
+  },
+  "4d267ad59b8c7aafe0c15279551face8f352624a": {
+   "strength": 1,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "531a13ad7ad0d4fd0c9e09dbf13cb03efccf1092": {
+   "strength": 2,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "8749933d4fbc6dc89899082d5d44b5e97ed44c2f": {
+   "strength": 2,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "992109355d6de21a0b0c3ed131b240cc97e12699": {
+   "strength": 2,
+   "sub": "政策法规",
+   "note": ""
+  },
+  "166dc1037e553b61d00e86d20ce9689e7cf6698c": {
+   "strength": 0,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "bbc55cf1f342a2aa6604ddfddc94d1859e0a7e87": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "d8b9cdc35d0ef67567beb19dacac6900283aad9f": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "53a064b916c8429011eb9f5d9b558309685bb801": {
+   "strength": 1,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "c62d74c2b4926499d24764f49650282e2a33a9b3": {
+   "strength": 1,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "ef9354119cc5228a348acc21e04b42fa30891264": {
+   "strength": 2,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "b8430036f56c623f4d1c97765549e4e1985f4798": {
+   "strength": 0,
+   "sub": "企业经营",
+   "note": ""
+  },
+  "106c9df941e29d4b9ae386a79c2f07b77c57eb44": {
+   "strength": 1,
+   "sub": "企业经营",
+   "note": ""
+  },
+  "1072deef938cc94b72e27b5d1b596b2b0ee4bca6": {
+   "strength": 1,
+   "sub": "企业经营",
+   "note": ""
+  },
+  "2749d971fa181a386542c343bb328b7d17cbba46": {
+   "strength": 0,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "69a0ee1556a71b0624f32370283d62a9bb2b3a80": {
+   "strength": 1,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "e293d5373af56b0ee283b00329e4d5fd91aa1845": {
+   "strength": 2,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "e9f6641b00f6664aa20f9242c609cfb24acebc71": {
+   "strength": 0,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "d7ea5704df82cb797aa1a3b69c4d353ac1cd28e5": {
+   "strength": 1,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "9b229c968709b94648cc5935d33ba6546b65519e": {
+   "strength": 1,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "227cc57b554ffaf0df51e093261dd3dd02ffae4f": {
+   "strength": 1,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "b2d248d2744f4ef23b5896dec1b38d8a440e3582": {
+   "strength": 0,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "4488d74c8aa572c6abdeef9dbb2593222215e084": {
+   "strength": 2,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "9e6d0fc04b00fa292b6663d17f34d8f54c80805c": {
+   "strength": 1,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "f3f393c7918d1bf55a6a7268460185af35bfce6f": {
+   "strength": 0,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "4da42094fd6023b6147a0a2c1bfe828a138250d5": {
+   "strength": 0,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "48f9a1c89fc6d8de78216a6eb3178a07ac7a37a8": {
+   "strength": 1,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "1cd558c4d22c00aea996c0da81622f70e11ca0fb": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "a47ce214dc14128fbb04872f266e67f815c1ccb0": {
+   "strength": 1,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "e3513c746108d5d03c799928136da75483c7af7f": {
+   "strength": 1,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "9e70a006de0bbc1b843f9cd98c8e6cdf55ce71da": {
+   "strength": 2,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "bafe2a9ee4cb8979a94efad3d135a1e38d21c6f0": {
+   "strength": 1,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "4ec2d17f488cdf789895e10e1ca66f00576e980c": {
+   "strength": 2,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "8065e71bfb00d1ec6cce47c777ce07b8d6adc953": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "610593efbccbf64ef7945c3598722f07bb25bd84": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "01a6dd1c7a78463d1b72de9445d324f04d878ae7": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "e29e228efe07b96f05329d7fdcc9c794fbed69d6": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "352bd1e2a6261a2598c9c4dbf73ad4408553f4df": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "5fc02b9997b889a99fc0d64ca88487ae013cee6c": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "22bc8f5145c7581a085e132c0c5fbd2a8c65ad7d": {
+   "strength": 1,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": "这一条似乎不是新闻，而是网站说明？ "
+  },
+  "baf0695a34fbfd832052f0d9106355eaf8f6b9da": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "71f0f84cfa53d71880f7294a87e679feab1699a2": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "7a365df8cc2c14b31ba6ef87d78ae739a56b811e": {
+   "strength": 0,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "6332b5c3f5e1f04ab221016e8e4ce0734345128c": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "19a44b7f01924f7be86261bb24ae0f316ade3394": {
+   "strength": 1,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "04de473b24033216a99ae01849796e47b782c85a": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": "这个属于宏观研究"
+  },
+  "3b43dfbb13abee612d70ceb31f2c044a5c5c65d5": {
+   "strength": 1,
+   "sub": "技术研发",
+   "note": ""
+  },
+  "9996b4983f5d66a8599218a6be7dd62e39640ff7": {
+   "strength": 1,
+   "sub": "金融资本",
+   "note": ""
+  },
+  "974bf3f6312c26e1d28a06bc6df2edd7eee541aa": {
+   "strength": 1,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "1ae3848ab7ef75a89d60eec51e3c0b57937586ae": {
+   "strength": 0,
+   "sub": "政策法规",
+   "note": ""
+  },
+  "059594dbf45a2576f9fa8fd81696791cba1bfdef": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "9cee17b0ecb0cae1fb41d77e3697bf4413813ee2": {
+   "strength": 2,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "a92ea8009aa02c72a2a3177c63d9bf23999e218f": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "7b36c0646dac2bb7ab1fb49706b3d86cbd7b8d03": {
+   "strength": 2,
+   "sub": "政策法规",
+   "note": ""
+  },
+  "584d3cb8ec2cb19f98a76f8bbb87a8ac19b2bf9e": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "fb7f0492d1e4ca32a400664fe5dc3e8808a8a1c2": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "14e34a4fad43a3c7b930bb087a75e6561e71dabe": {
+   "strength": 1,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "c59aea34c904eeca5bfd3fe1508641d2c57c8b44": {
+   "strength": 0,
+   "sub": "社会创新",
+   "note": ""
+  },
+  "65ea336a1b11d84420af8062c00f1fef23cbe302": {
+   "strength": 0,
+   "sub": "金融资本",
+   "note": ""
+  },
+  "45fbc89befa9c7d8de331b4d3eefc07fde4f7d1e": {
+   "strength": 0,
+   "sub": "金融资本",
+   "note": ""
+  },
+  "fd623d4f45a958e7b99f13f6e94e777338882a15": {
+   "strength": 0,
+   "sub": "企业经营",
+   "note": ""
+  },
+  "dd4ad0b762e34eb026c14e01a47ed2229ad42b21": {
+   "strength": 2,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "e207b06ee1d66643d3fa83bad1040297b969163e": {
+   "strength": 2,
+   "sub": "基础研究",
+   "note": ""
+  },
+  "6129dbf155ffebb82497742e52d7dc9ff35dbda1": {
+   "strength": 0,
+   "sub": "企业经营",
+   "note": ""
+  },
+  "b095dfb02a2c971a1da32e7e548edda8aa513eda": {
+   "strength": 0,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "bf957accff56037d4b4a20d743ca9c67cf2fa6d3": {
+   "strength": 1,
+   "sub": "国际动态",
+   "note": ""
+  },
+  "c8b93b17b87a9c02dce8533eeeda04fb2b3c59ce": {
+   "strength": 2,
+   "sub": "政策法规",
+   "note": ""
+  }
+ }
+}

@@ -1,0 +1,111 @@
+{
+ "tag": "jev-bench-n16-seed20260928",
+ "ts": "2026-09-28T14:27:36.958951+00:00",
+ "corpus": {
+  "count": 229,
+  "ids_sha1_12": "40359bf4959b"
+ },
+ "sample": 16,
+ "extra": {
+  "seed": 20260928,
+  "window": "近 7 天（229/3613 条）"
+ },
+ "items": [
+  {
+   "id": "9657e8319abe85f8d9453d3054ecdc1bf53665db",
+   "title": "到2030年，全球可再生能源每年需要增加1，200 GW：IRENA -亚洲电力",
+   "sub_dimension": "国际动态",
+   "score": 56
+  },
+  {
+   "id": "2e011fcd6643ddc31b259adef18077a6d00d43f4",
+   "title": "欧洲议会表决MSR改革,ETS1注销门槛拟从4亿提至6.5亿",
+   "sub_dimension": "国际动态",
+   "score": 61
+  },
+  {
+   "id": "98e6e7e68fda1b07d8142e5e02e6d3027e2c8743",
+   "title": "南非考虑启动生物多样性信用试点 拟制定流程计划与准则",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "13a75bf578003325c2aa96a8b97b0940f9b250de",
+   "title": "科达制造要砸45亿扩产石墨负极！重组被否后的一场重资产押注？",
+   "sub_dimension": "金融资本",
+   "score": 57
+  },
+  {
+   "id": "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9",
+   "title": "Hot or Cool News：2026年9月",
+   "sub_dimension": "社会创新",
+   "score": 41
+  },
+  {
+   "id": "2ff5927638fe0bdc38724ade5379403f1eb0f56a",
+   "title": "Claude Opus 5.5型号-智能、性能和价格比较",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "9c0ef034b74afc90e0ebec7870b58b4f2f142aca",
+   "title": "英特尔将在RoboBusiness讨论扩展物理人工智能所需的基础设施",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "9e3778aed15f44f90589a7be9bb5486ce6330047",
+   "title": "现代担心中国电动汽车生产商也会破坏他们在美国的业务？",
+   "sub_dimension": "企业经营",
+   "score": 51
+  },
+  {
+   "id": "d17d950199a2abf09f73d114073b873625ef681f",
+   "title": "官宣！沃尔沃汽车CEO换人！李书福：对他充满信心",
+   "sub_dimension": "企业经营",
+   "score": 49
+  },
+  {
+   "id": "634453d16f56e82a75df915fc962caefcf8cdd36",
+   "title": "可再生能源创纪录，但步伐必须近一倍才能实现2030年目标- The Well News",
+   "sub_dimension": "政策法规",
+   "score": 63
+  },
+  {
+   "id": "bbc3baec877b9c8dea2bc15a07767e70d423114d",
+   "title": "9月例行新闻发布会最新情况通报",
+   "sub_dimension": "政策法规",
+   "score": 73
+  },
+  {
+   "id": "6950f3cbe1382af87f3b4391ea5be555dc2d4346",
+   "title": "人工深思熟虑群体的智慧",
+   "sub_dimension": "基础研究",
+   "score": 66
+  },
+  {
+   "id": "626e4edb13d55a76f63c0f01e4a0ab120e166771",
+   "title": "自组织代理团队学会共同推理",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "437e7e1fd55265d85db3d684d51578d381caeac6",
+   "title": "PAANI：河流机器人仿真中的设备视觉证据融合和可解释性指导",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "45474fd80edf022bd330fd9ab18e393bce2793f9",
+   "title": "Grok 4.7（xHigh）-智能、性能和价格分析",
+   "sub_dimension": "技术研发",
+   "score": 37
+  },
+  {
+   "id": "dc4f78d10886d799b909fc4cd69118f90c71220b",
+   "title": "海面具身智能公司半年完成3亿融资，曾获李泽湘、高秉强、阿里、元禾系等投资｜硬氪首发",
+   "sub_dimension": "金融资本",
+   "score": 56
+  }
+ ]
+}

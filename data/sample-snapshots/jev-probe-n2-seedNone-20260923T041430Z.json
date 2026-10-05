@@ -1,0 +1,28 @@
+{
+ "tag": "jev-probe-n2-seedNone",
+ "ts": "2026-09-23T04:14:30.773498+00:00",
+ "corpus": {
+  "count": 3613,
+  "ids_sha1_12": "efb93ac1e0cc"
+ },
+ "sample": 2,
+ "extra": {
+  "seed": null,
+  "no_pro": true,
+  "no_sub": false
+ },
+ "items": [
+  {
+   "id": "4cee6d1b0dddb1bb04dd9da2028ce6d749599bf5",
+   "title": "IRENA：到2050年，太阳能电池板废物可能损失200亿美元-taiyangnews.info",
+   "sub_dimension": "国际动态",
+   "score": 50
+  },
+  {
+   "id": "6d1663497ff767f42d3331b441bb2f76800c7107",
+   "title": "瑞典能源署启动第二轮bio-CCS反向拍卖,提供101.7亿瑞典克朗投资与运营支持",
+   "sub_dimension": "金融资本",
+   "score": 76
+  }
+ ]
+}

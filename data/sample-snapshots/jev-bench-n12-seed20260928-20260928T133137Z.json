@@ -1,0 +1,87 @@
+{
+ "tag": "jev-bench-n12-seed20260928",
+ "ts": "2026-09-28T13:31:37.097139+00:00",
+ "corpus": {
+  "count": 229,
+  "ids_sha1_12": "40359bf4959b"
+ },
+ "sample": 12,
+ "extra": {
+  "seed": 20260928,
+  "window": "近 7 天（229/3613 条）"
+ },
+ "items": [
+  {
+   "id": "9657e8319abe85f8d9453d3054ecdc1bf53665db",
+   "title": "到2030年，全球可再生能源每年需要增加1，200 GW：IRENA -亚洲电力",
+   "sub_dimension": "国际动态",
+   "score": 56
+  },
+  {
+   "id": "98e6e7e68fda1b07d8142e5e02e6d3027e2c8743",
+   "title": "南非考虑启动生物多样性信用试点 拟制定流程计划与准则",
+   "sub_dimension": "金融资本",
+   "score": 71
+  },
+  {
+   "id": "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9",
+   "title": "Hot or Cool News：2026年9月",
+   "sub_dimension": "社会创新",
+   "score": 41
+  },
+  {
+   "id": "2ff5927638fe0bdc38724ade5379403f1eb0f56a",
+   "title": "Claude Opus 5.5型号-智能、性能和价格比较",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "151b9b422fb12dfda5dadea4f3297cec84bf7899",
+   "title": "Meta Muse 助手曝出严重 0-day 漏洞，Amazon 已开始封禁 Muse",
+   "sub_dimension": "企业经营",
+   "score": 67
+  },
+  {
+   "id": "f0fdc84841fbf83f72ca4b7c9676a10046083d2c",
+   "title": "世界银行、国际货币基金组织支持改变贫穷国家债务框架",
+   "sub_dimension": "政策法规",
+   "score": 44
+  },
+  {
+   "id": "f7f8f7ef7b2f2d4531319eb1008414d3d96e3f10",
+   "title": "Process Light：基于大语言模型的交通信号控制的过程监督",
+   "sub_dimension": "基础研究",
+   "score": 61
+  },
+  {
+   "id": "7334e538c783010076d20e1bc547aefebe5f5781",
+   "title": "钨业龙头中钨高新子公司原董事长胡启明被查",
+   "sub_dimension": "基础研究",
+   "score": 49
+  },
+  {
+   "id": "e3513c746108d5d03c799928136da75483c7af7f",
+   "title": "超越线性上下文：使用本地9 B语言模型进行长篇小说推理的图形引导证据导航",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "7e8b7a904926b5bc4fdd756cf7ee6c3126cdb7d9",
+   "title": "Claude Opus 5.5位居人工分析智能指数榜首",
+   "sub_dimension": "技术研发",
+   "score": 39
+  },
+  {
+   "id": "60fcd76607f0f0f4a176a6a63f8ddfda294bc4e1",
+   "title": "transformers 支持直接加载 GGUF 量化模型，本地推理性能接近 llama.cpp",
+   "sub_dimension": "技术研发",
+   "score": 51
+  },
+  {
+   "id": "ae3f16260b4cb21d0f0ff01df9cf63d76a53475a",
+   "title": "GPT-6 Sol与Claude Opus 5.5同日开打，谁是「性价比之王」",
+   "sub_dimension": "技术研发",
+   "score": 37
+  }
+ ]
+}

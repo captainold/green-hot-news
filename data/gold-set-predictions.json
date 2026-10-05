@@ -1,0 +1,2679 @@
+{
+ "ts": "2026-09-29T10:45:49.906495+00:00",
+ "kind": "gold-set-predictions-freeze",
+ "note": "预登记：84 条未标注 gold set 上的三轨预测，冻结于人工标注之前（防偏置）。终审用 gold_set.py evaluate（现跑），本文件为对照副本。",
+ "gold_set": {
+  "path": "data/gold-set.jsonl",
+  "n": 84,
+  "sha1_12": "cbef2b7abd60",
+  "labeled_before_freeze": false
+ },
+ "models": {
+  "jev": "TypeSafe/jev-latest",
+  "pro": "deepseek-ai/DeepSeek-V4-Pro"
+ },
+ "rows": [
+  {
+   "id": "013ba351bdaaf537c340f9bc12890b5d7bfdb27f",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 1.0
+    },
+    "topic": 6,
+    "is_green": 0.08,
+    "is_noise": 0.71,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.03,
+     "is_important": 0.37,
+     "is_routine": 0.93
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "01a6dd1c7a78463d1b72de9445d324f04d878ae7",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.68
+    },
+    "topic": 12,
+    "is_green": 0.51,
+    "is_noise": 0.04,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.01,
+     "is_important": 0.09,
+     "is_routine": 0.35
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "04de473b24033216a99ae01849796e47b782c85a",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 1.0
+    },
+    "topic": 18,
+    "is_green": 0.76,
+    "is_noise": 0.03,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.01,
+     "is_important": 0.24,
+     "is_routine": 0.18
+    }
+   },
+   "pro": {
+    "score": 20,
+    "level": 1
+   }
+  },
+  {
+   "id": "059594dbf45a2576f9fa8fd81696791cba1bfdef",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.75
+    },
+    "topic": 6,
+    "is_green": 0.02,
+    "is_noise": 0.06,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.03,
+     "is_important": 0.09,
+     "is_routine": 0.48
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "106c9df941e29d4b9ae386a79c2f07b77c57eb44",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "金融资本",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.56
+    },
+    "topic": 18,
+    "is_green": 0.22,
+    "is_noise": 0.27,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.22,
+     "is_routine": 0.93
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "1072deef938cc94b72e27b5d1b596b2b0ee4bca6",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.97
+    },
+    "topic": 12,
+    "is_green": 0.08,
+    "is_noise": 0.58,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.23,
+     "is_routine": 0.94
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "14e34a4fad43a3c7b930bb087a75e6561e71dabe",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.96
+    },
+    "topic": 12,
+    "is_green": 0.68,
+    "is_noise": 0.08,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.15,
+     "is_routine": 0.89
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "166dc1037e553b61d00e86d20ce9689e7cf6698c",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.56
+    },
+    "topic": 6,
+    "is_green": 0.05,
+    "is_noise": 0.4,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.04,
+     "is_important": 0.26,
+     "is_routine": 0.86
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "171a4087bb080598dab25830560466fd5c9ca3e7",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.79
+    },
+    "topic": 12,
+    "is_green": 0.7,
+    "is_noise": 0.73,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.03,
+     "is_important": 0.22,
+     "is_routine": 0.95
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "19a44b7f01924f7be86261bb24ae0f316ade3394",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.88
+    },
+    "topic": 6,
+    "is_green": 0.12,
+    "is_noise": 0.32,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.04,
+     "is_important": 0.29,
+     "is_routine": 0.87
+    }
+   },
+   "pro": {
+    "score": 20,
+    "level": 1
+   }
+  },
+  {
+   "id": "1ae3848ab7ef75a89d60eec51e3c0b57937586ae",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.7
+    },
+    "topic": 12,
+    "is_green": 0.18,
+    "is_noise": 0.04,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.01,
+     "is_important": 0.38,
+     "is_routine": 0.15
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "1cd558c4d22c00aea996c0da81622f70e11ca0fb",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.61
+    },
+    "topic": 18,
+    "is_green": 0.27,
+    "is_noise": 0.12,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.57,
+     "is_routine": 0.86
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "20f308059501421b601d7707ee196bbd81f570eb",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.97
+    },
+    "topic": 18,
+    "is_green": 0.98,
+    "is_noise": 0.94,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.01,
+     "is_important": 0.11,
+     "is_routine": 0.97
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "227cc57b554ffaf0df51e093261dd3dd02ffae4f",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.59
+    },
+    "topic": 18,
+    "is_green": 0.04,
+    "is_noise": 0.06,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.07,
+     "is_important": 0.45,
+     "is_routine": 0.68
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "22bc8f5145c7581a085e132c0c5fbd2a8c65ad7d",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.46
+    },
+    "topic": 6,
+    "is_green": 0.15,
+    "is_noise": 0.06,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.06,
+     "is_important": 0.34,
+     "is_routine": 0.43
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "2749d971fa181a386542c343bb328b7d17cbba46",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.79
+    },
+    "topic": 12,
+    "is_green": 0.02,
+    "is_noise": 0.27,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.19,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "351b63c5ef5aaac0414f7e5b5dfeb15c453ad55b",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.99
+    },
+    "topic": 12,
+    "is_green": 0.82,
+    "is_noise": 0.88,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.18,
+     "is_routine": 0.95
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "352bd1e2a6261a2598c9c4dbf73ad4408553f4df",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.51
+    },
+    "topic": 6,
+    "is_green": 0.02,
+    "is_noise": 0.2,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.3,
+     "is_routine": 0.86
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "35c412feb2e4ff92596b2123465f6813b0e1e6ac",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.98
+    },
+    "topic": 12,
+    "is_green": 0.98,
+    "is_noise": 0.43,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.13,
+     "is_routine": 0.95
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "3b43dfbb13abee612d70ceb31f2c044a5c5c65d5",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.87
+    },
+    "topic": 18,
+    "is_green": 0.03,
+    "is_noise": 0.23,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.07,
+     "is_important": 0.38,
+     "is_routine": 0.85
+    }
+   },
+   "pro": {
+    "score": 20,
+    "level": 1
+   }
+  },
+  {
+   "id": "4488d74c8aa572c6abdeef9dbb2593222215e084",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.65
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.08,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.07,
+     "is_important": 0.43,
+     "is_routine": 0.65
+    }
+   },
+   "pro": {
+    "score": 25,
+    "level": 2
+   }
+  },
+  {
+   "id": "45fbc89befa9c7d8de331b4d3eefc07fde4f7d1e",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "金融资本",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.63
+    },
+    "topic": 6,
+    "is_green": 0.07,
+    "is_noise": 0.11,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.1,
+     "is_important": 0.54,
+     "is_routine": 0.41
+    }
+   },
+   "pro": {
+    "score": 25,
+    "level": 2
+   }
+  },
+  {
+   "id": "48f9a1c89fc6d8de78216a6eb3178a07ac7a37a8",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.85
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.11,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.23,
+     "is_routine": 0.86
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "4d267ad59b8c7aafe0c15279551face8f352624a",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.74
+    },
+    "topic": 6,
+    "is_green": 0.07,
+    "is_noise": 0.24,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.04,
+     "is_important": 0.58,
+     "is_routine": 0.88
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "4da42094fd6023b6147a0a2c1bfe828a138250d5",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.74
+    },
+    "topic": 6,
+    "is_green": 0.02,
+    "is_noise": 0.07,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.7,
+     "is_routine": 0.77
+    }
+   },
+   "pro": {
+    "score": 20,
+    "level": 1
+   }
+  },
+  {
+   "id": "4ec2d17f488cdf789895e10e1ca66f00576e980c",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.53
+    },
+    "topic": 6,
+    "is_green": 0.13,
+    "is_noise": 0.13,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.07,
+     "is_important": 0.75,
+     "is_routine": 0.65
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "531a13ad7ad0d4fd0c9e09dbf13cb03efccf1092",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.61
+    },
+    "topic": 18,
+    "is_green": 0.96,
+    "is_noise": 0.11,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.23,
+     "is_routine": 0.88
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "534ea97410e11aaa92f30532cedac89e6094dd03",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.75
+    },
+    "topic": 12,
+    "is_green": 0.83,
+    "is_noise": 0.74,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.34,
+     "is_routine": 0.94
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "53a064b916c8429011eb9f5d9b558309685bb801",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.74
+    },
+    "topic": 18,
+    "is_green": 0.08,
+    "is_noise": 0.45,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.09,
+     "is_important": 0.37,
+     "is_routine": 0.83
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "584d3cb8ec2cb19f98a76f8bbb87a8ac19b2bf9e",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "金融资本",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.99
+    },
+    "topic": 25,
+    "is_green": 0.92,
+    "is_noise": 0.65,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.01,
+     "is_important": 0.11,
+     "is_routine": 0.91
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "5fc02b9997b889a99fc0d64ca88487ae013cee6c",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 1.0
+    },
+    "topic": 12,
+    "is_green": 0.45,
+    "is_noise": 0.64,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.17,
+     "is_routine": 0.96
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "60be7c5bec6c7c7fda964e9811eb0fb540af7b79",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.9
+    },
+    "topic": 6,
+    "is_green": 0.13,
+    "is_noise": 0.09,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.14,
+     "is_routine": 0.74
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "610593efbccbf64ef7945c3598722f07bb25bd84",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.99
+    },
+    "topic": 12,
+    "is_green": 0.83,
+    "is_noise": 0.7,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.27,
+     "is_routine": 0.94
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "6129dbf155ffebb82497742e52d7dc9ff35dbda1",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "金融资本",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.82
+    },
+    "topic": 18,
+    "is_green": 0.03,
+    "is_noise": 0.24,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.43,
+     "is_routine": 0.58
+    }
+   },
+   "pro": {
+    "score": 25,
+    "level": 2
+   }
+  },
+  {
+   "id": "6332b5c3f5e1f04ab221016e8e4ce0734345128c",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.97
+    },
+    "topic": 12,
+    "is_green": 0.62,
+    "is_noise": 0.55,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.01,
+     "is_important": 0.26,
+     "is_routine": 0.94
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "65ea336a1b11d84420af8062c00f1fef23cbe302",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "金融资本",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.85
+    },
+    "topic": 6,
+    "is_green": 0.01,
+    "is_noise": 0.04,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.03,
+     "is_important": 0.14,
+     "is_routine": 0.17
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "69a0ee1556a71b0624f32370283d62a9bb2b3a80",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.9
+    },
+    "topic": 6,
+    "is_green": 0.04,
+    "is_noise": 0.22,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.24,
+     "is_routine": 0.85
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "6e76d50a7688f313edcc51aa13f92d9755c18614",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.83
+    },
+    "topic": 12,
+    "is_green": 0.82,
+    "is_noise": 0.14,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.82,
+     "is_routine": 0.87
+    }
+   },
+   "pro": {
+    "score": 25,
+    "level": 2
+   }
+  },
+  {
+   "id": "71f0f84cfa53d71880f7294a87e679feab1699a2",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.95
+    },
+    "topic": 18,
+    "is_green": 0.94,
+    "is_noise": 0.72,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.03,
+     "is_important": 0.19,
+     "is_routine": 0.97
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.92
+    },
+    "topic": 12,
+    "is_green": 0.53,
+    "is_noise": 0.34,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.05,
+     "is_important": 0.26,
+     "is_routine": 0.88
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "7a365df8cc2c14b31ba6ef87d78ae739a56b811e",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.99
+    },
+    "topic": 12,
+    "is_green": 0.92,
+    "is_noise": 0.56,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.03,
+     "is_important": 0.11,
+     "is_routine": 0.89
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "7b36c0646dac2bb7ab1fb49706b3d86cbd7b8d03",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.98
+    },
+    "topic": 6,
+    "is_green": 0.03,
+    "is_noise": 0.05,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.02,
+     "is_important": 0.88,
+     "is_routine": 0.78
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "8065e71bfb00d1ec6cce47c777ce07b8d6adc953",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 1.0
+    },
+    "topic": 12,
+    "is_green": 0.94,
+    "is_noise": 0.34,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.01,
+     "is_important": 0.08,
+     "is_routine": 0.88
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "8749933d4fbc6dc89899082d5d44b5e97ed44c2f",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.73
+    },
+    "topic": 18,
+    "is_green": 0.99,
+    "is_noise": 0.23,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.49,
+     "is_routine": 0.73
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "923f172278e0e60d9407fd222ca60fadbbd47e8a",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 1.0
+    },
+    "topic": 12,
+    "is_green": 0.68,
+    "is_noise": 0.09,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.03,
+     "is_important": 0.19,
+     "is_routine": 0.36
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "9657e8319abe85f8d9453d3054ecdc1bf53665db",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.94
+    },
+    "topic": 18,
+    "is_green": 0.99,
+    "is_noise": 0.14,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.03,
+     "is_important": 0.53,
+     "is_routine": 0.25
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "974bf3f6312c26e1d28a06bc6df2edd7eee541aa",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.6
+    },
+    "topic": 18,
+    "is_green": 0.93,
+    "is_noise": 0.45,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.04,
+     "is_important": 0.27,
+     "is_routine": 0.93
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "992109355d6de21a0b0c3ed131b240cc97e12699",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.64
+    },
+    "topic": 12,
+    "is_green": 0.61,
+    "is_noise": 0.03,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.06,
+     "is_important": 0.65,
+     "is_routine": 0.51
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "9996b4983f5d66a8599218a6be7dd62e39640ff7",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.79
+    },
+    "topic": 18,
+    "is_green": 0.03,
+    "is_noise": 0.2,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.05,
+     "is_important": 0.47,
+     "is_routine": 0.61
+    }
+   },
+   "pro": {
+    "score": 20,
+    "level": 1
+   }
+  },
+  {
+   "id": "9b229c968709b94648cc5935d33ba6546b65519e",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.53
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.37,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.14,
+     "is_routine": 0.67
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "9cee17b0ecb0cae1fb41d77e3697bf4413813ee2",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.26
+    },
+    "topic": 6,
+    "is_green": 0.19,
+    "is_noise": 0.02,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.05,
+     "is_important": 0.13,
+     "is_routine": 0.15
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "9e6d0fc04b00fa292b6663d17f34d8f54c80805c",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.57
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.15,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.01,
+     "is_important": 0.42,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "9e70a006de0bbc1b843f9cd98c8e6cdf55ce71da",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.89
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.26,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.13,
+     "is_routine": 0.93
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "a47ce214dc14128fbb04872f266e67f815c1ccb0",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.96
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.1,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.2,
+     "is_routine": 0.82
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "a92ea8009aa02c72a2a3177c63d9bf23999e218f",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.86
+    },
+    "topic": 12,
+    "is_green": 0.95,
+    "is_noise": 0.3,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.26,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "b095dfb02a2c971a1da32e7e548edda8aa513eda",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.68
+    },
+    "topic": 18,
+    "is_green": 0.98,
+    "is_noise": 0.3,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.03,
+     "is_important": 0.27,
+     "is_routine": 0.89
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "b14463e82a810672628040e0981d2153db0cfbe9",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.75
+    },
+    "topic": 12,
+    "is_green": 0.02,
+    "is_noise": 0.04,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.02,
+     "is_important": 0.44,
+     "is_routine": 0.31
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "b2d248d2744f4ef23b5896dec1b38d8a440e3582",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.87
+    },
+    "topic": 12,
+    "is_green": 0.02,
+    "is_noise": 0.08,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.15,
+     "is_routine": 0.87
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "b8430036f56c623f4d1c97765549e4e1985f4798",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.51
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.38,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.18,
+     "is_important": 0.6,
+     "is_routine": 0.65
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "baf0695a34fbfd832052f0d9106355eaf8f6b9da",
+   "sub_kw": "企业经营",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.94
+    },
+    "topic": 12,
+    "is_green": 0.15,
+    "is_noise": 0.05,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.1,
+     "is_routine": 0.84
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "bafe2a9ee4cb8979a94efad3d135a1e38d21c6f0",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.95
+    },
+    "topic": 12,
+    "is_green": 0.01,
+    "is_noise": 0.11,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.2,
+     "is_routine": 0.83
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "bbc55cf1f342a2aa6604ddfddc94d1859e0a7e87",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.52
+    },
+    "topic": 12,
+    "is_green": 0.98,
+    "is_noise": 0.37,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.19,
+     "is_routine": 0.93
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "bf957accff56037d4b4a20d743ca9c67cf2fa6d3",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.69
+    },
+    "topic": 12,
+    "is_green": 0.97,
+    "is_noise": 0.36,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.25,
+     "is_routine": 0.92
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "c02c0873076b98bf2cdd4a6ab4067abe949783a3",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.66
+    },
+    "topic": 12,
+    "is_green": 0.28,
+    "is_noise": 0.19,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.06,
+     "is_important": 0.48,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "c0dca56a0af433cf58f0cd8d48c81a52d007afa8",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.57
+    },
+    "topic": 18,
+    "is_green": 0.98,
+    "is_noise": 0.54,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.27,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "c59aea34c904eeca5bfd3fe1508641d2c57c8b44",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 1.0
+    },
+    "topic": 12,
+    "is_green": 0.81,
+    "is_noise": 0.04,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.18,
+     "is_routine": 0.7
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "c62d74c2b4926499d24764f49650282e2a33a9b3",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.66
+    },
+    "topic": 18,
+    "is_green": 0.05,
+    "is_noise": 0.33,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.37,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "c8b93b17b87a9c02dce8533eeeda04fb2b3c59ce",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.88
+    },
+    "topic": 6,
+    "is_green": 0.11,
+    "is_noise": 0.05,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.02,
+     "is_important": 0.87,
+     "is_routine": 0.76
+    }
+   },
+   "pro": {
+    "score": 25,
+    "level": 2
+   }
+  },
+  {
+   "id": "d390d14b8b52147831811e46f102e38d62ee563e",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.5
+    },
+    "topic": 12,
+    "is_green": 0.37,
+    "is_noise": 0.37,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.04,
+     "is_important": 0.3,
+     "is_routine": 0.92
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "d7ea5704df82cb797aa1a3b69c4d353ac1cd28e5",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.52
+    },
+    "topic": 18,
+    "is_green": 0.04,
+    "is_noise": 0.68,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.21,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "d8b9cdc35d0ef67567beb19dacac6900283aad9f",
+   "sub_kw": "国际动态",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.78
+    },
+    "topic": 12,
+    "is_green": 0.66,
+    "is_noise": 0.54,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.02,
+     "is_important": 0.26,
+     "is_routine": 0.91
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "dd4ad0b762e34eb026c14e01a47ed2229ad42b21",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.44
+    },
+    "topic": 12,
+    "is_green": 0.63,
+    "is_noise": 0.1,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.54,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "e207b06ee1d66643d3fa83bad1040297b969163e",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.91
+    },
+    "topic": 6,
+    "is_green": 0.03,
+    "is_noise": 0.04,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.01,
+     "is_important": 0.13,
+     "is_routine": 0.29
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "e293d5373af56b0ee283b00329e4d5fd91aa1845",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 20,
+    "level": 1
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 3,
+     "score": 30,
+     "conf": 0.53
+    },
+    "topic": 18,
+    "is_green": 0.87,
+    "is_noise": 0.51,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.21,
+     "is_routine": 0.92
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "e29e228efe07b96f05329d7fdcc9c794fbed69d6",
+   "sub_kw": "社会创新",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "社会创新",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.34
+    },
+    "topic": 12,
+    "is_green": 0.95,
+    "is_noise": 0.11,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.08,
+     "is_important": 0.42,
+     "is_routine": 0.59
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "e3513c746108d5d03c799928136da75483c7af7f",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.96
+    },
+    "topic": 12,
+    "is_green": 0.01,
+    "is_noise": 0.1,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.02,
+     "is_important": 0.24,
+     "is_routine": 0.71
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "e64ebbc8b1362ca421615cccec5c74a790d4dc7a",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "国际动态",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.5
+    },
+    "topic": 12,
+    "is_green": 0.89,
+    "is_noise": 0.2,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.03,
+     "is_important": 0.37,
+     "is_routine": 0.82
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "e9f6641b00f6664aa20f9242c609cfb24acebc71",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "技术研发",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.71
+    },
+    "topic": 12,
+    "is_green": 0.44,
+    "is_noise": 0.12,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.3,
+     "is_important": 0.26,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "ef9354119cc5228a348acc21e04b42fa30891264",
+   "sub_kw": "技术研发",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "企业经营",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.84
+    },
+    "topic": 12,
+    "is_green": 0.02,
+    "is_noise": 0.22,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.22,
+     "is_routine": 0.61
+    }
+   },
+   "pro": {
+    "score": 20,
+    "level": 1
+   }
+  },
+  {
+   "id": "f164700d9564009d523a2ac105e3088591a41436",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 30,
+    "level": 3
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 1,
+     "score": 20,
+     "conf": 0.96
+    },
+    "topic": 6,
+    "is_green": 0.04,
+    "is_noise": 0.07,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.03,
+     "is_important": 0.89,
+     "is_routine": 0.77
+    }
+   },
+   "pro": {
+    "score": 25,
+    "level": 2
+   }
+  },
+  {
+   "id": "f3f393c7918d1bf55a6a7268460185af35bfce6f",
+   "sub_kw": "基础研究",
+   "kw": {
+    "score": 8,
+    "level": 0
+   },
+   "jev": {
+    "sub": "基础研究",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.89
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.14,
+    "strength_C": {
+     "level": 0,
+     "score": 8,
+     "is_milestone": 0.03,
+     "is_important": 0.2,
+     "is_routine": 0.84
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "f6bf12c4cff1dbcad6981f628ba67f237fcd9415",
+   "sub_kw": "政策法规",
+   "kw": {
+    "score": 10,
+    "level": 0
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.85
+    },
+    "topic": 18,
+    "is_green": 0.96,
+    "is_noise": 0.61,
+    "strength_C": {
+     "level": 0,
+     "score": 10,
+     "is_milestone": 0.03,
+     "is_important": 0.45,
+     "is_routine": 0.9
+    }
+   },
+   "pro": {
+    "score": 10,
+    "level": 0
+   }
+  },
+  {
+   "id": "fb7f0492d1e4ca32a400664fe5dc3e8808a8a1c2",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "政策法规",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.55
+    },
+    "topic": 25,
+    "is_green": 0.99,
+    "is_noise": 0.04,
+    "strength_C": {
+     "level": 2,
+     "score": 25,
+     "is_milestone": 0.04,
+     "is_important": 0.8,
+     "is_routine": 0.44
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  },
+  {
+   "id": "fd623d4f45a958e7b99f13f6e94e777338882a15",
+   "sub_kw": "金融资本",
+   "kw": {
+    "score": 25,
+    "level": 2
+   },
+   "jev": {
+    "sub": "金融资本",
+    "strength_A": {
+     "level": 2,
+     "score": 25,
+     "conf": 0.8
+    },
+    "topic": 18,
+    "is_green": 0.02,
+    "is_noise": 0.08,
+    "strength_C": {
+     "level": 1,
+     "score": 20,
+     "is_milestone": 0.02,
+     "is_important": 0.43,
+     "is_routine": 0.41
+    }
+   },
+   "pro": {
+    "score": 8,
+    "level": 0
+   }
+  }
+ ],
+ "summary": {
+  "n": 84,
+  "wall_s": 615.5,
+  "fails": {},
+  "levels_dist": {
+   "kw": {
+    "3": 13,
+    "2": 10,
+    "1": 11,
+    "0": 50
+   },
+   "jev_A": {
+    "3": 25,
+    "2": 51,
+    "1": 8
+   },
+   "jev_C": {
+    "2": 8,
+    "1": 11,
+    "0": 65
+   },
+   "pro": {
+    "2": 6,
+    "1": 6,
+    "0": 72
+   }
+  },
+  "collapse_check": {
+   "kw": {
+    "max_tier": "0",
+    "max_share": 0.595,
+    "collapse_flag": false
+   },
+   "jev_A": {
+    "max_tier": "2",
+    "max_share": 0.607,
+    "collapse_flag": false
+   },
+   "jev_C": {
+    "max_tier": "0",
+    "max_share": 0.774,
+    "collapse_flag": false
+   },
+   "pro": {
+    "max_tier": "0",
+    "max_share": 0.857,
+    "collapse_flag": true
+   }
+  },
+  "sub_confusion_kw_vs_jev": {
+   "政策法规": {
+    "政策法规": 7,
+    "国际动态": 4,
+    "技术研发": 0,
+    "基础研究": 1,
+    "社会创新": 0,
+    "企业经营": 2,
+    "金融资本": 0
+   },
+   "国际动态": {
+    "政策法规": 1,
+    "国际动态": 9,
+    "技术研发": 1,
+    "基础研究": 0,
+    "社会创新": 0,
+    "企业经营": 2,
+    "金融资本": 0
+   },
+   "技术研发": {
+    "政策法规": 0,
+    "国际动态": 0,
+    "技术研发": 8,
+    "基础研究": 0,
+    "社会创新": 0,
+    "企业经营": 3,
+    "金融资本": 1
+   },
+   "基础研究": {
+    "政策法规": 1,
+    "国际动态": 0,
+    "技术研发": 2,
+    "基础研究": 7,
+    "社会创新": 1,
+    "企业经营": 1,
+    "金融资本": 0
+   },
+   "社会创新": {
+    "政策法规": 1,
+    "国际动态": 2,
+    "技术研发": 0,
+    "基础研究": 0,
+    "社会创新": 6,
+    "企业经营": 0,
+    "金融资本": 0
+   },
+   "企业经营": {
+    "政策法规": 2,
+    "国际动态": 2,
+    "技术研发": 2,
+    "基础研究": 0,
+    "社会创新": 3,
+    "企业经营": 3,
+    "金融资本": 0
+   },
+   "金融资本": {
+    "政策法规": 2,
+    "国际动态": 1,
+    "技术研发": 1,
+    "基础研究": 3,
+    "社会创新": 0,
+    "企业经营": 0,
+    "金融资本": 5
+   }
+  },
+  "sub_agree": {
+   "n": 84,
+   "agree": 45
+  },
+  "strength_agree": {
+   "kw_vs_jevA": {
+    "n": 84,
+    "agree": 6,
+    "rate": 0.071
+   },
+   "kw_vs_jevC": {
+    "n": 84,
+    "agree": 48,
+    "rate": 0.571
+   },
+   "kw_vs_pro": {
+    "n": 84,
+    "agree": 48,
+    "rate": 0.571
+   },
+   "jevA_vs_pro": {
+    "n": 84,
+    "agree": 4,
+    "rate": 0.048
+   }
+  },
+  "jev_lat_p50": 0.28
+ }
+}

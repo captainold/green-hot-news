@@ -32,7 +32,10 @@
 2. **内容强度必须按七细类自适应**（政策法规看文件/国际动态看协议/技术研发看突破/基础研究看发表/社会创新看机制模式创新/企业经营看进展/金融资本看信号）——禁止退回 v1.0 那种"只认政策文件"的单维度类型分（那是技术/AI 被压分的教训）
 3. **修改打分 = 修改 `docs/标准文档/打分体系标准.md` + `scripts/update_news.py` 两处，必须同步**，并跑一轮 `python3.11 scripts/update_news.py --obsidian-dir . --window-hours 96` 验证分布
 4. 评分相关前端字段：`score` / `score_level` / `score_breakdown{source,strength,topic,people,freshness,trl}` / `dimension`（三层中文：政策/创新/产业） / `sub_dimension`（七细类）/ `trl`（注意是 `strength` 不是 `type`）
-5. **打分双轨观察（2026-08-26 老温定，系统重要升级点）**：内容强度**暂用关键词判定**；`scripts/score_diff_monitor.py` 随机抽样对比「关键词 vs LLM（DeepSeek-V4-Pro few-shot）」的差距，结果累积 `data/score-diff-history.json`，**持续优化 LLM 提示词**（`PROMPT_EXAMPLES` few-shot 锚定是优化入口）。**勿把 LLM 打分接入主流程**（实验结论：Flash 系统性低估、Pro 延迟超 30min timer，两者都不替代关键词）
+5. **打分双轨观察（2026-08-26 老温定，系统重要升级点）**：内容强度**暂用关键词判定**；`scripts/score_diff_monitor.py` 随机抽样对比「关键词 vs LLM（DeepSeek-V4-Pro few-shot）」的差距，结果累积 `data/score-diff-history.json`，**持续优化 LLM 提示词**（`PROMPT_EXAMPLES` few-shot 锚定是优化入口）。**勿把 LLM 打分接入主流程**（实验结论：Flash 系统性低估、Pro 延迟超 30min timer，两者都不替代关键词）。**Pro 轨定位（2026-09-29 老温裁可）：参照轨**——gold 终审强度最优（56.6%）但低估中间档、慢（25s/条）、贵 20~160 倍、有 >12h 级可用性事故史，只作 kw/Jev 分歧的仲裁参照，不作线上判定器；`score_diff_monitor` 的 Pro→Flash 自动回落保持
+6. **标尺标定铁律（2026-09-23 老温定）**：**Jev（TypeSafe 决策模型）暂不接内容强度**（P0 实测：与 Pro 0/30 一致、97% 输出挤在最高两档、频率锚定无效 → 见 `docs/2026-09-23 Jev（TypeSafe）接入方案-讨论稿.md` §七；**2026-09-30 v5.2 收紧后复评再次确认**：kw 48.8% vs jevC 47.6% 已打平）。任何判定器（关键词/LLM/Jev）要替换现有维度，**必须先过人工 gold set**：`scripts/gold_set.py sample|workbench|import|evaluate` + `data/gold-set.jsonl`（84 条，七细类均衡），验收指标见方案 §七 P0.5（**预测分布塌陷 ≥80% 落同一档者一律不采用，无论命中率多高**）。接入顺序：**gold set → 七细类（Jev 最强项）→ 相关性门控 → 内容强度/主题相关（最后）**。Jev 的正确问法是"可证的是非（noul）/ 从给定选项里选（choice）"，**不要让它给绝对刻度**
+   - **P2 影子模式已上线（2026-09-30）**：服务器直连 TypeSafe（`JEV_DIALECT=native`，配置在 `/etc/green-policy.env`），主流程每轮并行写 `rec["jev_shadow"]`，**`score` 仍走关键词**；`JEV_SHADOW=0` 即完全停用。**跑影子前必须先看 `data/jev-shadow-report.json` 的分布/失败率，再谈切换**
+   - ⚠️ **评估基线陷阱（2026-09-30 踩坑）**：`gold_set.py evaluate` 的 kw 轨若拿不到 `site_id`/`library`（gold 记录里没有），会把 kw 细类**低估约 7pp**（45.8% vs 实际 52.4%）——已修（`history_meta()`/`live_sub()` 按 url 反查）。**据此修正：Jev 细类优势是 +4.7pp，不是 +13.2pp**。任何"某判定器比关键词强多少"的结论，都要先确认基线有没有被这种字段缺失压低
 
 ## 🗂️ 关键架构（一句话版）
 

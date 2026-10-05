@@ -1,0 +1,199 @@
+{
+ "tag": "jev-anchor-n30-seed7",
+ "ts": "2026-09-23T04:12:08.052106+00:00",
+ "corpus": {
+  "count": 3613,
+  "ids_sha1_12": "efb93ac1e0cc"
+ },
+ "sample": 30,
+ "extra": {
+  "seed": 7,
+  "forms": [
+   "A",
+   "B",
+   "C"
+  ]
+ },
+ "items": [
+  {
+   "id": "351b63c5ef5aaac0414f7e5b5dfeb15c453ad55b",
+   "title": "E3 G WhatsApp记者注册",
+   "sub_dimension": "国际动态",
+   "score": 69
+  },
+  {
+   "id": "f22a878a52301372671732782821071f16f69cf3",
+   "title": "NRDC和TERI召开“2026年气候对话：安塔利亚之路”，地缘政治转变和印度的气候优先事项成为焦点",
+   "sub_dimension": "国际动态",
+   "score": 61
+  },
+  {
+   "id": "ab733427e5bfe0d2f549a294d6c9c91b629e4593",
+   "title": "美国称获得委内瑞拉650亿桶石油储量“多数控制权”，遭质疑：美国就是资源掠夺者",
+   "sub_dimension": "国际动态",
+   "score": 59
+  },
+  {
+   "id": "795c2b7fc77501046b1c9f6e29cdef6d0bb9d0ca",
+   "title": "关于联合国气候变化框架公约第31次缔约国会议（COP31）日本馆设置的举办地展示的通过结果",
+   "sub_dimension": "国际动态",
+   "score": 65
+  },
+  {
+   "id": "1b6bd3008a7bb6382f4822cfef4a8d79d7c95362",
+   "title": "网下打新报价违规 农银汇理基金被警示！近1年半数报价无效",
+   "sub_dimension": "金融资本",
+   "score": 69
+  },
+  {
+   "id": "c3883b1aa685031f6b6aeecb96fe957e1673691e",
+   "title": "上海环交所与上海市保险同业公会联合举办碳保险创新与发展交流活动",
+   "sub_dimension": "金融资本",
+   "score": 84
+  },
+  {
+   "id": "18aa21a23ca94e87f064ca8fbcc9c022a4b6c8e7",
+   "title": "指导文件3：计算嵌入货物排放量的CBAM方法",
+   "sub_dimension": "金融资本",
+   "score": 58
+  },
+  {
+   "id": "6e0b560d84f35d0b0b736689fa55d5180d05a111",
+   "title": "OpenAI和Anthropic IPO冲刺期人事震荡 商业化路径分化加剧",
+   "sub_dimension": "金融资本",
+   "score": 73
+  },
+  {
+   "id": "610593efbccbf64ef7945c3598722f07bb25bd84",
+   "title": "2026绿色消费季·绿色开学季｜校园生活的绿色打开方式",
+   "sub_dimension": "社会创新",
+   "score": 58
+  },
+  {
+   "id": "e29e228efe07b96f05329d7fdcc9c794fbed69d6",
+   "title": "“一滴水”汇入国家绿色发展的“一片海” ——生态公益项目蚂蚁森林10周年纪实",
+   "sub_dimension": "社会创新",
+   "score": 56
+  },
+  {
+   "id": "01a6dd1c7a78463d1b72de9445d324f04d878ae7",
+   "title": "马上评｜绿色综艺留下满地垃圾，生态责任岂能沦为口号",
+   "sub_dimension": "社会创新",
+   "score": 63
+  },
+  {
+   "id": "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9",
+   "title": "Hot or Cool News：2026年9月",
+   "sub_dimension": "社会创新",
+   "score": 41
+  },
+  {
+   "id": "6d5b868a55a4323c198bb96592e804299feba184",
+   "title": "当AI开始抽佣：你以为它在给你建议， 其实它在做选择",
+   "sub_dimension": "技术研发",
+   "score": 45
+  },
+  {
+   "id": "0df71d43afae150218fc132633127b70aea538a2",
+   "title": "Polimill打造日本下一代公共AI基础设施",
+   "sub_dimension": "技术研发",
+   "score": 55
+  },
+  {
+   "id": "467f4e9f4c4006cfbee5803df9c3235e4d96588e",
+   "title": "OpenRouter 实测 Jev 1.13 与 Claude Opus 5 在 Banking77 分类任务上的准确率、延迟与成本",
+   "sub_dimension": "技术研发",
+   "score": 68
+  },
+  {
+   "id": "c38b0f8af5213ab06b8ae8d08715041d95d6c9c4",
+   "title": "美国司法部介入纽约时报诉 OpenAI 案，主张 AI 训练属合理使用",
+   "sub_dimension": "技术研发",
+   "score": 75
+  },
+  {
+   "id": "d46a095ac41e36b1c34d385f51915e7ed4b39e21",
+   "title": "天然气库存跌至新低，欧洲能源危机“凛冬将至”？",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "7023644884dd54085cf306cac2cc0499bf33c6d4",
+   "title": "在澳大利亚观察到海豚母亲和幼崽使用贝壳捕鱼",
+   "sub_dimension": "企业经营",
+   "score": 35
+  },
+  {
+   "id": "ebe6081e7220a9739cba953a0d44ca5f5d2b8e31",
+   "title": "气候和领导人在UNGA 81上的任务",
+   "sub_dimension": "企业经营",
+   "score": 47
+  },
+  {
+   "id": "5757a5e8b580cd54d854ef3fb6f7454fcd7aa46b",
+   "title": "我国日均词元调用量突破 500 万亿，中国大模型稳居全球第一梯队",
+   "sub_dimension": "企业经营",
+   "score": 77
+  },
+  {
+   "id": "bb533aff07b053440674129e2cb8626bfa08637c",
+   "title": "我院组织召开京津冀美丽中国先行区建设生态环境重大工程技术体系研究专题研讨会",
+   "sub_dimension": "政策法规",
+   "score": 47
+  },
+  {
+   "id": "df2d46dbc5bf8189ead45030696c9d5094d28b80",
+   "title": "2018年，我们将寻求北国节能和新能源大奖。",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "e2785fbc84973825143ff32cc45d1198d09c0005",
+   "title": "期待与政府共同主办2026年世界气候产业博览会今年的活动将重点关注技术创新如何塑造建设更安全和可持续的能源未来的努力9月16日至18日在釜山参加：",
+   "sub_dimension": "政策法规",
+   "score": 53
+  },
+  {
+   "id": "dccf70b789da62c0861cea03c79ae62e45089eaf",
+   "title": "热带气旋洛厄尔后预报讨论",
+   "sub_dimension": "政策法规",
+   "score": 41
+  },
+  {
+   "id": "330d81f23be1c9cae9c8a3c72e9de8f199983dea",
+   "title": "交通对每日PM2.5暴露的贡献以及与癌症死亡率的联系<sub></sub>",
+   "sub_dimension": "基础研究",
+   "score": 49
+  },
+  {
+   "id": "bed52526c6d5fe8fa5dbe4783c22bbcb3c3d7349",
+   "title": "适用于大规模供应链运营的可靠LLM驱动决策引擎：架构、安全和性能保证",
+   "sub_dimension": "基础研究",
+   "score": 67
+  },
+  {
+   "id": "af8a583015e191e3c4f29cddc35f720222bf3269",
+   "title": "用于研究T细胞机械传递的仿生细胞",
+   "sub_dimension": "基础研究",
+   "score": 49
+  },
+  {
+   "id": "5c1674e289cd714423d74dea1636e02fd847602a",
+   "title": "不同的表示学习目标从相同的心理测量数据中恢复不同的潜在结构",
+   "sub_dimension": "基础研究",
+   "score": 53
+  },
+  {
+   "id": "1fee9bec4e4ce10e6cb32df728f0067b08ccff61",
+   "title": "气候变化指标：住宅能源使用",
+   "sub_dimension": "政策法规",
+   "score": 49
+  },
+  {
+   "id": "ab054edaab3840d23f980168c47a7b0ea418a6a9",
+   "title": "人类学/克劳德代码",
+   "sub_dimension": "技术研发",
+   "score": 30
+  }
+ ]
+}

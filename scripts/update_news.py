@@ -41,6 +41,16 @@ except ImportError:  # running as a plain script
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import tech_feature
 
+# Jev（TypeSafe System One）判定客户端 —— P2 影子模式用（2026-09-30）
+try:
+    from . import jev_client
+except ImportError:  # running as a plain script
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import jev_client
+    except ImportError:  # 未部署 jev_client.py 时主流程照常运行
+        jev_client = None  # type: ignore[assignment]
+
 try:
     import feedparser
 except ModuleNotFoundError:
@@ -2685,31 +2695,43 @@ def fetch_opml_rss(session: requests.Session, opml_path: str, now: datetime) -> 
 #    判据见 docs/标准文档/打分体系标准.md（修改打分须同步文档）。
 CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
     # 政策法规：判据=文件层级（法律>行政法规>部委规章）＋发布主体（党中央国务院>部委）
+    # v5.2（2026-09-29 gold set 收紧）：30 档只留「法律层级 + 党中央国务院级」；印发/通知/
+    # 规划/部委名/十五五等降 25（gold 实证：13 条假里程碑里 5 条政策类全是这些词撑上去的，
+    # 老温判定《"十五五"规划印发通知》=重要级而非里程碑级）；「中央」单字过泛移除
+    # （「党中央/中办/国办」仍保留）；「发布」降 25（报告发布类多为进展~重要）。
     "政策法规": [
         (30, ["法律", "条例", "行政法规", "立法", "修订", "废止",
-              "国务院", "党中央", "中央", "中办", "国办", "中央深改委", "中央财经委",
+              "国务院", "党中央", "中办", "国办", "中央深改委", "中央财经委",
+              "管理办法", "新规", "政策文件", "行动方案", "实施方案", "指导意见"]),
+        (25, ["征求意见", "草案", "解读", "一图读懂", "新闻发布会", "吹风会", "答记者问",
               "印发", "通知", "意见", "办法", "规划", "方案", "公告", "发布",
-              "管理办法", "新规", "政策文件", "行动方案", "实施方案", "指导意见",
               "十五五", "十四五",
-              # 部委名（标题以部委开头的都是官方政策信号，2026-08-26 补：修复
-              # 「国家发改委：成品油价格调整」类标题因无动作词漏判 30 分）
+              # 部委名单（v5.2 从 30 降 25：部委发文多为例行工作部署，gold 实证
+              # 「工信部详解路线图」=重要级；2026-08-26 加名单是为修「发改委：成品油调价」
+              # 漏判高分——降档后仍保 25 分信号不丢）
               "发改委", "发展改革委", "生态环境部", "能源局", "工信部", "财政部",
               "人民银行", "央行", "住建部", "商务部", "交通运输部", "水利部",
               "农业农村部", "国资委", "科技部", "自然资源部", "市场监管总局"]),
-        (25, ["征求意见", "草案", "解读", "一图读懂", "新闻发布会", "吹风会", "答记者问"]),
         (20, ["报告", "数据", "统计", "年报", "季报", "白皮书", "公报"]),
     ],
     # 国际动态：判据=协议层级＋气候里程碑（COP决议/气候融资>一般峰会>报告）
+    # v5.2（2026-09-29 gold set 收紧）：「协议」降 25——gold 实证「三星锁定产能长协」被
+    # 「协议」误判 30；商业长协不是国际公约。「达成/签署」收成短语（达成协议/签署条约级）。
     "国际动态": [
-        (30, ["协议", "条约", "公约", "协定", "峰会", "气候大会", "缔约方",
-              "缔约方大会", "联合声明", "宣言", "公报", "框架公约", "巴黎协定", "cop",
-              "达成", "签署", "承诺", "气候融资", "损失与损害", "ndc", "国家自主贡献"]),
-        (25, ["谈判", "磋商", "成果文件", "路线图", "主席国", "气候行动", "气候雄心"]),
+        (30, ["条约", "公约", "缔约方", "缔约方大会", "联合声明", "宣言",
+              "公报", "框架公约", "巴黎协定", "cop", "气候大会", "峰会",
+              "气候融资", "损失与损害", "ndc", "国家自主贡献",
+              "达成协议", "签署协议"]),
+        (25, ["谈判", "磋商", "成果文件", "路线图", "主席国", "气候行动", "气候雄心",
+              "协议", "协定", "达成", "签署", "承诺"]),
         (20, ["报告", "展望", "评估", "合作", "倡议", "声明"]),
     ],
     # 技术研发：判据=突破程度＋首创性（世界首次/颠覆>重要进展>常规研发）
+    # v5.2（2026-09-29 gold set 收紧）：「突破」降 25——gold 实证「ChatGPT Ads 年化收入
+    # 10 亿美元」老温判常规级（0），商业化收入里程碑不是技术突破；世界首个/全球首个/
+    # 颠覆/攻克等真首创词保持 30。
     "技术研发": [
-        (30, ["突破", "首发", "首次", "世界首个", "全球首个", "里程碑", "攻克",
+        (30, ["首发", "首次", "世界首个", "全球首个", "里程碑", "攻克",
               "颠覆", "革命性", "领跑", "最高效率", "最大功率", "刷新纪录", "破纪录",
               # AI 治理/安全信号（2026-08-19）：AI 与政治/民主/国家安全的顶层交叉
               "治理", "监管", "问责", "合规", "立法", "管控",
@@ -2718,7 +2740,7 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
               "accountability", "national security", "cybersecurity",
               "democratic", "safety", "cyber"]),
         (25, ["重大进展", "示范", "样机", "中试", "成套技术", "工艺包", "技术路线",
-              "发布", "上线", "部署", "启用", "大模型", "智能体"]),
+              "发布", "上线", "部署", "启用", "大模型", "智能体", "突破"]),
         (20, ["研发", "进展", "测试", "验证", "升级", "优化", "效率", "专利",
               "工艺", "材料", "方法", "评估", "预测",
               "adaptation", "response", "pathway", "framework", "system",
@@ -2745,21 +2767,26 @@ CONTENT_STRENGTH_RULES: dict[str, list[tuple[int, list[str]]]] = {
     "企业经营": [
         (30, ["投产", "并网", "交付", "建成", "签约", "中标", "突破", "首次",
               "世界首个", "全球首个", "里程碑", "量产", "首台", "首套", "首例",
-              "最大", "超大规模", "千亿", "百亿"]),
+              "超大规模", "千亿", "百亿"]),
         (25, ["扩产", "开工", "奠基", "下线", "上市", "战略合作", "重大订单",
-              "出海", "全球布局"]),
+              "出海", "全球布局", "最大"]),
         (20, ["进展", "上线", "落地", "试点", "示范", "应用", "产量", "订单",
               "营收", "合作", "建厂", "报告", "发布", "数据", "出口", "试验",
               "recycle", "yield", "output", "test", "upgrade"]),
     ],
     # 金融资本：判据=碳市场里程碑＋资本规模（扩围/破纪录>重要融资并购>常规交易）
+    # v5.2（2026-09-29 gold set 收紧）：30 档只留「碳市场结构性事件」；ipo/上市/亿元/万亿/千亿/
+    # 突破/大涨/新高/成交/收购/并购 降 25——gold 实证：「焦炭期权上市」「赴港IPO」「金饰涨价」
+    # 老温全判常规级（0），这些词把市场例行交易抬成了里程碑。
     "金融资本": [
-        (30, ["扩围", "大涨", "突破", "新高", "首次", "创纪录", "启动", "成交",
-              "亿元", "并购", "收购", "全国碳市场", "ccer", "重启",
-              "里程碑", "万亿", "千亿", "ipo", "上市"]),
+        (30, ["扩围", "首次", "创纪录", "全国碳市场", "ccer", "重启",
+              "里程碑"]),
         (25, ["融资", "投资", "募资", "增资", "发行", "绿色债券", "气候债券",
-              "基金设立", "碳价", "覆盖"]),
-        (20, ["价格", "指数", "报告", "数据", "交易", "配额", "基金", "债券", "esg"]),
+              "基金设立", "碳价", "覆盖",
+              "大涨", "突破", "新高", "启动", "成交", "并购", "收购",
+              "万亿", "千亿", "ipo", "上市"]),
+        (20, ["价格", "指数", "报告", "数据", "交易", "配额", "基金", "债券", "esg",
+              "亿元"]),
     ],
 }
 # 内容强度兜底默认分（2026-08-26 老温裁决：按文档原设计分细类）
@@ -3134,8 +3161,8 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     > 政府强词(政策·政策法规) > 国际动态词(政策·国际动态) > 金融词(产业·金融资本)
     > 双碳核心词 A1(产业·企业经营) > 社会创新词(创新·社会创新)
     > AI 词分流 > 基础研究窄词(创新·基础研究) > 技术研发词(创新·技术研发)
-    > 企业经营词(产业·企业经营) > 政策库默认(政策·政策法规)
-    > 政策弱词(政策·政策法规) > 兜底(产业·企业经营)。
+    > 企业经营词(产业·企业经营) > 外源政府默认(政策·国际动态, v5.2)
+    > 政策库默认(政策·政策法规) > 政策弱词(政策·政策法规) > 兜底(产业·企业经营)。
     """
     import re as _dim_re
     title_l = (title or "").lower()
@@ -3197,6 +3224,15 @@ def categorize_dimension(site_id: str, title: str, summary: str, library: str) -
     for kw in ENTERPRISE_KW:
         if kw.lower() in text:
             return "产业", "企业经营"
+    # 外国政府/国际机构源（v5.2 2026-09-29 gold set 修复）：us_epa/us_noaa/jp_meti/
+    # india_pib/eu_commission 等域外官方发布 → 政策·国际动态（此前政策库默认吞成政策法规，
+    # gold 实证 646 条外源里 492 被判政策法规、gold 国际动态 20 条里 10 条被错判；
+    # gold「真政策法规」7 条全来自中国源，改判零误伤）。中国政府源（ndrc/mee/...）不受影响。
+    if library == "policy" and site_id in FOREIGN_GOV_POLICY_SITES:
+        # 标题命中中国政策强词（印发/通知/部委名）的外源条目极少，且多为转载中国政策
+        # ——保留原政策库语义，仅在无强词时改判国际动态
+        if not any(kw.lower() in title_l for kw in GOV_STRONG_KW):
+            return "政策", "国际动态"
     # 政策库（官方原文）默认政策——官方文件即使含双碳词也不改判产业
     if library == "policy":
         return "政策", "政策法规"
@@ -3566,6 +3602,16 @@ FOREIGN_GOV_SITES = {
     # 国际能源机构（2026-08-23 补：IEA/IRENA 周更~双周更，24h 窗口会整源滤空，
     # 62 天 0 条即此因；与国外官方源同级 7 天宽窗口）
     "iea", "irena", "unfccc", "worldbank",
+}
+
+# 外国政府/国际机构政策源（v5.2 2026-09-29 gold set 修复，与 FOREIGN_GOV_SITES 的区别：
+# 这个集合用于**细类判定**——域外官方发布默认归 政策·国际动态 而非 政策法规；
+# euractiv 是媒体、ncsc/caep 是中国机构，不在此列）
+FOREIGN_GOV_POLICY_SITES = {
+    "us_epa", "us_doe", "us_noaa", "us_eia", "us_ferc", "us_carb",
+    "eu_commission", "india_pib",
+    "jp_moe", "jp_meti", "jp_anre",
+    "iea", "irena", "unfccc", "worldbank", "unep",
 }
 
 # 超低频源（2026-08-17）：国际智库更新周级~双周级（Agora 最新条目可超 14 天），
@@ -4093,6 +4139,146 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
         print(f"   History: +{added} new, {len(items)} total (62d window)")
 
 
+JEV_SHADOW_VERSION = "p2-2026-09-30"
+_JEV_LEVEL_OF_SCORE = {30: 3, 25: 2, 20: 1}
+
+
+def _jevs_level_of_score(score: int | None) -> int | None:
+    """内容强度分值 → 四档（30→3/25→2/20→1/其余→0）；None 原样返回。"""
+    if score is None:
+        return None
+    return _JEV_LEVEL_OF_SCORE.get(score, 0)
+
+
+def _jevs_summary(recs: list[dict], secs: list[float], fails: int, wall: float) -> dict:
+    """影子模式汇总：分布对比 + 一致率 + 延迟/失败（P2 验收指标）。"""
+    from collections import Counter
+
+    kw_sub: Counter = Counter()
+    jv_sub: Counter = Counter()
+    kw_lvl: Counter = Counter()
+    jv_lvl_c: Counter = Counter()
+    jv_lvl_a: Counter = Counter()
+    sub_agree = sub_total = 0
+    lvl_agree = lvl_total = 0
+    lvl_near = 0
+    judged = 0
+    for rec in recs:
+        sh = rec.get("jev_shadow") or {}
+        if not sh or sh.get("err"):
+            continue
+        judged += 1
+        ks = rec.get("sub_dimension", "")
+        js = sh.get("sub", "")
+        kw_sub[ks] += 1
+        if js:
+            jv_sub[js] += 1
+        if ks and js:
+            sub_total += 1
+            sub_agree += int(ks == js)
+        kscore = (rec.get("score_breakdown") or {}).get("strength")
+        kl = _jevs_level_of_score(kscore)
+        if kl is None:
+            continue
+        lc, la = sh.get("level_C"), sh.get("level_A")
+        kw_lvl[kl] += 1
+        if lc is not None:
+            jv_lvl_c[lc] += 1
+        if la is not None:
+            jv_lvl_a[la] += 1
+        if lc is not None:
+            lvl_total += 1
+            lvl_agree += int(kl == lc)
+            lvl_near += int(abs(kl - lc) <= 1)
+    secs_sorted = sorted(s for s in secs if s > 0)
+
+    return {
+        "version": JEV_SHADOW_VERSION,
+        "dialect": jev_client.dialect() if jev_client else "",
+        "model": (jev_client._load_cfg("JEV_MODEL", "") if jev_client else ""),
+        "n": len(recs),
+        "judged": judged,
+        "failed": fails,
+        "wall_sec": wall,
+        "latency_p50": round(secs_sorted[len(secs_sorted) // 2], 2) if secs_sorted else None,
+        "latency_p95": round(secs_sorted[min(len(secs_sorted) - 1, int(len(secs_sorted) * 0.95))], 2) if secs_sorted else None,
+        "latency_max": round(secs_sorted[-1], 2) if secs_sorted else None,
+        "kw_sub_dist": dict(kw_sub.most_common()),
+        "jev_sub_dist": dict(jv_sub.most_common()),
+        "kw_level_dist": {str(k): v for k, v in sorted(kw_lvl.items(), reverse=True)},
+        "jev_level_C_dist": {str(k): v for k, v in sorted(jv_lvl_c.items(), reverse=True)},
+        "jev_level_A_dist": {str(k): v for k, v in sorted(jv_lvl_a.items(), reverse=True)},
+        "sub_agree_pct": round(100.0 * sub_agree / sub_total, 1) if sub_total else None,
+        "level_agree_pct": round(100.0 * lvl_agree / lvl_total, 1) if lvl_total else None,
+        "level_near1_pct": round(100.0 * lvl_near / lvl_total, 1) if lvl_total else None,
+    }
+
+
+def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
+    """P2 影子模式（2026-09-30 方案 §七 P2）：每条并行问 Jev，写 `rec["jev_shadow"]`。
+
+    铁律：**只写影子字段，绝不改 score**——分数仍走关键词判定（方案 §七 P2 验收：
+    "任何异常：关开关即回到现状"）。开关 `JEV_SHADOW=1`，未配置/异常一律静默跳过。
+    """
+    if jev_client is None or not jev_client.shadow_enabled():
+        return {}
+    if not jev_client.is_enabled():
+        print("  Jev 影子：JEV_SHADOW=1 但无 JEV_API_KEY，跳过", flush=True)
+        return {}
+    limit = jev_client.shadow_max()
+    targets = [r for r in recs if isinstance(r, dict)][:limit] if limit else []
+    if not targets:
+        return {}
+    jev_client.reset()
+    questions = jev_client.build_questions(with_sub=True)
+    questions.update(jev_client.build_noul_strength_questions())
+    t0 = time.monotonic()
+    print(f"  Jev 影子模式：{len(targets)} 条并行判定（dialect={jev_client.dialect()}）", flush=True)
+    secs: list[float] = []
+    fails = 0
+    from concurrent.futures import ThreadPoolExecutor as _TPE3, as_completed as _AC3
+    with _TPE3(max_workers=4) as _ex:
+        futs = {_ex.submit(jev_client.evaluate, jev_client.state_from_item(rec), questions, 45): rec
+                for rec in targets}
+        for fut in _AC3(futs):
+            rec = futs[fut]
+            try:
+                answers, sec, err = fut.result()
+            except Exception as exc:  # 线程内异常不得打断主流程
+                answers, sec, err = None, 0.0, f"{type(exc).__name__}: {exc}"
+            secs.append(sec)
+            if answers is None:
+                fails += 1
+                rec["jev_shadow"] = {"v": JEV_SHADOW_VERSION, "err": (err or "")[:120],
+                                     "sec": round(sec, 2)}
+                continue
+            lvl_c = jev_client.compose_strength_level(answers)
+            rec["jev_shadow"] = {
+                "v": JEV_SHADOW_VERSION,
+                "sub": jev_client.sub_dimension(answers),
+                "sub_conf": jev_client.confidence(answers, "sub_dim"),
+                "level_C": lvl_c,                                            # 三问 noul 合成（P0 最优形态）
+                "level_A": jev_client.score_level(answers),                   # 四档 score 概率加权位置
+                "score_C": jev_client.level_to_score(lvl_c, "", None),        # 候选分（未采用，仅供比对）
+                "kw_sub": rec.get("sub_dimension", ""),
+                "kw_score": (rec.get("score_breakdown") or {}).get("strength"),
+                "is_green": jev_client.noul(answers, "is_green"),
+                "is_noise": jev_client.noul(answers, "is_noise"),
+                "sec": round(sec, 2),
+            }
+    wall = round(time.monotonic() - t0, 1)
+    report = _jevs_summary(targets, secs, fails, wall)
+    try:
+        (output_dir / "jev-shadow-report.json").write_text(
+            json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+    except OSError:
+        pass
+    print(f"  Jev 影子完成：判定 {report['judged']}/{report['n']}，失败 {fails}，"
+          f"耗时 {wall}s（p50 {report['latency_p50']}s）｜细类一致 {report['sub_agree_pct']}%"
+          f"｜强度一致 {report['level_agree_pct']}%（±1 {report['level_near1_pct']}%）", flush=True)
+    return report
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Green Policy News Radar")
     parser.add_argument("--output-dir", default="data", help="Output directory for JSON files")
@@ -4455,6 +4641,12 @@ def main() -> int:
                         rec["tech_feature"] = _tf
                     archived_tech_features[k] = _tf  # "无"也缓存，避免重复调 LLM（2026-08-23）
         print(f"  技术特征提取完成（t+{time.monotonic()-_t0:.0f}s）", flush=True)
+
+    # ── P2 影子模式（2026-09-30，方案 §七 P2）─────────────────────────────
+    # 每条并行问 Jev，结果只写 rec["jev_shadow"]；**score 仍走关键词判定**
+    # （开关 JEV_SHADOW=1；前端不显示。用于全量分布对比/日成本/失败率验收）
+    _run_jev_shadow(list(_to_process.values()), output_dir)
+
     if archived_pub:
         (output_dir / "published-index.json").write_text(
             json.dumps(archived_pub, ensure_ascii=False, indent=1), encoding="utf-8")

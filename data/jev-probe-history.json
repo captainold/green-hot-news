@@ -1,0 +1,653 @@
+[
+ {
+  "ts": "2026-09-28T13:31:37.098368+00:00",
+  "kind": "benchmark-smoke-n12",
+  "model": "TypeSafe/jev-latest",
+  "dialect": "tokenhub",
+  "sample": {
+   "n": 12,
+   "seed": 20260928,
+   "window": "近 7 天（229/3613 条）",
+   "snapshot": "jev-bench-n12-seed20260928-20260928T133137Z.json",
+   "corpus": {
+    "count": 229,
+    "ids_sha1_12": "40359bf4959b"
+   }
+  },
+  "claim": {
+   "items": 384,
+   "seconds": 24.9,
+   "usd": 0.19
+  },
+  "modes": {
+   "jev_serial": {
+    "wall_s": 70.1,
+    "ok": 7,
+    "fail": 5,
+    "items_per_s": 0.1,
+    "latency_s": {
+     "p50": 0.45,
+     "p95": 10.462,
+     "p99": 10.462,
+     "max": 10.462
+    },
+    "fails": [
+     {
+      "i": 3,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     },
+     {
+      "i": 5,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     },
+     {
+      "i": 6,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     },
+     {
+      "i": 8,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     },
+     {
+      "i": 10,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     }
+    ],
+    "aborted": "",
+    "note": "主流程路径：含 _MIN_INTERVAL=0.1s 限流（QPS10）"
+   },
+   "jev_c4": {
+    "wall_s": 19.9,
+    "ok": 8,
+    "fail": 4,
+    "items_per_s": 0.4,
+    "latency_s": {
+     "p50": 9.289,
+     "p95": 12.972,
+     "p99": 12.972,
+     "max": 12.972
+    },
+    "fails": [
+     {
+      "i": 4,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     },
+     {
+      "i": 5,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     },
+     {
+      "i": 10,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     },
+     {
+      "i": 7,
+      "err": "HTTP 503: {\"error\":{\"code\":\"provider_upstream_unavailable\",\"message\":\"upstream connect error or disconnect/reset before "
+     }
+    ],
+    "tokens": {
+     "input": 8757,
+     "output": 1216,
+     "calls_measured": 8
+    }
+   }
+  },
+  "llm": {},
+  "jev_cost": {
+   "tokens_input": 8757,
+   "tokens_output": 1216,
+   "per_call_tokens": 1246.6,
+   "usd_token_price": 0.0004,
+   "usd_decision_price": 0.0002
+  }
+ },
+ {
+  "ts": "2026-09-28T14:27:36.962324+00:00",
+  "kind": "benchmark-smoke-n16",
+  "model": "TypeSafe/jev-latest",
+  "dialect": "tokenhub",
+  "sample": {
+   "n": 16,
+   "seed": 20260928,
+   "window": "近 7 天（229/3613 条）",
+   "snapshot": "jev-bench-n16-seed20260928-20260928T142736Z.json",
+   "corpus": {
+    "count": 229,
+    "ids_sha1_12": "40359bf4959b"
+   }
+  },
+  "claim": {
+   "items": 384,
+   "seconds": 24.9,
+   "usd": 0.19
+  },
+  "modes": {
+   "jev_serial": {
+    "wall_s": 49.8,
+    "ok": 16,
+    "fail": 0,
+    "items_per_s": 0.32,
+    "latency_s": {
+     "p50": 1.843,
+     "p95": 5.933,
+     "p99": 13.552,
+     "max": 13.552
+    },
+    "fails": [],
+    "aborted": "",
+    "retries": 0,
+    "note": "主流程路径：含 _MIN_INTERVAL=0.1s 限流（QPS10）+ 外围重试×2"
+   },
+   "jev_c4": {
+    "wall_s": 16.0,
+    "ok": 16,
+    "fail": 0,
+    "items_per_s": 1.0,
+    "latency_s": {
+     "p50": 1.999,
+     "p95": 12.04,
+     "p99": 12.041,
+     "max": 12.041
+    },
+    "fails": [],
+    "retries": 0,
+    "tokens": {
+     "input": 17932,
+     "output": 2432,
+     "calls_measured": 16
+    }
+   }
+  },
+  "llm": {},
+  "jev_cost": {
+   "tokens_input": 17932,
+   "tokens_output": 2432,
+   "per_call_tokens": 1272.8,
+   "usd_token_price": 0.0008,
+   "usd_decision_price": 0.0004
+  }
+ },
+ {
+  "ts": "2026-09-28T14:29:16.109143+00:00",
+  "kind": "benchmark-smoke-n228",
+  "model": "TypeSafe/jev-latest",
+  "dialect": "tokenhub",
+  "sample": {
+   "n": 228,
+   "seed": 20260928,
+   "window": "近 7 天（228/3613 条）",
+   "snapshot": "jev-bench-n228-seed20260928-20260928T142916Z.json",
+   "corpus": {
+    "count": 228,
+    "ids_sha1_12": "75b26f21647f"
+   }
+  },
+  "claim": {
+   "items": 384,
+   "seconds": 24.9,
+   "usd": 0.19
+  },
+  "modes": {
+   "jev_serial": {
+    "wall_s": 455.3,
+    "ok": 228,
+    "fail": 0,
+    "items_per_s": 0.5,
+    "latency_s": {
+     "p50": 1.994,
+     "p95": 4.989,
+     "p99": 7.554,
+     "max": 12.114
+    },
+    "fails": [],
+    "aborted": "",
+    "retries": 1,
+    "note": "主流程路径：含 _MIN_INTERVAL=0.1s 限流（QPS10）+ 外围重试×2"
+   },
+   "jev_c8": {
+    "wall_s": 18.1,
+    "ok": 228,
+    "fail": 0,
+    "items_per_s": 12.6,
+    "latency_s": {
+     "p50": 0.273,
+     "p95": 0.362,
+     "p99": 10.325,
+     "max": 10.334
+    },
+    "fails": [],
+    "retries": 0,
+    "tokens": {
+     "input": 255160,
+     "output": 34656,
+     "calls_measured": 228
+    }
+   },
+   "jev_c16": {
+    "wall_s": 10.4,
+    "ok": 228,
+    "fail": 0,
+    "items_per_s": 22.02,
+    "latency_s": {
+     "p50": 0.277,
+     "p95": 0.377,
+     "p99": 10.317,
+     "max": 10.332
+    },
+    "fails": [],
+    "retries": 0,
+    "tokens": {
+     "input": 255160,
+     "output": 34656,
+     "calls_measured": 228
+    }
+   }
+  },
+  "llm": {
+   "pro": {
+    "model": "deepseek-ai/DeepSeek-V4-Pro",
+    "wall_s": 609.4,
+    "ok": 227,
+    "fail": 1,
+    "items_per_s": 0.37,
+    "latency_s": {
+     "p50": 17.484,
+     "p95": 43.957,
+     "p99": 55.76,
+     "max": 88.248
+    },
+    "fails": [
+     {
+      "i": 72,
+      "err": "ReadTimeout: HTTPSConnectionPool(host='api.siliconflow.cn', port=443): Read timed out. (read timeout=120)"
+     }
+    ],
+    "tokens": {
+     "input": 148163,
+     "output": 187231
+    },
+    "score_dist": {
+     "8": 76,
+     "10": 72,
+     "20": 65,
+     "25": 13,
+     "30": 1
+    },
+    "workers": 8
+   },
+   "flash": {
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "wall_s": 68.1,
+    "ok": 228,
+    "fail": 0,
+    "items_per_s": 3.35,
+    "latency_s": {
+     "p50": 1.999,
+     "p95": 4.53,
+     "p99": 7.49,
+     "max": 15.055
+    },
+    "fails": [],
+    "tokens": {
+     "input": 130825,
+     "output": 10106
+    },
+    "score_dist": {
+     "8": 85,
+     "10": 67,
+     "20": 70,
+     "25": 6
+    },
+    "workers": 8
+   }
+  },
+  "jev_cost": {
+   "tokens_input": 255160,
+   "tokens_output": 34656,
+   "per_call_tokens": 1271.1,
+   "usd_token_price": 0.0107,
+   "usd_decision_price": 0.0056
+  },
+  "llm_prices": {}
+ },
+ {
+  "ts": "2026-09-28T14:49:48.398004+00:00",
+  "kind": "benchmark-384",
+  "model": "TypeSafe/jev-latest",
+  "dialect": "tokenhub",
+  "sample": {
+   "n": 384,
+   "seed": 20260928,
+   "window": "近 30 天（1222/3613 条）",
+   "snapshot": "jev-bench-n384-seed20260928-20260928T144948Z.json",
+   "corpus": {
+    "count": 1222,
+    "ids_sha1_12": "f401e3a50edf"
+   }
+  },
+  "claim": {
+   "items": 384,
+   "seconds": 24.9,
+   "usd": 0.19
+  },
+  "modes": {
+   "jev_serial": {
+    "wall_s": 68717.9,
+    "ok": 384,
+    "fail": 0,
+    "items_per_s": 0.01,
+    "latency_s": {
+     "p50": 0.281,
+     "p95": 4.887,
+     "p99": 13.689,
+     "max": 111.875
+    },
+    "fails": [],
+    "aborted": "",
+    "retries": 5,
+    "note": "主流程路径：含 _MIN_INTERVAL=0.1s 限流（QPS10）+ 外围重试×2"
+   },
+   "jev_c8": {
+    "wall_s": 23.6,
+    "ok": 384,
+    "fail": 0,
+    "items_per_s": 16.27,
+    "latency_s": {
+     "p50": 0.272,
+     "p95": 0.373,
+     "p99": 10.282,
+     "max": 10.306
+    },
+    "fails": [],
+    "retries": 0,
+    "tokens": {
+     "input": 433515,
+     "output": 58368,
+     "calls_measured": 384
+    }
+   },
+   "jev_c16": {
+    "wall_s": 12.0,
+    "ok": 384,
+    "fail": 0,
+    "items_per_s": 31.98,
+    "latency_s": {
+     "p50": 0.277,
+     "p95": 0.352,
+     "p99": 10.357,
+     "max": 10.374
+    },
+    "fails": [],
+    "retries": 0,
+    "tokens": {
+     "input": 433515,
+     "output": 58368,
+     "calls_measured": 384
+    }
+   }
+  },
+  "llm": {
+   "pro": {
+    "model": "deepseek-ai/DeepSeek-V4-Pro",
+    "wall_s": 89.8,
+    "ok": 0,
+    "fail": 384,
+    "items_per_s": 0.0,
+    "latency_s": {
+     "p50": 0.0,
+     "p95": 0.0,
+     "p99": 0.0,
+     "max": 0
+    },
+    "fails": [
+     {
+      "i": 6,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 8,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 5,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 4,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 2,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     }
+    ],
+    "tokens": {
+     "input": 0,
+     "output": 0
+    },
+    "score_dist": {},
+    "workers": 8
+   },
+   "flash": {
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "wall_s": 123.0,
+    "ok": 384,
+    "fail": 0,
+    "items_per_s": 3.12,
+    "latency_s": {
+     "p50": 1.996,
+     "p95": 5.627,
+     "p99": 7.357,
+     "max": 10.791
+    },
+    "fails": [],
+    "tokens": {
+     "input": 218745,
+     "output": 15832
+    },
+    "score_dist": {
+     "8": 131,
+     "10": 128,
+     "20": 99,
+     "25": 13,
+     "30": 13
+    },
+    "workers": 8
+   }
+  },
+  "jev_cost": {
+   "tokens_input": 433515,
+   "tokens_output": 58368,
+   "per_call_tokens": 1280.9,
+   "usd_token_price": 0.0182,
+   "usd_decision_price": 0.0094
+  },
+  "llm_prices": {}
+ },
+ {
+  "ts": "2026-09-29T10:01:23.944056+00:00",
+  "kind": "benchmark-384",
+  "model": "TypeSafe/jev-latest",
+  "dialect": "tokenhub",
+  "sample": {
+   "n": 384,
+   "seed": 20260928,
+   "window": "近 30 天（1197/3613 条）",
+   "snapshot": "jev-bench-n384-seed20260928-20260929T100123Z.json",
+   "corpus": {
+    "count": 1197,
+    "ids_sha1_12": "766a82689d15"
+   }
+  },
+  "claim": {
+   "items": 384,
+   "seconds": 24.9,
+   "usd": 0.19
+  },
+  "modes": {},
+  "llm": {
+   "pro": {
+    "model": "deepseek-ai/DeepSeek-V4-Pro",
+    "wall_s": 47.0,
+    "ok": 0,
+    "fail": 384,
+    "items_per_s": 0.0,
+    "latency_s": {
+     "p50": 0.0,
+     "p95": 0.0,
+     "p99": 0.0,
+     "max": 0
+    },
+    "fails": [
+     {
+      "i": 0,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 7,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 5,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 4,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     },
+     {
+      "i": 3,
+      "err": "HTTP 503: {\"code\":50508,\"message\":\"System is too busy now. Please try again later.\",\"data\":null}"
+     }
+    ],
+    "tokens": {
+     "input": 0,
+     "output": 0
+    },
+    "score_dist": {},
+    "workers": 8
+   },
+   "flash": {
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "wall_s": 116.6,
+    "ok": 384,
+    "fail": 0,
+    "items_per_s": 3.29,
+    "latency_s": {
+     "p50": 1.88,
+     "p95": 5.716,
+     "p99": 11.193,
+     "max": 13.788
+    },
+    "fails": [],
+    "tokens": {
+     "input": 219329,
+     "output": 12942
+    },
+    "score_dist": {
+     "8": 135,
+     "10": 128,
+     "20": 99,
+     "25": 11,
+     "30": 11
+    },
+    "workers": 8
+   }
+  },
+  "llm_prices": {}
+ },
+ {
+  "ts": "2026-09-29T10:08:09.583660+00:00",
+  "kind": "benchmark-384",
+  "model": "TypeSafe/jev-latest",
+  "dialect": "tokenhub",
+  "sample": {
+   "n": 384,
+   "seed": 20260928,
+   "window": "近 30 天（1197/3613 条）",
+   "snapshot": "jev-bench-n384-seed20260928-20260929T100809Z.json",
+   "corpus": {
+    "count": 1197,
+    "ids_sha1_12": "766a82689d15"
+   }
+  },
+  "claim": {
+   "items": 384,
+   "seconds": 24.9,
+   "usd": 0.19
+  },
+  "modes": {},
+  "llm": {
+   "pro": {
+    "model": "deepseek-ai/DeepSeek-V4-Pro",
+    "wall_s": 1487.6,
+    "ok": 380,
+    "fail": 4,
+    "items_per_s": 0.26,
+    "latency_s": {
+     "p50": 25.112,
+     "p95": 67.032,
+     "p99": 100.376,
+     "max": 111.577
+    },
+    "fails": [
+     {
+      "i": 61,
+      "err": "ReadTimeout: HTTPSConnectionPool(host='api.siliconflow.cn', port=443): Read timed out. (read timeout=120)"
+     },
+     {
+      "i": 219,
+      "err": "ReadTimeout: HTTPSConnectionPool(host='api.siliconflow.cn', port=443): Read timed out. (read timeout=120)"
+     },
+     {
+      "i": 285,
+      "err": "ReadTimeout: HTTPSConnectionPool(host='api.siliconflow.cn', port=443): Read timed out. (read timeout=120)"
+     },
+     {
+      "i": 334,
+      "err": "ReadTimeout: HTTPSConnectionPool(host='api.siliconflow.cn', port=443): Read timed out. (read timeout=120)"
+     }
+    ],
+    "tokens": {
+     "input": 247028,
+     "output": 313770
+    },
+    "score_dist": {
+     "8": 112,
+     "10": 139,
+     "20": 84,
+     "25": 30,
+     "30": 15
+    },
+    "workers": 8
+   },
+   "flash": {
+    "model": "deepseek-ai/DeepSeek-V4-Flash",
+    "wall_s": 146.7,
+    "ok": 384,
+    "fail": 0,
+    "items_per_s": 2.62,
+    "latency_s": {
+     "p50": 1.905,
+     "p95": 8.255,
+     "p99": 17.876,
+     "max": 26.56
+    },
+    "fails": [],
+    "tokens": {
+     "input": 219329,
+     "output": 13621
+    },
+    "score_dist": {
+     "8": 133,
+     "10": 128,
+     "20": 94,
+     "25": 18,
+     "30": 11
+    },
+    "workers": 8
+   }
+  },
+  "llm_prices": {}
+ }
+]

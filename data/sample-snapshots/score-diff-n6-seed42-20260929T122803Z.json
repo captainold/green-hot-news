@@ -1,0 +1,52 @@
+{
+ "tag": "score-diff-n6-seed42",
+ "ts": "2026-09-29T12:28:03.862763+00:00",
+ "corpus": {
+  "count": 3613,
+  "ids_sha1_12": "efb93ac1e0cc"
+ },
+ "sample": 6,
+ "extra": {
+  "seed": 42,
+  "model": "pro",
+  "jev": false
+ },
+ "items": [
+  {
+   "id": "bc137df15e1850d4abed47bce21832caf02e935d",
+   "title": "印度在2011-2020年间恢复了2，176万公顷土地，创造了12.2亿人日的就业机会：Shri Bhupender Yadav在蒙古国伊斯兰堡举行的《联合国防",
+   "sub_dimension": "国际动态",
+   "score": 77
+  },
+  {
+   "id": "0ebfa8d52e44deea1e86ace7a2c31fb5fca8fc44",
+   "title": "武汉一栋楼,放着全球最大\"碳账本\"",
+   "sub_dimension": "金融资本",
+   "score": 74
+  },
+  {
+   "id": "73cd7fcc903be89b9f5fea35f129eb429ecbc1c9",
+   "title": "Hot or Cool News：2026年9月",
+   "sub_dimension": "社会创新",
+   "score": 41
+  },
+  {
+   "id": "0f1f386af9c333b78a3f20511774fb97b04b6f04",
+   "title": "误解生成、放大和检测的跨学科分类和建模，从修辞学到人工智能代理",
+   "sub_dimension": "技术研发",
+   "score": 45
+  },
+  {
+   "id": "3a813b6cfdc84ee17ef7f667445e1b1a9f0a7fe7",
+   "title": "新疆且末250MW/1000MWh构网型独立新型储能项目EPC中标候选人公示 - 上海有色金属",
+   "sub_dimension": "企业经营",
+   "score": 73
+  },
+  {
+   "id": "6c4b92c683033186387f85041cecc1b19519856d",
+   "title": "通过促进隔热窗的改造等促进住宅的节能·省CO2加速化支援事业（经济产业省·国土交通省连）",
+   "sub_dimension": "政策法规",
+   "score": 43
+  }
+ ]
+}

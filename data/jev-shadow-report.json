@@ -1,0 +1,41 @@
+{
+ "version": "p2-2026-09-30",
+ "dialect": "tokenhub",
+ "model": "TypeSafe/jev-latest",
+ "n": 6,
+ "judged": 6,
+ "failed": 0,
+ "wall_sec": 11.4,
+ "latency_p50": 10.9,
+ "latency_p95": 11.01,
+ "latency_max": 11.01,
+ "kw_sub_dist": {
+  "金融资本": 2,
+  "社会创新": 2,
+  "国际动态": 1,
+  "技术研发": 1
+ },
+ "jev_sub_dist": {
+  "金融资本": 3,
+  "国际动态": 1,
+  "社会创新": 1,
+  "技术研发": 1
+ },
+ "kw_level_dist": {
+  "2": 2,
+  "1": 2,
+  "0": 2
+ },
+ "jev_level_C_dist": {
+  "3": 1,
+  "1": 1,
+  "0": 4
+ },
+ "jev_level_A_dist": {
+  "3": 3,
+  "2": 3
+ },
+ "sub_agree_pct": 66.7,
+ "level_agree_pct": 33.3,
+ "level_near1_pct": 66.7
+}
