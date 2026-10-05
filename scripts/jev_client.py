@@ -187,6 +187,19 @@ def shadow_max() -> int:
         return 600
 
 
+def shadow_budget() -> float:
+    """P2 影子模式墙钟预算秒数（JEV_SHADOW_BUDGET，默认 180s）。
+
+    ⚠️ 为什么必须有：单次 timeout=45s，若上游变慢（2026-09-28 实测 503 风暴），
+    600 条 × 45s / 4 并发 = 最坏 112 分钟，会把 30 分钟的 timer 拖爆。
+    超预算即停止判定剩余条目（已判的照常入档），主流程不受影响。
+    """
+    try:
+        return max(10.0, float(_load_cfg("JEV_SHADOW_BUDGET", "180") or 180))
+    except (TypeError, ValueError):
+        return 180.0
+
+
 def score_level(answers: dict, key: str = "strength") -> int | None:
     """score 型问题的概率加权档位（四舍五入后截断到 0~3）；无答案返回 None。"""
     a = (answers or {}).get(key) or {}

@@ -4163,11 +4163,24 @@ def _jevs_summary(recs: list[dict], secs: list[float], fails: int, wall: float) 
     lvl_agree = lvl_total = 0
     lvl_near = 0
     judged = 0
+    noise_ge50 = green_lt50 = 0
+    top_noise: list[dict] = []
     for rec in recs:
         sh = rec.get("jev_shadow") or {}
         if not sh or sh.get("err"):
             continue
         judged += 1
+        # 相关性门控（P3 第②项）与语料质量治理的现成指标：
+        # is_noise 高 = 疑似非新闻页混入；is_green 低 = 疑似与绿色低碳无关
+        _noise = sh.get("is_noise")
+        if isinstance(_noise, (int, float)):
+            if _noise >= 0.5:
+                noise_ge50 += 1
+                top_noise.append({"t": (rec.get("title_zh") or rec.get("title") or "")[:60],
+                                  "src": rec.get("site_name", ""), "noise": round(float(_noise), 2)})
+        _green = sh.get("is_green")
+        if isinstance(_green, (int, float)) and _green < 0.5:
+            green_lt50 += 1
         ks = rec.get("sub_dimension", "")
         js = sh.get("sub", "")
         kw_sub[ks] += 1
@@ -4211,6 +4224,12 @@ def _jevs_summary(recs: list[dict], secs: list[float], fails: int, wall: float) 
         "sub_agree_pct": round(100.0 * sub_agree / sub_total, 1) if sub_total else None,
         "level_agree_pct": round(100.0 * lvl_agree / lvl_total, 1) if lvl_total else None,
         "level_near1_pct": round(100.0 * lvl_near / lvl_total, 1) if lvl_total else None,
+        # ↓ 相关性门控 / 语料质量治理用（P3 第②项的前置观测）
+        "noise_ge50": noise_ge50,
+        "noise_ge50_pct": round(100.0 * noise_ge50 / judged, 1) if judged else None,
+        "green_lt50": green_lt50,
+        "green_lt50_pct": round(100.0 * green_lt50 / judged, 1) if judged else None,
+        "top_noise": sorted(top_noise, key=lambda x: -x["noise"])[:10],
     }
 
 
@@ -4233,14 +4252,25 @@ def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
     questions = jev_client.build_questions(with_sub=True)
     questions.update(jev_client.build_noul_strength_questions())
     t0 = time.monotonic()
-    print(f"  Jev 影子模式：{len(targets)} 条并行判定（dialect={jev_client.dialect()}）", flush=True)
+    budget = jev_client.shadow_budget()
+    print(f"  Jev 影子模式：{len(targets)} 条并行判定（dialect={jev_client.dialect()}，"
+          f"预算 {budget:.0f}s）", flush=True)
     secs: list[float] = []
     fails = 0
+    skipped = 0
+    done = 0
     from concurrent.futures import ThreadPoolExecutor as _TPE3, as_completed as _AC3
     with _TPE3(max_workers=4) as _ex:
         futs = {_ex.submit(jev_client.evaluate, jev_client.state_from_item(rec), questions, 45): rec
                 for rec in targets}
         for fut in _AC3(futs):
+            # 墙钟护栏：上游变慢时宁可少判，也不能拖爆 30 分钟 timer（2026-09-30）
+            if time.monotonic() - t0 > budget:
+                skipped = len(futs) - done
+                _ex.shutdown(wait=False, cancel_futures=True)
+                print(f"  ⚠️ Jev 影子达预算 {budget:.0f}s，剩余 {skipped} 条本轮跳过", flush=True)
+                break
+            done += 1
             rec = futs[fut]
             try:
                 answers, sec, err = fut.result()
@@ -4268,13 +4298,17 @@ def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
             }
     wall = round(time.monotonic() - t0, 1)
     report = _jevs_summary(targets, secs, fails, wall)
+    report["skipped"] = skipped
+    report["budget_sec"] = budget
+    report["cap"] = limit
     try:
         (output_dir / "jev-shadow-report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
     except OSError:
         pass
     print(f"  Jev 影子完成：判定 {report['judged']}/{report['n']}，失败 {fails}，"
-          f"耗时 {wall}s（p50 {report['latency_p50']}s）｜细类一致 {report['sub_agree_pct']}%"
+          f"跳过 {skipped}，耗时 {wall}s（p50 {report['latency_p50']}s）"
+          f"｜细类一致 {report['sub_agree_pct']}%"
           f"｜强度一致 {report['level_agree_pct']}%（±1 {report['level_near1_pct']}%）", flush=True)
     return report
 

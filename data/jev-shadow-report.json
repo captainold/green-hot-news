@@ -5,10 +5,10 @@
  "n": 6,
  "judged": 6,
  "failed": 0,
- "wall_sec": 11.4,
- "latency_p50": 10.9,
- "latency_p95": 11.01,
- "latency_max": 11.01,
+ "wall_sec": 11.2,
+ "latency_p50": 10.75,
+ "latency_p95": 10.85,
+ "latency_max": 10.85,
  "kw_sub_dist": {
   "金融资本": 2,
   "社会创新": 2,
@@ -37,5 +37,19 @@
  },
  "sub_agree_pct": 66.7,
  "level_agree_pct": 33.3,
- "level_near1_pct": 66.7
+ "level_near1_pct": 66.7,
+ "noise_ge50": 1,
+ "noise_ge50_pct": 16.7,
+ "green_lt50": 2,
+ "green_lt50_pct": 33.3,
+ "top_noise": [
+  {
+   "t": "热门或酷新闻：2026年4月",
+   "src": "Hot or Cool Institute",
+   "noise": 0.69
+  }
+ ],
+ "skipped": 0,
+ "budget_sec": 180.0,
+ "cap": 6
 }

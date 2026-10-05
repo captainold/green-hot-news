@@ -105,6 +105,26 @@ for r in sorted(rows, key=lambda x: -x["gold"]):
         continue
     md.append(f"| {LEVEL[r['gold']]} | {LEVEL.get(r['old'],'?')} | {LEVEL[r['new']]} | {r['title']} | "
               f"{r['gold_sub']}→{r['new_sub']} | {r['src']} |")
+
+residual = [r for r in rows if r["new"] == 3]
+md += ["", "## 四、仍需老温裁决的 3 处（v5.2 后仍判 30 档）", "",
+       "| 老温判 | 现判 | 标题 | 性质 | 建议 |", "|---|---|---|---|---|"]
+for r in residual:
+    if r["gold"] == 2:
+        nature, advice = "边界例", "±1 命中，可接受，无需动"
+    elif "Whatssapp" in r["title"] or "WhatsApp" in r["title"] or "注册" in r["title"]:
+        nature, advice = "**非新闻页混入**", "语料治理问题（抓取端过滤），不是词表问题"
+    else:
+        nature, advice = "AI 治理评论", "命中技术研发 30 档 AI 治理词 → 建议降 25（等您点头）"
+    md.append(f"| {LEVEL[r['gold']]} | {LEVEL[r['new']]} | {r['title']} | {nature} | {advice} |")
+md += ["", "## 五、另外两处待裁决（非本次收紧范围）", "",
+       "1. **外源政府规则范围**：现只覆盖 `FOREIGN_GOV_POLICY_SITES`（政府站），"
+       "X 账号机构源（@IRENA 等）仍按关键词走——是否扩展到「机构账号 + 无政府强词 → 国际动态」",
+       "2. **C 形态再收紧**（`is_routine` 可数判据）：分布会从顶塌翻成底塌（0/4/5/20），"
+       "需按 gold set 定阈值与措辞后再动",
+       "", "> 复算命令：`python -X utf8 scripts/_probe_kw_tighten_review.py`"
+       "（口径说明：本节细类命中按**实况重算**（补 site_id/library）；"
+       "`gold_set.py evaluate --judges kw` 的官方口径为 52.4%）"]
 out = ROOT / "data" / "kw-tighten-review.md"
 out.write_text("\n".join(md) + "\n", encoding="utf-8")
 print(f"\n→ {out}")
