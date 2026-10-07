@@ -4244,8 +4244,40 @@ def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
     if not jev_client.is_enabled():
         print("  Jev 影子：JEV_SHADOW=1 但无 JEV_API_KEY，跳过", flush=True)
         return {}
+
+    # ── 成本护栏①：频率门控（2026-10-07 老温批可）────────────────────────────
+    # JEV_SHADOW_INTERVAL_MIN 分钟内已跑过则整轮跳过（默认 0=每轮都跑）。
+    # 跳过时不写报告/状态文件，上一轮报告与逐条 jev_shadow 原样保留。
+    interval_min = jev_client.shadow_interval_min()
+    state_path = output_dir / "jev-shadow-state.json"
+    if interval_min > 0:
+        try:
+            last_ts = float(json.loads(state_path.read_text(encoding="utf-8")).get("last_run_ts", 0))
+            if time.time() - last_ts < interval_min * 60:
+                return {}
+        except Exception:
+            pass
+
+    # ── 成本护栏②：去重（2026-10-07 老温批可）────────────────────────────────
+    # 24h 窗口内同一条目原本每 30 分钟被重判一次（一天 48 次）；P0/预登记实测
+    # Jev 复跑漂移 <1pp，重复判定无观测价值。以磁盘上上一轮 latest-24h-all.json
+    # 中"已成功判定"的 id 为准跳过；上次失败（err）的条目允许重试。
+    already: set[str] = set()
+    try:
+        prev = json.loads((output_dir / "latest-24h-all.json").read_text(encoding="utf-8"))
+        prev_items = prev.get("items", []) if isinstance(prev, dict) else prev
+        for it in prev_items:
+            if isinstance(it, dict) and it.get("id"):
+                sh = it.get("jev_shadow")
+                if sh and not sh.get("err"):
+                    already.add(it["id"])
+    except Exception:
+        already = set()          # 首轮/文件损坏 → 全量判（cap 兜底）
+
     limit = jev_client.shadow_max()
-    targets = [r for r in recs if isinstance(r, dict)][:limit] if limit else []
+    candidates = [r for r in recs if isinstance(r, dict) and r.get("id") not in already]
+    dedup_skipped = max(0, len(recs) - len(candidates))
+    targets = candidates[:limit] if limit else []
     if not targets:
         return {}
     jev_client.reset()
@@ -4301,13 +4333,22 @@ def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
     report["skipped"] = skipped
     report["budget_sec"] = budget
     report["cap"] = limit
+    report["dedup_skipped"] = dedup_skipped     # 本轮因"上一轮已判定"被跳过数（护栏②）
+    report["window_total"] = len(recs)
+    try:
+        state_path.write_text(json.dumps({"last_run_ts": time.time(),
+                                          "interval_min": interval_min,
+                                          "judged": report["judged"]},
+                                         ensure_ascii=False), encoding="utf-8")
+    except OSError:
+        pass
     try:
         (output_dir / "jev-shadow-report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
     except OSError:
         pass
     print(f"  Jev 影子完成：判定 {report['judged']}/{report['n']}，失败 {fails}，"
-          f"跳过 {skipped}，耗时 {wall}s（p50 {report['latency_p50']}s）"
+          f"预算跳过 {skipped}，去重跳过 {dedup_skipped}，耗时 {wall}s（p50 {report['latency_p50']}s）"
           f"｜细类一致 {report['sub_agree_pct']}%"
           f"｜强度一致 {report['level_agree_pct']}%（±1 {report['level_near1_pct']}%）", flush=True)
     return report

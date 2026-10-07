@@ -200,6 +200,19 @@ def shadow_budget() -> float:
         return 180.0
 
 
+def shadow_interval_min() -> float:
+    """影子模式最小运行间隔分钟（JEV_SHADOW_INTERVAL_MIN，默认 0=每轮都跑）。
+
+    成本护栏③（2026-10-07 老温批可）：影子随主流程每 30 分钟触发一次，
+    去重（护栏②，update_news._run_jev_shadow）后剩余判定量已很小，
+    此间隔是防重复判定/窗口抖动的第二道护栏。
+    """
+    try:
+        return max(0.0, float(_load_cfg("JEV_SHADOW_INTERVAL_MIN", "0") or 0))
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def score_level(answers: dict, key: str = "strength") -> int | None:
     """score 型问题的概率加权档位（四舍五入后截断到 0~3）；无答案返回 None。"""
     a = (answers or {}).get(key) or {}
