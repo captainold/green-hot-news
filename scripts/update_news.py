@@ -4388,6 +4388,54 @@ def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
     return report
 
 
+# ── P3 ① 七细类接管（2026-10-09 老温批可："可以接管"）────────────────────────
+# 依据：gold 终审（2026-10-05 修正基线后）Jev 七细类 57.1% vs 关键词 52.4%（+4.7pp）
+#      ——原 59.0% vs 45.8% 系 kw 基线被 site_id/library 缺失压低 7pp，已修（AGENTS.md 铁律 6）
+#      + 影子全库侧同向（kw 系统性把政策法规判少、企业经营判多）。
+# 原则：**公式不变，只换判定器**——sub_dimension 换源后按同一 score_item 六维公式重打分；
+#      内容强度依旧按细类自适应（细类变了，强度档位规则随之换用对应细类）。
+SUB_TO_DIM: dict[str, str] = {
+    "政策法规": "政策", "国际动态": "政策",
+    "技术研发": "创新", "基础研究": "创新", "社会创新": "创新",
+    "企业经营": "产业", "金融资本": "产业",
+}
+
+
+def _apply_jev_sub_takeover(recs: list[dict], now: datetime) -> dict:
+    """把持有有效 jev_shadow.sub 的条目的细类换成 Jev 判定（choice）。
+
+    回退规则：未判定 / 判定失败(err) / 开关关闭 → 保留关键词结果（静默，绝不打断主流程）。
+    开关：JEV_SUB_TAKEOVER=1（默认 0）；关掉即完全回到关键词（关开关即回现状）。
+    """
+    if jev_client is None or not jev_client.sub_takeover_enabled():
+        return {}
+    changed = 0
+    fallback = 0
+    moved: dict[str, int] = {}
+    for rec in recs:
+        if not isinstance(rec, dict):
+            continue
+        sh = rec.get("jev_shadow") or {}
+        js = "" if sh.get("err") else str(sh.get("sub") or "")
+        if js not in SUB_TO_DIM:
+            fallback += 1
+            continue
+        old = str(rec.get("sub_dimension") or "")
+        if js == old:
+            continue
+        rec["sub_dimension"] = js
+        rec["dimension"] = SUB_TO_DIM[js]
+        rec["layer"] = DIM_TO_LAYER.get(rec["dimension"], "Layer 2")
+        scoring = score_item(rec.get("site_id", ""), rec.get("title", ""),
+                             rec.get("summary", ""), rec.get("people") or [],
+                             rec.get("published_at", ""), now, js, rec.get("trl", ""))
+        rec.update(scoring)
+        key = f"{old}→{js}" if old else f"(空)→{js}"
+        moved[key] = moved.get(key, 0) + 1
+        changed += 1
+    return {"changed": changed, "fallback": fallback, "moved": moved}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Green Policy News Radar")
     parser.add_argument("--output-dir", default="data", help="Output directory for JSON files")
@@ -4755,6 +4803,16 @@ def main() -> int:
     # 每条并行问 Jev，结果只写 rec["jev_shadow"]；**score 仍走关键词判定**
     # （开关 JEV_SHADOW=1；前端不显示。用于全量分布对比/日成本/失败率验收）
     _run_jev_shadow(list(_to_process.values()), output_dir)
+
+    # ── P3 ① 七细类接管（2026-10-09 老温批可；开关 JEV_SUB_TAKEOVER=1）─────
+    # 有有效 jev_shadow.sub 的条目：细类/层级换成 Jev 判定 + 按同一公式重打分；
+    # 未判定/失败 → 保留关键词（回退）。影子关闭时本步自动空转（全关键词）。
+    _st = _apply_jev_sub_takeover(list(_to_process.values()), now)
+    if _st:
+        _mv = "，".join(f"{k}×{v}" for k, v in sorted(_st["moved"].items(),
+                                                    key=lambda kv: -kv[1])[:6])
+        print(f"  七细类接管：{_st['changed']} 条改判（回退关键词 {_st['fallback']} 条）"
+              + (f"｜主要迁移 {_mv}" if _mv else ""), flush=True)
 
     if archived_pub:
         (output_dir / "published-index.json").write_text(

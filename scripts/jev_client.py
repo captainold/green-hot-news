@@ -213,6 +213,16 @@ def shadow_interval_min() -> float:
         return 0.0
 
 
+def sub_takeover_enabled() -> bool:
+    """P3 ① 七细类接管开关（JEV_SUB_TAKEOVER=1/true/yes/on，默认关闭）。
+
+    2026-10-09 老温批可：sub_dimension 判定源从关键词换成 Jev choice
+    （gold 终审修正基线后 57.1% vs 52.4%，+4.7pp；见 AGENTS.md 铁律 6 评估基线陷阱
+    修正 + 影子全库侧同向）。关闭/缺 key → 关键词照常。
+    """
+    return (_load_cfg("JEV_SUB_TAKEOVER", "") or "").strip().lower() in ("1", "true", "yes", "on")
+
+
 def score_level(answers: dict, key: str = "strength") -> int | None:
     """score 型问题的概率加权档位（四舍五入后截断到 0~3）；无答案返回 None。"""
     a = (answers or {}).get(key) or {}
