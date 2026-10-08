@@ -4245,38 +4245,64 @@ def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
         print("  Jev 影子：JEV_SHADOW=1 但无 JEV_API_KEY，跳过", flush=True)
         return {}
 
-    # ── 成本护栏①：频率门控（2026-10-07 老温批可）────────────────────────────
+    # ── 成本护栏①：频率门控 + 字段回填（2026-10-07 老温批可；10-08 修缺陷）──
     # JEV_SHADOW_INTERVAL_MIN 分钟内已跑过则整轮跳过（默认 0=每轮都跑）。
-    # 跳过时不写报告/状态文件，上一轮报告与逐条 jev_shadow 原样保留。
     interval_min = jev_client.shadow_interval_min()
     state_path = output_dir / "jev-shadow-state.json"
+    seen_path = output_dir / "jev-shadow-seen.json"
+
+    def _load_seen() -> dict:
+        """已判定记忆（id → {ts, shadow}），7 天裁剪（窗口最长 96h，7 天足够）。"""
+        try:
+            data = json.loads(seen_path.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                week_ago = time.time() - 7 * 86400
+                return {k: v for k, v in data.items()
+                        if isinstance(v, dict) and v.get("ts", 0) >= week_ago}
+        except Exception:
+            pass
+        return {}
+
+    def _restore(recs_list: list[dict], seen_map: dict) -> None:
+        """把已判定的影子字段回填到本轮 recs。
+
+        为什么必须回填（2026-10-08 生产实测踩坑）：每轮抓取的 recs 都是全新对象，
+        gate 跳过判定的周期若不回填，latest-24h*.json 会被无字段版本整体覆盖——
+        逐条 jev_shadow 每 30 分钟被洗掉一次，去重永远找不到已判定 id，
+        导致每小时全量重判 600 条（护栏②形同虚设）。"""
+        for r in recs_list:
+            if not isinstance(r, dict):
+                continue
+            ent = seen_map.get(r.get("id"))
+            if ent and not (ent.get("shadow") or {}).get("err"):
+                r["jev_shadow"] = ent["shadow"]
+
+    seen = _load_seen()
     if interval_min > 0:
         try:
             last_ts = float(json.loads(state_path.read_text(encoding="utf-8")).get("last_run_ts", 0))
             if time.time() - last_ts < interval_min * 60:
+                _restore(recs, seen)     # 跳过判定，但保住输出文件里的字段
                 return {}
         except Exception:
             pass
 
-    # ── 成本护栏②：去重（2026-10-07 老温批可）────────────────────────────────
-    # 24h 窗口内同一条目原本每 30 分钟被重判一次（一天 48 次）；P0/预登记实测
-    # Jev 复跑漂移 <1pp，重复判定无观测价值。以磁盘上上一轮 latest-24h-all.json
-    # 中"已成功判定"的 id 为准跳过；上次失败（err）的条目允许重试。
-    already: set[str] = set()
-    try:
-        prev = json.loads((output_dir / "latest-24h-all.json").read_text(encoding="utf-8"))
-        prev_items = prev.get("items", []) if isinstance(prev, dict) else prev
-        for it in prev_items:
-            if isinstance(it, dict) and it.get("id"):
-                sh = it.get("jev_shadow")
-                if sh and not sh.get("err"):
-                    already.add(it["id"])
-    except Exception:
-        already = set()          # 首轮/文件损坏 → 全量判（cap 兜底）
-
+    # ── 成本护栏②：去重（2026-10-08 修：记忆改存独立 seen 文件）─────────────
+    # ⚠️ 不再读 latest-24h-all.json 当记忆源——该文件每 30 分钟被"gate 跳过
+    # 判定的周期"用无字段 recs 重写，记忆放里面活不过一个周期（10-08 实测教训）。
+    # 独立 jev-shadow-seen.json 只有判定周期才写，跳过周期只读。
+    candidates: list[dict] = []
+    dedup_skipped = 0
+    for r in recs:
+        if not isinstance(r, dict):
+            continue
+        ent = seen.get(r.get("id"))
+        if ent and not (ent.get("shadow") or {}).get("err"):
+            r["jev_shadow"] = ent["shadow"]          # 回填，保证输出连续
+            dedup_skipped += 1
+        else:
+            candidates.append(r)
     limit = jev_client.shadow_max()
-    candidates = [r for r in recs if isinstance(r, dict) and r.get("id") not in already]
-    dedup_skipped = max(0, len(recs) - len(candidates))
     targets = candidates[:limit] if limit else []
     if not targets:
         return {}
@@ -4328,7 +4354,15 @@ def _run_jev_shadow(recs: list[dict], output_dir: Path) -> dict:
                 "is_noise": jev_client.noul(answers, "is_noise"),
                 "sec": round(sec, 2),
             }
+            _rid = rec.get("id")
+            if _rid:
+                seen[str(_rid)] = {"ts": time.time(), "shadow": rec["jev_shadow"]}
     wall = round(time.monotonic() - t0, 1)
+    try:
+        seen_path.write_text(json.dumps(seen, ensure_ascii=False, separators=(",", ":")),
+                             encoding="utf-8")
+    except OSError:
+        pass
     report = _jevs_summary(targets, secs, fails, wall)
     report["skipped"] = skipped
     report["budget_sec"] = budget
