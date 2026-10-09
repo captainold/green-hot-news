@@ -4762,6 +4762,10 @@ def main() -> int:
         # 主题标签（2026-08-19）：仅主题标签（TOPIC_RULES），供前端「关系图谱」
         # 展示主题标签共现；地域/政策类型等数据库管理标签不导出、前端不显示
         rec["topics"] = extract_topic_tags(rec.get("title", ""))
+        # 主题域（2026-10-09 提案 v0.3 定稿）：1 主域 + 0~1 副域（跨绿色×AI 分支），
+        # 纯标签不打分——与 sub_dimension（阶段轴，Jev 判定）正交
+        rec["topic_domain"], rec["topic_domain_alt"] = tag_topic_domain(
+            rec.get("title", ""), rec.get("summary", ""), rec.get("site_id", ""))
         # 打分体系 v4.0（2026-08-23）：内容强度按细类 + TRL 第 6 维度
         people = extract_people(rec.get("title", ""), rec.get("summary", ""), "")
         scoring = score_item(
@@ -5087,6 +5091,82 @@ POLICY_TYPE_RULES: list[tuple[str, list[str]]] = [
     ("新闻发布会", ["新闻发布会", "答问", "通报", "发布", "发布会"]),
     ("数据报告", ["报告", "数据", "统计", "年报", "季报"]),
 ]
+
+
+# ── 主题域 topic_domain（2026-10-09 提案 v0.3 定稿，老温批可）────────────────
+# 双轴制：sub_dimension = 阶段轴（Jev 判定，参与打分）；topic_domain = 主题轴
+# （本函数产出，**不打分**，纯标签）。规则（提案 §三·C/D）：
+#   • 1 主域 + 0~1 副域（副域仅记绿色×AI 跨分支交叉；同分支细交叉不记，v1）
+#   • 主域 = 命中词数最高域（并以表中顺序破平）；全部不命中 → ""（前端"未分域"）
+#   • AI 分支域（A1~A5）要求 AI 门控（来源白名单/AI 词），防"研究/发布/风险"
+#     等宽词把非 AI 内容误吸进 AI 域；A5 例外——自身强信号（数据中心/算力等）
+#     不受门控
+# 词表 = 提案 §三·D 定稿（绿 10 域 + AI 5 域，含实证体量依据）
+TOPIC_DOMAINS: dict[str, tuple[str, tuple[str, ...]]] = {
+    "电力与可再生": ("绿", ("光伏", "风电", "风力发电", "太阳能", "水力发电", "水电", "核电",
+                    "储能", "电网", "绿电", "可再生", "电价", "弃风弃光", "虚拟电厂")),
+    "氢能与新型燃料": ("绿", ("氢", "燃料电池", "绿氢", "绿氨", "甲醇", "生物燃料", "加氢站", "电解槽")),
+    "交通与出行": ("绿", ("电动车", "新能源汽车", "新能源车", "充电桩", "充电站", "动力电池",
+                    "锂电池", "自动驾驶", "航空", "航运", "重卡", "evtol")),
+    "工业与建筑脱碳": ("绿", ("钢铁", "水泥", "化工", "ccus", "碳捕集", "绿氢冶金", "绿色建筑",
+                     "供暖", "制冷", "节能改造", "余热")),
+    "碳市场与绿色金融": ("绿", ("碳市场", "碳交易", "碳价", "ccer", "碳关税", "cbam", "碳足迹",
+                      "碳核算", "碳配额", "碳排放权", "esg", "绿色债券", "绿色信贷", "绿色金融",
+                      "气候投融资")),
+    "气候科学与影响适应": ("绿", ("气候模型", "全球变暖", "ipcc", "排放清单", "极端天气", "高温",
+                       "干旱", "野火", "山火", "洪水", "暴雨", "台风", "飓风", "热浪",
+                       "气候韧性", "气候适应")),
+    "自然生态与资源循环": ("绿", ("生物多样性", "湿地", "森林", "海洋保护", "珊瑚", "生态修复",
+                       "荒漠化", "循环经济", "回收", "无废", "垃圾分类", "再利用", "再制造")),
+    "气候治理与外交": ("绿", ("cop", "缔约方", "巴黎协定", "ndc", "气候大会", "气候谈判",
+                    "联合国气候", "环境法", "履约")),
+    "灾害与安全": ("绿", ("爆炸", "泄漏", "火灾", "事故", "核安全", "溃坝", "伤亡")),
+    "社会与公正转型": ("绿", ("绿色消费", "碳普惠", "碳账户", "公众参与", "低碳生活",
+                     "公正转型", "绿色就业")),
+    "AI 研究与论文": ("AI", ("论文", "benchmark", "数据集", "预印本", "arxiv", "研究")),
+    "AI 模型与产品": ("AI", ("发布", "上线", "推出", "大模型", "版本", "agent", "智能体",
+                    "api", "开源")),
+    "AI 治理与安全": ("AI", ("监管", "治理", "对齐", "安全", "伦理", "合规", "风险", "版权", "ai 法案")),
+    "AI 产业与资本": ("AI", ("融资", "估值", "营收", "ipo", "招股", "并购", "商业化", "付费用户")),
+    "AI×能源与算力": ("AI", ("数据中心", "算力", "智算", "pue", "能耗", "hbm", "gpu", "绿电采购")),
+}
+# A5 自身强信号：不受 AI 门控限制（这些词本身就是 AI×能源信号）
+_A5_STRONG: tuple[str, ...] = ("数据中心", "算力", "智算", "hbm", "gpu")
+
+
+def _ai_gate(site_id: str, title: str, summary: str) -> bool:
+    """AI 分支门控：AI 源白名单（含 radarai 开源工具流）或 AI 词命中/标题 ai 词边界。"""
+    if site_id in AI_SITES or site_id == "radarai":
+        return True
+    text = (title + " " + (summary or "")).lower()
+    if any(_kw_hit(text, str(kw).lower()) for kw in AI_DIM_KW):
+        return True
+    return re.search(AI_TITLE_RE, text) is not None
+
+
+def tag_topic_domain(title: str, summary: str = "", site_id: str = "") -> tuple[str, str]:
+    """主题域判定（提案 v0.3 §三·C/D 定稿）：返回 (主域, 副域)，不打分不参与排序。"""
+    text = (title + " " + (summary or "")).lower()
+    ai_ok = _ai_gate(site_id, title, summary or "")
+    hit: dict[str, int] = {}
+    for _name, (_branch, _kws) in TOPIC_DOMAINS.items():
+        if _branch == "AI":
+            if _name == "AI×能源与算力":
+                if not (ai_ok or any(_kw_hit(text, kw) for kw in _A5_STRONG)):
+                    continue
+            elif not ai_ok:
+                continue
+        _n = sum(1 for kw in _kws if _kw_hit(text, kw))
+        if _n:
+            hit[_name] = _n
+    if not hit:
+        return "", ""
+    _order = list(TOPIC_DOMAINS)
+    main = max(hit, key=lambda k: (hit[k], -_order.index(k)))
+    _main_branch = TOPIC_DOMAINS[main][0]
+    _alts = [k for k in hit if k != main and TOPIC_DOMAINS[k][0] != _main_branch]
+    alt = max(_alts, key=lambda k: (hit[k], -_order.index(k))) if _alts else ""
+    return main, alt
 
 
 def extract_topic_tags(title: str) -> list[str]:
