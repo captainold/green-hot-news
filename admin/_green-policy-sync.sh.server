@@ -8,6 +8,12 @@ export PATH="/root/.local/bin:$PATH"
 # 1) 抓取新闻 + 导出 Obsidian 笔记 + 生成网站数据
 .venv/bin/python scripts/update_news.py --obsidian-dir . --window-hours 96
 
+# 1.1) 空摘要增量补抓（S0-A2，2026-10-09 老温批可）：新条目中空摘要的补正文摘要——
+#      限额 60 条/轮（历史积压自动逐轮消化）+ 失败冷却（cache/web-summary-cache.json 7 天）；
+#      写回 data/*.json + 素材库 md frontmatter（持久层，主流程每轮回读）。
+#      失败不阻断主流程；systemd 环境自带 HTTPS_PROXY（夏威夷家宽出口）。
+.venv/bin/python scripts/backfill_web_summaries.py --apply --limit 60 --workers 4 || echo "summary backfill failed"
+
 # 1.5) 健康追踪（管理面板 admin/data/ 数据源）
 .venv/bin/python scripts/health_tracker.py || echo "health tracker failed"
 
@@ -16,6 +22,9 @@ export PATH="/root/.local/bin:$PATH"
 
 # 1.7) 数据质量检查（QA：只报告不修复，输出 data/qa-report.json + qa-report.md，供人工/agent 会话开始时审阅）
 .venv/bin/python scripts/qa_check.py || echo "qa check failed"
+
+
+
 # 2) 素材层 git 提交（服务器生成 + 本地 Obsidian 手工编辑双向同步）
 if [ -d /srv/git/green-policy-materials.git ]; then
     # 2a) 提交服务器侧新生成/修改的笔记（无改动则跳过）
