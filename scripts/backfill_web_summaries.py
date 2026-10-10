@@ -266,7 +266,8 @@ def main() -> int:
                 pass
         todo_urls.append(u)
     gnews_n = sum(1 for u in todo_urls if pool[u]["gnews"])
-    print(f"候选（空摘要）: {len(pool)} 条｜本轮处理 {len(todo_urls)}"
+    _plan = min(len(todo_urls), args.limit) if args.limit else len(todo_urls)
+    print(f"候选（空摘要）: {len(pool)} 条｜本轮处理 {_plan}"
           f"（gnews {gnews_n} / 直接源 {len(todo_urls) - gnews_n}）｜失败冷却跳过 {cooled}")
     if args.dry_run or not args.apply:
         from collections import Counter
