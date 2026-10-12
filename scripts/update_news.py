@@ -4698,6 +4698,34 @@ def _apply_jev_sub_takeover(recs: list[dict], now: datetime) -> dict:
     return {"changed": changed, "fallback": fallback, "moved": moved}
 
 
+# ── 非新闻页过滤（S0-B，2026-10-10 老温批可）────────────────────────────────
+# 数据来源：影子 is_noise≥0.5 全量挖掘（838 条判定语料 + 60 条人工复核，2026-10-10）。
+# 三个模式桶在语料上精度 100%（命中即真垃圾）；"低价值边界内容"（评论/科普/公报
+# 编号/活动宣传）**刻意不过滤**——那是打分兜底分的活（老温 gold 已按 0-1 档处理）。
+# 典型案例：eu_commission 的 Google-News site: 流被色情 SEO 注入（2026-10-10 实测
+# 9/9 命中全为垃圾）；us_eia/us_doe 栏目页（Publications/Timeline）；jp_moe 公文表格行。
+NON_NEWS_PATTERNS: list[tuple[str, "re.Pattern[str]"]] = [
+    # ① SEO 注入/黑产（命中即丢，最紧急——已在线上发现）
+    ("注入", re.compile(r"(?i)(\bporn|xxx|bokep|sex ?videos?|@18\+|\bxnx\b|viral ?sex)")),
+    # ② 栏目/列表页（前缀安全版 + 纯标题名精确版）
+    ("栏目页", re.compile(r"(?i)^(list of |publications?$|resources?$|timeline$|home ?page$|"
+                       r"today in energy|jrc publications|directory$|videos?$)")),
+    # ③ 公文表格残留（jp_moe 事业费表格、公文抬头）
+    ("表格残留", re.compile(r"(事業費の額|御中|別表|様式|交付金、補助金等)")),
+    # ④ URL 当标题（gold 实测案例）
+    ("URL标题", re.compile(r"^https?://")),
+]
+
+
+def non_news_label(title: str) -> str:
+    """非新闻页判定：命中返回标签（调用方丢弃），否则返回 "". """
+    t = (title or "").strip()
+    for label, rx in NON_NEWS_PATTERNS:
+        if rx.search(t):
+            return label
+    return ""
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Green Policy News Radar")
     parser.add_argument("--output-dir", default="data", help="Output directory for JSON files")
@@ -4800,6 +4828,7 @@ def main() -> int:
                     title_zh_map[_t] = _zh
     print(f"  翻译完成: {len(title_zh_map)} 条已译（t+{time.monotonic()-_t0:.0f}s）", flush=True)
 
+    _non_news_dropped: dict[str, int] = {}   # S0-B 非新闻页过滤计数
     for raw in raw_items:
         tid = make_item_id(raw.site_id, raw.title, raw.url)
         if tid in seen_ids:
@@ -4825,6 +4854,13 @@ def main() -> int:
         # 统一清理标题尾部源名后缀（" - EPA" / " - CleanTechnica" 等），
         # 覆盖各 fetch 函数未单独清理的 Google News RSS 源（2026-08-18）
         clean_title = _strip_title_suffix(raw.title)
+        # 非新闻页过滤（S0-B）：命中硬垃圾模式即丢弃（计入轮末汇总；前 5 条打样例）
+        _nn = non_news_label(clean_title)
+        if _nn:
+            _non_news_dropped[_nn] = _non_news_dropped.get(_nn, 0) + 1
+            if sum(_non_news_dropped.values()) <= 5:
+                print(f"  🗑 非新闻页丢弃[{_nn}]: {clean_title[:60]}", flush=True)
+            continue
         # 统一清洗摘要：unescape + 去模板变量（QA 2026-08-21：X 平台 &amp;、中国环境报 {{content.*}}）
         clean_summary = _cap_summary(_clean_summary(raw.meta.get("summary", "")))
         record = {
@@ -4845,6 +4881,10 @@ def main() -> int:
 
         if is_policy_relevant(clean_title, raw.url, raw.site_id, clean_summary):
             green_items.append(record)
+
+    _nn_total = sum(_non_news_dropped.values())
+    _nn_detail = "，".join(f"{k} {v}" for k, v in sorted(_non_news_dropped.items(), key=lambda kv: -kv[1]))
+    print(f"  🗑 非新闻页过滤：本轮丢弃 {_nn_total} 条" + (f"（{_nn_detail}）" if _nn_detail else ""), flush=True)
 
     # 24h window filter for web output
     # 国外官方源更新频率低（周级）→ 用 7 天宽窗口，否则 96h 窗口常滤空
