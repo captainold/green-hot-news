@@ -1159,6 +1159,14 @@ def _rich_extract(resp, url: str) -> str:
         html_str = resp.content.decode(resp.apparent_encoding or "utf-8", errors="ignore")
         md = trafilatura.extract(html_str, output_format="markdown", include_links=False,
                                  include_images=True, favor_precision=True) or ""
+        # 2026-10-09：trafilatura 对部分中国政府站整页返回空（gov.cn 实测 2.2.0——
+        # 政策文件页提取 0 字符，同页自研 extract_rich 能出 5k 正文）。不兜底则素材
+        # 笔记正文为空壳，且 fetch_article 因 len(body)<MIN 整条判失败返回 None。
+        if not md.strip():
+            md2, _ = extract_rich(resp.text, BeautifulSoup(resp.text, "html.parser"),
+                                  base_url=url)
+            if md2:
+                md = md2
         if md and url:
             # 图片相对路径拼接（/upload/ /images/ /static/ /wp-content/ 等常见静态目录）
             base = url.split("?")[0]

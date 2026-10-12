@@ -77,6 +77,9 @@ NOTES_ROOT = ROOT / "Notes"
 COOLDOWN_DAYS = 7
 CHECKPOINT_EVERY = 150
 MIN_SUMMARY_LEN = 15
+# 摘要上限（字符）：与 update_news.SUMMARY_MAX_CHARS / export_qmd.SUMMARY_MAX_CHARS 同值
+# （2026-10-12 膨胀事故：单条摘要涨到 33MB → 这里写入前就截断，护栏第三道）
+SUMMARY_MAX_CHARS = 12000
 _SHELL_PAT = re.compile(
     r"skip to main|打开.{0,8}app|下载.{0,8}app|click here|main content|sign in|log in|"
     r"subscribe|newsletter|cookie|订阅|登录|下载客户端", re.I)
@@ -164,7 +167,7 @@ def _fetch_summary(url: str) -> tuple[str | None, str]:
     # "打开虎嗅APP" 等短样板文本会通过长度检查——短文本 + 导航标记即判垃圾
     if len(summary) < 80 and _SHELL_PAT.search(summary):
         return None, "junk-shell"
-    return summary, "ok"
+    return summary[:SUMMARY_MAX_CHARS], "ok"
 
 
 def build_vault_index() -> dict[str, Path]:

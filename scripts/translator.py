@@ -33,6 +33,9 @@ _TMT_SERVICE = "tmt"
 _TMT_ACTION = "TextTranslate"
 _TMT_VERSION = "2018-03-21"
 _TMT_REGION = "ap-guangzhou"
+# 国内 API 直连（不走 env 代理）：服务器 HTTPS_PROXY 指向 qqpw 夏威夷家宽出口，
+# 翻译走家宽绕美国一圈既慢又白耗节点流量（2026-10-12 流量超额事故修复）。
+_NO_PROXY = {"http": None, "https": None}
 
 _BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36"
 
@@ -229,6 +232,7 @@ def translate_text(text: str, source: str = "auto",
         r = requests.post(
             f"https://{_TMT_HOST}",
             headers=headers, data=payload, timeout=(10, 20),
+            proxies=_NO_PROXY,
         )
         r.raise_for_status()
         data = r.json()

@@ -36,8 +36,21 @@ _FETCH_WORKERS = 4
 _MIN_BODY_CHARS = 200
 # 文件名标题段字节预算：11(日期+空格) + 200 + 14(〔mat-xxxxxx〕) + 10( 【dupN】) + 3(.md) < 255
 _NAME_TITLE_BYTES = 200
+# 摘要上限（字符）：护栏，防异常值把 frontmatter/data JSON 撑爆
+# （2026-10-12 事故：load_archived_summaries 不回反转义 + _yaml_scalar 每轮转义，
+#  含反斜杠的摘要每 30min 翻一倍 → 单条 md 涨到 96MB、summary-index.json 170MB。
+#  正常摘要 50-5800 字，12000 字上限不影响展示，只拦 runaway）
+SUMMARY_MAX_CHARS = 12000
+# published_at 上限（字符）：防"每轮追加 T00:00:00+08:00"式膨胀（同 2026-10-12 事故）
+PUBLISHED_MAX_CHARS = 40
 # 解码 gnews url 的进程内缓存（同一 b64 一轮内可能重复出现；跨轮由 mat-index 天然记忆）
 _GNEWS_DECODE_CACHE: dict[str, Optional[str]] = {}
+
+
+def _cap_scalar(s: str, limit: int) -> str:
+    """截断过长标量（字符数），保留头部 + 省略号。"""
+    s = s or ""
+    return s if len(s) <= limit else s[:limit] + "…"
 
 
 def _resolve_gnews_dup(url: str, url_index: dict[str, Path], session) -> Optional[str]:
@@ -208,8 +221,9 @@ def build_frontmatter(item: dict) -> dict:
         "people": item.get("people") or [],
         "score": item.get("score", 0),
         "score_level": item.get("score_level", ""),
-        "published_at": item.get("published_at", ""),
-        "summary": (item.get("summary") or "").replace("\n", " ").strip(),
+        "published_at": _cap_scalar(item.get("published_at", ""), PUBLISHED_MAX_CHARS),
+        "summary": _cap_scalar((item.get("summary") or "").replace("\n", " ").strip(),
+                               SUMMARY_MAX_CHARS),
         "author": item.get("author") or "",
         "related": item.get("related") or [],
     }
@@ -227,6 +241,35 @@ def _yaml_scalar(v) -> str:
             return "[]"
         return "[" + ", ".join(_yaml_scalar(x) for x in v) + "]"
     return '""'
+
+
+def yaml_unscalar(raw: str) -> str:
+    """`_yaml_scalar` 的逆：去掉成对引号 + 反转义 `\\\\`→`\\`、`\\"`→`"`。
+
+    2026-10-12 修复（指数膨胀事故）：写入侧每轮把 `\\` 转义成 `\\\\`，读取侧原来
+    直接拿正则原文**不回反转义** —— 主流程每轮回读+回写一次，含反斜杠的摘要就翻一倍
+    （实测单条 md 201KB→…→25MB→48MB，每 30min 精确 ×2；summary-index.json 涨到 170MB）。
+    只反转义 `\\\\` 与 `\\"`（转义器只产出这两种），其他 `\\x` 原样保留，避免误伤。
+    """
+    s = (raw or "").strip()
+    if len(s) >= 2 and s.startswith('"') and s.endswith('"'):
+        # 结尾引号未被转义（其前连续反斜杠为偶数个）才算闭合引号
+        k, j = 0, len(s) - 2
+        while j >= 0 and s[j] == "\\":
+            k += 1
+            j -= 1
+        if k % 2 == 0:
+            s = s[1:-1]
+    out: list[str] = []
+    i, n = 0, len(s)
+    while i < n:
+        if s[i] == "\\" and i + 1 < n and s[i + 1] in ("\\", '"'):
+            out.append(s[i + 1])
+            i += 2
+            continue
+        out.append(s[i])
+        i += 1
+    return "".join(out)
 
 
 def build_qmd(item: dict, content: str = "") -> str:
@@ -297,6 +340,27 @@ def extra_sections(text: str) -> str:
     return "\n\n".join(parts)
 
 
+# 正文抓取需绕开 env 代理的站点（2026-10-09）：党中央/国务院文件源走直连。
+# 实测（服务器）：gov.cn 经 mihomo 家宽出口 SSL EOF 断连（SSLEOFError），直连 200/16ms；
+# 新华社两通道都可通但直连快 ~50 倍（89ms vs 4.8s）。不绕开 → 素材笔记正文为空
+# （《新质生产力意见》首轮落盘即 718B 空壳）。
+_DIRECT_BODY_SITES = {"govcn", "xinhua"}
+_direct_session_obj = None
+
+
+def _direct_session():
+    """无代理 Session（懒建单例：trust_env=False 忽略 env 里的 mihomo 代理）。"""
+    global _direct_session_obj
+    if _direct_session_obj is None:
+        import requests as _req
+        s = _req.Session()
+        s.trust_env = False
+        s.headers.update({"User-Agent": article_content.BROWSER_UA,
+                          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"})
+        _direct_session_obj = s
+    return _direct_session_obj
+
+
 def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
     """抓取富文本正文 + 下载图片附件。
 
@@ -310,15 +374,21 @@ def fetch_rich_body(item: dict, att_dir: Path, session) -> tuple[str, int]:
         pdf_text = article_content.fetch_arxiv_pdf(url, session=session)
         if pdf_text:
             return pdf_text, 0  # PDF 全文纯文本，无图片附件
-    res = article_content.fetch_article(url, session=session, rich=True)
-    if not res or not res.get("content"):
-        return "", 0
-    content: str = res["content"] or ""
-    if len(content) < _MIN_BODY_CHARS:
-        return "", 0
-    # 下载正文图片 → attachments/（相对路径引用；referer=原页面 URL 解决防盗链）
-    content, n_img = article_content.download_images(content, att_dir, session=session, referer=url)
-    return content, n_img
+    # 直连优先（仅 _DIRECT_BODY_SITES）→ 不成再回退默认（env 代理）通道
+    sessions = [session]
+    if (item.get("site_id") or "") in _DIRECT_BODY_SITES:
+        sessions = [_direct_session(), session]
+    for sess in sessions:
+        res = article_content.fetch_article(url, session=sess, rich=True)
+        if not res or not res.get("content"):
+            continue
+        content: str = res["content"] or ""
+        if len(content) < _MIN_BODY_CHARS:
+            continue
+        # 下载正文图片 → attachments/（相对路径引用；referer=原页面 URL 解决防盗链）
+        content, n_img = article_content.download_images(content, att_dir, session=sess, referer=url)
+        return content, n_img
+    return "", 0
 
 
 def _load_url_index(output_dir: Path, material: bool) -> dict[str, Path]:
@@ -394,11 +464,29 @@ def export(input_path: Path, output_dir: Path, force: bool = False,
                 continue  # 已有正文，跳过
             pending.append(item)
             continue
+        # 落盘路径兜底判重（2026-10-12 事故修复，**必须排在 gnews 孪生解码之前**）：
+        # 索引（cache/mat-index.json）只由手工/每日重建，过期时"索引之后新增"的条目会被
+        # 判成新条目重抓（实测 409 条 pending 里 402 条本地早有正文，单轮 ~140MB 走 qqpw
+        # 家宽代理，是节点流量超额的主因）。这里按 url 算出的落盘路径独立判重，绕开索引依赖。
+        # ⚠️ 顺序教训：此判断若排在孪生解码之后，gnews 条目仍会先走 ~600KB/条的联网解码
+        #    （实测整轮 pending 构建卡 15+ 分钟、白耗 ~120MB），故必须前置。
+        _own_path: Optional[Path] = None
+        if not force and url:
+            _own_path = url_index.get(url)
+            if _own_path is None:
+                try:
+                    _own_path = target_path(item, output_dir, material)
+                except Exception:
+                    _own_path = None
+            if _own_path is not None and _own_path.exists() and _has_body(_own_path):
+                url_index[url] = _own_path   # 回填索引，后续轮次走快路径
+                continue
         # dup 根治（2026-10-05）：gnews 聚合 url 不在索引时，先解码成真实 url 再查一次。
         # 命中既有直连笔记 → 记住映射，落盘时按直连路径 upsert（不再新建 〔mat-〕孪生文件）。
-        # 只在这一分支解码（索引已命中的 gnews 条目无需解码），控制 batchexecute 调用量。
+        # 已有落盘文件（哪怕暂无正文）就没必要再解码找孪生 —— 直接按自己的路径重抓/续写。
         _dup_real: Optional[str] = None
-        if url and "news.google.com" in url and url not in url_index:
+        if (url and "news.google.com" in url and url not in url_index
+                and not (_own_path is not None and _own_path.exists())):
             _dup_real = _resolve_gnews_dup(url, url_index, _req.Session())
             if _dup_real and _dup_real in url_index:
                 it_path = url_index[_dup_real]

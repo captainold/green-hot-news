@@ -19,6 +19,9 @@ import requests
 
 _SF_BASE = "https://api.siliconflow.cn/v1"
 _SF_MODEL = "deepseek-ai/DeepSeek-V4-Pro"
+# 国内 API 一律直连（不走 env 代理）：服务器 HTTPS_PROXY 指向 qqpw 夏威夷家宽出口，
+# SiliconFlow 是中国站——经家宽绕一圈既慢又白耗节点流量（2026-10-12 流量超额事故修复）。
+_NO_PROXY = {"http": None, "https": None}
 
 # 提示词模板（2026-08-23 与老温核定 + 评测集验证；2026-08-24 加正文输入，老温批准）
 PROMPT_TEMPLATE = """你是绿色低碳科技领域的技术情报分析师。从下面新闻的标题、摘要和正文中，提取该新闻涉及的"技术特征"——即具体的技术参数、技术路线、工艺方法或性能指标。
@@ -109,6 +112,7 @@ def extract_tech_feature(title: str, summary: str, content: str = "", _retry: in
                 "temperature": 0,
             },
             timeout=(15, 60),
+            proxies=_NO_PROXY,
         )
         # 致命错误（余额不足/认证失败/限流）→ 立即熔断，不再重试
         if r.status_code in _FATAL_STATUS:

@@ -63,6 +63,10 @@ BROWSER_UA = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
 )
 SH_TZ = timezone(timedelta(hours=8))
+# 摘要长度上限（字符）：膨胀事故护栏（2026-10-12），与 export_qmd.SUMMARY_MAX_CHARS 同值。
+# 取 12000：素材库实测**正常**摘要最长 ~5800 字（IEEE Spectrum 长摘要），上限只拦翻倍
+# runaway（事故值 3300 万字），不误伤正常长摘要。
+SUMMARY_MAX_CHARS = 12000
 
 
 @dataclass
@@ -182,9 +186,33 @@ def _diff_multi_block(a: str, b: str) -> bool:
 
 
 def create_session() -> requests.Session:
+    """源抓取（RSS/feed/列表页）默认 Session —— **直连**，不走 env 代理。
+
+    2026-10-12 流量事故修复：此前这里信任 env（服务器 HTTPS_PROXY → qqpw 夏威夷家宽），
+    于是 79 个源的 feed 抓取全部绕美国家宽，单轮 ~5MB、日 ~0.25GB 白耗节点流量。
+    feed 是普通 HTTP 拉取，数据中心 IP 不受反爬影响（正文页才需要家宽出口）。
+    少数直连被墙/403 的站点在 _PROXY_FEED_SITES 点名走代理。
+    """
     session = requests.Session()
+    session.trust_env = False
     session.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"})
     return session
+
+
+# feed 直连失败候补名单：这些 site_id 的源抓取显式走 env 代理（家宽出口）。
+# 2026-10-12 迁移时为空 —— 首轮验证若某源 ok=False 且直连失败，把它加进来。
+_PROXY_FEED_SITES: set[str] = set()
+_proxy_session_obj: Optional[requests.Session] = None
+
+
+def proxy_session() -> requests.Session:
+    """走 env 代理的 Session（仅 _PROXY_FEED_SITES 使用；懒建单例）。"""
+    global _proxy_session_obj
+    if _proxy_session_obj is None:
+        s = requests.Session()
+        s.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"})
+        _proxy_session_obj = s
+    return _proxy_session_obj
 
 
 def make_item_id(site_id: str, title: str, url: str) -> str:
@@ -597,6 +625,134 @@ def fetch_cac(session: requests.Session, now: datetime) -> list[RawItem]:
     except Exception:
         pass
     return items
+
+
+# ── 党中央/国务院文件官方首发源（2026-10-09 接入，老温裁定）───────────────────
+# 背景：2026-10-09 18:02 新华社受权发布《中共中央 国务院关于发展新质生产力的意见》
+# （七部分 19 项，第四部分整章为绿色低碳循环发展经济体系），当日 18:33/19:12 两轮
+# 抓取均未收到。三个结构性缺口：①77 源里没有中国政府网/新华社——中央文件首发渠道
+# 不在链路内；②部委转发有时滞（实测发布 1.5h 后发改委/生态环境部/工信部/中国能源报
+# 均未转发）；③媒体/热榜通道被标题级绿色词门控挡掉（该文件标题不含任何绿色词，
+# 且"新质生产力"不在任何关键词表）。
+# 老温 2026-10-09 决策：补贴两个官方首发源，**gov.cn 文件全领域收集**——中央/国务院级
+# 文件级别分量足够，不做绿色词过滤（主题相关分由 score_topic 自然区分）。
+# 只保留「文件形态」标题（中共中央/国务院/中办国办抬头 + 法律条例），滤除同页混排的
+# 政策解读/答记者问/图表——实测 /zhengce/ 去重 20 条链接 → 8 条文件。
+# 相关性直通见 CENTRAL_DOC_SITES；打分：来源权威 20（现有最高档）+ 内容强度 30
+# （政策法规 30 档含「国务院/党中央/中办/国办」）。
+_CENTRAL_DOC_TITLE_RE = re.compile(
+    r"^(中共中央|国务院|中办|国办)"
+    r"|^中华人民共和国[\u4e00-\u9fff]{2,20}(法|条例)$"
+)
+# 同页混排的非文件条目（政策解读/答记者问/图表/发布会）——标题虽以「国务院…」开头
+# 但属第二手转述，实测混入「国务院常务会议解读 | …,」与页脚「国务院部门网站」
+_CENTRAL_DOC_TITLE_EXCLUDE_RE = re.compile(
+    r"解读|答记者问|图表|图解|新闻发布会|新闻发言人|吹风会|部门网站|地方政府网站"
+)
+# gov.cn 文件真实路径：中央文件 /zhengce/YYYYMM/content_x.htm、国务院文件
+# /zhengce/content/YYYYMM/content_x.htm（页脚 /home/ 路径由此滤除）
+_CENTRAL_DOC_URL_RE = re.compile(r"/zhengce/(?:content/)?20\d{4}/content_\d+\.htm$")
+
+
+def _is_central_doc_title(title: str) -> bool:
+    """文件形态标题判定（全领域文件源用，不做主题词过滤）。"""
+    t = (title or "").strip()
+    if _CENTRAL_DOC_TITLE_EXCLUDE_RE.search(t):
+        return False
+    return bool(_CENTRAL_DOC_TITLE_RE.search(t))
+
+
+def _cn_direct_session() -> requests.Session:
+    """中国站独立 Session：trust_env=False 直连 + 浏览器 UA（cac 同款教训：
+
+    本地走 env 代理会挂起、服务器走 mihomo 家宽出口易被 WAF 挡/超时——
+    2026-10-09 实测：cac/gov.cn 经代理 403~SSL EOF，api.thepaper.cn 经代理 ReadTimeout。
+    中央文件源（govcn/xinhua）、澎湃栏目 API、财新栏目页共用此通道。
+    """
+    s = requests.Session()
+    s.trust_env = False
+    s.headers.update({"User-Agent": BROWSER_UA, "Accept-Language": "zh-CN,zh;q=0.9"})
+    return s
+
+
+def fetch_govcn(session: requests.Session, now: datetime) -> list[RawItem]:
+    """中国政府网·政策 — 中央文件 + 国务院文件（2026-10-09 接入）。
+
+    /zhengce/ 频道首页列出最新政策文件（每条 li 内 span 带发布日期），中央文件与
+    国务院文件混排，同页另有政策解读/答记者问/图表 → 只收文件形态标题。
+    实测从服务器（新加坡）直连 200 / ~100ms，无需代理。
+    """
+    items: list[RawItem] = []
+    try:
+        s = _cn_direct_session()
+        r = s.get("https://www.gov.cn/zhengce/", timeout=(5, 20))
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding or "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        seen: set[str] = set()
+        for a in soup.find_all("a", href=True):
+            href = (a.get("href") or "").strip()
+            if not re.search(r"content_\d+\.htm$", href):
+                continue
+            url = urljoin("https://www.gov.cn/zhengce/", href)
+            if not _CENTRAL_DOC_URL_RE.search(url):
+                continue
+            title = a.get_text(strip=True)
+            if not _is_central_doc_title(title):
+                continue
+            if url in seen:
+                continue
+            seen.add(url)
+            li = a.find_parent("li")
+            pub = _list_item_date(li) if li is not None else None
+            items.append(RawItem(
+                site_id="govcn", site_name="中国政府网",
+                source="政策文件",
+                title=title, url=url,
+                published_at=parse_date_only(pub),
+            ))
+    except Exception:
+        pass
+    return items[:80]
+
+
+def fetch_xinhua(session: requests.Session, now: datetime) -> list[RawItem]:
+    """新华社·受权发布 — 中央文件首发渠道（2026-10-09 接入）。
+
+    news.cn/politics/zywj/index.htm 是受权发布栏目（⚠️ 不带 index.htm 的 /zywj/
+    是 2023 静态残留页，实测返回 2023 年条目，勿用）。链接形如
+    /politics/zywj/YYYYMMDD/<hash>/c.html → 发布日期直接取 URL 日期段。
+    栏目内另有答记者问/解读稿 → 只收文件形态标题（实测 16 条链接 → 10 条文件）。
+    """
+    items: list[RawItem] = []
+    try:
+        s = _cn_direct_session()
+        r = s.get("https://www.news.cn/politics/zywj/index.htm", timeout=(5, 20))
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding or "utf-8"
+        soup = BeautifulSoup(r.text, "html.parser")
+        seen: set[str] = set()
+        for a in soup.find_all("a", href=True):
+            href = (a.get("href") or "").strip()
+            m = re.search(r"/zywj/(20\d{2})(\d{2})(\d{2})/", href)
+            if not m:
+                continue
+            title = a.get_text(strip=True)
+            if not _is_central_doc_title(title):
+                continue
+            url = urljoin("https://www.news.cn", href)
+            if url in seen:
+                continue
+            seen.add(url)
+            items.append(RawItem(
+                site_id="xinhua", site_name="新华社·受权发布",
+                source="受权发布",
+                title=title, url=url,
+                published_at=parse_date_only(f"{m.group(1)}-{m.group(2)}-{m.group(3)}"),
+            ))
+    except Exception:
+        pass
+    return items[:80]
 
 
 def fetch_mee(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1034,6 +1190,15 @@ _NAV_JUNK_TITLE_RE = re.compile(
     r"national hurricane center\b.*|climate prediction center\b.*)\s*$",
     re.IGNORECASE,
 )
+
+
+def _cap_summary(s: str) -> str:
+    """摘要长度上限（2026-10-12 膨胀事故护栏）：防异常值把 md frontmatter / data JSON 撑爆。
+
+    与 export_qmd.SUMMARY_MAX_CHARS 保持一致；正常摘要 50-300 字，2000 字只拦 runaway。
+    """
+    s = s or ""
+    return s if len(s) <= SUMMARY_MAX_CHARS else s[:SUMMARY_MAX_CHARS] + "…"
 
 
 def _clean_summary(raw: str) -> str:
@@ -1545,24 +1710,63 @@ def fetch_goldman(session: requests.Session, now: datetime) -> list[RawItem]:
 
 
 # ── 中国 P0 扩容（2026-08-19 第四轮：财新双碳/国家节能中心/澎湃） ──
+# 2026-10-09 老温裁定：财新/澎湃**改抓站点自有栏目**，弃 Google News 绿色词查询
+# （原方案查询词命中是前置条件 + 抓回后还要过标题级绿色词门控 = 双重收窄，覆盖不全）。
+# 栏目本身即绿色/能源主题 → is_policy_relevant 走 GREEN_SITES 直通（见该表注释）。
+# 代价（已知）：站内**其它栏目**的绿色报道不再覆盖（如澎湃时事/财经频道的零散绿色稿），
+# 若需并跑（栏目 ∪ 查询）把 query 列表加回即可。
 
 def fetch_caixin(session: requests.Session, now: datetime) -> list[RawItem]:
-    """财新网 — 双碳/绿色金融/能源（2026-08-19 接入）。
+    """财新网 — 能源频道 + 环科·环境栏目（2026-08-19 接入，2026-10-09 改自有栏目）。
 
-    双碳专栏博客是 JS SPA（HTML 空壳、无 RSS）→ Google News 搜 site:caixin.com
-    中文绿色词（实测 21 条/7d：油气十五五规划/碳市场扩围/再生铜，质量高）。
-    ⚠️ 英文 query 会被成人站污染（site:caixin.com 的 en query 返回垃圾）→ 只用 zh-CN。
+    直抓栏目页主列表容器 `div.conlf`（每页 ~25 条去重后条目，随轮次滚动）：
+      · https://www.caixin.com/energy/           能源频道
+      · https://science.caixin.com/environment/  环科频道·环境栏目
+    ⚠️ energy.caixin.com「无所不能」是**旧能源频道、已停更**（页面文章停在 2014 年），
+       现役能源频道在 www.caixin.com/energy/（2026-10-09 实测确认）。
+    ⚠️ 每条文章在列表里有「图片链（无文字）+ 标题链」两份 → 只取有标题的；
+       按栏目自身域名过滤（环境页混入 2 条 china.caixin.com 侧栏）。
+    ⚠️ **列表页免费、正文有收费墙**（#Main_Content_Val 后接 #chargeWall，未订阅仅得导语
+       ~300 字）→ 财新定位为线索/索引源，素材正文=导语。
+    直连可用（服务器实测 26ms）。
     """
-    return fetch_foreign_gov(session, now, "caixin", "财新", [
-        "site:caixin.com 碳 when:7d",
-        "site:caixin.com 双碳 when:7d",
-        "site:caixin.com 碳中和 when:7d",
-        "site:caixin.com 碳市场 when:7d",
-        "site:caixin.com 绿色金融 when:7d",
-        "site:caixin.com 能源 when:7d",
-        "site:caixin.com 环保 when:7d",
-        "site:caixin.com 排放 when:7d",
-    ], locale="zh-CN")
+    sources = [
+        ("https://www.caixin.com/energy/", "energy", "能源频道"),
+        ("https://science.caixin.com/environment/", "environment", "环科·环境"),
+    ]
+    items: list[RawItem] = []
+    s = _cn_direct_session()
+    for url, _key, source in sources:
+        try:
+            r = s.get(url, timeout=(8, 25))
+            r.raise_for_status()
+            r.encoding = r.apparent_encoding or "utf-8"
+        except Exception:
+            continue
+        soup = BeautifulSoup(r.text, "html.parser")
+        host = urlparse(url).netloc
+        container = soup.select_one("div.conlf") or soup
+        seen: set[str] = set()
+        for a in container.find_all("a", href=True):
+            href = (a.get("href") or "").strip()
+            if not re.search(r"/\d{4}-\d{2}-\d{2}/\d+\.html$", href):
+                continue
+            if not href.startswith("http"):
+                href = urljoin(url, href)
+            if urlparse(href).netloc != host:
+                continue  # 只留本栏目自身域
+            title = a.get_text(strip=True)
+            if len(title) < 8 or href in seen:
+                continue
+            seen.add(href)
+            m = re.search(r"/(20\d{2}-\d{2}-\d{2})/", href)
+            items.append(RawItem(
+                site_id="caixin", site_name="财新",
+                source=source,
+                title=title, url=href,
+                published_at=parse_date_only(m.group(1) if m else None),
+            ))
+    return items[:80]
 
 
 def fetch_chinanecc(session: requests.Session, now: datetime) -> list[RawItem]:
@@ -1601,23 +1805,54 @@ def fetch_chinanecc(session: requests.Session, now: datetime) -> list[RawItem]:
 
 
 def fetch_thepaper(session: requests.Session, now: datetime) -> list[RawItem]:
-    """澎湃新闻 — 绿政/能源/AI 报道（2026-08-19 接入）。
+    """澎湃新闻 — 绿政公署（环境与公共健康调查）+ 能见度（能源）栏目。
 
-    首页 JS 加载 → Google News 搜 site 中文绿色词（实测：上海港绿色甲醇/
-    非洲贸易绿色化/绿色算力，质量高）。版图综合媒体 P1（绿政公署栏目）。
+    2026-08-19 接入时用 Google News 搜 site:thepaper.cn 中文绿色词；2026-10-09 老温裁定
+    改抓站点自有栏目（查询词命中前置 + 标题级门控双重收窄 → 覆盖不全）。
+    端点：POST api.thepaper.cn/contentapi/nodeCont/getByNodeId
+      ⚠️ 栏目是 **node 不是 channel**：绿政公署 /channel_25425 是兜底页，
+         getByChannelId{"channelId":25425} 返回「频道不存在」→ 必须 getByNodeId。
+      ⚠️ 必须直连（trust_env=False）：服务器经 mihomo 家宽代理访问 api.thepaper.cn
+         会 ReadTimeout（实测）。
+      ⚠️ 响应 link 字段为空 → 文章 URL 自拼 newsDetail_forward_<contId>。
+    字段：name=标题、publishTime='YYYY-MM-DD HH:MM:SS'（北京时间绝对时间）。
+    实测：绿政公署 ~6 条/日（厄尔尼诺/国家气候中心/红树林…），能见度（能源）更活跃。
     """
-    return fetch_foreign_gov(session, now, "thepaper", "澎湃新闻", [
-        "site:thepaper.cn 绿色 when:7d",
-        "site:thepaper.cn 低碳 when:7d",
-        "site:thepaper.cn 双碳 when:7d",
-        "site:thepaper.cn 碳市场 when:7d",
-        "site:thepaper.cn 能源 when:7d",
-        "site:thepaper.cn 环保 when:7d",
-        "site:thepaper.cn 碳中和 when:7d",
-        "site:thepaper.cn 储能 when:7d",
-        "site:thepaper.cn 新能源 when:7d",
-        "site:thepaper.cn 排放 when:7d",
-    ], locale="zh-CN")
+    nodes = [(25425, "绿政公署"), (25436, "能见度")]
+    items: list[RawItem] = []
+    for node_id, node_name in nodes:
+        try:
+            s = _cn_direct_session()
+            s.headers["Content-Type"] = "application/json"
+            r = s.post("https://api.thepaper.cn/contentapi/nodeCont/getByNodeId",
+                       json={"nodeId": node_id, "pageSize": 20, "startTime": 0},
+                       timeout=(8, 25))
+            r.raise_for_status()
+            data = (r.json() or {}).get("data") or {}
+        except Exception:
+            continue
+        for it in data.get("list") or []:
+            title = (it.get("name") or "").strip()
+            cont_id = str(it.get("contId") or "").strip()
+            if len(title) < 8 or not cont_id.isdigit():
+                continue
+            published = None
+            m = re.match(r"(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})",
+                         (it.get("publishTime") or "").strip())
+            if m:
+                try:
+                    published = datetime(*[int(x) for x in m.groups()],
+                                         tzinfo=timezone(timedelta(hours=8)))
+                except Exception:
+                    published = None
+            items.append(RawItem(
+                site_id="thepaper", site_name="澎湃新闻",
+                source=node_name,
+                title=title,
+                url=f"https://www.thepaper.cn/newsDetail_forward_{cont_id}",
+                published_at=published,
+            ))
+    return items[:60]
 
 
 # ── AI 维度扩容（2026-08-19 第四轮：Artificial Analysis/36氪/虎嗅） ──
@@ -2818,6 +3053,8 @@ def score_content_strength(sub_dimension: str, title: str, summary: str) -> int:
 SOURCE_SCORE: dict[str, int] = {
     # 部委官方（20 分）
     "ndrc": 20, "mee": 20, "nea": 20, "miit": 20, "cac": 20,
+    # 党中央/国务院文件官方首发源（2026-10-09 接入：20 为现有最高档，中央文件同档）
+    "govcn": 20, "xinhua": 20,
     # 国外主要国家政策源（2026-08-14 新增：官方部委档）
     "us_epa": 20, "us_doe": 20, "eu_commission": 20,
     "euractiv": 16, "india_pib": 20,
@@ -3592,6 +3829,17 @@ GREEN_SITES = {
     "chinanecc",
 }
 
+# 党中央/国务院文件官方首发源（2026-10-09 接入）——**全领域收集**（老温裁定），
+# 不做绿色/AI 主题词过滤：中央/国务院级文件级别分量足够，主题相关分由 score_topic
+# 自然区分（非绿色文件拿低主题分、不抢榜，但入政策库留档）。
+# 与 GREEN_SITES 分开命名是为语义准确：这里不是"整站绿色"，而是"整站高权威文件"。
+CENTRAL_DOC_SITES = {"govcn", "xinhua"}
+
+# 栏目化抓取的媒体源（2026-10-09 老温裁定「改抓站点自身栏目」）——抓取范围即绿色/能源
+# 栏目本身，故直通标题级绿色词门控（否则栏目内标题不含绿色词的稿件会被误杀，
+# 2026-10-08 那类「国家气候中心：超强厄尔尼诺已经形成」就是典型）。
+COLUMN_SCOPED_SITES = {"thepaper", "caixin"}
+
 # 低频源宽窗口（2026-08-14）：国外官方源 + 中国智库型机构（NCSC/CAEP），
 # 更新频率低（周级/月级），网站数据用 7 天宽窗口过滤，其余源保持 96h
 FOREIGN_GOV_SITES = {
@@ -3709,6 +3957,14 @@ def is_policy_relevant(title: str, url: str = "", site_id: str = "", summary: st
     # Auto-pass for known green sites
     if site_id in GREEN_SITES:
         return True
+    # 党中央/国务院文件首发源（2026-10-09）：全领域收集，标题不含绿色词也放行
+    # （抓取端已按「文件形态」过滤掉同页的政策解读/答记者问/图表）
+    if site_id in CENTRAL_DOC_SITES:
+        return True
+    # 栏目化抓取的媒体源（2026-10-09：澎湃绿政公署/能见度、财新能源/环境）——栏目本身
+    # 即绿色/能源范围，直通（不再要求标题含绿色词）
+    if site_id in COLUMN_SCOPED_SITES:
+        return True
     # AI 领域全链条源（2026-08-14）：理论/模型/市场/商业全通过
     if site_id in AI_SITES:
         return True
@@ -3798,6 +4054,9 @@ BUILTIN_SOURCES: list[tuple[Any, str, str]] = [
     (fetch_nea, "nea", "国家能源局"),
     (fetch_miit, "miit", "工信部"),
     (fetch_cac, "cac", "中央网信办"),
+    # 党中央/国务院文件官方首发源（2026-10-09 接入：中央文件首发渠道缺失修复）
+    (fetch_govcn, "govcn", "中国政府网"),
+    (fetch_xinhua, "xinhua", "新华社·受权发布"),
     # ── 国外主要国家政策源（2026-08-14 新增：Google News 搜 site） ──
     (fetch_us_epa, "us_epa", "美国EPA"),
     (fetch_us_doe, "us_doe", "美国DOE"),
@@ -3903,6 +4162,9 @@ SITE_LAYOUT: dict[str, tuple[str, str]] = {
     "ndrc":       ("policy", "中国"),
     "mee":        ("policy", "中国"),
     "cac":        ("policy", "中国"),
+    # 党中央/国务院文件首发源（2026-10-09 接入；素材库落 政策/中国/中国政府网|新华社·受权发布）
+    "govcn":      ("policy", "中国"),
+    "xinhua":     ("policy", "中国"),
     "mee_jiedu":  ("policy", "中国"),
     "nea":        ("policy", "中国"),
     "miit":       ("policy", "中国"),
@@ -4106,7 +4368,7 @@ def merge_history(output_dir: Path, new_items: list[dict], now: datetime) -> Non
         # 历史条目摘要统一清洗（2026-08-23：国家节能中心/上海环交所等旧条目
         # summary 残留页脚垃圾词——清洗逻辑后来增强过，旧数据未重洗）
         if it.get("summary"):
-            _s = _clean_summary(it["summary"])
+            _s = _cap_summary(_clean_summary(it["summary"]))
             if _s != it["summary"]:
                 it["summary"] = _s
     _missing_zh = [it for it in items
@@ -4466,7 +4728,9 @@ def main() -> int:
     with ThreadPoolExecutor(max_workers=6) as ex:
         futures: dict[Any, tuple[str, str]] = {}
         for func, site_id, site_name in BUILTIN_SOURCES:
-            futures[ex.submit(func, session, now)] = (site_id, site_name)
+            # 默认直连 session；点名源走 env 代理（见 _PROXY_FEED_SITES 注释）
+            _sess = proxy_session() if site_id in _PROXY_FEED_SITES else session
+            futures[ex.submit(func, _sess, now)] = (site_id, site_name)
 
         opml_future = None
         if args.rss_opml:
@@ -4562,7 +4826,7 @@ def main() -> int:
         # 覆盖各 fetch 函数未单独清理的 Google News RSS 源（2026-08-18）
         clean_title = _strip_title_suffix(raw.title)
         # 统一清洗摘要：unescape + 去模板变量（QA 2026-08-21：X 平台 &amp;、中国环境报 {{content.*}}）
-        clean_summary = _clean_summary(raw.meta.get("summary", ""))
+        clean_summary = _cap_summary(_clean_summary(raw.meta.get("summary", "")))
         record = {
             "id": tid,
             "site_id": raw.site_id,
@@ -4678,8 +4942,22 @@ def main() -> int:
             pass
 
     def _archived_to_iso(pub: str) -> str:
-        if " " in pub:
-            return pub.replace(" ", "T") + "+08:00"
+        """笔记 frontmatter 的 published 值 → ISO。
+
+        2026-10-12 修复（膨胀事故）：原实现只判 `" " in pub`，date-only 时追加
+        `T00:00:00+08:00`。但回读进来的值往往已是上一轮写下的 ISO（如
+        `2026-10-10T00:00:00+08:00`）——不含空格 → 被当成 date-only 再追加一次，
+        一轮回写一段，实测 published_at 累积 24 段 `T00:00:00+08:00`。
+        现在：已带时间（含 "T"）的一律原样返回。
+        """
+        pub = (pub or "").strip()
+        if not pub:
+            return pub
+        if "T" in pub:                      # 已是 ISO（含 dateTtime / 带 Z / 带时区）
+            return pub
+        if " " in pub:                      # "YYYY-MM-DD HH:MM" 老格式
+            v = pub.replace(" ", "T")
+            return v if ("+" in v[10:] or v.endswith("Z")) else v + "+08:00"
         return pub + "T00:00:00+08:00"  # date-only → midnight Beijing
 
     # NOTE: green_items shares the same dict objects as all_items, so this
@@ -4717,7 +4995,7 @@ def main() -> int:
             if summary:
                 # 2026-08-23：回填摘要也要过 _clean_summary（历史存的旧摘要
                 # 可能残留"打印本页/关闭窗口"等页脚垃圾词——QA B2 实测）
-                rec["summary"] = _clean_summary(summary)
+                rec["summary"] = _cap_summary(_clean_summary(summary))
         if not rec.get("published_at"):
             if rec.get("url") in archived_pub:
                 rec["published_at"] = _archived_to_iso(archived_pub[rec["url"]])
@@ -4973,6 +5251,7 @@ def person_role(name: str) -> str:
 # Source → default region mapping
 SOURCE_REGION: dict[str, str] = {
     "ndrc": "中国", "nea": "中国", "mee": "中国", "mee_jiedu": "中国", "miit": "中国", "cac": "中国",
+    "govcn": "中国", "xinhua": "中国",  # 党中央/国务院文件首发源（2026-10-09）
     # 国外主要国家政策源（2026-08-14 新增）
     "us_epa": "美国", "us_doe": "美国", "eu_commission": "欧盟",
     "euractiv": "欧盟", "india_pib": "印度",
@@ -5299,11 +5578,22 @@ def load_archived_titles(base_dir_str: str) -> dict[str, str]:
     return mapping
 
 
+def _yaml_unscalar(raw: str) -> str:
+    """（薄封装）frontmatter 双引号标量反转义 —— 实现见 export_qmd.yaml_unscalar。
+
+    2026-10-12 膨胀事故修复：读侧原来不回反转义，写入侧每轮转义一次 → 含反斜杠的
+    摘要每轮翻一倍。延迟导入避免与 export_qmd 循环依赖。
+    """
+    from export_qmd import yaml_unscalar
+    return yaml_unscalar(raw)
+
+
 def load_archived_summaries(base_dir_str: str) -> dict[str, str]:
-    """Map url -> summary from existing notes' frontmatter (政策库 + 媒体库).
+    """Map url -> summary from existing notes' frontmatter (素材库).
 
     2026-08-14 新增：首页学 News Minimalist 做「可展开摘要」，需要把笔记里的
     summary 同步进 JSON（前端无需再抓正文）。
+    2026-10-12：回读走 `_yaml_unscalar` 反转义 + 长度上限（见该函数与膨胀事故复盘）。
     """
     mapping: dict[str, str] = {}
     notes_root = Path(base_dir_str) / "Notes"
@@ -5315,10 +5605,10 @@ def load_archived_summaries(base_dir_str: str) -> dict[str, str]:
         try:
             content = p.read_text(encoding="utf-8")
             um = re.search(r'^url:\s*"?([^"\n]+)"?\s*$', content, re.M)
-            sm = re.search(r'^summary:\s*"?(.+?)"?\s*$', content, re.M)
+            sm = re.search(r'^summary:\s*(.+?)\s*$', content, re.M)
             if not um or not sm:
                 continue
-            summary = sm.group(1).strip().rstrip('"')
+            summary = _yaml_unscalar(sm.group(1))[:SUMMARY_MAX_CHARS]
             if summary and len(summary) > 8:
                 mapping[um.group(1).strip()] = summary
         except Exception:
