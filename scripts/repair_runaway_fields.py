@@ -209,7 +209,11 @@ def repair_vault(apply: bool) -> list[str]:
         changed = False
         with open(p, "rb") as fh:
             for raw in fh:
-                line = raw[:-1] if raw.endswith(b"\n") else raw
+                # 保留原行尾（CRLF 文件只改内容不换行尾 —— 2026-10-12 踩坑：
+                # 首版用 read_text() 读（universal newlines 会把 CRLF 归一成 LF），
+                # 写回后整库行尾漂移、git diff 变成整文件改动）
+                eol = b"\r\n" if raw.endswith(b"\r\n") else b"\n"
+                line = raw[:-len(eol)] if raw.endswith(eol) else raw
                 if line.startswith(FM_SUMMARY):
                     val = line[len(FM_SUMMARY):].strip()
                     new, ch = _fix_summary_value(val)
@@ -241,7 +245,7 @@ def repair_vault(apply: bool) -> list[str]:
                             n_body += 1
                             changed = True
                             line = new
-                lines.append(line)
+                lines.append(line + eol)
         if not changed:
             continue
         n_files += 1
@@ -249,7 +253,7 @@ def repair_vault(apply: bool) -> list[str]:
         if apply:
             _backup(p, MATERIAL)
             with open(p, "wb") as fh:
-                fh.write(b"\n".join(lines) + b"\n")
+                fh.write(b"".join(lines))
     biggest.sort(reverse=True)
     out = [f"  素材库 md：改文件 {n_files}（frontmatter summary {n_sum}｜published {n_pub}｜正文超长行 {n_body}）"
            + ("" if apply else "（dry-run）")]
