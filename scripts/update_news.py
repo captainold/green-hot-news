@@ -1243,6 +1243,31 @@ def _is_nav_junk_title(title_clean: str) -> bool:
     return bool(_NAV_JUNK_TITLE_RE.match(title_clean.strip()))
 
 
+# 成人内容/垃圾视频类标题硬拦截（2026-10-12 色情寄生虫 SEO 事故，见
+# docs/todo/ 事故复盘）。事故链：垃圾发布者把色情 PDF 传到高权威域名的用户上传
+# 目录（实测 education-for-climate.ec.europa.eu/system/files/2026-10/*.pdf ——
+# 欧盟气候教育联盟社区平台），Google News 把该文件当"文章"收录 → 沿
+# `site:ec.europa.eu <绿词> when:7d` 查询进入管道。而 eu_commission 等 GREEN_SITES
+# 源是整站直通（is_policy_relevant 恒 True），抓取端只挡短标题/导航碎片/纯日期
+# 三种形态 → 垃圾标题原样入库、打分 47~59、上网站、还被翻成中文。
+# 本名单**优先于一切直通白名单**硬拒（先例：ALLNET_BLOCK_WORDS 之于全网热点）。
+# 词表按类别词收录，刻意不收的：单字 "adult"（EPALE "Adult Learning" 会误杀）、
+# "casino"（EPA 公告 Grand Casino Hinckley 会误杀）、单字 "sex"（社会学
+# "sex-disaggregated" 会误杀）—— 成人词一律要求与 video/clip 同现或为平台名。
+_SPAM_JUNK_TITLE_RE = re.compile(
+    r"porn|xnxx|xhamster|xvideos|pornhub|brazzers|redtube|onlyfans|bokep|ullu|"
+    r"mature audience|adult video|\bxxx+\b|\bsex[\s~_+\-]*videos?|"
+    # 中文侧：成人内容整治类新闻本身也非本雷达主题，误杀可接受
+    r"色情|成人视频|成人影片|成人片|情色|性爱视频|裸聊|援交|约炮|招嫖|黄色网站",
+    re.IGNORECASE,
+)
+
+
+def _is_spam_junk_title(title: str) -> bool:
+    """True if the title is adult/spam-video junk — 源无关的硬拒（不依赖站点评级）。"""
+    return bool(_SPAM_JUNK_TITLE_RE.search(title or ""))
+
+
 def fetch_foreign_gov(session: requests.Session, now: datetime, site_id: str, site_name: str, queries: list[str], limit: int = 20, locale: str = "en-US") -> list[RawItem]:
     """国外主要国家政策源 — Google News RSS 按站点搜索（2026-08-14 新增）。
 
@@ -4714,6 +4739,8 @@ NON_NEWS_PATTERNS: list[tuple[str, "re.Pattern[str]"]] = [
     ("表格残留", re.compile(r"(事業費の額|御中|別表|様式|交付金、補助金等)")),
     # ④ URL 当标题（gold 实测案例）
     ("URL标题", re.compile(r"^https?://")),
+    # ⑤ 文件名/文档标题（062902.pdf 类，S0-C 抽检顺带）
+    ("文件名", re.compile(r"(?i)^[^\s，。；：]{2,40}\.(pdf|docx?|xlsx?|pptx?|zip|csv)$")),
 ]
 
 
@@ -4798,6 +4825,26 @@ def main() -> int:
     seen_items: set[str] = set()  # 2026-08-19: 统一按规范化标题去重（见下）
     seen_title_prefix: dict[str, list[str]] = {}  # 2026-08-24: 前缀桶 → 已见标题（相似度去重候选）
     print(f"  抓取完成: {len(raw_items)} 条 raw（{sum(1 for s in source_statuses if s['ok'])}/{len(source_statuses)} 源 ok，耗时 {time.monotonic()-_t0:.0f}s）", flush=True)
+
+    # ── 垃圾标题硬拦截（2026-10-12 色情寄生虫 SEO 事故）─────────────────────
+    # 位置刻意选在翻译与打分之前：垃圾既不烧 TMT 翻译调用，也不进评分/网站/素材库，
+    # 且优先于 GREEN_SITES / CENTRAL_DOC_SITES 等一切直通白名单（见 _SPAM_JUNK_TITLE_RE）。
+    # 抓取端 item_count 保持原始条数，便于从 source-status 看出上游污染量。
+    _spam_dropped: dict[str, list[str]] = {}
+    _kept_raw: list[RawItem] = []
+    for _raw in raw_items:
+        if _is_spam_junk_title(_raw.title):
+            _spam_dropped.setdefault(_raw.site_id, []).append(_raw.title)
+            continue
+        _kept_raw.append(_raw)
+    if _spam_dropped:
+        _n_spam = sum(len(v) for v in _spam_dropped.values())
+        _by_site = ", ".join(f"{k}:{len(v)}" for k, v in sorted(_spam_dropped.items()))
+        print(f"  🚫 垃圾标题硬拦截: {_n_spam} 条（{_by_site}）", flush=True)
+        for _sid, _ts in sorted(_spam_dropped.items()):
+            for _t in _ts[:3]:
+                print(f"      - [{_sid}] {_t[:70]}", flush=True)
+    raw_items = _kept_raw
 
     all_items: list[dict[str, Any]] = []
     green_items: list[dict[str, Any]] = []

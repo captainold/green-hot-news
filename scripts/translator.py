@@ -288,6 +288,35 @@ def _save_cache() -> None:
         pass
 
 
+# ── 译文后置清洗（S0-C，2026-10-12 老温批可）──────────────────────────────
+# 背景（存量 4,897 条 title_zh 全量抽检）：主要两类问题——
+#  ① 同文回显：TMT 对无译义文本（文件名 062902.pdf / 纯专名 eLibrary / 日语公文）
+#     原样返回，落库成了"翻译"（28 条实测）→ 视为失败：不落库不缓存，前端回落原文；
+#  ② 尾部串残：来源名/栏目名尾巴（"… | 企业欧洲网络"、"- Prothom Alo English"，
+#     52 条实测）→ 精确剥离（pipe 尾 ≤20 字且无句末标点；dash 尾限拉丁且 ≥4 字符）。
+# 说明：拉丁连续词多为专有名词合理保留（人名/公司/产品），**不处理**。
+_ZH_TAIL_PIPE_RE = re.compile(r"\s*[|｜]\s*([^|｜]{1,20})$")
+_ZH_TAIL_DASH_RE = re.compile(r"\s*[-–—]\s*([A-Za-z][A-Za-z0-9 .,&'’()\-]{3,50})$")
+_SENT_END = ("。", "！", "？", "!", "?", "；", ";")
+
+
+def clean_zh_output(src_clean: str, out: str) -> Optional[str]:
+    """译文后置清洗：同文回显 → None（判失败）；尾部串残 → 剥离后返回。"""
+    z = (out or "").strip()
+    if not z:
+        return None
+    if z == (src_clean or "").strip():
+        return None                      # 同文回显 = 实际未翻译
+    m = _ZH_TAIL_PIPE_RE.search(z)
+    if m and not m.group(1).rstrip().endswith(_SENT_END):
+        z = z[:m.start()].rstrip()
+    m = _ZH_TAIL_DASH_RE.search(z)
+    if m:
+        z = z[:m.start()].rstrip()
+    z = re.sub(r"\s{2,}", " ", z).strip()
+    return z or None
+
+
 def translate_title(title: str, use_cache: bool = True) -> Optional[str]:
     """翻译标题；非中文才翻译，失败/已中文返回 None。
 
@@ -303,10 +332,13 @@ def translate_title(title: str, use_cache: bool = True) -> Optional[str]:
     if use_cache:
         cache = _load_cache()
         if t in cache:
-            return cache[t]
+            return clean_zh_output(clean, cache[t])   # 旧缓存串残在读路径同样清洗
     out = translate_text(clean)
-    if out:
-        _cache[t] = out
+    if not out:
+        return None
+    cleaned = clean_zh_output(clean, out)
+    if cleaned:
+        _cache[t] = cleaned                           # 只缓存有效译文（回显不落缓存）
         if use_cache:
             _save_cache()
-    return out
+    return cleaned
